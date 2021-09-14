@@ -1,0 +1,164 @@
+// Table align middle
+.table-align-middle {
+  th,
+  td {
+    vertical-align: middle !important;
+  }
+}
+
+// Table text center
+.table-text-center {
+  th,
+  td {
+    text-align: center;
+  }
+}
+
+// fit to content for td or th tag
+.table-nostretch th,
+.table-nostretch td,
+.nostretch {
+  width: 1%;
+  white-space: nowrap;
+}
+
+@each $color, $value in $theme-colors {
+  @if $color != 'dark' and $color != 'light' {
+    .thead-#{$color} {
+      background-color: theme-color-level($color, $table-bg-level);
+      .table & th {
+        border-color: theme-color-level($color, $table-border-level);
+      }
+    }
+    .table-#{$color} {
+      thead {
+        background-color: $value;
+        @if $color != 'warning' {
+          color: theme-color-level($color, $table-bg-level);
+        }
+      }
+    }
+  }
+}
+
+.column-filter > th {
+  vertical-align: middle !important;
+  font-weight: normal;
+  padding-right: $table-cell-padding !important;
+  .table-sm & {
+    padding-right: $table-cell-padding-sm !important;
+  }
+}
+.has-checkAll {
+  > thead > tr:last-child > th:first-child,
+  > tbody > tr:not(.detail-row) > td:first-child {
+    width: 31px;
+    text-align: center;
+  }
+}
+.detail-toggle {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  text-decoration: none !important;
+  font-size: 24px;
+  line-height: 1;
+  &::before {
+    content: '\e148'; // add_circle_outline
+    font-family: 'Material Icons';
+  }
+  &[aria-expanded="true"]::before {
+    content: '\e15d'; // remove_circle_outline
+  }
+  &:focus {
+    outline: 0;
+  }
+}
+.detail-row {
+  transition: none;
+  background-color: $table-accent-bg;
+  &.show > td {
+    border-top-width: 2px;
+  }
+  &:hover {
+    background-color: $table-accent-bg !important;
+  }
+}
+ul.data-detail {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  > li {
+    padding: 0.1em 0;
+    font-size: 90%;
+  }
+  span:first-child {
+    display: inline-block;
+    min-width: 75px;
+    font-weight: $font-weight-bold;
+  }
+}
+a.sorting {
+  position: relative;
+  display: block;
+  padding-right: 16px;
+  color: $table-color;
+  &:hover {
+    text-decoration: none;
+  }
+  &::before,
+  &::after {
+    position: absolute;
+    top: calc(50% - 11px);
+    opacity: 0.3;
+  }
+  &::before {
+    content: "\2191";
+    right: 7px;
+  }
+  &::after {
+    content: "\2193";
+    right: 0;
+  }
+  &.asc::before {
+    opacity: 1;
+  }
+  &.desc::after {
+    opacity: 1;
+  }
+  .thead-dark & {
+    color: #fff;
+  }
+}
+
+.table-form {
+  > tbody > tr {
+    > td:nth-child(odd) {
+      background-color: $table-active-bg;
+      vertical-align: middle;
+      width: 1%;
+      white-space: nowrap;
+      text-align: right;
+      padding-left: 1rem;
+      padding-top: 0;
+      padding-bottom: 0;
+      > label {
+        display: block;
+        margin-bottom: 0;
+        font-size: .875em;
+      }
+    }
+    > td:nth-child(even) {
+      padding: 0;
+      > .form-control,
+      > .custom-select {
+        border: 0;
+      }
+      > .custom-file label {
+        border-color: transparent;
+      }
+    }
+  }
+}

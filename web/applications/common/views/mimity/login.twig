@@ -1,0 +1,104 @@
+<div class="row justify-content-center mb-3">
+    <div class="col-md-12 d-flex justify-content-center">
+        <div class="card shadow">
+            <div class="tab-content p-0">
+
+                <div class="tab-pane{% if login %} active show{% endif %}" id="id-tab-login">
+                    <div class="card-header bg-primary text-white flex-column">
+                        <h4 class="text-center mb-0">{{ _('LBL_WELCOME') }}</h4>
+                        <div class="text-center opacity-50 font-italic">{{ _('LBL_LOGIN') }}</div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- START Form -->
+                        {% if forms['login'].errors|length > 0 %}
+                            <div class="alert alert-accent alert-danger">
+                                {% for error in forms['login'].errors %}
+                                    <h6 class="mb-1 alert-heading">{{ _('ERR_' ~ error['code']) }}</h6>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <form class="mb-3" action="/login/" method="post">
+                            <input type="hidden" name="login[redirect]" value="{{ forms.login.values.redirect }}">
+                            <div class="form-group{% if forms.login.errors %} has-error{% endif %}">
+                                <div class="floating-label input-icon">
+                                    <i data-feather="mail" stroke-width="1"></i>
+                                    <input type="email" class="form-control" name="login[email]" value="{{ forms.login.values.email }}" id="emailAdress" aria-describedby="emailHelp" placeholder="{{ _('LBL_EMAIL') }}">
+                                    <label for="emailAdress">{{ _('LBL_EMAIL') }}</label>
+                                </div>
+                            </div>
+                            <div class="form-group{% if forms.login.errors %} has-error{% endif %}">
+                                <div class="floating-label input-icon">
+                                    <i data-feather="lock" stroke-width="1"></i>
+                                    <input type="password" class="form-control" name="login[password]" value="{{ forms.login.values.password }}" id="password" placeholder="{{ _('LBL_PASSWORD') }}">
+                                    <label for="password">{{ _('LBL_PASSWORD') }}</label>
+                                </div>
+                            </div>
+                            <div class="form-group text-right">
+                                <a href="/" class="text-primary small" data-toggle="tab" data-target="#id-tab-forgot">
+                                    {{ _('LBL_FORGOT_PASSWORD') }}
+                                </a>
+
+                            </div>
+                            <button type="submit" name="login[signin]" class="btn btn-primary btn-block">
+                                {{ _('BTN_SIGN_IN') }}
+                            </button>
+                        </form>
+                        <!-- END Form -->
+                    </div>
+                </div>
+
+
+                <div class="tab-pane{% if forgotpassword %} active show{% endif %}" id="id-tab-forgot" data-swipe-prev="#id-tab-login">
+                    <div class="card-header bg-primary text-white flex-column">
+                        <h4 class="text-center mb-0">{{ _('LBL_RECOVER_PASSWORD') }}</h4>
+                        <div class="text-center opacity-50 font-italic">{{ _('LBL_RECOVER_PASSWORD_INFO') }}</div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        {% if forms['forgotPassword'].errors|length > 0 %}
+                            <div class="alert alert-accent alert-danger">
+                                {% for error in forms['forgotPassword'].errors %}
+                                    <h6 class="mb-1 alert-heading">{{ _('ERR_' ~ error['code']) }}</h6>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if not success %}
+                            <form action="/login/" id="forgotpassword" method="post" autocomplete="off" class="mb-3">
+                                <div class="form-group{% if forms.forgotPassword.errors %} has-error{% endif %}">
+                                    <div class="form-group">
+                                        <div class="floating-label input-icon">
+                                            <i data-feather="mail" stroke-width="1"></i>
+                                            <input type="email" class="form-control" id="id-recover-email" name="forgotPassword[email]" value="{{ forms.forgotPassword.values.email }}" placeholder="{{ _('LBL_EMAIL') }}">
+                                            <label for="id-recover-email">{{ _('LBL_EMAIL') }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" name="forgotPassword[sendpwd]" class="btn btn-theme btn-primary btn-block">
+                                    {{ _('BTN_CONTINUE') }}
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-success alert-accent">
+                                <i class="fas fa-info-circle mr-2 text-success"></i>
+                                {{ _('LBL_RECOVER_PASSWORD_SENT') }}
+                            </div>
+                        {% endif %}
+
+                        <div class="text-right">
+                            <a href="/" data-toggle="tab" class="small" data-target="#id-tab-login">
+                                <i class="fas fa-chevron-left mr-1"></i>
+                                {{ _('LBL_BACK_TO_LOGIN') }}
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'copyright.twig' %}

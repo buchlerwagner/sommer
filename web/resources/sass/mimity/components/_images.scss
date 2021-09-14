@@ -1,0 +1,57 @@
+.img {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  margin: 0;
+  &.online::after,
+  &.offline::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    box-shadow: 0 0 0 2px #fff;
+  }
+  &.online::after {
+    background-color: #4cc065;
+  }
+  &.offline::after {
+    background-color: #ccc;
+  }
+}
+
+[data-cover] {
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.overlay,
+.overlay-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transition: opacity .3s ease;
+  opacity: 0;
+}
+.overlay {
+  z-index: 1;
+  .img:hover &,
+  &.overlay-show {
+    opacity: .5;
+  }
+}
+.overlay-content {
+  @include flex-center;
+  z-index: 2;
+  flex-direction: column;
+  .img:hover &,
+  &.overlay-show {
+    opacity: 1;
+  }
+}

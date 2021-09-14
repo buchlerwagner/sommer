@@ -1,0 +1,9 @@
+{% import "formBuilderMacros.twig" as self %}
+<div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}">
+    {% if element.getLabel %}
+    <a id="{{ element.getId }}" href="{{ element.getUrl }}" class="{{ element.getClass }}"{{ self.attributes(element.getAttributes) }}>
+        {{ self.icon(element) }}
+        {{ _(element.getLabel) }}
+    </a>
+    {% endif %}
+</div>

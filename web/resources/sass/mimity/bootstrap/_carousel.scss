@@ -1,0 +1,20 @@
+@if $enable-transitions != true {
+  .carousel-item {
+    transition: $carousel-transition;
+  }
+  .carousel-fade {
+    .active.carousel-item-left,
+    .active.carousel-item-right {
+      transition: opacity 0s $carousel-transition-duration;
+    }
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    transition: $carousel-control-transition;
+  }
+  .carousel-indicators {
+    li {
+      transition: $carousel-indicator-transition;
+    }
+  }
+}

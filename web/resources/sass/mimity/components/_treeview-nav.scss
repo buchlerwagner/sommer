@@ -1,0 +1,37 @@
+.nav.treeview {
+  flex-direction: column;
+  .nav {
+    flex-direction: column;
+  }
+
+  // Toggler
+  .treeview-toggle {
+    display: flex;
+    align-items: center;
+    &::after {
+      margin-left: auto;
+    }
+  }
+
+  // Icon
+  i, svg {
+    margin-right: $nav-link-padding-x;
+  }
+  svg {
+    width: 24px;
+  }
+
+  // Submenu
+  &:not(.treeview-folder) ul {
+    padding-left: $nav-link-padding-x;
+    a {
+      font-size: .9375rem;
+      padding-top: .25rem;
+      padding-bottom: .25rem;
+    }
+  }
+  .treeview-toggle.has-icon + ul {
+    padding-left: calc(#{$nav-link-padding-x} + #{$material-icons-size});
+  }
+}
+

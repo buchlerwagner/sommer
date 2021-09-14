@@ -1,0 +1,11 @@
+// Make gutters more compact by cutting default gutters padding in half
+.gutters-sm {
+  $gutter: ceil($grid-gutter-width / 4);
+  margin-right: -$gutter;
+  margin-left: -$gutter;
+  > .col,
+  > [class*="col-"] {
+    padding-right: $gutter;
+    padding-left: $gutter;
+  }
+}

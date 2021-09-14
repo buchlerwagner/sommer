@@ -1,0 +1,11 @@
+{% import "formBuilderMacros.twig" as self %}
+<div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}{% if element.hasError %} has-error{% endif %}">
+    {{ self.label(element) }}
+    {% if element.isReadonly %}
+        <div class="card">
+            <div class="card-body">{{ value|raw }}</div>
+        </div>
+    {% else %}
+        <textarea id="{{ element.getId }}" name="{{ formName }}[{{ element.getName }}]" class="htmleditor form-control{{ element.getClass }}"{% if element.isDisabled %} disabled{% endif %}{{ self.attributes(element.getAttributes) }}>{{ value }}</textarea>
+    {% endif %}
+</div>

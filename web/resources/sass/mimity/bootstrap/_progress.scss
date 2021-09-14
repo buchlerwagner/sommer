@@ -1,0 +1,22 @@
+.progress-bar-animated {
+  transform: translateZ(0); // Reduce cpu usage (https://stackoverflow.com/questions/34792969/bootstrap-progress-bar-animation-using-50-cpu)
+}
+// Enable transition
+@if $enable-transitions != true {
+  @keyframes progress-bar-stripes {
+    from { background-position: $progress-height 0; }
+    to { background-position: 0 0; }
+  }
+  .progress-bar {
+    transition: $progress-bar-transition;
+  }
+  .progress-bar-animated {
+    animation: progress-bar-stripes $progress-bar-animation-timing;
+
+    @if $enable-prefers-reduced-motion-media-query {
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+}

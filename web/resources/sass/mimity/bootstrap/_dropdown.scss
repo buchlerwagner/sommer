@@ -1,0 +1,8 @@
+@if $enable-shadows != true {
+  .dropdown-menu {
+    box-shadow: $dropdown-box-shadow;
+  }
+}
+.dropdown-item {
+  font-size: $font-size-sm;
+}

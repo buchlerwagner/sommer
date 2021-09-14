@@ -1,0 +1,97 @@
+{% import "form_elements" ~ constant('TWIG_FILE_EXTENSION') as form_elements %}
+<div class="card bcard">
+    <div class="card-body px-1 px-md-3">
+        {% if table.headerCaption %}
+            <div class="d-flex justify-content-between flex-column flex-sm-row mb-3 px-2 px-sm-0">
+                <h3 class="text-130 pl-1 mb-3 mb-sm-0 text-primary-d2">
+                    {{ table.headerCaption }}
+                </h3>
+            </div>
+        {% endif %}
+
+        <table id="table_{{ table.name }}" data-classname="{{ table.className }}" class="table table-striped table-bordered table-hover ibe-datatable" data-displaystart="{{ ((table.settings.page-1) * table.settings.display) }}" data-pagelength="{{ table.settings.display }}" data-globalsearch="{{ table.settings.global_filtervalue }}" data-class-name="{{ table.className }}" width="100%">
+            <thead>
+        {% set filters = false %}
+        {% for col in table.columns %}
+            {% if col.filter is not empty %}
+                {% set filters = true %}
+            {% endif %}
+        {% endfor %}
+        {% if filters %}
+                <tr class="datatable-filters">
+        {% for col in table.columns %}
+            {% if col.filter is not empty %}
+                    <th class="hasinput" data-column="{{ (loop.index-1) }}">
+                {% if col.filter is not iterable %}
+                        <input class="form-control" type="text" placeholder="{{ _(col.caption)|capitalize }}" value="{{ table.settings.filtervalues[ (loop.index-1) ] }}"{% if col.autocomplete %} autocomplete="{{ col.autocomplete }}"{% endif %}>
+                {% elseif col.filter.type == 'checkbox' %}
+                        <div class="checkbox{% if table.settings.filtervalues[ colidx ] is empty %} state-disabled{% endif %}">
+                            <input type="checkbox" value="{{ table.settings.filtervalues[ colidx ] }}" {% if table.settings.filtervalues[ colidx ] == 'on' %} checked="checked"{% endif %} />
+                            <label></label>
+                        </div>
+                {% elseif col.filter.type == 'autocomplete' %}
+                        <div class="row">
+                            <div class="col-xs-12">
+                            {% set params = {'type' : 'text', 'id' : col.filter.id, 'name' : '', 'placeholder' : _(col.caption)|capitalize, 'data' : col.filter.data, 'class' : 'autocomplete'} %}
+                            {{ form_elements._input(params, table.settings.filtervalues[ colidx ]) }}
+                            </div>
+                        </div>
+                {% elseif col.filter.type == 'select' %}
+                        <select class="form-control">
+                            <option value=""></option>
+                    {% for opt_key, opt_val in col.filter.options %}
+                        {% if opt_val is iterable %}
+                            {% if opt_val.name is not empty %}
+                                <option value="{{ opt_key }}"{% if opt_val.class is not empty %} class="{{ opt_val.class }}"{% endif %}>{{ opt_val.name }}</option>
+                            {% else %}
+                                <optgroup label="{{ _(opt_key) }}">
+                                {% for opt_key2, opt_val2 in opt_val %}
+                                    <option value="{{ opt_key2 }}">{{ opt_val2 }}</option>
+                                {% endfor %}
+                                </optgroup>
+                            {% endif %}
+                        {% else %}
+                                <option value="{{ opt_key }}">{{ opt_val }}</option>
+                        {% endif %}
+                    {% endfor %}
+                        </select>
+                {% elseif col.filter.type == 'date' %}
+                    {{ form_elements._date(col.filter, table.settings.filtervalues[ colidx ]) }}
+                {% endif %}
+                    </th>
+            {% elseif col.type != 'hidden' %}
+                    <th>&nbsp;</th>
+            {% endif %}
+        {% endfor %}
+        {% if table.options %}
+                    <th>&nbsp;</th>
+        {% endif %}
+                </tr>
+        {% endif %}
+                <tr class="datatable-columns">
+        {% for col in table.columns %}
+            {% if col.type != 'hidden' %}
+                    <th{% if col.class %} class="{{ col.class }}"{% endif %} data-sortable="{{ col.sortable }}"{% if table.settings.orderfield == col.field %} data-direction="{{ table.settings.orderdir }}"{% endif %}>
+                        {{ _(col.caption)|capitalize }}
+                        {% if col.info is not empty %}<i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ _(col.info) }}"></i>{% endif %}
+                    </th>
+            {% endif %}
+        {% endfor %}
+        {% if table.options %}
+                    <th class="text-center">{{ _('LBL_OPTIONS')|capitalize }}</th>
+        {% endif %}
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    {% if table.buttons|length > 0 %}
+    <div class="card-footer">
+        <div class="panel-footer text-right">
+            {% for val1 in table.buttons %}
+                {{ form_elements.form_button(val1, table.name) }}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>

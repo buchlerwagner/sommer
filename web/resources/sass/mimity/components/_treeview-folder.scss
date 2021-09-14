@@ -1,0 +1,24 @@
+.treeview-folder {
+  ul {
+    position: relative;
+    &::before { // vertical dotted border
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(#{$nav-link-padding-x} + (#{$material-icons-size} / 2));
+      border-left: 1px dotted rgba(#000, .25);
+    }
+    > li > a {
+      position: relative;
+      &::before { // horizontal dotted folder
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: calc(#{$material-icons-size} / 2 * -1);
+        border-top: 1px dotted rgba(#000, .25);
+        width: calc((#{$material-icons-size} / 2) + (#{$nav-link-padding-x} / 2));
+      }
+    }
+  }
+}

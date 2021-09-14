@@ -1,0 +1,43 @@
+.bootstrap-touchspin {
+  .input-group-btn > .btn {
+    width: 2.5em;
+  }
+  .bs-touchspin-vertical {
+    margin-right: calc(35px - 1px);
+    + .input-group-append {
+      margin-right: 34px;
+      margin-left: -35px;
+    }
+  }
+  .input-group-btn-vertical {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    > .btn {
+      line-height: 1;
+      position: absolute !important;
+      right: 0;
+      width: 35px;
+      height: 50%;
+      padding: 0;
+      text-align: center;
+      top: inherit !important;
+    }
+    .bootstrap-touchspin-up {
+      top: 0;
+      height: calc(50% + 1px);
+      @if $enable-rounded {
+        border-radius: 0 $border-radius 0 0;
+      }
+      @include hover-focus {
+        z-index: 1; // bring to front
+      }
+    }
+    .bootstrap-touchspin-down {
+      bottom: 0;
+      @if $enable-rounded {
+        border-radius: 0 0 $border-radius 0;
+      }
+    }
+  }
+}

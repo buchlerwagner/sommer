@@ -1,0 +1,18 @@
+#ajaxloader {
+  position: fixed;
+  z-index: $zindex-modal + 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: url(../img/loading.svg);
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: top;
+  .sticky-navbar & {
+    background-position-y: 100px;
+  }
+}
+.alert-error-load pre {
+  margin-bottom: 0;
+}

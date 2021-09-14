@@ -1,0 +1,76 @@
+.note-editor.note-frame {
+  border-color: $border-color;
+  box-shadow: none;
+  .modal-header {
+    border-bottom-width: 1px;
+    align-items: center;
+  }
+  .modal-body {
+    overflow: auto !important;
+    scrollbar-width: thin;
+  }
+  .modal-footer {
+    border-top-width: 1px;
+    > p {
+      margin-bottom: 0;
+    }
+  }
+  &.focus {
+    border-color: $input-focus-border-color;
+  }
+  &.fullscreen {
+    border-radius: 0;
+    border: 0;
+  }
+}
+.card-header.note-toolbar {
+  display: block;
+  padding: 0 0 5px 5px;
+  border-top-left-radius: $border-radius;
+  border-top-right-radius: $border-radius;
+  .note-btn {
+    height: 31px;
+  }
+}
+.note-popover .popover-content {
+  border-radius: $border-radius;
+}
+.note-group-image-url {
+  overflow: unset !important;
+}
+.note-editor.note-frame .note-editing-area .note-editable {
+  scrollbar-width: thin;
+}
+.note-editor.note-frame .note-statusbar,
+.note-editor.note-airframe .note-statusbar {
+  border-color: $border-color;
+}
+textarea.summernote {
+  display: block !important;
+  height: 0;
+  padding: 0;
+  border: 0;
+  visibility: hidden;
+}
+// validation
+.was-validated {
+  textarea:invalid + .note-editor {
+    border-color: $danger;
+  }
+  textarea:valid + .note-editor {
+    border-color: $success;
+  }
+  .note-form-control:invalid,
+  .note-form-control:valid {
+    border-color: $input-border-color;
+    &:focus {
+      border-color: $input-focus-border-color;
+    }
+  }
+}
+textarea.is-invalid + .note-editor {
+  border-color: $danger;
+}
+textarea.is-valid + .note-editor {
+  border-color: $success;
+}

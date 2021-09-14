@@ -1,0 +1,4 @@
+.markdown-result table {
+  @extend .table;
+  @extend .table-bordered;
+}

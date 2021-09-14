@@ -1,0 +1,133 @@
+.nav-link {
+  color: $nav-link-color;
+  &.active {
+    color: $nav-link-active-color;
+  }
+  &.has-icon {
+    display: flex;
+    align-items: center;
+    > i[class^="fa"] {
+      font-size: 21px;
+      width: 1.15em;
+      text-align: center;
+    }
+  }
+  &.nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    > i[class^="fa"] {
+      font-size: 21px;
+    }
+  }
+  &.nav-link-img {
+    display: flex;
+    align-items: center;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    img {
+      width: 38px;
+      height: 38px;
+      border: 2px solid #fff;
+    }
+  }
+  .nav-tabs-simple & {
+    border-color: transparent !important;
+    background-color: transparent !important;
+    &.active {
+      box-shadow: 0 -2px 0 0 $component-active-bg inset;
+    }
+  }
+  .nav-circle & {
+    border-radius: 50%;
+  }
+  &.nav-link-faded {
+    $faded-primary: theme-color-level('primary', -11);
+    &:hover {
+      color: $component-active-bg;
+      background-color: $faded-primary;
+    }
+    &:focus {
+      outline: 0;
+    }
+    .nav .show > &,
+    .navbar-nav .show > &,
+    .nav-pills &.active,
+    &:active,
+    &.active {
+      color: darken($component-active-bg, 8%);
+      background-color: darken($faded-primary, 8%);
+    }
+  }
+}
+.nav-label {
+  margin-top: 1.5rem;
+  margin-bottom: .5rem;
+  font-size: 70%;
+  color: $text-muted;
+  padding-left: $nav-link-padding-x;
+  font-weight: 500;
+}
+.nav-notif {
+  .dropdown-menu {
+    overflow: hidden;
+    width: $nav-notif-width;
+  }
+}
+@include media-breakpoint-down(xs) {
+  .nav-notif .dropdown-menu {
+    position: fixed !important;
+    // top: $main-header-height - 6px;
+    top: $main-header-height - 0.125rem;
+    right: ($grid-gutter-width / 2) - 1px;
+    left: ($grid-gutter-width / 2) - 1px;
+    width: auto;
+    margin: 0;
+  }
+}
+.nav-section {
+  padding: 1rem;
+  position: sticky;
+  top: $main-header-height;
+  label {
+    font-size: $font-size-sm;
+    padding-left: $font-size-sm;
+  }
+  .nav-link {
+    font-size: $font-size-sm;
+    padding: 0.375rem 0.875rem;
+    &.active {
+      background-color: $gray-400;
+    }
+    &:focus {
+      outline: 0;
+    }
+  }
+}
+.tab-content:not(.card-body) {
+  padding: 1rem;
+  border-top-width: 0;
+  @if $enable-rounded {
+    @include border-bottom-radius($nav-tabs-border-radius);
+  }
+}
+@each $size, $length in $spacers {
+  @if $size != 0 {
+    .nav-gap-x-#{$size} {
+      > .nav-link + .nav-link:not(.nav-item),
+      > .nav-item + .nav-item {
+        margin-left: $length;
+      }
+    }
+    .nav-gap-y-#{$size} {
+      > .nav-link + .nav-link:not(.nav-item),
+      > .nav-item + .nav-item {
+        margin-top: $length;
+      }
+    }
+  }
+}

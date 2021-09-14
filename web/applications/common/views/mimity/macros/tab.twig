@@ -1,0 +1,42 @@
+{% import "form_elements.twig" as form_elements %}
+{% import "tools.twig" as tools %}
+		<ul class="nav nav-tabs" id="{{ tab.id }}">
+		{% for idx, item in tab.tabs %}
+			<li class="nav-item">
+				<a href="#{{ tab.id ~ idx }}" class="nav-link{% if tab.active == idx %} active{% endif %}" data-toggle="tab"{% if item.formname is not empty %} data-formname="{{ item.formname }}"{% endif %} tabindex="-1" role="tab">
+					{% if item.icon is not empty %}<i class="fa fa-fw fa-{{ item.icon }}"></i>{% endif %}
+					{{ _(item.title) }}
+					{% if item.badge %}<b class="badge bg-danger">{{ item.badge }}</b>{% endif %}
+				</a>
+			</li>
+		{% endfor %}
+        </ul>
+
+		<div class="tab-content">
+	{% for idx, item in tab.tabs %}
+			<div class="tab-pane {{ tab.class }}{% if tab.active == idx %} active{% endif %}" id="{{ tab.id ~ idx }}">
+		{% if item.formname is not empty %}
+			{% set form = forms[item.formname] %}
+				<form action="{{ form.action }}" method="post" id="{{ form.name }}-form" class="form-horizontal parsley-form hpanel no-margin"{% if form.upload is not empty %} enctype="multipart/form-data"{% endif %}>
+					<div class="panel-body">
+				{{ form_elements.fieldset(form.controls, form.values, form.name, form.template) }}
+					</div>
+			{% if form.buttons|length > 0 %}
+					<div class="panel-footer text-right">
+				{% for val1 in form.buttons %}
+					{{ form_elements.form_button(val1, form.name) }}
+				{% endfor %}
+					</div>
+			{% endif %}
+				</form>
+        {% elseif item.include is not empty %}
+            {% include item.include ~ constant('TWIG_FILE_EXTENSION') %}
+        {% else %}
+				<div class="panel-body{% if not item.padding %} no-padding{% endif %}">
+			{{ include(template_from_string( item.content )) }}
+				</div>
+		{% endif %}
+			</div>
+	{% endfor %}
+		</div>
+

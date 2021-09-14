@@ -1,0 +1,5 @@
+.form-group > label:not(.custom-control-label) {
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+  margin-bottom: 0.2rem !important;
+}

@@ -1,0 +1,20 @@
+.btn-group-circle {
+  > .btn {
+    width: 38px;
+    border-radius: 50% !important;
+    &:not(:first-child) {
+      margin-left: .25rem !important;
+    }
+    @include flex-center();
+    &.focus,
+    &:focus {
+      box-shadow: none;
+    }
+  }
+  &.btn-group-sm > .btn {
+    width: 31px;
+  }
+  &.btn-group-lg > .btn {
+    width: 48px;
+  }
+}

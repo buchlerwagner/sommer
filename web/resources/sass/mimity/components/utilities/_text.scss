@@ -1,0 +1,24 @@
+@each $color, $value in $colors {
+  @include text-emphasis-variant(".text-#{$color}", $value, true);
+}
+.font-size-base {
+  font-size: $font-size-base;
+}
+.font-size-sm {
+  font-size: $font-size-sm;
+}
+.font-size-lg {
+  font-size: $font-size-lg;
+}
+.text-decoration-underline {
+  text-decoration: underline;
+}
+.font-size-90 {
+  font-size: 90%;
+}
+@each $color, $value in $grays {
+  .text-gray-#{$color} {
+    color: $value;
+  }
+}
+@include text-emphasis-variant('.text-light', $light, true);

@@ -1,0 +1,170 @@
+{% import "form_elements.twig" as form_elements %}
+
+{% if form.errors|length > 0 and form.displayErrors %}
+    <div class="alert alert-danger alert-accent" role="alert">
+        <h5 class="mb-1 alert-heading text-danger">
+            <i class="fas fa-exclamation-triangle mr-1 mb-1"></i>
+            {{ _('ERR_GENERIC') }}
+        </h5>
+
+        {% for error in form.errors %}
+            <div>{{ _('ERR_' ~ error['code']) }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if context.messages and form.displayErrors %}
+    {% for type, message in context.messages %}
+    <div class="alert alert-info alert-accent" role="alert">
+        <div class="alert-heading text-{{ type }}-m1">
+            {% if type == 'danger' %}
+                <i class="fas fa-exclamation-triangle mr-1 mb-1"></i>
+            {% elseif  type == 'warning' %}
+                <i class="fas fa-exclamation-circle mr-1 mb-1"></i>
+            {% elseif  type == 'success' %}
+                <i class="fas fa-check mr-1 mb-1"></i>
+            {% else %}
+                <i class="fas fa-info-circle mr-3 fa-2x text-blue"></i>
+            {% endif %}
+
+            {% for msg in message %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+
+{% if form.title %}
+<div class="border-0 mb-3">
+    <h3 class="page-title text-secondary d-block">
+        {{ _(form.title) }}{% if form.subTitle %}: <span class="text-primary font-light">{{ _(form.subTitle) }}</span>{% endif %}
+    </h3>
+</div>
+{% endif %}
+
+{% if form.includeBefore %}
+    {% include form.includeBefore ~ '.twig' %}
+{% endif %}
+
+{% if form.sections %}
+    {% if form.sections.type == 'tabs' %}
+        <div class="row gutters-sm">
+            <div class="col-md-4 d-none d-md-block">
+                <div class="card">
+                    <div class="card-body">
+                        <nav class="nav flex-column nav-pills nav-gap-y-1">
+                            {% for section in form.sections.items %}
+                            <a href="#{{ section.id }}" data-toggle="tab" class="nav-item nav-link has-icon nav-link-faded{% if section.active %} active{% endif %}">
+                                {% if section.icon %}
+                                    <i class="fa {{section.icon  }} mr-2"></i>
+                                {% elseif section.featherIcon %}
+                                    <i data-feather="{{ section.featherIcon }}" class="mr-2"></i>
+                                {% endif %}
+                                {{ _(section.title) }}
+                            </a>
+                            {% endfor %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header border-bottom mb-3 d-flex d-md-none">
+                        <ul class="nav nav-tabs card-header-tabs nav-gap-x-1" role="tablist">
+                            {% for section in form.sections.items %}
+                                <li class="nav-item">
+                                    <a href="#{{ section.id }}" data-toggle="tab" class="nav-link has-icon{% if section.active %} active{% endif %}">
+                                        {% if section.icon %}
+                                            <i class="fa {{section.icon  }} mr-2"></i>
+                                        {% elseif section.featherIcon %}
+                                            <i data-feather="{{ section.featherIcon }}" class="mr-2"></i>
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="card-body tab-content">
+                        {% for section in form.sections.items %}
+                            <div class="tab-pane{% if section.active %} active{% endif %}" id="{{ section.id }}">
+                                {% if form.type == 'formBuilder' %}
+                                    {{ formBuilder.renderElements(form.controls, form.values, form.name, form.errors) }}
+                                {% else %}
+                                    {{ form_elements.fieldset(form.controls[section.id], form.values, form.name) }}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.buttons|length > 0 %}
+                        <div class="d-flex card-footer p-3 bg-gray-100 border-top{% if form.cssClass.footer %} {{ form.cssClass.footer }}{% endif %}">
+                            <div class="justify-content-end ml-auto">
+                                {% for btn in form.buttons %}
+                                    {% if (not form.readonly or btn.name == 'cancel' or btn.alwaysshow) and btn.type != 'hidden' %}
+                                        {{ form_elements.form_button(btn, form.name) }}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {% for section in form.sections.items %}
+            <div class="row gutters-sm mb-4">
+                <div class="col-md-4 d-none d-md-block">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="text-primary">{{ _(section.title) }}</h5>
+                            {% if section.text %}
+                                {{ _(section.text) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            {{ form_elements.fieldset(form.controls[section.id], form.values, form.name) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% if form.buttons|length > 0 %}
+            <div class="d-flex pt-3 border-top{% if form.cssClass.footer %} {{ form.cssClass.footer }}{% endif %}">
+                <div class="justify-content-end ml-auto">
+                    {% for btn in form.buttons %}
+                        {% if (not form.readonly or btn.name == 'cancel' or btn.alwaysshow) and btn.type != 'hidden' %}
+                            {{ form_elements.form_button(btn, form.name) }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% else %}
+    <div class="{% if form.boxed %}card bcard{% endif %}{% if form.cssClass.card %} {{ form.cssClass.card }}{% endif %}">
+        {% if form.boxed %}
+            <div class="card-body{% if form.cssClass.body %} {{ form.cssClass.body }}{% endif %}">
+                {{ form_elements.fieldset(form.controls, form.values, form.name) }}
+            </div>
+        {% else %}
+            {{ form_elements.fieldset(form.controls, form.values, form.name) }}
+        {% endif %}
+
+        {% if form.buttons|length > 0 %}
+            <div class="d-flex {% if form.boxed %}card-footer p-3 bg-gray-100 border-top{% else %}mt-4{% endif %}{% if form.cssClass.footer %} {{ form.cssClass.footer }}{% endif %}">
+                <div class="justify-content-end ml-auto">
+                {% for btn in form.buttons %}
+                    {% if (not form.readonly or btn.name == 'cancel' or btn.alwaysshow) and btn.type != 'hidden' %}
+                        {{ form_elements.form_button(btn, form.name) }}
+                    {% endif %}
+                {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

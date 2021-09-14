@@ -1,0 +1,21 @@
+.form-fieldset {
+
+  /*
+  padding: 1rem;
+  border: 1px solid $input-border-color;
+  border-radius: $border-radius;
+  */
+
+  margin-bottom: $form-group-margin-bottom;
+  > legend {
+    border-bottom: 1px solid $input-border-color;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 0.5rem;
+    color: $primary;
+  }
+}
+
+.form-fieldset.no-underline > legend {
+  border-bottom: none !important;
+}

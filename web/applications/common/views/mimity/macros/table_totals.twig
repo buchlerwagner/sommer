@@ -1,0 +1,47 @@
+{% if colspan is empty %}
+	{% set colspan = 0 %}
+	{% if table.show_rowindex %}
+		{% set colspan = colspan + 1 %}
+	{% endif %}
+	{% for col in table.columns %}{% if col.type != 'hidden' and (col.caption is not empty or col.rawcaption is not empty) %}
+		{% set colspan = colspan + 1 %}
+	{% endif %}{% endfor %}
+	{% if table.options %}
+		{% set colspan = colspan + 1 %}
+	{% endif %}
+{% endif %}
+
+{% if table.summarize is not empty %}
+<tfoot>
+{% for sumkey, sumrow in table.summarize %}
+	{% set maxsumrows = 0 %}
+	{% for col in sumrow %}
+		{% if col.field is not empty %}{% if table.totals[sumkey][col.field]|length > maxsumrows %}{% set maxsumrows = table.totals[sumkey][col.field]|length %}{% endif %}{% endif%}
+	{% endfor %}
+	{% if maxsumrows > 0 %}
+		{% for i in 1..maxsumrows %}
+			<tr class="d-flex bg-gray-100">
+				{% for col in sumrow %}
+					{% if col.field is empty %}
+						{% if i == 1 %}<td class="{% if col.class %}{{ col.class }}{% endif %}" rowspan="{{ maxsumrows }}"{% if col.colspan is not empty %} colspan="{{ col.colspan }}"{% endif %}>{% if col.caption is not empty %}<b>{{ _(col.caption) }}:</b>{% endif %}</td>{% endif %}
+					{% else %}
+						<td class="text-right{% if col.class %} {{ col.class }}{% endif %} total_{{ table.name }}_{{ i }}">
+							{% if table.totals[sumkey][col.field]|length >= i %}
+								{% if col.type == 'number' %}<div{% if table.totals[sumkey][col.field][(i-1)].sumfield > 0 %} class="text-success"{% elseif table.totals[sumkey][col.field][(i-1)].sumfield < 0 %} class="text-danger"{% endif %}>{% endif %}
+								{% if col.templatestring is not empty %}
+									{% set sumfield = table.totals[sumkey][col.field][(i-1)].sumfield %}
+									{{ include(template_from_string( col.templatestring )) }}
+								{% else %}
+									{{ _price(table.totals[sumkey][col.field][(i-1)].sumfield, table.totals[sumkey][col.field][(i-1)].unitfield) }}
+								{% endif %}
+								{% if col.type == 'number' %}</div>{% endif %}
+							{% endif %}
+						</td>
+					{% endif %}
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	{% endif %}
+{% endfor %}
+</tfoot>
+{% endif %}

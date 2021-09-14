@@ -1,0 +1,12 @@
+.badge {
+  vertical-align: text-bottom;
+}
+.btn .badge {
+  vertical-align: baseline;
+}
+.badge-pill {
+  padding-right: $badge-pill-padding-x + 0.05em;
+}
+.badge-light {
+  @include badge-variant($light);
+}

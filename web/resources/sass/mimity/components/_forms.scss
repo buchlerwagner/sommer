@@ -1,0 +1,270 @@
+// Input icon
+.input-icon {
+  position: relative;
+  display: block;
+  width: 100%;
+  > i,
+  > svg {
+    position: absolute;
+    z-index: 5;
+  }
+  > i[class^="fa"] {
+    text-align: center;
+    width: 1.25em;
+  }
+  &.input-icon-lg {
+    font-size: $input-font-size-lg;
+  }
+  &.input-icon-sm {
+    font-size: $input-font-size-sm;
+  }
+}
+// Icon top position ==============================================================================
+  .input-icon > svg { top: 8px }
+  .input-icon.input-icon-sm > svg { top: 6px }
+  .input-icon.input-icon-lg > svg { top: 10px }
+  // material icons
+  .input-icon > i.material-icons { top: 7px }
+  .input-icon.input-icon-sm > i.material-icons { top: 5px }
+  .input-icon.input-icon-lg > i.material-icons { top: 9px }
+  // fontawesome
+  .input-icon > i[class^="fa"] { top: 11px }
+  .input-icon.input-icon-sm > i[class^="fa"] { top: 9px }
+  .input-icon.input-icon-lg > i[class^="fa"] { top: 15px }
+
+// Icon left position =============================================================================
+  .input-icon:not(.input-icon-right) > svg { left: (1/1.3321492007) * $input-padding-x }
+  .input-icon.input-icon-sm:not(.input-icon-right) > svg { left: (1/1.3321492007) * $input-padding-x-sm }
+  .input-icon.input-icon-lg:not(.input-icon-right) > svg { left: (1/1.3321492007) * $input-padding-x-lg }
+  // material icons
+  .input-icon:not(.input-icon-right) > i.material-icons { left: (2/3) * $input-padding-x }
+  .input-icon.input-icon-sm:not(.input-icon-right) > i.material-icons { left: (2/3) * $input-padding-x-sm }
+  .input-icon.input-icon-lg:not(.input-icon-right) > i.material-icons { left: (2/3) * $input-padding-x-lg }
+  // fontawesome
+  .input-icon:not(.input-icon-right) > i[class^="fa"] { left: (2/2.4) * $input-padding-x }
+  .input-icon.input-icon-sm:not(.input-icon-right) > i[class^="fa"] { left: (2/2.4) * $input-padding-x-sm }
+  .input-icon.input-icon-lg:not(.input-icon-right) > i[class^="fa"] { left: (2/2.4) * $input-padding-x-lg }
+
+// Input padding-left =============================================================================
+  .input-icon:not(.input-icon-right) .form-control {
+    padding-left: calc(#{$input-padding-x} + 1.5em)
+  }
+  .input-icon.input-icon-sm:not(.input-icon-right) .form-control-sm { padding-left: calc(#{$input-padding-x-sm} + 1.5em) }
+  .input-icon.input-icon-lg:not(.input-icon-right) .form-control-lg { padding-left: calc(#{$input-padding-x-lg} + 1.5em) }
+
+// Icon right position
+  .input-icon.input-icon-right > svg { right: (1/1.3321492007) * $input-padding-x }
+  .input-icon.input-icon-right.input-icon-sm > svg { right: (1/1.3321492007) * $input-padding-x-sm }
+  .input-icon.input-icon-right.input-icon-lg > svg { right: (1/1.3321492007) * $input-padding-x-lg }
+  // material icons
+  .input-icon.input-icon-right > i.material-icons { right: (2/3) * $input-padding-x }
+  .input-icon.input-icon-right.input-icon-sm > i.material-icons { right: (2/3) * $input-padding-x-sm }
+  .input-icon.input-icon-right.input-icon-lg > i.material-icons { right: (2/3) * $input-padding-x-lg }
+  // fontawesome
+  .input-icon.input-icon-right > i[class^="fa"] { right: (2/2.4) * $input-padding-x }
+  .input-icon.input-icon-sm.input-icon-right > i[class^="fa"] { right: (2/2.4) * $input-padding-x-sm }
+  .input-icon.input-icon-lg.input-icon-right > i[class^="fa"] { right: (2/2.4) * $input-padding-x-lg }
+
+// Input padding-right
+  .input-icon.input-icon-right > .form-control { padding-right: calc(#{$input-padding-x} + 1.5em) }
+  .input-icon.input-icon-right.input-icon-sm > .form-control-sm { padding-right: calc(#{$input-padding-x-sm} + 1.5em) }
+  .input-icon.input-icon-right.input-icon-lg > .form-control-lg { padding-right: calc(#{$input-padding-x-lg} + 1.5em) }
+
+// Floating Labels
+.floating-label {
+  position: relative;
+  display: block;
+  width: 100%;
+  > label,
+  > .form-control {
+    height: 3.125rem;
+    padding: $input-padding-x;
+  }
+  > textarea.form-control {
+    height: auto;
+    min-height: 3.125rem;
+  }
+  > label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    margin-bottom: 0;
+    cursor: text;
+    transition: all .1s;
+    pointer-events: none;
+    color: $text-muted;
+    border: 1px solid transparent;
+  }
+  > .form-control {
+    &::placeholder {
+      opacity: 0;
+    }
+    &:focus,
+    &:not(:placeholder-shown) {
+      padding-top: 1.25rem;
+      padding-bottom: .25rem;
+      ~ label {
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+        font-size: 75%;
+      }
+    }
+  }
+  &.input-icon {
+    > svg {
+      width: 2.125em;
+      height: 2.125em;
+    }
+    > i.material-icons {
+      font-size: 2.25em;
+    }
+    > i[class^="fa"] {
+      font-size: 1.625em;
+    }
+    &:not(.input-icon-right) {
+      > label,
+      > .form-control {
+        padding-left: calc(#{$input-padding-x} + 2.25em);
+      }
+      > .form-control:focus ~ label,
+      > .form-control:not(:placeholder-shown) ~ label {
+        padding-left: calc(#{$input-padding-x} + 2.25em + 9px);
+      }
+    }
+    &.input-icon-right {
+      > label,
+      > .form-control {
+        padding-right: calc(#{$input-padding-x} + 2.25em);
+      }
+      > .form-control:focus ~ label,
+      > .form-control:not(:placeholder-shown) ~ label {
+        padding-right: calc(#{$input-padding-x} + 2.25em + 9px);
+      }
+    }
+  }
+}
+.floating-label-sm {
+  font-size: $input-font-size-sm;
+  > label,
+  > .form-control {
+    height: 2.438rem;
+    padding: $input-padding-x-sm;
+  }
+  > .form-control {
+    &:focus,
+    &:not(:placeholder-shown) {
+      padding-top: calc(1.25rem - 0.125rem);
+      padding-bottom: calc(.25rem - 0.125rem);
+      ~ label {
+        padding-top: calc(.25rem - 0.125rem);
+        padding-bottom: calc(.25rem - 0.125rem);
+        font-size: 75%;
+      }
+    }
+  }
+  &.input-icon {
+    > svg {
+      top: 5px;
+    }
+    &:not(.input-icon-right) {
+      > label,
+      > .form-control {
+        padding-left: calc(#{$input-padding-x-sm} + 2.25em);
+      }
+      > .form-control:focus ~ label,
+      > .form-control:not(:placeholder-shown) ~ label {
+        padding-left: calc(#{$input-padding-x-sm} + 2.25em + 9px);
+      }
+    }
+    &.input-icon-right {
+      > label,
+      > .form-control {
+        padding-right: calc(#{$input-padding-x-sm} + 2.25em);
+      }
+      > .form-control:focus ~ label,
+      > .form-control:not(:placeholder-shown) ~ label {
+        padding-right: calc(#{$input-padding-x-sm} + 2.25em + 9px);
+      }
+    }
+  }
+}
+.floating-label-lg {
+  font-size: $input-font-size-lg;
+  > label,
+  > .form-control {
+    height: 4rem;
+    padding: $input-padding-x-lg;
+  }
+  > .form-control {
+    &:focus,
+    &:not(:placeholder-shown) {
+      padding-top: calc(1.25rem + 0.125rem);
+      padding-bottom: calc(.25rem + 0.125rem);
+      ~ label {
+        padding-top: calc(.25rem + 0.125rem);
+        padding-bottom: calc(.25rem + 0.125rem);
+        font-size: 75%;
+      }
+    }
+  }
+  &.input-icon {
+    &:not(.input-icon-right) {
+      > label,
+      > .form-control {
+        padding-left: calc(#{$input-padding-x-lg} + 2.25em);
+      }
+      > .form-control:focus ~ label,
+      > .form-control:not(:placeholder-shown) ~ label {
+        padding-left: calc(#{$input-padding-x-lg} + 2.25em + 12px);
+      }
+    }
+    &.input-icon-right {
+      > label,
+      > .form-control {
+        padding-right: calc(#{$input-padding-x-lg} + 2.25em);
+      }
+      > .form-control:focus ~ label,
+      > .form-control:not(:placeholder-shown) ~ label {
+        padding-right: calc(#{$input-padding-x-lg} + 2.25em + 12px);
+      }
+    }
+  }
+}
+
+.form-control[multiple],
+.custom-select[multiple] {
+  padding: $input-padding-y;
+  &.form-control-sm {
+    padding: $input-padding-y-sm;
+  }
+  &.form-control-lg {
+    padding: $input-padding-y-lg;
+  }
+}
+
+// Input clearable
+[data-toggle="clear"] {
+  cursor: pointer;
+  color: $text-muted;
+}
+.input-clearable {
+  // hide icon
+  [data-toggle="clear"] {
+    display: none;
+  }
+  // show icon when non-empty input focused
+  .form-control:not(:placeholder-shown):focus {
+    + [data-toggle="clear"] {
+      display: block;
+    }
+  }
+  // show icon when container hovered and input not empty
+  &:hover .form-control:not(:placeholder-shown) + [data-toggle="clear"] {
+    display: block;
+  }
+}
+label.input-clearable {
+  margin-bottom: 0;
+}

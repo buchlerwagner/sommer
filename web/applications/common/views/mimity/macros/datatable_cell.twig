@@ -1,0 +1,6 @@
+{% import "tools" ~ constant('TWIG_FILE_EXTENSION') as tools %}
+{% if type == 'options' %}
+	{{ tools.table_options(keyvalue, table, row) }}
+{% else %}
+	{{ tools.table_cell(table_name, keyvalue, column, val, row, readonly, table) }}
+{% endif %}

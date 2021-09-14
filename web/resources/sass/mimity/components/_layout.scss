@@ -1,0 +1,61 @@
+.sidebar-header,
+.sidebar-body {
+  width: $sidebar-width; // Prevent text wrap on sidebar-collapse
+}
+
+// Large devices (desktops, 992px and up)
+@include media-breakpoint-up(lg) {
+  .main {
+    margin-left: $sidebar-width;
+  }
+  .sidebar-collapse {
+    .sidebar {
+      width: $sidebar-width-collapse;
+      .show + ul { // Hide submenu
+        display: none;
+        height: 0;
+      }
+      .nav-label {
+        display: none; // Hide nav-label
+      }
+      &:hover {
+        width: $sidebar-width;
+        .show + ul { // Show submenu on sidebar:hover
+          display: block;
+          height: auto;
+        }
+        .nav-label {
+          display: block; // Show nav-label on sidebar:hover
+        }
+      }
+    }
+    .main {
+      margin-left: $sidebar-width-collapse;
+    }
+  }
+  .sticky-navbar {
+    .sidebar {
+      transform: translate3d(-#{$sidebar-width},0,0); // Hide sidebar
+    }
+    .main {
+      margin-left: 0;
+    }
+  }
+}
+
+// Medium devices (tablets, phones, less than 992px)
+@include media-breakpoint-down(md) {
+  .sidebar {
+    transform: translate3d(-#{$sidebar-width},0,0); // Hide sidebar
+  }
+  .sidebar-expand {
+    overflow: hidden; // Prevent scroll
+    .sidebar {
+      transform: translate3d(0,0,0); // Show sidebar
+      border-right: 0 !important;
+    }
+    .sidebar-header [data-toggle="sidebar"] { // Show sidebar's toggler
+      display: flex;
+    }
+  }
+}

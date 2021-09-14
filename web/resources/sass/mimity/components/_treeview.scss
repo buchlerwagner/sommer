@@ -1,0 +1,13 @@
+.treeview-toggle {
+  cursor: pointer;
+  white-space: nowrap;
+  @include caret();
+  &:not(.show) {
+    &::after {
+      transform: rotate(-90deg);
+    }
+    + ul {
+      display: none;
+    }
+  }
+}

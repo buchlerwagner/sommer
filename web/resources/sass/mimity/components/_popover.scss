@@ -1,0 +1,82 @@
+// Static popover
+.popover-static {
+  position: relative;
+  z-index: unset;
+  max-width: 100%;
+  border-color: transparent;
+  font-size: inherit;
+  box-shadow: $box-shadow-sm;
+  &.bs-popover-right,
+  &.bs-popover-left {
+    .arrow {
+      top: 7px;
+    }
+  }
+  &.bs-popover-right .arrow::before {
+    border-right-color: rgba($black, .175);
+  }
+  &.bs-popover-left .arrow::before {
+    border-left-color: rgba($black, .175);
+  }
+}
+
+[class^="popover popover-header-"] .popover-header {
+  margin-right: -1px;
+  margin-top: -1px;
+  margin-left: -1px;
+  border-bottom-width: 0;
+}
+[class^="popover popover-"]:not([class^="popover popover-static"]) .popover-header,
+[class^="popover popover-"]:not([class^="popover popover-header-"]):not([class^="popover popover-static"]) .popover-body {
+  color: #fff;
+}
+[class^="popover popover-"]:not([class^="popover popover-header-"]) .popover-header {
+  border-color: $card-border-color;
+}
+.popover-warning .popover-header,
+.popover-warning .popover-body,
+.popover-header-warning .popover-header {
+  color: color-yiq($warning) !important;
+}
+[class^="popover popover-"].bs-popover-bottom .popover-header::before {
+  border-bottom: 0;
+}
+@each $color, $value in $theme-colors {
+  @if $color != 'light' {
+    .popover-#{$color},
+    .popover-#{$color} .popover-header,
+    .popover-header-#{$color} .popover-header {
+      background-color: $value;
+    }
+    .popover-#{$color},
+    .popover-header-#{$color} {
+      &.bs-popover-bottom {
+        .arrow::before,
+        .arrow::after {
+          border-bottom-color: $value;
+        }
+      }
+    }
+    .popover-#{$color} {
+      border-color: $value;
+      &.bs-popover-top {
+        .arrow::before,
+        .arrow::after {
+          border-top-color: $value;
+        }
+      }
+      &.bs-popover-right {
+        .arrow::before,
+        .arrow::after {
+          border-right-color: $value;
+        }
+      }
+      &.bs-popover-left {
+        .arrow::before,
+        .arrow::after {
+          border-left-color: $value;
+        }
+      }
+    }
+  }
+}

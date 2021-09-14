@@ -1,0 +1,12 @@
+{% import "formBuilderMacros.twig" as self %}
+<div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}{% if element.hasError %} has-error{% endif %}">
+    {{ self.label(element) }}
+    {% if element.getIcon %}
+        <span class="input-icon{% if element.getIconPosition %} input-icon-right{% endif %}">
+        {{ self.icon(element) }}
+    {% endif %}
+    <textarea id="{{ element.getId }}" name="{{ formName }}[{{ element.getName }}]" rows="{{ element.getRows }}" placeholder="{{ _(element.getPlaceholder) }}"{% if element.getMaxLength %} maxlength="{{ element.getMaxLength }}"{% endif %} class="form-control {{ element.getClass }}{% if element.getInputSize %} form-control-{{ element.getInputSize }}{% endif %}"{% if element.isDisabled %} disabled{% endif %}{% if element.isReadonly %} readonly{% endif %}{{ self.attributes(element.getAttributes) }}>{{ value }}</textarea>
+    {% if element.getIcon %}
+        </span>
+    {% endif %}
+</div>

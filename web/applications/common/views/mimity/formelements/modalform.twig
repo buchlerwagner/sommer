@@ -1,0 +1,27 @@
+{% import "tools.twig" as tools %}
+{% import "form_elements.twig" as form_elements %}
+{% if form.errors|length > 0 %}
+<div class="alert alert-danger" role="alert">
+
+    <h5 class="mb-1 alert-heading text-danger">
+        <i class="fas fa-exclamation-triangle mr-1 mb-1"></i>
+        {{ _('ERR_GENERIC') }}
+    </h5>
+
+    {% for error in form.errors %}
+        <p>{{ _('ERR_' ~ error.code, error.message)|raw }}</p>
+        {% if error.type == 3 %}
+            <p class="padding-left-20">{{ error.message|raw }}</p>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if form.view %}
+    {{ tools.view(form) }}
+{% else %}
+    <form action="{{ form.action }}" method="post" id="{{ form.name }}-form"{% if form.upload is not empty %} enctype="multipart/form-data"{% endif %} class="form-horizontal parsley-form" onsubmit="postModalForm(this);return false;" data-modal="true">
+        {{ form_elements.fieldset(form.controls, form.values, form.name, form.template) }}
+    </form>
+{% endif %}
+

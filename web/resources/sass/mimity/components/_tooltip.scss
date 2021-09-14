@@ -1,0 +1,22 @@
+@each $color, $value in $theme-colors {
+  @if $color != 'dark' and $color != 'light' {
+    .tooltip-#{$color} {
+      &.bs-tooltip-top .arrow::before {
+        border-top-color: $value;
+      }
+      &.bs-tooltip-right .arrow::before {
+        border-right-color: $value;
+      }
+      &.bs-tooltip-bottom .arrow::before {
+        border-bottom-color: $value;
+      }
+      &.bs-tooltip-left .arrow::before {
+        border-left-color: $value;
+      }
+      .tooltip-inner {
+        color: color-yiq($value);
+        background-color: $value;
+      }
+    }
+  }
+}

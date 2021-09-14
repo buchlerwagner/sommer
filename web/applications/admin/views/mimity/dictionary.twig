@@ -1,0 +1,118 @@
+{% import "tools.twig" as tools %}
+{% import "form_elements.twig" as form_elements %}
+
+<section class="section-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+                <form action="." id="frm-dictionary" name="frmDictionary" method="post" data-confirmtxt="{{ _('TXT_CONFIRM_LABEL_REVERT') }}">
+                    <div class="row">
+                        <div class="col-md-8">
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="btn-group mb-3">
+                                        <div class="btn-group" data-toggle="tooltip" title="{{ _('LBL_TRANSLATE_FROM') }}">
+                                            <button id="btn-langfrom" class="btn btn-light dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
+                                                <i class="flag flag-{{ post.langfrom }}"></i> {{ languages[post.langfrom] }}
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                {% for key, value in languages %}
+                                                    <a class="dropdown-item btn-select" data-value="{{ key }}"><i class="flag flag-{{ key }}"></i> {{ value }}</a>
+                                                {% endfor %}
+                                            </div>
+                                            <input type="hidden" id="langfrom" name="langfrom" value="{{ post.langfrom }}">
+                                        </div>
+
+                                        <div class="btn-group" data-toggle="tooltip" title="{{ _('LBL_SORTBY') }}">
+                                            <button id="btn-filter" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                {{ _( lists.sort[ post.sort ] ) }}
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                {% for key, value in lists.sort %}
+                                                    <a class="dropdown-item btn-select" data-value="{{ key }}">{{ _(value) }}</a>
+                                                {% endfor %}
+                                            </div>
+                                            <input type="hidden" id="sort" name="sort" value="{{ post.sort }}">
+                                        </div>
+
+                                        <div class="btn-group" data-toggle="tooltip" title="{{ _('LBL_FILTERBY') }}">
+                                            <button id="btn-filter" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                {{ _( lists.filter[ post.filter ] ) }}
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                {% for key, value in lists.filter %}
+                                                    <a class="dropdown-item btn-select" data-value="{{ key }}">{{ _(value) }}</a>
+                                                {% endfor %}
+                                            </div>
+                                            <input type="hidden" id="filter" name="filter" value="{{ post.filter }}">
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="btn-group float-right" data-toggle="tooltip" title="{{ _('LBL_TRANSLATE_TO') }}">
+                                        <button id="btn-langto" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                            <i class="flag flag-{{ post.langto }}"></i> {{ languages[post.langto] }}
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            {% for key, value in languages %}
+                                                <a class="dropdown-item btn-select" data-value="{{ key }}"><i class="flag flag-{{ key }}"></i> {{ value }}</a>
+                                            {% endfor %}
+                                        </div>
+                                        <input type="hidden" id="langto" name="langto" value="{{ post.langto }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="labels-list">
+                                    {% for key, value in labels.items %}
+                                        {{ tools.label_editor(key, value, post) }}
+                                    {% endfor %}
+                                    </div>
+                                    {{ tools.infinite_scroll('scroll', '#labels-list', post.page, labels.stats.totalpages, '/ajax/dictionary/loadpage/?page=', '') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="card bg sticky-top mt-5" style="top:100px">
+                                <div class="card-body">
+                                    <h5>{{ _('LBL_SEARCHBY') }}</h5>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-search"></i>
+                                                </span>
+                                            </div>
+                                            <input class="form-control inp-search hasclear" type="text" name="label" placeholder="{{ _('LBL_LABEL_EXPRESSION') }}" id="search-label" value="{{ post.label }}" >
+                                            <div class="input-group-append">
+                                                <button class="btn btn-light" id="btn-search" type="button">{{ _('BTN_OK') }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body bg-gray-100">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label id="label-info-orig">{{ _('LBL_ORIGINAL_LABELS', labels.stats.orig.translated, labels.stats.total) }}</label>
+                                            {{ form_elements.progressbar('progress-orig', labels.stats.orig.status, 0, 100, labels.stats.orig.status ~ '%', 'success') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>

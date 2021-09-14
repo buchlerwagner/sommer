@@ -1,0 +1,28 @@
+{% import "tools.twig" as tools %}
+
+{% if filterForm and not table.form %}
+    <div class="card mb-4 border-1 bt-primary bt-2">
+        <div class="card-header h6 bg-white d-flex">
+            <a href="#filterForm" data-toggle="collapse" role="button" class="d-flex">
+                <b class="card-title m-0">
+                {% if filterForm.title %}
+                    {{ _(filterForm.title) }}
+                {% else %}
+                    {{ _('LBL_FILTER') }}
+                {% endif %}
+                </b>
+            </a>
+            <div class="ml-auto d-flex justify-content-start"></div>
+            <div class="card-toolbar d-flex justify-content-start">
+                <a href="#filterForm" class="card-toolbar-btn{% if not filterForm.hasFilter %} collapsed{% endif %}" data-toggle="collapse" role="button">
+                    <i class="fa fa-chevron-down"></i>
+                </a>
+            </div>
+        </div>
+        <div id="filterForm" class="card-body collapse{% if filterForm.hasFilter %} show{% endif %}">
+        {{ tools.form(filterForm) }}
+        </div>
+    </div>
+{% endif %}
+
+{{ tools.table(table, filterForm.name) }}

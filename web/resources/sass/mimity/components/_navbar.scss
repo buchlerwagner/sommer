@@ -1,0 +1,49 @@
+.main-navbar {
+  background-color: #fff;
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+  height: $main-navbar-height;
+  .nav-link {
+    white-space: nowrap;
+    &:not([data-scroll]) > i,
+    &:not([data-scroll]) > svg {
+      margin-right: .25rem;
+    }
+  }
+  .dropdown {
+    position: static;
+  }
+  .dropdown-menu {
+    top: 44px;
+    left: auto;
+    overflow: auto;
+    max-height: calc(#{$vh100} - 113px);
+  }
+  .navbar-collapse {
+    overflow: hidden;
+    scroll-behavior: smooth;
+  }
+}
+[data-scroll="left"],
+[data-scroll="right"] {
+  padding: $nav-link-padding-y $nav-link-padding-x !important;
+}
+[data-scroll="left"] {
+  margin-right: .5rem;
+}
+[data-scroll="right"] {
+  margin-left: .5rem;
+}
+// Large devices (desktops, 992px and up)
+@include media-breakpoint-up(lg) {
+  .sticky-navbar .main-header {
+    position: relative;
+    box-shadow: 0 -1px $border-color inset;
+  }
+}
+// Medium devices (tablets, phones, less than 992px)
+@include media-breakpoint-down(md) {
+  .main-navbar {
+    display: none;
+  }
+}

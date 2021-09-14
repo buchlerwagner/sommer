@@ -1,0 +1,46 @@
+.page-link {
+  $faded-primary: theme-color-level('primary', -11);
+  .page-item.active & {
+    color: darken($component-active-bg, 8%);
+    background-color: darken($faded-primary, 8%);
+  }
+  &:hover {
+    color: $component-active-bg;
+    background-color: $faded-primary;
+  }
+  @include hover-focus {
+    border-color: $component-active-bg;
+  }
+  &.has-icon {
+    display: inline-flex;
+    align-items: center;
+    height: 38px;
+    .pagination-sm & {
+      height: 31px;
+    }
+    .pagination-lg & {
+      height: 56px;
+    }
+  }
+}
+
+.pagination-circle {
+  .page-link {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 50% !important;
+    @include flex-center;
+  }
+  .page-item:not(:last-child) .page-link {
+    margin-right: .25rem;
+  }
+  &.pagination-sm .page-link {
+    width: 34px;
+    height: 34px;
+  }
+  &.pagination-lg .page-link {
+    width: 56px;
+    height: 56px;
+  }
+}

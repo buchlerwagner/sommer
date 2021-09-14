@@ -1,0 +1,42 @@
+{% import "formBuilderMacros.twig" as formBuilder %}
+{% if title %}
+<div class="modal-header bg-dark d-block text-white">
+    <h3 class="modal-title" id="customModalLabel">{{ _(title) }}</h3>
+    {% if subtitle %}
+        <h6 class="text-warning">{{ _(subtitle) }}</h6>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="modal-body{% if scroll %} overflow-auto{% endif %}"{% if height %} style="max-height: {{ height }}px;" {% endif %}>
+    {% if contentstring is not empty %}
+        {{ include(template_from_string( contentstring )) }}
+    {% elseif content is not empty %}
+        {% include content ~ '.twig' %}
+    {% endif %}
+</div>
+
+{% if not nofooter %}
+<div class="card-progress d-none">
+    <div class="card-progressbar bg-primary"></div>
+</div>
+<div class="modal-footer d-block" data-loading="{{ _('LBL_LOADING_PLEASE_WAIT') }}">
+    {% if accept_action is not empty %}
+        <a href="javascript:;" class="btn btn-light ml-2 float-right" {% if cancel_action is not empty %} onclick="{{ cancel_action }}" {% else %} data-dismiss="modal" {% endif %}>{% if captions.cancel is not empty %}{{ _(captions.cancel) }}{% else %}{{ _('BTN_CANCEL') }}{% endif %}</a>
+        <button type="button" class="btn btn-primary btn-progress float-right" onclick="{{ accept_action }}">{% if accept_button is not empty %}{{ _(accept_button) }}{% elseif captions.save is not empty %}{{ _(captions.save) }}{% else %}{{ _('BTN_OK') }}{% endif %}</button>
+    {% else %}
+        {% if buttons and not readonly%}
+            {% for btn in buttons %}
+                {% if btn.include %}
+                    {% include btn.include ~ constant('TWIG_FILE_EXTENSION') %}
+                {% else %}
+                    {{ formBuilder.button(btn) }}
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <button type="button" class="btn btn-light float-right" data-dismiss="modal">{{ _('BTN_CLOSE') }}</button>
+        {% endif %}
+    {% endif %}
+</div>
+{% endif %}
+<script>app.reInit();</script>

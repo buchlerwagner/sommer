@@ -1,0 +1,129 @@
+{% import "form_elements" ~ constant('TWIG_FILE_EXTENSION') as form_elements %}
+{% import "tools" ~ constant('TWIG_FILE_EXTENSION') as tools %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex mb-3">
+                    <h6 class="card-title mb-0">{{ _('LBL_USER_GROUP') }}: <span class="text-primary">{{ _('LBL_GROUP_' ~ group) }}</span></h6>
+                    {% if userGroups %}
+                    <div class="ml-auto">
+                        <form action="." method="post">
+                        {{ form_elements.select('group', 'group', userGroups, group, '', false, 'this.form.submit();', 'form-control-sm colored-select') }}
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table user_level_rights table-hover">
+                        <thead class="thead-primary">
+                            <tr class="d-flex">
+                                <th class="col-{{ 12 - (roles|length * 2) }} border-t-0">&nbsp;</th>
+                                {% for key, roleName in roles %}
+                                    <th class="col-2 text-center border-t-0">{{ roleName.name }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for page in pages %}
+                            {% set key = page.name %}
+                            {% set mainmenu = false %}
+
+                            {% if page.items is not empty %}
+                                {% set mainmenu = true %}
+                            {% endif %}
+
+                            <tr class="d-flex">
+                                <td class="col-{{ 12 - (roles|length * 2) }}">
+                                    {% if mainmenu %}<b class="text-primary">{% endif %}{{ _('MENU_' ~ key) }}{% if mainmenu %} <i class="fa fa-chevron-down"></i></b>{% endif %}
+                                    {% if not mainmenu and key != 'index' and addFunction and accessLevel == 2 %}
+                                        <div class="float-right"><a href="/ajax/forms/addFunction/{{ key }}/" data-toggle="modal" data-target="#ajax-modal" class="add-function"><i class="fa fa-plus"></i></a></div>
+                                    {% endif %}
+                                </td>
+                                {% for role, roleName in roles %}
+                                    <td class="text-center col-2">
+                                        {% if not mainmenu %}
+                                            {% set params = {'id' : group ~ '|' ~ key, 'name' : group ~ '[' ~ key ~ ']', 'data' : {'usergroup': group, 'page': key, 'role': role}, 'options': accessoptions} %}
+                                            {{ form_elements.accesslevel(params, rights[role][key].value, accessLevel) }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+
+                            {% if functions[key] is not empty and viewFunction %}
+                                {% for fn in functions[key] %}
+                                    <tr class="d-flex">
+                                        <td class="col-{{ 12 - (roles|length * 2) }} function-rights text-primary pl-5 small">
+                                            {{ fn.name }}
+                                        </td>
+                                        {% for role, roleName in roles %}
+                                            <td class="col-2 bg-{{state.class }} function-rights text-primary text-center small">
+                                                {% if accessLevel == 2 %}
+                                                    {% set params = {'color': 'succes', 'id' : 'fn-' ~ group ~ '-' ~ role ~ '-' ~ fn.key, 'name' : 'function[' ~  group ~ '][' ~ fn.key ~ ']', 'data': {'usergroup': group, 'function': fn.key, 'page': key, 'role': role}} %}
+                                                    {{ form_elements._checkbox(params, 1, function_rights[role][fn.key]) }}
+                                                {% elseif accessLevel == 1 %}
+                                                    {% if function_rights[role][fn.key] %}
+                                                        <i class="fa fa-check fa-fw text-success"></i>
+                                                    {% else %}
+                                                        <i class="fa fa-times text-danger fa-fw"></i>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if mainmenu %}
+                                {% for item in page.items %}
+                                    {% set key = item %}
+                                    <tr class="d-flex">
+                                        <td class="col-{{ 12 - (roles|length * 2) }} pl-4">
+                                            {{ _('MENU_' ~ key) }}
+                                            {% if addFunction %}
+                                                <div class="float-right"><a href="/ajax/forms/addFunction/{{ key }}/" data-toggle="modal" data-target="#ajax-modal" class="add-function"><i class="fa fa-plus"></i></a></div>
+                                            {% endif %}
+                                        </td>
+                                        {% for role, roleName in roles %}
+                                            <td class="col-2 text-center">
+                                                {% set params = {'id' : group ~ '-' ~ key, 'name' : group ~ '[' ~ key ~ ']', 'data' : {'usergroup': group, 'page': key, 'role': role}, 'options': accessoptions} %}
+                                                {{ form_elements.accesslevel(params, rights[role][key].value, accessLevel) }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% if functions[key] is not empty and viewFunction %}
+                                        {% for fn in functions[key] %}
+                                            <tr class="d-flex bgc-light">
+                                                <td class="col-{{ 12 - (roles|length * 2) }} function-rights text-primary pl-5 small">
+                                                    {{ fn.name }}
+                                                </td>
+                                                {% for role, roleName in roles %}
+                                                    <td class="col-2 function-rights text-center">
+                                                        {% if accessLevel == 2 %}
+                                                            {% set params = {'color': 'succes', 'id' : 'fn-' ~ group ~ '-' ~ role ~ '-' ~ fn.key, 'name' : 'function[' ~  group ~ '][' ~ fn.key ~ ']', 'data': {'usergroup': group, 'function': fn.key, 'page': key, 'role': role}} %}
+                                                            {{ form_elements._checkbox(params, 1, function_rights[role][fn.key]) }}
+                                                        {% elseif accessLevel == 1 %}
+                                                            {% if function_rights[role][fn.key] %}
+                                                                <i class="fa fa-check fa-fw text-success"></i>
+                                                            {% else %}
+                                                                <i class="fa fa-times text-danger fa-fw"></i>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

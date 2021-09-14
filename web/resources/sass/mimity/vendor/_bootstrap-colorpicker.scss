@@ -1,0 +1,13 @@
+.popover.colorpicker-bs-popover {
+  box-shadow: $dropdown-box-shadow;
+}
+.colorpicker-bar {
+  font-size: 11px;
+  line-height: inherit;
+}
+.colorpicker-saturation,
+.colorpicker-alpha-color,
+.colorpicker-hue,
+.colorpicker-bar {
+  box-shadow: none;
+}

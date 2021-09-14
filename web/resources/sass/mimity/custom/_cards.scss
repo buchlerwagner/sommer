@@ -1,0 +1,83 @@
+/* the loading/progressing bar animation */
+
+@keyframes card-progress-frames {
+  0%{transform:translateX(-100%)}
+  15%{transform:translateX(0%) scaleX(0.3)}
+  40%{transform:translateX(55%) scaleX(0.1)}
+  85%{transform:translateX(140%) scaleX(0.6)}
+  100%{transform:translateX(100%)}
+}
+
+.card-progress {
+  overflow: hidden;
+  height: 4px;
+  border-radius: 8px 8px 0 0;
+}
+
+.card-progressbar {
+  height: inherit;
+  transform-origin: left;
+  animation: card-progress-frames 2.2s infinite linear;
+  min-width: 360px;
+}
+
+/* Disable on IE */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .card-progressbar {
+    animation: none;
+  }
+}
+
+.car-property {
+  min-height: 190px;
+}
+
+.car-property:before {
+  font-family: "Font Awesome 5 Pro";
+  font-size: 50px;
+  font-weight: 600;
+  right: 15px;
+  position:absolute;
+  top: 0;
+  opacity: 0.15;
+}
+
+.car-property-general:before {
+  content: '\f1b9';
+  color: $primary;
+}
+.car-property-general {
+  border-top: 4px solid $primary;
+}
+
+.car-property-tires:before {
+  content: '\f631';
+  color: $info;
+}
+.car-property-tires {
+  border-top: 4px solid $info;
+}
+
+.car-property-services:before {
+  content: '\f7d9';
+  color: $warning;
+}
+.car-property-services {
+  border-top: 4px solid $warning;
+}
+
+.car-property-permissions:before {
+  content: '\f336';
+  color: $success;
+}
+.car-property-permissions {
+  border-top: 4px solid $success;
+}
+
+[data-toggle="collapse"] .fa:before {
+  content: "\f0d7";
+}
+
+[data-toggle="collapse"].collapsed .fa:before {
+  content: "\f0da";
+}

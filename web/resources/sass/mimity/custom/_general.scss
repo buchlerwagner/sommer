@@ -1,0 +1,64 @@
+.profile-img-editor {
+  border-radius: 0 0 3px 3px;
+  padding: 10px;
+  position: relative;
+}
+
+.editArea {
+  position:absolute;
+  left: 50%;
+  bottom:20px;
+}
+
+.editTools {
+  position:relative;
+  left: -50%;
+  opacity:0;
+  color: #ffffff;
+  text-align: center;
+  transition: all 0.3s ease-in-out 0s;
+  -mox-transition: all 0.3s ease-in-out 0s;
+  -webkit-transition: all 0.3s ease-in-out 0s;
+}
+
+.editTools a,
+.editTools a:visited,
+.editTools a:hover{
+  color: #ffffff;
+  text-decoration: none;
+}
+.editTools i {
+  color: #ffffff;
+  font-size: 20px;
+  text-shadow: 2px 2px #000000;
+}
+
+.profile-img-editor:hover .editTools {
+  opacity:1;
+}
+
+.user-profile-img {
+  border: 2px solid $white;
+}
+
+.no-underline {
+  text-decoration: none !important;
+}
+
+.no-hover-underline:hover{
+  text-decoration: underline !important;
+}
+
+.no-hover-bg:hover {
+  background: none !important;
+}
+
+.pt-empty-label {
+  padding-top: 1.7em;
+}
+
+.position-center {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}

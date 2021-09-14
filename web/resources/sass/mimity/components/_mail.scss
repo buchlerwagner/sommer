@@ -1,0 +1,85 @@
+.btn-starred {
+  color: $text-muted;
+  &.active {
+    color: #f5c94b;
+  }
+}
+
+.mail-item {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-radius: 0 !important;
+  .media {
+    align-items: center;
+    position: relative;
+  }
+  background-color: $gray-200;
+  &.unread {
+    font-weight: $font-weight-bold;
+    background-color: #fff;
+    .small {
+      font-weight: $font-weight-bold;
+    }
+  }
+  &.checked {
+    background-color: lighten($warning, 40%);
+  }
+  .media-body {
+    cursor: pointer;
+    display: flex;
+    overflow: hidden;
+    @include media-breakpoint-up(sm) {
+      align-items: center;
+      height: 37px;
+    }
+    @include media-breakpoint-only(xs) {
+      justify-content: center;
+      flex-direction: column;
+      height: 76px;
+    }
+  }
+  .custom-checkbox .custom-control-input:not(:checked)~.custom-control-label::before {
+    background-color: transparent;
+  }
+  @include media-breakpoint-up(sm) {
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(#000,.1),
+                  0 -4px 6px -1px rgba(#000,.1),
+                  0 2px 4px -1px rgba(#000,.06),
+                  0 -2px 4px -1px rgba(#000,.06);
+      z-index: 1;
+      border-color: rgba(#000,.25);
+    }
+  }
+  @include media-breakpoint-only(xs) {
+    .btn-starred {
+      position: absolute !important;
+      right: 0;
+      top: 50% !important;
+      margin-top: -12px;
+      font-size: 1rem;
+    }
+  }
+}
+@include media-breakpoint-up(sm) {
+  .mail-item-from {
+    width: 210px;
+  }
+  .mail-item-subject {
+    max-width: calc(100% - 220px);
+  }
+}
+.mail-item-from,
+.mail-item-subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@include media-breakpoint-only(xs) {
+  .mail-item-summary {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

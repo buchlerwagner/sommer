@@ -1,0 +1,25 @@
+<div class="modal fade" id="ajax-modal" data-blur="true" tabindex="-1" role="dialog" aria-labelledby="ajaxModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+        </div>
+	</div>
+</div>
+
+<div class="modal fade" id="confirm-delete" data-blur="true" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h3 class="modal-title text-white" id="confirmModalLabel" data-default-title="{{ _('LBL_CONFIRM_MODAL_TITLE') }}">{{ _('LBL_CONFIRM_MODAL_TITLE') }}</h3>
+            </div>
+
+            <div class="modal-body">
+                <p class="confirm-question"></p>
+            </div>
+
+            <div class="modal-footer" data-loading="{{ _('LBL_LOADING_PLEASE_WAIT') }}">
+                <button type="button" class="btn btn-danger danger btn-action btn-progress" data-default-caption="{{ _('BTN_DELETE') }}">{{ _('BTN_DELETE') }}</button>
+                <a href="javascript:;" data-dismiss="modal" class="btn btn-light ml-2">{{ _('BTN_CANCEL') }}</a>
+            </div>
+        </div>
+    </div>
+</div>

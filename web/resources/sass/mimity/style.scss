@@ -1,0 +1,162 @@
+// Required
+@import '../bootstrap/functions';
+@import 'bootstrap/variables'; // Override variables
+
+// ================================ BOOTSTRAP MIXINS ================================
+// Vendor
+@import '../bootstrap/vendor/rfs';
+
+// Deprecate
+@import '../bootstrap/mixins/deprecate';
+
+// Utilities
+@import '../bootstrap/mixins/breakpoints';
+@import '../bootstrap/mixins/hover';
+@import '../bootstrap/mixins/image';
+@import '../bootstrap/mixins/badge';
+@import '../bootstrap/mixins/resize';
+@import '../bootstrap/mixins/screen-reader';
+@import '../bootstrap/mixins/size';
+@import '../bootstrap/mixins/reset-text';
+@import '../bootstrap/mixins/text-emphasis';
+@import '../bootstrap/mixins/text-hide';
+@import '../bootstrap/mixins/text-truncate';
+@import '../bootstrap/mixins/visibility';
+
+// Components
+@import 'bootstrap/mixins/alert'; // Override alert mixins
+@import 'bootstrap/mixins/buttons'; // Override button mixins
+@import '../bootstrap/mixins/caret';
+@import '../bootstrap/mixins/pagination';
+@import '../bootstrap/mixins/lists';
+@import '../bootstrap/mixins/list-group';
+@import '../bootstrap/mixins/nav-divider';
+@import '../bootstrap/mixins/forms';
+@import '../bootstrap/mixins/table-row';
+
+// Skins
+@import '../bootstrap/mixins/background-variant';
+@import '../bootstrap/mixins/border-radius';
+@import '../bootstrap/mixins/box-shadow';
+@import '../bootstrap/mixins/gradients';
+@import '../bootstrap/mixins/transition';
+
+// Layout
+@import '../bootstrap/mixins/clearfix';
+@import '../bootstrap/mixins/grid-framework';
+@import '../bootstrap/mixins/grid';
+@import '../bootstrap/mixins/float';
+// ================================ BOOTSTRAP MIXINS ================================
+
+
+// ================================ BOOTSTRAP COMPONENTS ================================
+@import '../bootstrap/root';
+@import '../bootstrap/reboot';
+@import '../bootstrap/type'; @import 'bootstrap/type'; // Custom type styles
+@import '../bootstrap/images';
+@import '../bootstrap/code';
+@import '../bootstrap/grid';
+@import '../bootstrap/tables'; @import 'bootstrap/tables'; // Custom table styles
+@import '../bootstrap/forms'; @import 'bootstrap/forms'; // Custom form styles
+@import '../bootstrap/buttons'; @import 'bootstrap/buttons'; // Custom button styles
+@import '../bootstrap/transitions'; @import 'bootstrap/transitions'; // Custom transition styles
+@import '../bootstrap/dropdown'; @import 'bootstrap/dropdown'; // Custom dropdown styles
+@import '../bootstrap/button-group';
+@import '../bootstrap/input-group';
+@import '../bootstrap/custom-forms'; @import 'bootstrap/custom-forms'; // Custom custom-forms styles
+@import '../bootstrap/nav'; @import 'bootstrap/nav'; // Custom nav styles
+@import '../bootstrap/navbar';
+@import '../bootstrap/card'; @import 'bootstrap/card'; // Custom card styles
+@import '../bootstrap/breadcrumb'; @import 'bootstrap/breadcrumb'; // Custom breadcrumb styles
+@import '../bootstrap/pagination';
+@import '../bootstrap/badge'; @import 'bootstrap/badge'; // Custom badge styles
+@import '../bootstrap/jumbotron';
+@import 'bootstrap/alert'; // Override alert styles
+@import '../bootstrap/progress'; @import 'bootstrap/progress'; // Custom badge styles
+@import '../bootstrap/media';
+@import '../bootstrap/list-group';
+@import '../bootstrap/close';
+@import '../bootstrap/toasts';
+@import '../bootstrap/modal'; @import 'bootstrap/modal'; // Custom modal styles
+@import '../bootstrap/tooltip';
+@import '../bootstrap/popover'; @import 'bootstrap/popover'; // Custom popover styles
+@import '../bootstrap/carousel'; @import 'bootstrap/carousel'; // Custom carousel styles
+@import '../bootstrap/spinners'; @import 'bootstrap/spinners'; // Custom spinner styles
+@import '../bootstrap/utilities';
+@import '../bootstrap/print';
+// ================================ BOOTSTRAP COMPONENTS ================================
+
+
+// ================================ CUSTOM COMPONENTS ================================
+@import 'vendor/variables';
+@import 'vendor/material-icons';
+@import 'vendor/feather-icons';
+@import 'vendor/simplebar';
+@import 'vendor/swiper';
+@import 'vendor/bootbox';
+@import 'vendor/noty';
+@import 'vendor/sortablejs';
+@import 'vendor/datatables';
+@import 'vendor/flatpickr';
+@import 'vendor/clockpicker';
+@import 'vendor/bootstrap-colorpicker';
+@import 'vendor/bootstrap-select';
+@import 'vendor/bootstrap-touchspin';
+@import 'vendor/nouislider';
+@import 'vendor/summernote';
+@import 'vendor/markdown-it';
+@import 'vendor/fullcalendar';
+@import 'vendor/smartwizard';
+@import 'vendor/select2';
+@import 'vendor/tagin';
+
+@import 'components/variables';
+@import 'components/mixins';
+@import 'components/custom-scrollbar';
+@import 'components/grid';
+@import 'components/tables';
+@import 'components/forms';
+@import 'components/buttons';
+@import 'components/dropdown';
+@import 'components/button-group';
+@import 'components/custom-forms';
+@import 'components/nav';
+@import 'components/navbar';
+@import 'components/card';
+@import 'components/breadcrumb';
+@import 'components/pagination';
+@import 'components/badge';
+@import 'components/alert';
+@import 'components/progress';
+@import 'components/list-group';
+@import 'components/toasts';
+@import 'components/tooltip';
+@import 'components/popover';
+
+@import 'components/animation';
+@import 'components/sidebar';
+@import 'components/logo';
+@import 'components/main';
+@import 'components/layout';
+@import 'components/layout-inner';
+@import 'components/timeline';
+@import 'components/images';
+@import 'components/list';
+@import 'components/file-manager';
+@import 'components/mail';
+@import 'components/chat';
+@import 'components/login';
+@import 'components/todo';
+@import 'components/forum';
+@import 'components/pricing';
+@import 'components/label';
+@import 'components/form-fieldset';
+@import 'components/autowidth';
+@import 'components/toggle-password';
+@import 'components/autocomplete';
+@import 'components/treeview';
+@import 'components/treeview-nav';
+@import 'components/treeview-folder';
+@import 'components/utilities';
+
+@import 'components/ajax';

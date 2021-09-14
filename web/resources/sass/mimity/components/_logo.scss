@@ -1,0 +1,17 @@
+.logo {
+  color: $logo-color;
+  font-size: $navbar-brand-font-size;
+  font-weight: $logo-font-weight;
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  &:hover {
+    text-decoration: none;
+    color: $logo-color;
+  }
+  img {
+    width: $logo-size;
+    height: $logo-size;
+    margin-right: .5rem;
+  }
+}

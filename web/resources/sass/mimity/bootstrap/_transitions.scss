@@ -1,0 +1,14 @@
+// Keep transitions
+@if $enable-transitions != true {
+  .fade {
+    transition: $transition-fade;
+  }
+  .collapsing {
+    transition: $transition-collapse;
+  }
+}
+
+// strengthen it with !important
+.collapse:not(.show) {
+  display: none !important;
+}

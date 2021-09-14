@@ -1,0 +1,10 @@
+<div class="profile-img-editor mt-3">
+    <div class="editArea">
+        <div class="editTools">
+            <a href="javascript:void(0);" class="upload-profile-img"><i class="fa fa-camera"></i></a>
+            <a href="javascript:void(0);" class="delete-profile-img{% if not control.data.filename %} d-none{% endif %} ml-2"><i class="fa fa-trash-alt"></i></a>
+        </div>
+    </div>
+    <img src="{{ control.data.src }}" class="rounded-circle user-profile-img" width="200" alt="">
+</div>
+

@@ -1,0 +1,25 @@
+.divider-text {
+  position: relative;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  color: $text-muted;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .5px;
+  margin: 15px 0;
+  &::before,
+  &::after {
+    content: '';
+    display: block;
+    flex: 1;
+    height: 1px;
+    background-color: $hr-border-color;
+  }
+  &::before {
+    margin-right: 10px;
+  }
+  &::after {
+    margin-left: 10px;
+  }
+}

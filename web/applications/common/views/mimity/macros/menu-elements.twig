@@ -1,0 +1,23 @@
+{% macro item(menukey, menuitem, link, mainmenu, active) %}
+    {% if menukey != 'index' and link %}
+        {% if mainmenu %}
+            {% set link = '/' ~ link %}
+        {% else %}
+            {% set link = '/' ~ link ~ menukey ~ '/' %}
+        {% endif %}
+    {% else %}
+        {% set link = 'javascript:;' %}
+    {% endif %}
+
+    <a href="{{ link }}" class="nav-link{% if menuitem.items %} treeview-toggle{% endif %}{% if menuitem.icon or menuitem.feathericon %} has-icon{% endif %}{% if active %} active show{% endif %}">
+        {% if menuitem.icon %}
+            <i class="fa fa-fw {{ menuitem.icon }}"></i>
+        {% elseif menuitem.feathericon %}
+            <i data-feather="{{ menuitem.feathericon }}"></i>
+        {% endif %}
+        {% if menuitem.caption is empty %}{{ _('MENU_' ~ menukey) }}{% else %}{{ _(menuitem.caption) }}{% endif %}
+        {% if menuitem.badge %}
+            <span id="menu-badge-{{ menukey }}" class="badge badge-pill{% if menuitem.badge.color %} badge-{{ menuitem.badge.color }}{% else %} badge-warning{% endif %}{% if not menuitem.badge.value %} d-none{% endif %} ml-auto">{{ menuitem.badge.value }}</span>
+        {% endif %}
+    </a>
+{% endmacro %}

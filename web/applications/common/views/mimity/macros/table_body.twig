@@ -1,0 +1,83 @@
+{% import "tools.twig" as tools %}
+{% import "form_elements.twig" as form_elements %}
+<tbody class="mt-1">
+{% set groups = [] %}
+{% for i, row in table.rows %}
+    {% if row.__id %}
+        {% set rowID = row.__id %}
+    {% else %}
+        {% set rowID = row[0] %}
+    {% endif %}
+
+    {% set keyvalue = '' %}
+    {% for field in table.keyFields %}
+        {% if row[field]  %}
+            {% set keyvalue = keyvalue ~ row[field] %}
+        {% endif %}
+        {% if not loop.last  %}
+            {% set keyvalue = keyvalue ~ '|' %}
+        {% endif %}
+    {% endfor %}
+
+    {% set selected = false %}
+    {% if table.multipleSelect %}
+        {% if rowID in table.selection %}
+            {% set selected = true %}
+        {% endif %}
+    {% endif %}
+
+    {% if row.groups %}
+        {% for groupKey, group in row.groups %}
+            {% if groups[groupKey] != group.text and group.text %}
+                {% set groups = groups|merge({(groupKey): group.text}) %}
+                <tr class="group-level-{{ loop.index }} bg-gray-100 no-hover">
+                    <td colspan="{{ row|length }}"><b class="text-primary">{{ _(group.text) }}</b>{% if group.description %} - {{ group.description }}{% endif %}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% set modalSize = table.modalSize %}
+
+    {% if table.defaultAction == 'view' and table.viewForm %}
+        {% set formName = table.viewForm %}
+
+        {% if table.viewModalSize %}
+            {% set modalSize = table.viewModalSize %}
+        {% endif %}
+    {% else %}
+        {% set formName = table.formName %}
+    {% endif %}
+
+    <tr{% if table.sortable %} id="element-{{ rowID }}"{% endif %} class="d-flex{% if row.options.isDeleted %} bg-deleted{% else %} bg-h-yellow{% endif %} d-style{% if table.infoRowTemplate %} double-row-h{% endif %}{% if table.rowClick and (table.edit or table.view) %} tr-clickable{% endif %}{% if row.options.class %} {{ row.options.class }}{% endif %}{% if selected %} tr-selected{% endif %}" data-id="{{ rowID }}"{% if table.edit or table.view %}{% if table.customUrl %}data-url="{{ table.customUrl|replace({'%keyvalue%': keyvalue, '%id%': rowID }) }}"{% else %}{% if table.rowClick %}{% if table.subTable %} data-modal="true"{% if modalSize %} data-size="{{ modalSize }}"{% endif %} data-href="/ajax/forms/{{ formName }}/{{ keyvalue }}/{{ table.name }}/{% if table.readonly or table.defaultAction == 'view' %}?view=1{% endif %}" {% else %} data-edit="./{{ table.defaultAction }}|{{ table.name }}/{{ keyvalue }}/"{% endif %}{% endif %}{% endif %}{% if table.target %} data-target="{{ table.target }}"{% endif %}{% endif %}>
+    {% if table.multipleselect %}
+        <td class="text-center pr-0 pos-rel col-1">
+            {% set params = {'id' : table.name ~ '_' ~ rowID, 'name' : table.name ~ '[]', 'class': 'table-row-selector'} %}
+            {{ form_elements._checkbox(params, rowID, selected) }}
+        </td>
+        {% endif %}
+    {% if table.showRowindex %}
+        <td>{{ (table.settings.page-1)*table.settings.display+i+1 }}.</td>
+    {% endif %}
+    {% set c = 0 %}
+    {% set skipFields = table.keyFields|length %}
+    {% for key, val in row %}
+        {% if c >= skipFields and key != 'options' and key != 'groups' and key != '__id' %}
+            {% set column = table.columns[key] %}
+            {% if column.type != 'hidden' %}
+                <td class="{% if column.width %}col-{{ column.width }}{% endif %}{% if column.class %} {{ column.class }}{% endif %}">{{ tools.table_cell(table.name, keyvalue, column, val, row, (table.readonly or row['options'].readonly))|raw }}</td>
+            {% endif %}
+        {% endif %}
+        {% set c = c + 1 %}
+    {% endfor %}
+    {% if table.options %}
+        <td class="col-{{ table.optionsWidth }} text-right text-nowrap">{{ tools.table_options(keyvalue, table, row, table.readonly)|trim|raw }}</td>
+    {% endif %}
+    </tr>
+    {% if table.infoRowTemplate %}
+        <tr class="double-2nd-row-h d-flex bg-h-yellow-l4 d-style {% if table.rowClick %} tr-clickable{% endif %}{% if row.options.class %} {{ row.options.class }}{% endif %}{% if selected %} tr-selected{% endif %}" data-id="{{ rowID }}"{% if table.customUrl %}data-url="{{ table.customUrl|replace({'%keyvalue%': keyvalue, '%id%': rowID }) }}"{% else %}{% if table.rowClick and (table.edit or table.view) %}{% if table.subTable %} data-modal="true"{% if table.modalSize %} data-size="{{ table.modalSize }}"{% endif %} data-href="/ajax/forms/{{ table.formName }}/{{ keyvalue }}/{{ table.name }}/{% if table.readonly %}?view=1{% endif %}" {% else %} data-edit="./{{ table.defaultAction }}|{{ table.name }}/{{ keyvalue }}/"{% endif %}{% endif %}{% endif %}>
+            {% include table.infoRowTemplate ~ '.twig' %}
+        </tr>
+    {% endif %}
+{% endfor %}
+</tbody>

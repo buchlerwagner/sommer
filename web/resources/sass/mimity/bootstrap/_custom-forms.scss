@@ -1,0 +1,42 @@
+// Custom checkboxes, radios, switchs hover
+.custom-control .custom-control-input {
+  &:not(:disabled):not(:checked):not(:active):hover ~ .custom-control-label::before,
+  &:not(:disabled):not(:checked):not(:active):focus ~ .custom-control-label::before {
+    border-color: darken($custom-control-indicator-border-color, 20%);
+    .was-validated & {
+      border-color: inherit;
+    }
+  }
+}
+
+// Keep custom switch transition
+@if $enable-transitions != true {
+  .custom-switch {
+    .custom-control-label {
+      &::before {
+        transition: $custom-forms-transition;
+      }
+      &::after {
+        transition: transform .15s ease-in-out, $custom-forms-transition;
+      }
+    }
+  }
+}
+
+// Custom radio, switch, checkbox checked-disabled border color
+.custom-radio .custom-control-input:disabled:checked ~ .custom-control-label::before,
+.custom-switch .custom-control-input:disabled:checked ~ .custom-control-label::before,
+.custom-checkbox .custom-control-input:disabled:checked ~ .custom-control-label::before {
+  border-color: transparent;
+}
+
+// File browser
+.custom-file-label {
+  overflow: hidden; // hide overlapping file names
+  white-space: nowrap;
+  padding-right: 80px;
+  text-overflow: ellipsis;
+  .form-control-lg & {
+    padding-right: 95px;
+  }
+}

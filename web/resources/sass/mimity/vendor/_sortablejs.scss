@@ -1,0 +1,17 @@
+.drag-handle {
+  cursor: default;
+}
+.remove-handle {
+  cursor: pointer;
+}
+.sortable-ghost,
+.sortable-swap-highlight {
+  position: relative;
+  z-index: 2;
+}
+.sortable-ghost {
+  outline: 2px dashed $secondary;
+}
+.sortable-swap-highlight {
+  outline: 2px dotted $secondary;
+}

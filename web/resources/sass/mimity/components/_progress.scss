@@ -1,0 +1,11 @@
+.progress-vertical {
+  position: relative;
+  display: inline-block;
+  width: $progress-height;
+  margin-bottom: 0;
+  .progress-bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+}

@@ -1,0 +1,61 @@
+{% import "form_elements.twig" as form_elements %}
+<div class="card">
+    <div class="card-body">
+        {% if table.headerCaption %}
+            <div class="d-flex justify-content-between flex-column flex-sm-row mb-3 px-2 px-sm-0">
+                <h3 class="text-130 pl-1 mb-3 mb-sm-0 text-primary-m2">
+                    {{ _(table.headerCaption) }}
+                </h3>
+            </div>
+        {% endif %}
+        <table id="table_{{ table.name }}" class="{{ table.tableClass }}" data-table="{{ table.className }}" {% if table.className != table.name %} data-alias="{{ table.name }}"{% endif %}{% if table.parameters.options %} data-options="{{ table.parameters.options|json_encode() }}"{% endif %}{% if table.parameters.foreignkeys[0] %} data-foreignkey="{{ table.parameters.foreignkeys[0] }}"{% endif %}>
+            {% if table.header %}
+                <thead class="thead-primary">
+                    <tr class="d-flex">
+                    {% set colspan = 0 %}
+                    {% if table.multipleSelect %}
+                        {% set colspan = colspan + 1 %}
+                        {% set params = {'id' : table.name ~ '_a--', 'name' : '', 'class': 'table-row-selector-all'} %}
+                        <th><span class="d-none d-sm-block">{{ form_elements._checkbox(params, 'all', false) }}</span></th>
+                    {% endif %}
+                    {% if table.showRowIndex %}
+                        {% set colspan = colspan + 1 %}
+                        <th>&nbsp;</th>
+                    {% endif %}
+                    {% for col in table.columns %}
+                        {% apply spaceless %}
+                        {% if col.type != 'hidden' and (col.caption is not empty or col.rawcaption is not empty) %}
+                            {% set colspan = colspan + 1 %}
+                            <th{% if col.colspan is not empty %} colspan="{{ col.colspan }}"{% endif %} class="{% if col.width %}col-{{ col.width }}{% endif %}{% if col.headerClass is not empty %} {{ col.headerClass }}{% endif %} text-primary">
+                                {% if col.icon is not empty %}<i class="fa fa-fw fa-{{ col.icon }} text-muted"></i> {% endif %}
+                                {{ _(col.caption)|capitalize|nl2br }}
+                            </th>
+                        {% endif %}
+                        {% endapply %}
+                    {% endfor %}
+                    {% if table.options %}
+                        {% set colspan = colspan + 1 %}
+                        <th class="col-{{ table.optionsWidth }} text-right text-primary">{{ _('LBL_OPTIONS')|capitalize }}</th>
+                    {% endif %}
+                    </tr>
+                </thead>
+            {% endif %}
+
+            {% include table.bodyTemplate ~ constant('TWIG_FILE_EXTENSION') %}
+            {% include 'table_totals.twig' %}
+        </table>
+
+        <div class="d-flex p-3 border-top">
+            {% include "table_row_counter.twig" %}
+            {% if table.pagerOnBottom is not empty %}
+                {% include "table_pager.twig" %}
+            {% endif %}
+        </div>
+
+    </div>
+    {% if table.buttons|length > 0 %}
+        <div class="card-footer">
+            {% include "table_buttons.twig" %}
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,20 @@
+.list-group-sm .list-group-item {
+  padding: ($list-group-item-padding-y / 2) ($list-group-item-padding-x / 2);
+  font-size: $font-size-sm;
+}
+.list-group-borderless .list-group-item {
+  margin-bottom: 0;
+  border: 0;
+}
+.list-group-item.has-icon {
+  display: flex;
+  align-items: center;
+}
+.list-group-striped .list-group-item:nth-of-type(odd) {
+  &:not(.list-group-item-action) {
+    background-color: $list-group-item-striped-bg;
+  }
+  &.list-group-item-action:not(:hover):not(:focus) {
+    background-color: $list-group-item-striped-bg;
+  }
+}

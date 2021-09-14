@@ -1,0 +1,74 @@
+/** Floating labels **/
+
+.floating-label {
+  position: relative;
+  margin-bottom: $spacer;
+}
+
+.floating-label input{
+  height: 50px;
+}
+
+.floating-label > input,
+.floating-label > label {
+  padding: $spacer * .9 $spacer * .75;
+}
+
+.floating-label > label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  line-height: 1.5;
+  color: $gray-800;
+  border: 1px solid transparent;
+  border-radius: $border-radius-sm;
+  transition: all .1s ease-in-out;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.floating-label input::-webkit-input-placeholder {
+  color: transparent;
+}
+
+.floating-label input:-ms-input-placeholder {
+  color: transparent;
+}
+
+.floating-label input::-ms-input-placeholder {
+  color: transparent;
+}
+
+.floating-label input::-moz-placeholder {
+  color: transparent;
+}
+
+.floating-label input::placeholder {
+  color: transparent;
+}
+
+.floating-label input:focus,
+.floating-label input:not(:placeholder-shown) {
+  padding-top: calc(#{$spacer} + #{$spacer} * (2 / 3));
+  padding-bottom: calc(#{$spacer} / 3);
+}
+
+.floating-label input:focus ~ label,
+.floating-label input:not(:placeholder-shown) ~ label {
+  padding-top: calc(#{$spacer} / 3);
+  padding-bottom: calc(#{$spacer} / 3);
+  font-size: 12px;
+  color: $gray-500;
+}
+
+.form-row .floating-label label:not(.error) {
+  padding-left: calc(#{$spacer} * 1.1);
+}

@@ -1,0 +1,19 @@
+<body>
+{% include 'sidebar.twig' %}
+<div class="main">
+    <div class="main-header">
+        {% include 'navbar.twig' %}
+    </div>
+    <div class="main-body">
+        {% if pageName and page != 'index' %}
+            <h1 class="{% if pageSubTitle  %}mb-0{% else %}mb-3{% endif %} text-primary">{{ _(pageName)|raw }}</h1>
+        {% endif %}
+        {% if pageSubTitle and page != 'index' %}
+            <h4 class="mb-3 text-secondary">{{ _(pageSubTitle)|raw }}</h4>
+        {% endif %}
+
+        {% include page ~ '.twig' %}
+    </div>
+</div>
+
+{% include 'page-modals.twig' %}

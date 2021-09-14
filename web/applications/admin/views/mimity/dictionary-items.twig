@@ -1,0 +1,4 @@
+{% import "tools.twig" as tools %}
+{% for key, value in labels.items %}
+    {{ tools.label_editor(key, value, post) }}
+{% endfor %}

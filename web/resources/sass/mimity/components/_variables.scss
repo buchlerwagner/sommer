@@ -1,0 +1,85 @@
+$colors: (
+  "blue": $blue,
+  "indigo": $indigo,
+  "purple": $purple,
+  "pink": $pink,
+  "orange": $orange,
+  "teal": $teal,
+);
+$vh100: calc(var(--vh, 1vh) * 100); // https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
+
+// Webkit scroll bar
+$webkit-scrollbar-size: 9px;
+$webkit-scrollbar-track-bg: #f2f2f2;
+$webkit-scrollbar-track-border: 1px solid #d9d9d9;
+$webkit-scrollbar-handle-bg: #c2c2c2;
+$webkit-scrollbar-handle-border: 1px solid #9c9c9c;
+$webkit-scrollbar-handle-hover-bg: #919191;
+$webkit-scrollbar-handle-hover-border: 1px solid #6a6a6a;
+
+// Nav
+$nav-link-color: $gray-700;
+$nav-link-active-color: $component-active-bg;
+
+// Sidebar
+$sidebar-bg: #fff;
+$sidebar-width: 235px;
+$sidebar-header-height: 3.5 * $font-size-base;
+$sidebar-width-collapse: $sidebar-header-height;
+
+// Logo
+$logo-size: 40px;
+$logo-color: $body-color;
+$logo-font-weight: 500;
+
+// Main
+$main-header-height: $sidebar-header-height;
+$main-header-padding: 15px;
+$main-header-bg: #fff;
+$main-body-padding: 15px;
+
+// Navbar
+$main-navbar-height: 48px;
+
+// Nav notifications
+$nav-notif-width: 300px;
+$nav-notif-max-height: 500px;
+
+// Button extra small
+$btn-xs-padding-y: .125rem;
+$btn-xs-padding-x: .375rem;
+$btn-xs-font-size: .75rem;
+$btn-xs-line-height: 1.5;
+$btn-xs-border-radius: .15rem;
+
+// List group striped
+$list-group-item-striped-bg: rgba(#000,.05);
+
+// Timeline
+$timeline-ruler-width: 2px;
+$timeline-ruler-color: #6c757d;
+$timeline-circle-width: 16px;
+$timeline-circle-border: 2px solid #6c757d;
+
+// Inner layout
+$inner-sidebar-bg: $sidebar-bg;
+$inner-sidebar-width: $sidebar-width;
+$inner-main-header-height: $main-header-height;
+$inner-main-header-bg: $main-header-bg;
+
+// Chat
+$chat-sidebar-width: 320px;
+$chat-discussion-bg: url("../../images/pattern/pattern1.png");
+$chat-message-bg: #fff;
+$chat-message-right-bg: #effdde;
+$chat-message-max-width: 80%;
+$chat-read-color: $blue;
+$chat-divider-bg: #98a2aa;
+$chat-divider-color: #fff;
+
+// Login
+$login-bg: url("../../images/pattern/pattern1.png");
+$login-width: 350px;
+
+// Autowidth
+$autowidth-minwidth: 2rem;

@@ -1,0 +1,30 @@
+.todo-item {
+  position: relative;
+  width: 100%;
+  i[class^="fa"] {
+    color: $warning;
+  }
+  > time {
+    position: absolute;
+    right: 0;
+    bottom: -.75rem;
+  }
+  &.done {
+    text-decoration: line-through;
+    color: $text-muted;
+    i[class^="fa"],
+    .btn-link,
+    .small {
+      color: $text-muted !important;
+    }
+    > time {
+      text-decoration: line-through;
+    }
+    .color-item > label {
+      background-color: $text-muted;
+    }
+  }
+  .color-item > label {
+    background-color: $gray-700;
+  }
+}

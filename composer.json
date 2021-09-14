@@ -1,0 +1,11 @@
+{
+    "name": "root/careline",
+    "require": {
+        "twig/twig": "^3",
+        "phpmailer/phpmailer": "^6.1",
+        "mpdf/mpdf": "^8.0",
+        "myclabs/php-enum": "^1.7",
+        "phpoffice/phpspreadsheet": "1.11",
+        "markbaker/matrix": "1.2"
+    }
+}

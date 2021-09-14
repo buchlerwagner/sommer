@@ -1,0 +1,6 @@
+{% import "form_elements.twig" as form_elements %}
+<div class=" table_{{ table.name }}_buttons">
+{% for val1 in table.buttons %}
+    {{ form_elements.form_button(val1, table.name) }}
+{% endfor %}
+</div>

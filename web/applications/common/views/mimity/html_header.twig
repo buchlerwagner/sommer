@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="{{ language }}">
+	<head>
+		<meta charset="utf-8">
+        <meta http-equiv="pragma" content="no-cache" />
+        <meta http-equiv="cache-control" content="max-age=604800" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        {#
+        <link rel="icon" type="image/png" sizes="113x113" href="{{ images }}favicon-113.png">
+        <link rel="icon" type="image/png" sizes="250x250" href="{{ images }}favicon-250.png">
+        #}
+		<title>{% if title is not empty %}{{ _(title) }} | {% endif %}{{ sitedata.title }}</title>
+{% if meta %}
+    {% for property, content in meta %}
+        <meta property="{{ property }}" content="{{ content }}" />
+    {% endfor %}
+{% endif %}
+{% if headers %}
+    {% for h in headers %}
+        {{ h|raw }}
+    {% endfor %}
+{% endif %}
+{% if description is not empty %}
+        <meta name="description" content="{{ description }}">
+{% endif %}
+{% if keywords is not empty %}
+        <meta name="keywords" content="{{ keywords }}">
+{% endif %}
+
+{% for file in css.files %}
+        <link rel="stylesheet" type="text/css" href="{{ file }}">
+{% endfor %}
+
+{% if css.inline|length > 0 %}
+        <style>
+            {% for cssline in css.inline %}
+            {{ cssline|raw }}
+            {% endfor %}
+        </style>
+{% endif %}
+{% if sitedata.google.analytics %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ sitedata.google.analytics }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', '{{ sitedata.google.analytics }}');
+    </script>
+{% endif %}
+        <script>
+            var APP_LANGUAGE = '{{ language }}';
+    {% if messages %}
+        var _messages = {{ messages|raw }};
+    {% endif %}
+    </script>
+{% if js.header.files %}
+    {% for file in js.header.files %}
+    <script src="{{ file }}" type="text/javascript"></script>
+    {% endfor %}
+{% endif %}
+{% if js.header.inline %}
+    {% if js.header.inline|length > 0 %}
+        <style>
+            {% for inline in js.header.inline %}
+            {{ inline|raw }}
+            {% endfor %}
+        </style>
+    {% endif %}
+{% endif %}
+</head>
+
+

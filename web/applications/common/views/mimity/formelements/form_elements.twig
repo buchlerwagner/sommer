@@ -1,0 +1,1138 @@
+{% macro fieldset(controls, values, form_name) %}
+	{% import _self as form_elements %}
+
+	{% set row_open = false %}
+	{% set fieldset_open_out = false %}
+	{% set fieldset_open_in = false %}
+
+	{% for control in controls %}
+		{% if control.group is defined  %}
+			{% if control.col is not empty %}
+				{% if not row_open %}<div class="row">{% set row_open = true %}{% endif %}
+		        <div class="col-{{ control.col }}">
+			{% endif %}
+
+			{% if row_open %}
+				{% if control.fieldset is defined and not fieldset_open_out %}
+			        <fieldset{% if control.fieldsetid %} id="{{ control.fieldsetid }}"{% endif %}{% if control.fieldsetclass %} class="{{ control.fieldsetclass }}"{% endif %}>
+			        {% set fieldset_open_in = true %}
+					{% if control.fieldset is not empty %}
+					    <legend class="text-primary border-bottom mt-4 mb-4">{{ _(control.fieldset) }}</legend>
+    			    {% endif %}
+				{% endif %}
+			{% else %}
+				{% if control.fieldset is defined %}
+					{% if fieldset_open_out %}
+					        <div class="hr-line-dashed"></div>
+					    </fieldset>
+					{% endif %}
+			        <fieldset{% if control.fieldsetid %} id="{{ control.fieldsetid }}"{% endif %}{% if control.fieldsetclass %} class="{{ control.fieldsetclass }}"{% endif %}>
+			        {% set fieldset_open_out = true %}
+					{% if control.fieldset is not empty %}
+					    <legend class="text-primary border-bottom mt-4 mb-4">{{ _(control.fieldset) }}</legend>
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		{% elseif not fieldset_open_out %}
+			{% if row_open %}
+			    </div>
+			    {% set row_open = false %}
+			{% endif %}
+	        <fieldset{% if control.fieldsetid %} id="{{ control.fieldsetid }}"{% endif %}{% if control.fieldsetclass %} class="{{ control.fieldsetclass }}"{% endif %}>
+	        {% set fieldset_open_out = true %}
+		{% endif %}
+
+        {% if control.group|length > 0 %}
+			{% if fieldset_open_out or fieldset_open_in %}
+				{{ form_elements.control_group(control.group, values, form_name, control.class, control.id, control.hlayout) }}
+			{% else %}
+				{{ form_elements.fieldset(control.group, values, form_name) }}
+			{% endif %}
+		{% else %}
+			{{ form_elements.control(control, values, form_name, control.hlayout) }}
+		{% endif %}
+
+		{% if control.group is defined and control.col is not empty %}
+			{% if fieldset_open_in %}
+			    </fieldset>
+			    {% set fieldset_open_in = false %}
+			{% endif %}
+		    </div>
+		{% endif %}
+	{% endfor %}
+
+	{% if fieldset_open_out %}
+	        </fieldset>
+	    <div class="clearfix"></div>
+	    {% set fieldset_open_out = false %}
+	{% endif %}
+
+    {% if row_open %}
+        </div>
+        {% set row_open = false %}
+    {% endif %}
+{% endmacro %}
+
+{% macro control_group(controls, values, form_name, class, id = '', layout) %}
+	{% import _self as form_elements %}
+		<div class="{% if not layout %}row {% endif %}{% if class %} {{ class }}{% endif %}"{% if id is not empty %} id="{{ id }}"{% endif %}>
+		{% for control in controls %}
+			{% if control.type != 'hidden' and not layout %}<div class="col-{{ control.col }}">{% endif %}
+				{% if control.group|length > 0 %}
+					{{ form_elements.control_group(control.group, values, form_name, control.class, control.id) }}
+				{% else %}
+					{{ form_elements.control(control, values, form_name, layout) }}
+				{% endif %}
+			{% if control.type != 'hidden' and not layout %}</div>{% endif %}
+		{% endfor %}
+		</div>
+{% endmacro %}
+
+{% macro control(control, values, form_name, layout) %}
+	{% import _self as form_elements %}
+
+	{% if control.type == 'tabs' %}
+		{{ form_elements.tabs(control, values, form_name) }}
+	{% elseif control.type == 'boxes' %}
+		{{ form_elements.boxes(control, values, form_name) }}
+	{% elseif control.type == 'table' %}
+		{% set table = control.table %}
+		{% if table.datatable is not empty %}
+			{% include "datatable" ~ constant('TWIG_FILE_EXTENSION') %}
+		{% else %}
+            {% if table.tableType == 'table' %}
+			    {% include "table" ~ constant('TWIG_FILE_EXTENSION') %}
+    		{% elseif table.tableType == 'inline' %}
+                {% include "table-boxed" ~ constant('TWIG_FILE_EXTENSION') %}
+    		{% endif %}
+		{% endif %}
+	{% elseif control.html is not empty %}
+		{{ control.html|raw }}
+	{% elseif control.templatestring is not empty %}
+        {{ include(template_from_string( control.templatestring )) }}
+    {% elseif control.include is not empty %}
+        {% include control.include ~ constant('TWIG_FILE_EXTENSION') %}
+	{% else %}
+		{{ form_elements.section(control, values[ control.name ], form_name, layout, values) }}
+	{% endif %}
+{% endmacro %}
+
+{% macro tabs(control, values, form_name, template) %}
+	{% import _self as form_elements %}
+	<section id="section-{{ control.id }}">
+	    {% if control.label is not empty %}
+		    <label class="label">{{ _(control.label) }}</label>
+	    {% endif %}
+		<input type="hidden" name="{{ control.id }}" value="{{ control.active }}">
+
+        <ul id="{{ control.id }}" class="nav nav-tabs" role="tablist">
+            {% for key, tab in control.controls %}
+            <li class="nav-item">
+                <a class="flex-sm-fill nav-link {% if control.active == tab.id %} active{% endif %}" data-toggle="tab" href="#{{ tab.id }}" role="tab">
+                    {% if tab.icon %}<i class="fa {{ tab.icon }} mr-1 text-primary"></i>{% endif %}
+                    {{ _(tab.label) }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+
+		<div id="{{ control.id }}_content" class="tab-content p-2">
+	        {% for key, tab in control.controls %}
+                <div id="{{ tab.id }}" class="tab-pane{% if control.active == tab.id %} show active{% endif %}" role="tabpanel">
+                {{ form_elements.fieldset(tab.controls, values, form_name, template) }}
+                </div>
+	        {% endfor %}
+		</div>
+	</section>
+{% endmacro %}
+
+{% macro boxes(control, values, form_name, template) %}
+	{% import _self as form_elements %}
+	{% for key, box in control.controls %}
+        {% if control.sidetitles %}
+        <div class="row pt-4{% if not loop.first %} border-top{% endif %}">
+            <div class="col-{{ control.sidecol }} pt-3 mb-3 mb-lg-0">
+                {% if box.title is not empty %}
+                    <h5 class="card-title mb-3">{% if box.rawtitle %}{{ box.title }}{% else %}{{ _(box.title) }}{% endif %}</h5>
+                {% endif %}
+                {% if box.subtitle is not empty %}
+                    <span class="card-subtitle mb-3 text-muted">{% if box.rawtitle %}{{ box.subtitle }}{% else %}{{ _(box.subtitle) }}{% endif %}</span>
+                {% endif %}
+            </div>
+            <div class="col-{{ (12 - control.sidecol) }}">
+        {% endif %}
+
+            <div id="box-{{ box.id }}" class="form-box card mb-4{% if box.class %} {{ box.class }}{% endif %}">
+                <div class="card-body">
+                {% if not control.sidetitles %}
+                    {% if box.title is not empty %}
+                        <h5 class="card-title mb-3">{% if box.rawtitle %}{{ box.title }}{% else %}{{ _(box.title) }}{% endif %}</h5>
+                    {% endif %}
+                    {% if box.subtitle is not empty %}
+                        <h6 class="card-subtitle mb-3 text-muted">{% if box.rawtitle %}{{ box.subtitle }}{% else %}{{ _(box.subtitle) }}{% endif %}</h6>
+                    {% endif %}
+                {% endif %}
+
+                    {{ form_elements.fieldset(box.controls, values, form_name, template) }}
+                </div>
+            </div>
+
+	    {% if control.sidetitles %}
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% macro section(params, value, form_name, layout, values) %}
+	{% import _self as form_elements %}
+	{% set constraints = ' ' %}
+	{% if params.constraints is not empty and params.constraints is iterable %}
+		{% for constraint, constraint_value in params.constraints %}
+			{% set constraints = constraints ~ 'data-parsley-' ~ constraint ~ '=' ~ constraint_value ~ ' ' %}
+		{% endfor %}
+	{% endif %}
+	{% if params.name is not empty %}
+		{% set params = params|merge({name : form_name ~ '[' ~ params.name|replace({'/': ']['}) ~ ']', formname: form_name}) %}
+	{% endif %}
+    {% if layout %}
+        {% set params = params|merge({hlayout : layout}) %}
+    {% endif %}
+
+{% if params.type != 'hidden' and params.type != 'recaptcha' %}
+	<div{% if params.section.id is not empty %} id="{{ params.section.id }}"{% endif %} class="form-group{% if params.floatinglabel %} floating-label{% endif %} section-{{ params.id }} {% if params.section.class is not empty %} {{ params.section.class }}{% endif %}{% if params.hidden == 1 %} d-none{% endif %}{% if params.error is not empty %} has-error{% endif %}">
+{% endif %}
+
+	{% if params.type == 'textarea' or params.type == 'htmleditor' %}
+		{% if params.type == 'htmleditor' %}{% set params = params|merge({'class': params.class ~ ' htmleditor'}) %}{% endif %}
+		{{ form_elements._textarea(params, value, constraints) }}
+	{% elseif params.type == 'checkgroup' %}
+		{{ form_elements._checkgroup(params, value, constraints) }}
+	{% elseif params.type == 'bincheckgroup' %}
+		{{ form_elements._bincheckgroup(params, value, constraints) }}
+	{% elseif params.type == 'checkbox' %}
+		<div class="{% if params.inline %} inline-checkbox{% endif %}">
+		{{ form_elements._checkbox(params, params.valueon, value, constraints) }}
+        </div>
+	{% elseif params.type == 'checkboxslider' %}
+		{{ form_elements._checkboxslider(params, params.valueon, value, constraints) }}
+	{% elseif params.type == 'checkboxonoff' %}
+		{{ form_elements._checkboxonoff(params, params.valueon, value, constraints) }}
+	{% elseif params.type == 'radio' %}
+		{{ form_elements._radiogroup(params, value, constraints) }}
+	{% elseif params.type == 'date' %}
+		{{ form_elements._date(params, value, constraints) }}
+	{% elseif params.type == 'phone' %}
+		{{ form_elements._phone(params, value, constraints) }}
+	{% elseif params.type == 'autocomplete' %}
+		{{ form_elements._autocomplete(params, value, constraints) }}
+	{% elseif params.type == 'link' %}
+        {{ form_elements._link(params) }}
+	{% elseif params.type == 'slider' %}
+		{{ form_elements._slider(params, value) }}
+	{% elseif params.type == 'select' %}
+		{{ form_elements._select(params, value, constraints) }}
+    {% elseif params.type == 'selectpicker' %}
+        {{ form_elements._selectpicker(params, value, constraints) }}
+	{% elseif params.type == 'inputselect' %}
+		{{ form_elements._inputselect(params, value, constraints) }}
+	{% elseif params.type == 'button' %}
+		{{ form_elements._button(params) }}
+	{% elseif params.type == 'colorpicker' %}
+		{{ form_elements._colorpicker(params, value, constraints) }}
+	{% elseif params.type == 'geolocation' %}
+		{{ form_elements._geolocation(params) }}
+	{% elseif params.type == 'file' %}
+		{{ form_elements._file(params, value, constraints) }}
+    {% elseif params.type == 'fileinput' %}
+        {{ form_elements._fileinput(params, value, constraints) }}
+	{% elseif params.type == 'file_image' %}
+		{{ form_elements._file_image(params, value, constraints) }}
+    {% elseif params.type == 'language_text' %}
+        {{ form_elements._language_text(params, value) }}
+    {% elseif params.type == 'emojirating' %}
+        {{ form_elements._emojirating(params, value) }}
+    {% elseif params.type == 'tagsinput' %}
+        {{ form_elements._tagsinput(params, value) }}
+    {% elseif params.type == 'fastselect' %}
+        {{ form_elements._fastselect(params, value, constraints) }}
+    {% elseif params.type == 'recaptcha' %}
+        {%
+        set params = {
+            'type' : 'hidden',
+            'id' : params.id,
+            'name' : params.name,
+        }
+        %}
+        {{ form_elements._input(params, value, constraints) }}
+	{% else %}
+		{{ form_elements._input(params, value, constraints, '', values) }}
+	{% endif %}
+
+{% if params.type != 'hidden' and params.type != 'recaptcha' %}
+	</div>
+{% endif %}
+{% endmacro %}
+
+{% macro form_button(params, form_name) %}
+{% import _self as form_elements %}
+	{% if params.name is not empty %}
+		{% set params = params|merge({name : form_name ~ '[' ~ params.name|replace({'/': ']['}) ~ ']'}) %}
+	{% endif %}
+
+	{% if params.type == 'href' %}
+		{{ form_elements._href_button(params) }}
+    {% elseif params.type == 'link' %}
+        {{ form_elements._link(params) }}
+    {% elseif params.type == 'dropdown' %}
+        {{ form_elements._dropdown(params) }}
+    {% else %}
+		{{ form_elements._button(params) }}
+	{% endif %}
+{% endmacro %}
+
+{% macro _button(params) %}
+    {% if params.inline %}<div class="mt-3 pt-3">{% endif %}
+<button value="1" class="btn btn-{{ params.class }}" {% if params.id is not empty %} id="{{ params.id }}" {% endif %} type="{{ params.type }}" name="{{ params.name }}" {% if params.onclick is not empty %} onclick="{{ params.onclick|raw }}" {% endif %}{% if params.disabled %} disabled="disabled" {% endif %}{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}>
+	{% if params.icon is not empty %}<i class="fas fa-{{ params.icon }}"></i>{% endif %}
+	{{ _(params.label) }}
+</button>
+    {% if params.inline %}</div>{% endif %}
+{% endmacro %}
+
+{% macro button(type, id, name, label, disabled = false, onclick = "", class = "", icon = "") %}
+	{% import _self as form_elements %}
+	{%
+		set params = {
+			'type' : type,
+			'id' : id,
+			'name' : name,
+			'label' : label,
+			'disabled' : disabled,
+			'onclick' : onclick,
+			'class' : class,
+			'icon' : icon
+		}
+	%}
+	{{ form_elements._button(params) }}
+{% endmacro %}
+
+{% macro _href_button(params) %}
+<a class="btn btn-{{ params.class }}" id="{{ params.id }}" href="{{ params.link }}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{% if params.target %} target="{{ params.target }}"{% endif %}>
+    {% if params.icon is not empty %}<i class="fas fa-{{params.icon}} mr-1"></i>{% endif %}
+    {% if params.rawlabel is not empty %}{{ params.rawlabel|raw }}{% else %}{{ _(params.label) }}{% endif %}
+    {% if params.icon_right is not empty %}<i class="fas fa-{{params.icon_right}}"></i>{% endif %}
+</a>
+{% endmacro %}
+
+{% macro _link(params) %}
+    {% if params.inline %}<div class="mt-3 pt-3">{% endif %}
+    <a class="{{ params.class }}{% if params.disabled %} disabled{% endif %}" id="{{ params.id }}" href="{{ params.href }}" role="button"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}>
+        {% if params.icon is not empty %}<i class="fas fa-{{params.icon}} mr-1"></i>{% endif %}
+        {{ _(params.label) }}
+        {% if params.icon_right is not empty %}<i class="fas fa-{{params.icon_right}}"></i>{% endif %}
+    </a>
+    {% if params.inline %}</div>{% endif %}
+{% endmacro %}
+
+{% macro _dropdown(params) %}
+    {% import _self as form_elements %}
+    <div class="dropdown{% if params.groupClass %} {{ params.groupClass }}{% endif %}">
+        <button id="{{ params.id }}" class="btn dropdown-toggle{% if params.class %} {{ params.class }}{% else %} btn-primary{% endif %}" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{{ form_elements.dataAttribute(params.data, value) }}>
+            {% if params.icon %}
+                <i class="mr-1 {{ params.icon }}"></i>
+            {% endif %}
+            {{ _(params.label) }}
+        </button>
+        <div class="dropdown-menu">
+            {% for btn in params.items %}
+                <a href="{% if btn.url %}{{ btn.url }}{% else %}javascript:;{% endif %}" class="dropdown-item{% if btn.class %} {{ btn.class }}{% endif %}"{% if btn.onclick is not empty %} onclick="{{ btn.onclick|raw }}" {% endif %}{{ form_elements.dataAttribute(btn.data, value) }}>
+                    {% if btn.icon %}
+                        <i class="mr-1 {{ btn.icon }}"></i>
+                    {% endif %}
+                    {{ _(btn.label) }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro _label(params) %}
+	{% if params.label is not empty or params.nolabel %}
+		<label for="{{ params.id }}" class="control-label d-block{% if params.hlayout or params.horizontal %} col-{% if params.hlayout %}{{ params.hlayout }}{% else %}{{ params.horizontal|split(',',2)[0] }} padding-left-0{% endif %} text-right bold{% endif %}">
+			{% if params.nolabel %}&nbsp;{% else %}{% if params.rawlabel == 1 %}{{ params.label }}{% else %}{{ _(params.label) }}{% endif %}{% endif %}
+			{% if (params.constraints.required or params.requiredtxt) and not params.floatinglabel %}<span class="text-danger">{% if params.requiredtxt is not empty %}{{ params.requiredtxt }}{% else %}*{% endif %}</span>{% endif %}
+			{# % if params.helptext is not empty and not params.hlayout %}<span class="text-info small">{{ _(params.helptext) }}</span>{% endif % #}
+		</label>
+	{% endif %}
+{% endmacro %}
+
+{% macro _input(params, value = "", constraints = "", form_name = "", values = "") %}
+	{% import _self as form_elements %}
+	{% if form_name != "" %}
+		{% set params = params|merge({name : form_name ~ '[' ~ params.name|replace({'/': ']['}) ~ ']'}) %}
+	{% endif %}
+
+	{% if not params.floatinglabel %}
+	{{ form_elements._label(params) }}
+	{% endif %}
+    {% if params.hlayout or params.horizontal %}<div class="col-{% if params.horizontal %}{{ params.horizontal|split(',',2)[1] }} pr-0{% else %}{{ params.col }}{% endif %}">{% endif %}
+	{% if params.prefix is not empty or params.postfix is not empty or params.icon is not empty or params.preselect %}<div class="input-group">{% endif %}
+	{% if params.preselect %}
+	    <span class="input-group-prepend">
+	        <input type="checkbox" name="{{ params.name }}[change]" value="1" class="form-preselect">
+    		{% set params = params|merge({name : params.name ~ '[value]'}) %}
+        </span>
+	{% else %}
+        {% if params.prefix is not empty %}<div for="{{ params.id }}" class="input-group-prepend"><div class="input-group-text">{{ params.prefix|raw }}</div></div>{% endif %}
+        {% if params.icon is not empty %}<div for="{{ params.id }}" class="input-group-prepend"><div class="input-group-text"><i class="{{ params.icon }}"></i></div></div>{% endif %}
+    {% endif %}
+	{% if params.readonly %}
+    	<span id="{{ params.id }}" class="form-control form-control-static{% if params.class != '' %} {{ params.class }}{% endif %}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{% if params.tooltip is not empty %} data-toggle="tooltip" title="{{ params.tooltip }}"{% endif %}>{% if value is not empty %}{{ value|e }}{% elseif params.placeholder is not empty %}{{ _(params.placeholder) }}{% endif %}</span>
+        <input type="hidden"{% if params.class %} class="{{ params.class }}"{% endif %} id="{{ params.id }}-hidden" {% if params.name is not empty %} name="{{ params.name }}"{% endif %} value="{{ value|e }}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}/>
+	{% else %}
+        {% if params.select %}
+            <div class="input-group">
+        {% endif %}
+        {% if params.placeholder %}
+            {% set placeholder = params.placeholder %}
+        {% endif %}
+        {% if params.floatinglabel %}
+            {% set placeholder = ' ' %}
+        {% endif %}
+	    <input id="{{ params.id }}"{% if params.select.width %} style="min-width:{{ params.select.width }}" {% endif %} type="{{ params.type }}" {% if params.name is not empty %} name="{{ params.name }}"{% endif %} {% if params.disabled %} disabled="disabled"{% endif %}{% if placeholder is not empty %} placeholder="{{ _(placeholder) }}" autofocus{% endif %} value="{{ value|e }}"{% if params.maxlength > 0 %} maxlength="{{ params.maxlength }}"{% endif %}{% if params.autocompleteoff %} autocomplete="off"{% endif %} class="form-control{% if params.class != '' %} {{ params.class }}{% endif %}{% if params.postfix %} border-right-0{% endif %}{% if params.prefix %} border-left-0{% endif %}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{{ constraints|raw }}{% if params.onblur != '' %} onblur="{{ params.onblur|raw }}"{% endif %}{% if params.onchange != '' %} onchange="{{ params.onchange|raw }}"{% endif %}{% if params.tooltip is not empty %} data-toggle="tooltip" title="{{ params.tooltip }}"{% endif %}/>
+        {% if params.select %}
+			{% if params.postfix is not empty %}<div for="{{ params.id }}" class="input-group-append"><div class="input-group-text">{{ params.postfix|raw }}</div></div>{% endif %}
+            {%
+                set selectparams = {
+                    name: params.select.name,
+                    id: params.select.id,
+                    options: params.select.options,
+                    class: params.select.class,
+                    readonly: params.select.readonly,
+                    disabled: params.select.disabled
+                }
+            %}
+            {{ form_elements._select(selectparams, values[selectparams.name], '', params.formname) }}
+            </div>
+        {% endif %}
+        {% if params.floatinglabel %}
+            {{ form_elements._label(params) }}
+        {% endif %}
+
+	{% endif %}
+
+	{% if params.postfix is not empty and not params.select %}<div for="{{ params.id }}" class="input-group-append"><div class="input-group-text">{{ params.postfix|raw }}</div></div>{% endif %}
+	{% if params.prefix is not empty or params.postfix is not empty or params.icon is not empty or params.preselect %}</div>{% endif %}
+	{# % if params.helptext is not empty and (params.hlayout or params.horizontal) % #}
+	{% if params.helptext is not empty %}
+        <span class="form-text text-muted">{{ _(params.helptext) }}</span>
+    {% endif %}
+    {% if params.hlayout or params.horizontal %}</div>{% endif %}
+{% endmacro %}
+
+{% macro input(type, id, name, value, constraints = "", disabled = false, placeholder = "", class = "", icon = "", prefix = "", postfix = "", onblur = "") %}
+	{% import _self as form_elements %}
+	{%
+	set params = {
+		'type' : type,
+		'id' : id,
+		'name' : name,
+		'disabled' : disabled,
+		'placeholder' : placeholder,
+		'class' : class,
+		'icon' : icon,
+		'prefix' : prefix,
+		'postfix' : postfix,
+		'onblur' : onblur
+	}
+	%}
+	{{ form_elements._input(params, value, constraints) }}
+{% endmacro %}
+
+{% macro _language_text(params, value = "", form_name = "") %}
+    {% import _self as form_elements %}
+    {% if form_name != "" %}
+        {% set params = params|merge({name : form_name ~ '[' ~ params.name|replace({'/': ']['}) ~ ']'}) %}
+    {% endif %}
+    {{ form_elements._label(params) }}
+
+
+    <div class="input-group" id="{{ params.id }}">
+    {% if params.prefix is not empty %}<label for="{{ params.id }}" class="input-group-addon">{{ params.prefix|raw }}</label>{% endif %}
+    {% if params.icon is not empty %}<label for="{{ params.id }}" class="input-group-addon"><i class="fas fa-{{ params.icon }}"></i></label>{% endif %}
+    {% for code, l in params.languages %}
+
+        {% set constraints = ' ' %}
+        {% if params.constraints is not empty and params.constraints is iterable %}
+            {% for constraint, constraint_value in params.constraints %}
+                {% if constraint == 'required' and constraint_value is iterable %}
+                    {% for lang in constraint_value %}
+                        {% if lang == code %}
+                            {% set constraints = constraints ~ 'data-parsley-' ~ constraint ~ '=1 ' %}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% set constraints = constraints ~ 'data-parsley-' ~ constraint ~ '=' ~ constraint_value ~ ' ' %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <input id="{{ params.id }}-{{ code }}" type="input" data-parsley-error-message="{{ _('LBL_MISSING_LANG_TEXT', params.languages[code]) }}" name="{{ params.name }}[{{ code }}]" value="{{ value[code] }}"{% if params.disabled %} disabled="disabled"{% endif %}{% if params.placeholder is not empty %} placeholder="{{ params.placeholder }}"{% endif %} class="{% if params.currentlanguage != code %}hidden {% endif %}form-control{% if params.class != '' %} {{ params.class }}{% endif %}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{% if params.onblur != '' %} onblur="{{ params.onblur|raw }}"{% endif %}{% if params.tooltip is not empty %} data-toggle="tooltip" title="{{ params.tooltip }}"{% endif %}{% if params.maxlength > 0 %} maxlength="{{ params.maxlength }}"{% endif %}{% if params.autocompleteoff %} autocomplete="off"{% endif %}{{ constraints|raw }}>
+    {% endfor %}
+
+    {% if params.postfix is not empty %}<label for="{{ params.id }}" class="input-group-addon">{{ params.postfix|raw }}</label>{% endif %}
+    <div class="input-group-btn">
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+            <i class="flag flag-{{ params.currentlanguage }}"></i> {{ params.languages[ params.currentlanguage ] }}
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu pull-right">
+            {% for code, value in params.languages %}
+            <li><a href="javascript:;" data-lang="{{ code }}" class="input-select-language"><i class="flag flag-{{ code }}"></i> {{ value }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    </div>
+{% endmacro %}
+
+{% macro _textarea(params, value = "", constraints = "", form_name = "") %}
+	{% import _self as form_elements %}
+	{% if form_name != "" %}
+		{% set params = params|merge({name : form_name ~ '[' ~ params.name|replace({'/': ']['}) ~ ']'}) %}
+	{% endif %}
+	{{ form_elements._label(params) }}
+    {% if params.hlayout %}<div class="col-{{ params.col }}">{% endif %}
+	{% if params.readonly == true %}
+		<div id="{{ params.id }}" class="well">
+		{% if params.type == 'htmleditor' %}
+			{{ value|raw }}
+		{% else %}
+			{{ value|nl2br }}
+		{% endif %}
+		<div>
+	{% else %}
+        {% if params.preselect %}
+        <div class="input-group">
+            <span class="input-group-addon">
+                <input type="checkbox" name="{{ params.name }}[change]" value="1" class="form-preselect">
+                {% set params = params|merge({name : params.name ~ '[value]'}) %}
+            </span>
+        {% endif %}
+    	<textarea id="{{ params.id }}" rows="{{ params.rows }}" name="{{ params.name }}"{% if params.disabled %} disabled="disabled"{% endif %} placeholder="{{ params.placeholder }}" class="form-control{% if params.class != '' %} {{ params.class }}{% endif %}" {% if params.data %}{% for key, val in data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{{ constraints|raw }}>{{ value|e }}</textarea>
+        {% if params.preselect %}
+        </div>
+        {% endif %}
+	{% endif %}
+    {% if params.helptext is not empty and params.hlayout %}
+        <span class="help-block m-b-none">{{ _(params.helptext) }}</span>
+    {% endif %}
+    {% if params.hlayout %}</div>{% endif %}
+{% endmacro %}
+
+{% macro _autocomplete(params, value = "", constraints = "") %}
+	{% import _self as form_elements %}
+
+	{% set name = params.name %}
+	{% set params = params|merge({'type' : 'text'}) %}
+	{% set params = params|merge({'class' : params.class ~ ' autocomplete'}) %}
+	{% set params = params|merge({'value' : params.value.name}) %}
+	{% set params = params|merge({'name' : name ~ '[name]'}) %}
+
+    <div class="position-relative">
+        {{ form_elements._input(params, value.name, constraints) }}
+        <input type="hidden" name="{{ name ~ '[id]' }}" id="{{ params.id }}-id" value="{{ value.id }}">
+	</div>
+{% endmacro %}
+
+{% macro _date(params, value = "", constraints = "") %}
+	{% import _self as form_elements %}
+    {% set params = params|merge({'type' : 'text'}) %}
+    {% set params = params|merge({'class' : params.class ~ ' datepicker'}) %}
+	{{ form_elements._input(params, value, constraints) }}
+{% endmacro %}
+
+{% macro date(id, name, value, constraints = "", disabled = false, placeholder = "", class = "", icon = "", prefix = "", postfix = "", onblur = "", data = "") %}
+    {% import _self as form_elements %}
+    {%
+    set params = {
+        'type' : 'date',
+        'id' : id,
+        'name' : name,
+        'disabled' : disabled,
+        'placeholder' : placeholder,
+        'class' : class,
+        'icon' : icon,
+        'prefix' : prefix,
+        'postfix' : postfix,
+        'onblur' : onblur,
+        'data' : data
+    }
+    %}
+    {{ form_elements._date(params, value, constraints) }}
+{% endmacro %}
+
+{% macro _file(params, value = "", constraints = "") %}
+    {% if params.caption %}
+    <label class="control-label"><span>{{ _(params.caption) }}</span></label>
+    {% endif %}
+    <input id="{{ params.id }}" name="fileupload" type="file" class="files{% if params.class %} {{ params.class }}{% endif %}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{{ constraints|raw }}>
+{% endmacro %}
+
+{% macro _fileinput(params, value = "", constraints = "") %}
+    {% if params.caption %}
+        <label class="control-label"><span>{{ _(params.caption) }}</span></label>
+    {% endif %}
+    <input id="{{ params.id }}" name="{{ params.name }}" type="file"{% if params.multiple %} multiple{% endif %}{% if params.readonly %} readonly="readonly"{% endif %}{% if params.disabled %} disabled="disabled"{% endif %} class="file file-loading {{ params.class }}" data-preview-file-type="text"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{{ constraints|raw }}>
+{% endmacro %}
+
+{% macro _checkbox(params, value = "", checked = false, constraints = "", isgroup = false) %}
+    {% if params.label is not empty and not isgroup %}
+        <label class="control-label{% if params.hlayout %} col-{{ params.hlayout }} text-right bold{% endif %}">
+            {% if params.label != -1 %}{{ _(params.label) }}{% endif %}
+        </label>
+    {% endif %}
+    {% if params.hlayout and not isgroup %}<div class="col-{{ params.col }}">{% endif %}
+	<div class="custom-control custom-checkbox {% if params.layout == 'horizontal' %} custom-control-inline{% endif %}{% if params.outerclass %} {{ params.outerclass }}{% endif %}{% if params.color %} custom-checkbox-{{ params.color }}{% endif %}">
+		<input id="{{ params.id }}" type="checkbox" {% if params.disabled %} disabled="disabled"{% endif %}{% if checked == value %} checked="checked" {% endif %}{% if params.name != '' %} name="{{ params.name }}"{% endif %} value="{{ value }}"{{ constraints|raw }}{% if params.onclick is not empty %} onclick="{{ params.onclick|raw }}"{% endif %} class="custom-control-input{% if params.class %} {{ params.class }}{% endif %}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{% if params.altlabel %} data-altlabel="{% if not params.rawlabel %}{{ _(params.altlabel) }}{% else %}{{ params.altlabel|raw }}{% endif %}"{% endif %} data-parsley-ui-enabled="false" />
+		<label for="{{ params.id }}" class="custom-control-label">{% if params.caption != '' %}{{ _(params.caption) }}{% endif %}</label>
+	</div>
+    {% if params.hlayout and not isgroup %}</div>{% endif %}
+{% endmacro %}
+
+{% macro _checkboxonoff(params, value = "", checked = false, constraints = "") %}
+    {% if params.label is not empty %}
+    <label class="control-label{% if params.hlayout %} col-{{ params.hlayout }} text-right bold{% endif %}">
+        {{ _(params.label) }}
+    </label>
+    {% endif %}
+    {% if params.hlayout %}<div class="col-{{ params.col }}">{% endif %}
+    <span class="onoffswitch {% if params.class is not empty %} {{ params.class }}{% endif %}">
+        <input id="{{ params.id }}" type="checkbox" {% if params.disabled %} disabled="disabled"{% endif %}{% if checked == value %} checked="checked" {% endif %}{% if params.name != '' %} name="{{ params.name }}"{% endif %} value="{{ value }}"{{ constraints|raw }}{% if params.onclick is not empty %} onclick="{{ params.onclick|raw }}"{% endif %} class="onoffswitch-checkbox"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %} data-parsley-ui-enabled="false" />
+        <label class="onoffswitch-label" for="{{ params.id }}">
+            <span class="onoffswitch-inner" data-swchoff-text="{{ _(params.textoff) }}" data-swchon-text="{{ _(params.texton) }}"></span>
+            <span class="onoffswitch-switch"></span>
+        </label>
+    </span>
+    {% if params.hlayout %}</div>{% endif %}
+{% endmacro %}
+
+{% macro checkbox(id, name, value = "", checked = "", label = "", disabled = "", onclick = "", class = "") %}
+	{% import _self as form_elements %}
+	{%
+	set params = {
+		'id' : id,
+		'name' : name,
+		'caption' : label,
+		'disabled' : disabled,
+		'onclick' : onclick,
+		'class' : class,
+		'outerclass' : outerclass
+	}
+	%}
+
+	{{ form_elements._checkbox(params, value, checked) }}
+{% endmacro %}
+
+{% macro _checkgroup(params, value, constraints = "") %}
+	{% import _self as form_elements %}
+
+	{% set params = params|merge({origid : params.id}) %}
+	{% set params = params|merge({origname : params.name}) %}
+	{% set params = params|merge({origonclick : params.onclick}) %}
+
+	{% if params.label is not empty %}
+		{% if params.dropdown %}
+		    <div class="pos-rel dropdown-checkgroup{% if value|length > 0 %} active{% endif %}">
+			<label for="{{ params.id }}" class="form-control dropdown-toggle text-overflow" aria-expanded="false" data-toggle="dropdown">
+            <span class="dropdown-caption" data-default="{% if params.rawlabel == 1 %}{{ params.label }}{% else %}{{ _(params.label) }}{% endif %}">
+		{% else %}
+			<label for="{{ params.id }}" class="control-label{% if params.hlayout %} col-{{ params.hlayout }} text-right{% endif %} bold">
+		{% endif %}
+    	{% if params.rawlabel == 1 %}{{ params.label }}{% else %}{{ _(params.label) }}{% endif %}
+		{% if params.dropdown %}</span><b class="caret"></b>{% endif %}
+			</label>
+	{% endif %}
+	{% if params.dropdown %}
+        <div class="dropdown-menu">
+	{% endif %}
+
+	{% if params.options|length > 5 and not params.hideall %}
+		{% if params.options|length == value|length %}
+			{% set checked = 'all' %}
+		{% else %}
+			{% set checked = '' %}
+		{% endif %}
+
+		{% set params = params|merge({id : params.origid ~ '_all'}) %}
+		{% set params = params|merge({name : 'checkall'}) %}
+		{% set params = params|merge({valueon : 'checked'}) %}
+		{% set params = params|merge({caption : 'LBL_ALL'}) %}
+		{% set params = params|merge({onclick : 'applyCheckAll(this);'}) %}
+
+		{{ form_elements._checkbox(params, 'all', checked, constraints, true) }}
+
+		{% set all_onclick = 'applyCheckAll(this);' %}
+	{% else %}
+		{% set all_onclick = '' %}
+	{% endif %}
+
+	{% set params = params|merge({name : params.origname ~ '[]'}) %}
+	{% set params = params|merge({onclick : params.origonclick}) %}
+	{% set params = params|merge({rawlabel : params.rawoptions}) %}
+    {% set params = params|merge({highlight : params.highlight}) %}
+    {% set isgroup = true %}
+
+    {% if params.hlayout %}
+        <div class="col-{{ params.col }}">
+    {% endif %}
+
+	{% for key, val in params.options %}
+		{% if key in value %}
+			{% set checked = key %}
+		{% else %}
+			{% set checked = '-1' %}
+		{% endif %}
+
+        {% if val is iterable %}
+            {% set params = params|merge({label : val.label}) %}
+            {% set params = params|merge({altlabel : val.altlabel}) %}
+        {% else %}
+            {% set params = params|merge({label : val}) %}
+            {% set params = params|merge({altlabel : ''}) %}
+        {% endif %}
+
+        {% set params = params|merge({id : params.origid ~ '_' ~ loop.index}) %}
+		{% set params = params|merge({rawlabel : params.rawoptions}) %}
+		{% set params = params|merge({valueon : key}) %}
+		{% set params = params|merge({caption : val}) %}
+		{% set params = params|merge({onclick : all_onclick ~ params.origonclick}) %}
+
+        {% if params.slider %}
+	    	{{ form_elements._checkboxslider(params, key, checked, constraints) }}
+		{% else %}
+    		{{ form_elements._checkbox(params, key, checked, constraints, isgroup) }}
+		{% endif %}
+
+	{% endfor %}
+	{% if params.dropdown %}
+			</div>
+		</div>
+	{% endif %}
+
+    {% if params.hlayout %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro _radiogroup(params, value, constraints = "") %}
+	{% if params.label is not empty %}
+		<label for="{{ params.id }}" class="control-label{% if params.hlayout %} col-{{ params.hlayout }} text-right bold{% endif %}">{% if params.rawlabel == 1 %}{{ params.label }}{% else %}{{ _(params.label) }}{% endif %}</label><br />
+	{% endif %}
+    {% if params.hlayout %}<div class="col-{{ params.col }}">{% endif %}
+	{% for key, val in params.options %}
+		<div class="custom-control custom-radio{% if params.layout == 'horizontal' %} custom-control-inline{% endif %}">
+			<input class="custom-control-input {{ params.class }}" id="{{ params.id ~ '_' ~ key }}" type="radio" {% if params.readonly %} readonly="readonly"{% endif %} {% if params.disabled %} disabled="disabled"{% endif %} {% if value == key %} checked="checked" {% endif %} name="{{ params.name }}" value="{{ key }}" data-parsley-ui-enabled="false" {% if params.onclick is not empty %} onclick="{{ params.onclick|raw }}"{% endif %} />
+			<label for="{{ params.id ~ '_' ~ key }}" class="custom-control-label">{{ _(val) }}</label>
+		</div>
+	{% endfor %}
+    {% if params.hlayout %}</div>{% endif %}
+{% endmacro %}
+
+{% macro _select(params, value = "", constraints = "", form_name = "") %}
+	{% import _self as form_elements %}
+	{% if form_name != "" %}
+		{% set params = params|merge({name : form_name ~ '[' ~ params.name|replace({'/': ']['}) ~ ']'}) %}
+	{% endif %}
+
+	{% if params.multiple is not empty %}
+		{% set name = params.name ~ '[]' %}
+	{% else %}
+		{% set name = params.name %}
+	{% endif %}
+
+	{% set data = params.data %}
+
+	{% if data['list-url'] is not empty and data['default-value'] is empty and value is not iterable %}
+		{% set data = data|merge({'default-value': value}) %}
+	{% endif %}
+
+	{{ form_elements._label(params) }}
+    {% if params.hlayout %}<div class="col-{{ params.col }}">{% endif %}
+	{% if params.prefix is not empty or params.postfix is not empty or params.preselect %}<div class="input-group">{% endif %}
+		{% if params.preselect %}
+		    <span class="input-group-addon">
+                <input type="checkbox" name="{{ params.name }}[change]" value="1" class="form-preselect">
+                {% set name = name ~ '[value]' %}
+            </span>
+		{% else %}
+		    {% if params.prefix is not empty %}<div class="input-group-prepend"><span class="input-group-text">{{ params.prefix|raw }}</span></div>{% endif %}
+		{% endif %}
+		{% if params.readonly == true %}
+			<span class="form-control form-control-static">
+			{% for opt_key, opt_val in params.options %}
+                {% set label = false %}
+                {% set color = '' %}
+                {% set val = opt_val %}
+                {% set selected = (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) %}
+
+				{% if opt_val is iterable %}
+                    {% set val = opt_val.name %}
+                    {% if opt_val.class %}
+                        {% set label = true %}
+                        {% set color = opt_val.class %}
+				    {% endif %}
+				{% endif %}
+
+				{% if selected %}
+                    {% if label %}<span class="badge badge{{ color|replace({"alert": ""}) }} text-white">{% endif %}
+					{{ val|raw }}
+                    {% if label %}</span>{% endif %}
+				{% endif %}
+			{% endfor %}
+            <input type="hidden"{% if params.class %} class="{{ params.class }}"{% endif %} id="{{ params.id }}-hidden" name="{{ name }}" value="{{ value|e }}"{% if data %}{% for key, val in data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}/>
+			</span>
+		{% else %}
+			<select{% if params.multiple is not empty %} multiple{% endif %} id="{{ params.id }}" name="{{ name }}"{% if params.disabled %} disabled="disabled"{% endif %} {{ constraints }} class="custom-select form-control{% if params.class %} {{ params.class }}{% endif %}"{{ form_elements.dataAttribute(data, value) }}{% if params.onchange is not empty %} onchange="{{ params.onchange|raw }}"{% endif %}>
+			{% for opt_key, opt_val in params.options %}
+				{% if opt_val is iterable %}
+					{% if opt_val.name is not empty %}
+						<option value="{{ opt_key }}" {% if (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) %} selected="selected" {% endif %}{% if opt_val.data is not empty %} data-data="{{ opt_val.data }}"{% endif %}{% if opt_val.class is not empty %} class="{{ opt_val.class }}"{% endif %}{% if opt_val.style is not empty %} style="{{ opt_val.style }}"{% endif %}>{{ opt_val.name }}</option>
+					{% else %}
+					<optgroup label="{% if params.rawoptgroups %}{{ opt_key|raw }}{% else %}{{ _(opt_key) }}{% endif %}">
+					{% for opt_key2, opt_val2 in opt_val %}
+						<option value="{{ opt_key2 }}" {% if (value == 0 and opt_key2 is same as(value)) or (value != 0 and opt_key2 == value) %} selected="selected" {% endif %}>{{ opt_val2|raw }}</option>
+					{% endfor %}
+					</optgroup>
+					{% endif %}
+				{% else %}
+					<option value="{{ opt_key }}" {% if (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) %} selected="selected" {% endif %}>{{ opt_val }}</option>
+				{% endif %}
+			{% endfor %}
+			</select>
+		{% endif %}
+		{% if params.postfix is not empty %}<div class="input-group-append"><span class="input-group-text">{{ params.postfix|raw }}</span></div>{% endif %}
+	{% if params.prefix is not empty or params.postfix is not empty or params.preselect %}</div>{% endif %}
+    {% if params.helptext is not empty and params.hlayout %}
+        <span class="help-block m-b-none">{{ _(params.helptext) }}</span>
+    {% endif %}
+    {% if params.hlayout %}</div>{% endif %}
+{% endmacro %}
+
+{% macro _selectpicker(params, value = "", constraints = "", form_name = "") %}
+    {% import _self as form_elements %}
+    {% if form_name != "" %}
+        {% set params = params|merge({name : form_name ~ '[' ~ params.name|replace({'/': ']['}) ~ ']'}) %}
+    {% endif %}
+
+    {% if params.multiple is not empty %}
+        {% set name = params.name ~ '[]' %}
+    {% else %}
+        {% set name = params.name %}
+    {% endif %}
+
+    {% set data = params.data %}
+
+    {{ form_elements._label(params) }}
+    {% if params.hlayout %}<div class="col-{{ params.col }}">{% endif %}
+    {% if params.prefix is not empty or params.postfix is not empty or params.preselect %}<div class="input-group">{% endif %}
+    {% if params.prefix is not empty %}<span class="input-group-addon">{{ params.prefix|raw }}</span>{% endif %}
+    {% if params.readonly == true %}
+        <span class="form-control form-control-static">
+        {% for opt_key, opt_val in params.options %}
+            {% set label = false %}
+            {% set color = '' %}
+            {% set val = opt_val %}
+            {% set selected = (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) %}
+
+            {% if opt_val is iterable %}
+                {% set val = opt_val.name %}
+                {% if opt_val.class %}
+                    {% set label = true %}
+                    {% set color = opt_val.class %}
+                {% endif %}
+            {% endif %}
+
+            {% if selected %}
+                {% if label %}<span class="badge badge{{ color|replace({"alert": ""}) }} text-white">{% endif %}
+                {{ val|raw }}
+                {% if label %}</span>{% endif %}
+            {% endif %}
+        {% endfor %}
+        <input type="hidden"{% if params.class %} class="{{ params.class }}"{% endif %} id="{{ params.id }}-hidden" name="{{ name }}" value="{{ value|e }}"{% if data %}{% for key, val in data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}/>
+        </span>
+    {% else %}
+        <select{% if params.multiple is not empty %} multiple{% endif %} id="{{ params.id }}" name="{{ name }}"{% if params.disabled %} disabled="disabled"{% endif %}{% if params.title %} title="{{ _(params.title) }}"{% endif %} {{ constraints }} class="custom-select form-control selectpicker{% if params.class %} {{ params.class }}{% endif %}"{{ form_elements.dataAttribute(data, value) }}{% if params.onchange is not empty %} onchange="{{ params.onchange|raw }}"{% endif %}>
+            {% set group = false %}
+            {% set groupOpen = false %}
+            {% for opt_val in params.options %}
+                {% if opt_val.groupId and group != opt_val.groupId %}
+                    {% if groupOpen %}
+                        </optgroup>
+                    {% endif %}
+                    <optgroup label="{{ opt_val.groupName }}">
+					{% set group = opt_val.groupId %}
+                {% endif %}
+                <option value="{{ opt_val.id }}"{% if (value == 0 and opt_val.id is same as(value)) or (value != 0 and opt_val.id == value) or opt_val.id in value %} selected="selected"{% endif %}{% if opt_val.class %} class="{{ opt_val.class }}" {% endif %}{% if opt_val.data %}{% for key, val in opt_val.data %} data-{{key}}='{{val}}'{% endfor %}{% endif %}>{{ opt_val.text }}</option>
+            {% endfor %}
+
+            {% if groupOpen %}
+                </optgroup>
+            {% endif %}
+        </select>
+    {% endif %}
+    {% if params.postfix is not empty %}<span class="input-group-addon">{{ params.postfix|raw }}</span>{% endif %}
+    {% if params.prefix is not empty or params.postfix is not empty or params.preselect %}</div>{% endif %}
+    {% if params.helptext is not empty and params.hlayout %}
+        <span class="help-block m-b-none">{{ _(params.helptext) }}</span>
+    {% endif %}
+    {% if params.hlayout %}</div>{% endif %}
+{% endmacro %}
+
+
+{% macro select(id, name, options, value = "", label = "", disabled = "", onchange = "", class = "", multiple = false, data = "", rawoptgroups = false) %}
+	{% import _self as form_elements %}
+	{%
+	set params = {
+		'id' : id,
+		'name' : name,
+		'options' : options,
+		'disabled' : disabled,
+		'onchange' : onchange,
+		'class' : class,
+		'multiple' : multiple,
+		'data' : data,
+		'rawoptgroups': rawoptgroups
+	}
+	%}
+
+	{{ form_elements._select(params, value) }}
+{% endmacro %}
+
+{% macro _inputselect(params, value = "", constraints = "", form_name = "") %}
+    {% import _self as form_elements %}
+    {% if form_name != "" %}
+        {% set params = params|merge({name : form_name ~ '[' ~ params.name|replace({'/': ']['}) ~ ']'}) %}
+    {% endif %}
+
+    {{ form_elements._label(params) }}
+    {% if params.hlayout %}<div class="col-{{ params.col }}">{% endif %}
+    <div class="input-group input-select">
+        {% if params.prefix is not empty %}<label for="{{ params.id }}" class="input-group-addon">{{ params.prefix|raw }}</label>{% endif %}
+        {% if params.icon is not empty %}<label for="{{ params.id }}" class="input-group-addon"><i class="fa fa-{{ params.icon }}"></i></label>{% endif %}
+        <input id="{{ params.id }}_text" type="text" name="{{ params.name }}[text]"{% if params.disabled %} disabled="disabled"{% endif %}{% if params.placeholder is not empty %} placeholder="{{ _(params.placeholder) }}"{% endif %} value="{{ value.text|e }}"{% if params.maxlength > 0 %} maxlength="{{ params.maxlength }}"{% endif %}{% if params.autocompleteoff %} autocomplete="off"{% endif %} class="form-control{% if params.class != '' %} {{ params.class }}{% endif %}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{{ constraints|raw }}{% if params.onblur != '' %} onblur="{{ params.onblur|raw }}"{% endif %}{% if params.tooltip is not empty %} data-toggle="tooltip" title="{{ params.tooltip }}"{% endif %}/>
+
+        <select id="{{ params.id }}_select" name="{{ params.name }}[select]"{% if params.disabled %} disabled="disabled"{% endif %} {{ constraints }} class="form-control{% if params.class %} {{ params.class }}{% endif %}"{% if data %}{% for key, val in data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{% if params.onchange is not empty %} onchange="{{ params.onchange|raw }}"{% endif %}>
+            {% for opt_key, opt_val in params.options %}
+                {% if opt_val is iterable %}
+                    {% if opt_val.name is not empty and opt_val.data is not empty %}
+                        <option value="{{ opt_key }}" {% if (value.select == 0 and opt_key is same as(value.select)) or (value.select > 0 and opt_key == value.select) %} selected="selected" {% endif %} data-data="{{ opt_val.data }}">{{ opt_val.name }}</option>
+                    {% else %}
+                        <optgroup label="{% if params.rawoptgroups %}{{ opt_key }}{% else %}{{ _(opt_key) }}{% endif %}">
+                            {% for opt_key2, opt_val2 in opt_val %}
+                                <option value="{{ opt_key2 }}" {% if (value.select == 0 and opt_key2 is same as(value.select)) or (value.select > 0 and opt_key2 == value.select) %} selected="selected" {% endif %}>{{ opt_val2 }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endif %}
+                {% else %}
+                    <option value="{{ opt_key }}" {% if (value.select == 0 and opt_key is same as(value.select)) or (value.select > 0 and opt_key == value.select) %} selected="selected" {% endif %}>{{ opt_val }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+    {% if params.helptext is not empty and params.hlayout %}
+        <span class="help-block m-b-none">{{ _(params.helptext) }}</span>
+    {% endif %}
+    {% if params.hlayout %}</div>{% endif %}
+{% endmacro %}
+
+{% macro _slider(params, value) %}
+	{% set class = params.class %}
+	{% if class is empty %}
+		{% set class = 'slider-primary' %}
+	{% endif %}
+    {% if params.label is not empty %}
+        <label for="{{ params.id }}" class="control-label">{% if params.rawlabel == 1 %}{{ params.label }}{% else %}{{ _(params.label) }}{% endif %}</label>
+    {% endif %}
+	<input type="text" name="{{ params.name }}" class="slider form-control {{ class }}" id="{{ params.id }}" value="{{ value }}" data-slider-value="{{ value }}" {% if params.data %}{% for key, val in params.data %} data-{{key}}={% if '"' in val %}'{{val|raw}}'{% else %}"{{val|raw}}"{% endif %}{% endfor %}{% endif %} />
+{% endmacro %}
+
+{% macro _colorpicker(params, value = "", constraints = "") %}
+    {% import _self as form_elements %}
+
+	{{ form_elements._label(params) }}
+    {% if params.hlayout %}<div class="col-{{ params.col }}">{% endif %}
+    <div class="input-group color">
+        <input id="{{ params.id }}" type="text" name="{{ params.name }}" value="{{ value }}" class="form-control{% if params.class %} {{ params.class }}{% endif %}" {% if params.data %}{% for key, val in params.data %} data-{{key}}={% if '"' in val %}'{{val|raw}}'{% else %}"{{val|raw}}"{% endif %}{% endfor %}{% endif %} {{ constraints|raw }} />
+        <span class="input-group-addon"><i></i></span>
+    </div>
+    {% if params.helptext is not empty and params.hlayout %}
+        <span class="help-block m-b-none">{{ _(params.helptext) }}</span>
+    {% endif %}
+    {% if params.hlayout %}</div>{% endif %}
+{% endmacro %}
+
+{% macro _geolocation(params) %}
+	<div id="{{ params.id }}" class="geolocation{% if params.class != '' %} {{ params.class }}{% endif %}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}></div>
+{% endmacro %}
+
+{% macro progressbar(id, value, minvalue, maxvalue, text = '', color = 'primary', animate = false) %}
+    <div id="{{ id }}" class="progress">
+        <div class="progress-bar progress-bar-striped bg-{{ color }}{% if animate %} progress-bar-animate{% endif %}" role="progressbar" aria-valuenow="{{ value }}" aria-valuemin="{{ minvalue }}" aria-valuemax="{{ maxvalue }}" style="width: {{ value }}%">
+            {% if text is not empty and not small %}{{ text }}{% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro _file_image(params, value = "", constraints = "") %}
+    {% import _self as form_elements %}
+    <div class="col-6">
+        {{ form_elements._file(params, value, constraints) }}
+        {% if params.width is not empty and params.height is not empty %}
+        <div class="text-muted small">{{ _('LBL_DIMENSION', params.width, params.height) }}</div>
+        {% endif %}
+    </div>
+    <div class="col-6">
+        <div class='logo-container'>
+        {% if params.src %}
+            <a data-href="{{ params.delurl }}" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-question="{{ _(params.confirmmsg) }}" class="btn btn-xs btn-danger pull-right"><i class="glyphicon glyphicon-trash"></i> </a>
+            <img src="{{ params.src }}">
+        {% else %}
+            <div class="text-muted small">{{ _('LBL_NO_IMAGE_UPLOADED') }}</div>
+        {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro accesslevel(params, value, accessLevel = 2) %}
+    {% if value is empty %}
+        {% set value = 0 %}
+    {% endif %}
+    {% if accessLevel == 2 %}
+        <div class="btn-group{% if params.class %} {{ params.class }}{% endif %}" id="{{ params.id }}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}>
+            <button data-ico="{{ params.options[value].icon }}" data-color="{{ params.options[value].color }}" class="btn btn-{{ params.options[value].color }} btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-fw fa-{{ params.options[value].icon }}"></i>
+            </button>
+            <div class="dropdown-menu radius-1 brc-primary-m4 shadow-sm p-1 m-2">
+                {% for key, value in params.options %}
+                <a class="btn-accesslevel dropdown-item btn btn-sm btn-outline-{{ value.color }} btn-h-light-{{ value.color }} btn-a-{{ value.color }} my-1 radius-1" data-value="{% if value.value %}{{ value.value }}{% else %}{{ key }}{% endif %}" data-color="{{ value.color }}" data-ico="{{ value.icon }}" href="javascript:;"><i class="fa fa-{{ value.icon }} mr-2 text-{{ value.color }}"></i> {{ _(value.label) }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    {% elseif accessLevel == 1 %}
+        <i class="fa text-{{ params.options[value].color }} fa-fw fa-{{ params.options[value].icon }}" data-toggle="tooltip" title="{{ _(params.options[value].label) }}"></i>
+    {% endif %}
+{% endmacro %}
+
+{% macro _emojirating(params, value) %}
+    {% if params.label is not empty %}
+        <label class="control-label">
+            {{ _(params.label) }}
+        </label>
+    {% endif %}
+    <input id="{{ params.id }}-value" type="hidden" name="{{ params.name }}" value="{{ value }}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}/>
+    <div class="emojirating" data-value="{{ value }}" id="{{ params.id }}"></div>
+{% endmacro %}
+
+{% macro _tagsinput(params, value) %}
+    {% if params.label is not empty %}
+        <label class="control-label{% if params.hlayout %} col-{{ params.hlayout }}{% endif %}">{{ _(params.label) }}</label>
+    {% endif %}
+    {% if params.hlayout %}<div class="col-{{ params.col }}">{% endif %}
+    <input id="{{ params.id }}" type="text" value=""{% if params.disabled %} disabled{% endif %} class="input-sm{% if params.class %} {{ params.class }}{% endif %}"{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}>
+    {% if params.hlayout %}</div>{% endif %}
+{% endmacro %}
+
+{% macro _fastselect(params, value) %}
+    {% import _self as form_elements %}
+    {{ form_elements._label(params) }}
+    <select name="{{ params.name }}[]" id="{{ params.id }}" class="form-control fast-select{% if params.class %} {{ params.class }}{% endif %}"{% if params.disabled %} disabled{% endif %} multiple{% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}>
+        {% for opt in params.options %}
+            <option value="{{ opt.id }}" class="{{ opt.class }}"{% if opt.id in params.default %} selected{% endif %}>{{ opt.text }}</option>
+        {% endfor %}
+    </select>
+{% endmacro %}
+
+{% macro _bincheckgroup(params, value, constraints = "") %}
+	{% import _self as form_elements %}
+
+    <div class="bin-checkbox-container">
+    {% if params.preselect %}
+    <div class="input-group">
+    {% endif %}
+    <input type="hidden" id="{{ params.id }}" class="bin-checkbox-value" name="{{ params.name }}{% if params.preselect %}[value]{% endif %}" value="{{ value }}">
+
+	{% set params = params|merge({origid : params.id}) %}
+	{% set params = params|merge({origname : params.name}) %}
+	{% set params = params|merge({origonclick : params.onclick}) %}
+	{% set params = params|merge({color : params.color}) %}
+	{% set params = params|merge({class : 'bin-checkbox'}) %}
+	{% set params = params|merge({name : 'bin-checkbox[]'}) %}
+    {% set isgroup = true %}
+
+	{% if params.label is not empty %}
+	<label for="{{ params.id }}" class="control-label{% if params.hlayout %} col-{{ params.hlayout }} text-right{% endif %} bold">
+        {% if params.preselect %}
+            <input type="checkbox" name="{{ params.origname }}[change]" value="1" class="form-preselect">
+        	{% set params = params|merge({preselect : false}) %}
+        {% endif %}
+    	{% if params.rawlabel == 1 %}{{ params.label }}{% else %}{{ _(params.label) }}{% endif %}
+	</label>
+	{% endif %}
+
+    {% if params.hlayout %}
+        <div class="col-{{ params.col }}">
+    {% endif %}
+
+  	{% set params = params|merge({rawlabel : params.rawoptions}) %}
+
+
+	{% for key, val in params.options %}
+	    {% if (key b-and value) == key %}
+		    {% set checked = true %}
+        {% else %}
+		    {% set checked = false %}
+        {% endif %}
+
+        {% set params = params|merge({label : val}) %}
+        {% set params = params|merge({altlabel : val}) %}
+        {% set params = params|merge({id : params.origid ~ '_' ~ loop.index}) %}
+		{% set params = params|merge({valueon : key}) %}
+		{% set params = params|merge({caption : val}) %}
+
+        {% if params.slider %}
+	    	{{ form_elements._checkboxslider(params, key, checked, constraints) }}
+		{% else %}
+    		{{ form_elements._checkbox(params, key, checked, constraints, isgroup) }}
+		{% endif %}
+	{% endfor %}
+
+    {% if params.hlayout %}
+        </div>
+    {% endif %}
+    {% if params.preselect %}
+        </div>
+    {% endif %}
+
+        </div>
+{% endmacro %}
+
+{% macro _checkboxslider(params, value = "", checked = false, constraints = "") %}
+	<div class="checkbox{% if params.color %} checkbox-slider-{{ params.color }}{% endif %} checkbox-slider--b-flat{% if params.outerclass %} {{ params.outerclass }}{% endif %}">
+		<label>
+			<input id="{{ params.id }}"{% if params.class %} class="{{ params.class }}"{% endif %} type="checkbox" {% if params.disabled %} disabled="disabled"{% endif %}{% if checked == value %} checked="checked" {% endif %}{% if params.name != '' %} name="{{ params.name }}"{% endif %} value="{{ value }}"{{ constraints|raw }} {% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{% if params.altlabel %} data-altlabel="{{ _(params.altlabel) }}"{% endif %} data-parsley-ui-enabled="false" />
+			<span class="ml-2">{% if params.caption != '' %}{{ _(params.caption) }}{% endif %}</span>
+		</label>
+	</div>
+{% endmacro %}
+
+{% macro dataAttribute(data, value = '') %}
+    {% if data %}
+        {% for key, val in data %}
+            {% if key == 'default-value' and val == '?' %}
+                {% set val = value %}
+            {% endif %}
+            data-{{key}}="{{val}}"
+        {% endfor %}
+    {% endif %}
+{% endmacro %}

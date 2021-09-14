@@ -1,0 +1,15 @@
+<div class="row-fluid align-center">
+    {% if fileType == 'pdf' %}
+        <embed class="embed-responsive" style="float:none;display:inline;height:800px;width:100%;" src="{{ fileName }}"/>
+    {% elseif fileType == 'jpg' or fileType == 'jpeg' or fileType == 'png' %}
+        <div class="img-zoom">
+            <img src="{{ fileName }}" class="img-fluid" alt=""/>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            {{ _('LBL_NO_PREVIEW_FOR_THIS_FILETYPE') }}
+            <br>
+            <a href="{{ downloadUrl }}" target="_blank"><i class="fa fa-cloud-download-alt"></i> {{ _('LBL_DOWNLOAD_FILE') }}</a>
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,2 @@
+{% import "formBuilderMacros.twig" as self %}
+<input id="{{ element.getId }}" name="{{ formName }}[{{ element.getName }}]" type="{{ element.getType }}" value="{{ value }}"{% if element.getClass %} class="{{ element.getClass }}"{% endif %}{{ self.attributes(element.getAttributes) }}>

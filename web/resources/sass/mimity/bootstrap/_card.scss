@@ -1,0 +1,28 @@
+.accordion {
+  > .card {
+    border-width: 1px;
+    box-shadow: none;
+    > .card-header {
+      padding: 0;
+      > .btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        border-radius: 0;
+      }
+    }
+  }
+}
+.card {
+  box-shadow: $box-shadow-sm;
+}
+.card-header,
+.card-footer {
+  display: flex;
+  align-items: center;
+}
+.card-header > {
+  h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    margin-bottom: 0;
+  }
+}

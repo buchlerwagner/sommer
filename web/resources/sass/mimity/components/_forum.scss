@@ -1,0 +1,9 @@
+.forum-item {
+  > .media-body > p {
+    font-size: 80%;
+    margin-bottom: 0;
+  }
+}
+.forum-content {
+  transition: none !important;
+}

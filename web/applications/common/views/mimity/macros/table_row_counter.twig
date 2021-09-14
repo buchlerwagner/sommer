@@ -1,0 +1,12 @@
+<div class="d-flex table_{{ table.name }}_counter">
+    {% if not table.hideCounter %}
+    <span class="small text-muted">
+    {% if table.settings.totalcount > table.settings.filteredcount %}
+        {{ _('LBL_TABLE_FILTERED', '<b>' ~ table.settings.totalcount ~ '</b>', '<b>' ~ table.settings.filteredcount ~ '</b>')|raw }}
+        <a href="?{{ filterFormName }}[reset]=1"><i class="fa fa-times"></i> {{ _('BTN_CLEAR_FILTERS') }}</a>
+    {% else %}
+        {{ _('LBL_TABLE_COUNT', '<b>' ~ table.settings.totalcount ~ '</b>')|raw }}
+    {% endif %}
+    </span>
+    {% endif %}
+</div>

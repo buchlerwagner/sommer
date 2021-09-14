@@ -1,0 +1,97 @@
+// Keep modal transition
+.modal-dialog {
+  .modal.fade & {
+    transition: $modal-transition;
+  }
+}
+
+.modal-content {
+  box-shadow: $dropdown-box-shadow;
+}
+
+.modal-header {
+  box-shadow: $box-shadow-sm;
+}
+.modal-footer {
+  /*box-shadow: 0 -1px 3px 0 rgba($black, .1),0 -1px 2px 0 rgba($black, .06);*/
+  border-top: 1px solid $border-color;
+  background-color: $gray-100;
+}
+
+// Side modals
+.modal-content-top,
+.modal-content-right,
+.modal-content-bottom,
+.modal-content-left {
+  .modal-dialog {
+    margin: 0;
+  }
+  @if $enable-rounded {
+    .modal-content,
+    .modal-header {
+      border-radius: 0;
+    }
+  }
+}
+.modal-content-right,
+.modal-content-left {
+  .modal-dialog,
+  .modal-content {
+    $vh100: calc(var(--vh, 1vh) * 100); // https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
+    min-height: $vh100;
+  }
+  .modal-header,
+  .modal-footer {
+    flex-shrink: 0;
+  }
+}
+.modal-content-right {
+  padding-right: 0 !important;
+  .modal-dialog {
+    margin-left: auto;
+  }
+  &.fade .modal-dialog {
+    transform: translateX(25px);
+  }
+  &.show .modal-dialog {
+    transform: translateX(0);
+  }
+}
+.modal-content-left {
+  &.fade .modal-dialog {
+    transform: translateX(-25px);
+  }
+  &.show .modal-dialog {
+    transform: translateX(0);
+  }
+}
+.modal-content-bottom,
+.modal-content-top {
+  padding-right: 0 !important;
+  .modal-dialog {
+    position: absolute;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+  &.show .modal-dialog {
+    transform: translateY(0) !important;
+  }
+}
+.modal-content-bottom {
+  .modal-dialog {
+    bottom: 0;
+  }
+  &.fade .modal-dialog {
+    transform: translateY(25px);
+  }
+}
+.modal-content-top {
+  .modal-dialog {
+    top: 0;
+  }
+  &.fade .modal-dialog {
+    transform: translateY(-25px);
+  }
+}
+

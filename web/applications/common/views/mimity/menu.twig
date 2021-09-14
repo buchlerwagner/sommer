@@ -1,0 +1,47 @@
+{% import "menu-elements" ~ constant('TWIG_FILE_EXTENSION') as element %}
+<ul class="nav treeview mb-4" data-accordion="">
+    {% set level = 0 %}
+    {% for mkey, mvalue in menu %}
+        {% if mvalue['display'] == 1 or mvalue['display'] == 2 %}
+            {% if mvalue['items']|length > 0 and mvalue['display'] == 2 %}
+                {% set level = 0 %}
+                <li class="nav-item">
+                    {{ element.item(mkey, mvalue, false, true, mvalue['selected']) }}
+
+                    <ul class="nav">
+                        {% for gkey, gvalue in mvalue['items'] %}
+                            {% if gvalue['items']|length > 0 %}
+                                {% set level = 1 %}
+                                <li class="nav-item">
+                                    {{ element.item(gkey, gvalue, false, false, gvalue['selected']) }}
+
+                                    <ul class="nav">
+                                        {% set level = 2 %}
+                                        {% for hkey, hvalue in gvalue['items'] %}
+                                            <li class="nav-item">
+                                                {{ element.item(hkey, hvalue, mkey ~ '/' ~ gkey ~ '/', false, hvalue['selected']) }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% elseif gvalue['items'] is not defined %}
+                                <li class="nav-item">
+                                    {{ element.item(gkey, gvalue, mkey ~ '/', false, gvalue['selected']) }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    {{ element.item(mkey, mvalue, mkey ~ '/', true, mvalue['selected']) }}
+                </li>
+            {% endif %}
+        {% elseif mvalue['display'] == 10 %}
+            <li class="nav-label">
+                {% if mvalue.caption is empty %}{{ _('MENU_' ~ mkey) }}{% else %}{{ _(mvalue.caption) }}{% endif %}
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>

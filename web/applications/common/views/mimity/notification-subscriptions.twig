@@ -1,0 +1,58 @@
+{% if notificationOptions %}
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-hover">
+                <thead>
+                <tr class="d-flex">
+                    <th class="col-8 text-primary">{{ _('LBL_NOTIFICATION_TYPE') }}</th>
+                    <th class="col-2 text-center text-primary">{{ _('LBL_NOTIFICATION') }}</th>
+                    <th class="col-1 text-center text-primary">{{ _('LBL_EMAIL') }}</th>
+                    <th class="col-1 text-center text-primary">{{ _('LBL_SMS') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set category = false %}
+                {% for id, notification in notificationOptions %}
+                    {% if category != notification.category %}
+                        {% set category = notification.category %}
+                        <tr class="thead-primary">
+                            <td colspan="4">
+                                <b class="text-primary">{{ _(notificationCategories[category]) }}</b>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    <tr class="d-flex">
+                        <td class="col-8 pl-3">
+                            {{ _(notification.title) }}
+                        </td>
+                        <td class="col-2 text-center">
+                            {% if notification.notification.allow  %}
+                            <div class="custom-control custom-checkbox custom-checkbox-{{ notification.level|lower }}">
+                                <input id="notification-{{ id }}" value="1" type="checkbox"{% if notification.notification.value %} checked{% endif %}{% if not notification.notification.change %} disabled{% endif %} class="chk-notification custom-control-input" data-id="{{ notification.id }}" data-type="notification" data-uid="{{ user.id }}">
+                                <label for="notification-{{ id }}" class="custom-control-label"></label>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="col-1 text-center">
+                            {% if notification.email.allow  %}
+                            <div class="custom-control custom-checkbox custom-checkbox-{{ notification.level|lower }}">
+                                <input id="email-{{ id }}" value="1" type="checkbox"{% if notification.email.value %} checked{% endif %}{% if not notification.email.change %} disabled{% endif %} class="chk-notification custom-control-input" data-id="{{ notification.id }}" data-type="email" data-uid="{{ user.id }}">
+                                <label for="email-{{ id }}" class="custom-control-label"></label>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="col-1 text-center">
+                            {% if notification.sms.allow  %}
+                            <div class="custom-control custom-checkbox custom-checkbox-{{ notification.level|lower }}">
+                                <input id="sms-{{ id }}" value="1" type="checkbox"{% if notification.sms.value %} checked{% endif %}{% if not notification.sms.change %} disabled{% endif %} class="chk-notification custom-control-input" data-id="{{ notification.id }}" data-type="sms" data-uid="{{ user.id }}">
+                                <label for="sms-{{ id }}" class="custom-control-label"></label>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}

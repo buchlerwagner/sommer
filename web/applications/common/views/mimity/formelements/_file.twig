@@ -1,0 +1,10 @@
+{% import "formBuilderMacros.twig" as self %}
+<div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}{% if element.hasError %} has-error{% endif %}">
+    {{ self.label(element) }}
+    {% set inputValue = value %}
+    {% set inputName = formName ~ '[' ~ element.getName ~ ']' %}
+    <input id="{{ element.getId }}" name="{{ inputName }}" type="{{ element.getType }}" value="{{ inputValue }}" class="custom-file-input--{{ element.getClass }}"{% if element.isDisabled %} disabled{% endif %}{% if element.isReadonly %} readonly{% endif %}{{ self.attributes(element.getAttributes) }}>
+    {% if element.getPlaceholder %}
+        <label for="{{ element.getId }}" class="custom-file-label">{{ _(element.getPlaceholder) }}</label>
+    {% endif %}
+</div>

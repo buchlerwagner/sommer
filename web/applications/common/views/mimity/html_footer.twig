@@ -1,0 +1,32 @@
+{% if sitedata.google.analytics %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ sitedata.google.analytics }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', '{{ sitedata.google.analytics }}');
+    </script>
+{% endif %}
+
+{% if js.footer.files %}
+    {% for file in js.footer.files %}
+    <script src="{{ file }}" type="text/javascript"></script>
+    {% endfor %}
+{% endif %}
+
+{% if js.footer.inline %}
+    {% if js.footer.inline|length > 0 %}
+    <script>
+        $(function() {
+            {% for inline in js.footer.inline %}
+            {{ inline|raw }}
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
+{% endif %}
+
+	</body>
+</html>

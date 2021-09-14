@@ -1,0 +1,70 @@
+.btn-xs {
+  @include button-size($btn-xs-padding-y, $btn-xs-padding-x, $btn-xs-font-size, $btn-xs-line-height, $btn-xs-border-radius);
+}
+.btn-group-xs > .btn { @extend .btn-xs; }
+
+.btn-light {
+  @include button-variant($white, $input-border-color, $gray-100, $gray-500, $gray-300, $gray-500);
+}
+.btn-outline-light {
+  @include button-outline-variant($white);
+}
+.btn.has-icon {
+  display: inline-flex;
+  align-items: center;
+  &.btn-block {
+    display: flex;
+    justify-content: center;
+  }
+}
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px !important;
+  height: 38px;
+  padding: 0 !important;
+  .btn-group-lg > &,
+  &.btn-lg {
+    width: 48px !important;
+    height: 48px;
+  }
+  .btn-group-sm > &,
+  &.btn-sm {
+    width: 31px !important;
+    height: 31px;
+  }
+  .btn-group-xs > &,
+  &.btn-xs {
+    width: 24px !important;
+    height: 24px;
+  }
+}
+.btn-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  line-height: 1;
+  height: 68px;
+  > i,
+  > svg {
+    display: block;
+  }
+  > i {
+    font-size: 2em;
+    &.material-icons {
+      font-size: 2.375em;
+    }
+  }
+  > svg {
+    width: 2em;
+    height: 2em;
+  }
+  &.btn-sm {
+    height: 58px;
+  }
+  &.btn-lg {
+    height: 86px;
+  }
+}

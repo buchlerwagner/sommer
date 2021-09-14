@@ -1,0 +1,140 @@
+.accordion-unstacked {
+  > .card {
+    border-width: 1px;
+    box-shadow: none;
+    overflow: hidden;
+    &:not(:first-of-type) {
+      margin-top: .5rem;
+    }
+    > .card-header {
+      padding: 0;
+      > .btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        border-radius: 0;
+      }
+    }
+  }
+  @each $color, $value in $theme-colors {
+    @if $color != 'secondary' {
+      &.accordion-active-#{$color} > .card.active {
+        border-color: $value;
+        > .card-header > .dropdown-toggle {
+          @if $color == 'warning' {
+            color: theme-color-level('warning', 3);
+          } @else {
+            color: $value;
+          }
+        }
+      }
+      &.accordion-bg-#{$color} {
+        > .card {
+          border-color: $value;
+          background-color: $value;
+          > .card-header > .dropdown-toggle {
+            &[aria-expanded="false"] {
+              color: color-yiq($value);
+            }
+            &[aria-expanded="true"] {
+              @if $color == 'warning' {
+                color: color-yiq($value);
+              } @else {
+                color: $value;
+              }
+            }
+          }
+          &.active {
+            background-color: theme-color-level($color, -11);
+          }
+        }
+      }
+    }
+  }
+}
+[class*="accordion-bg"] > .card {
+  transition: background-color .35s ease;
+  > .card-header {
+    background-color: transparent;
+    > .dropdown-toggle[aria-expanded="false"] {
+      background-color: transparent !important;
+    }
+  }
+}
+.accordion,
+.accordion-unstacked {
+  > .card > .card-header {
+    border: 0;
+    > .dropdown-toggle {
+      display: flex;
+      align-items: center;
+      &:not([aria-expanded="true"]) {
+        background-color: rgba(#000,.04);
+        color: $gray-600;
+      }
+      &::after {
+        margin-left: auto;
+        transition: transform .35s ease;
+      }
+      &[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+.accordion-flush {
+  > .card {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    > .card-header {
+      border: 0;
+    }
+  }
+  .card > &:first-child > .card:first-child {
+    border-top: 0;
+    @include border-top-radius($card-border-radius);
+  }
+  .card > &:last-child > .card:last-child {
+    border-bottom: 0;
+    @include border-bottom-radius($card-border-radius);
+  }
+}
+
+.card-fullscreen {
+  position: fixed;
+  z-index: $zindex-fixed + 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border: 0;
+  @if $enable-rounded {
+    border-radius: 0;
+  }
+  > .card-header,
+  > .card-footer {
+    flex-shrink: 0;
+    @if $enable-rounded {
+      border-radius: 0;
+    }
+  }
+}
+
+.card-loader-overlay {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  color: #fff;
+  background-color: rgba(#000, .5);
+  background-repeat: no-repeat;
+  background-position: center;
+  @include flex-center;
+}

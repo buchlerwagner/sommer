@@ -1,0 +1,8 @@
+.nav-tabs,
+.nav-pills {
+  .nav-link {
+    @include hover-focus() {
+      outline: 0;
+    }
+  }
+}

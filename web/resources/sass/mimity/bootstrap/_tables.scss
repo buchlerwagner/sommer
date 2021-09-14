@@ -1,0 +1,13 @@
+.table thead th {
+  border-bottom-width: 1px;
+  font-weight: 500;
+  font-size: calc(#{$font-size-base} - 1px);
+}
+
+// Make table-sm font size smaller
+.table-sm {
+  font-size: $font-size-sm;
+  thead th {
+    font-size: calc(#{$font-size-sm} - 1px);
+  }
+}

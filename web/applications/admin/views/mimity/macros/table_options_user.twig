@@ -1,0 +1,7 @@
+{% if table.edit %}
+    {% if table.subTable %}
+        <a data-href="{{ table.name }}/sendPassword/{{ keyvalue }}/" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-question="{{ _('CONFIRM_PASSWORD_SEND')|e }}" data-title="{{ _('LBL_SEND_PASSWORD') }}" data-confirm-button="{{ _('LBL_SEND') }}" data-color="warning" class="btn btn-light h-warning"><i class="fa fa-key"></i></a>
+    {% else %}
+        <a data-href="sendPassword|{{ table.name }}/{{ keyvalue }}/" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-question="{{ _('CONFIRM_PASSWORD_SEND')|e }}" data-title="{{ _('LBL_SEND_PASSWORD') }}" data-confirm-button="{{ _('LBL_SEND') }}" data-color="warning" class="btn btn-light h-warning"><i class="fa fa-key"></i></a>
+    {% endif %}
+{% endif %}

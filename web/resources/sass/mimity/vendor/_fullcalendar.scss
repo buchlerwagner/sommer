@@ -1,0 +1,17 @@
+button.fc-event,
+.fc-event.fc-event-draggable {
+  cursor: grab !important;
+  &.fc-event-dragging,
+  &:active {
+    cursor: grabbing !important;
+  }
+}
+@include media-breakpoint-down(sm) {
+  .fc .fc-toolbar {
+    flex-direction: column;
+    align-items: start;
+  }
+  .fc-toolbar-chunk:not(:last-child) {
+    margin-bottom: .5rem;
+  }
+}

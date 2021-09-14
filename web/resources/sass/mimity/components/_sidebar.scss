@@ -1,0 +1,53 @@
+// Sidebar
+.sidebar {
+  position: fixed;
+  z-index: $zindex-fixed + 1;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  width: $sidebar-width;
+  height: 100%;
+  transition: all .25s cubic-bezier(0.4, 0.0, 0.2, 1);
+  box-shadow: 1px 0 3px 0 rgba($black, .1), 1px 0 2px 0 rgba($black, .06); // box-shadow-sm horizontally
+  background-color: $sidebar-bg;
+}
+
+// Sidebar header
+.sidebar-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: $sidebar-header-height;
+  padding: 0 8px;
+  box-shadow: $box-shadow-sm;
+  [data-toggle="sidebar"] {
+    display: none;
+  }
+}
+
+// Sidebar body
+.sidebar-body {
+  position: relative;
+  overflow-y: auto;
+  height: calc(100% - #{$sidebar-header-height});
+}
+
+// Sidebar backdrop
+.sidebar-backdrop {
+  position: fixed;
+  z-index: $zindex-fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+  background-color: rgba($modal-backdrop-bg, $modal-backdrop-opacity);
+  @include media-breakpoint-down(md) { // Show backdrop on md down
+    .sidebar-expand & {
+      display: block;
+      animation-name: fadeIn;
+      animation-duration: .5s;
+    }
+  }
+}

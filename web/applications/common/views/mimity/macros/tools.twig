@@ -1,0 +1,387 @@
+{% macro form(form, context) %}
+    <form action="{{ form.action }}" method="post" id="{{ form.name }}-form" autocomplete="off" class="parsley-form"{% if form.upload is not empty %} enctype="multipart/form-data"{% endif %} data-modal="false">
+        {% if form.type == 'formBuilder' %}
+            {% include "formBuilder.twig" %}
+        {% else %}
+            {% include "form.twig" %}
+        {% endif %}
+    </form>
+{% endmacro %}
+
+{% macro table(table, filterFormName) %}
+	{% import _self as tools %}
+	{% if table.form is not empty %}
+        {% if table.formTemplate %}
+            {% include table.formTemplate ~ constant('TWIG_FILE_EXTENSION') %}
+        {% else %}
+            {% if table.form.view is not empty %}
+                {{ tools.view(table.form) }}
+            {% else %}
+                {{ tools.form(table.form) }}
+            {% endif %}
+        {% endif %}
+	{% else %}
+        {% if table.boxed %}
+            {% include "table-boxed.twig" %}
+        {% else %}
+            {% include "table.twig" %}
+        {% endif %}
+
+        {% if table.inlineForm is not empty %}
+            {{ tools.form(table.inlineForm) }}
+	    {% endif %}
+	{% endif %}
+{% endmacro %}
+
+{% macro view(form) %}
+    {% import "formBuilderMacros.twig" as formBuilder %}
+    {% if form.title or form.toolsTemplate %}
+        <div class="border-0 mb-3">
+            {% if form.title %}
+            <div class="float-left">
+                <h1 class="page-title text-secondary-d3 text-140 d-block">
+                    {{ _(form.title) }}
+                </h1>
+                {% if form.subTitle %}
+                    <h6 class="text-grey-l2 font-light">{{ form.subTitle }}</h6>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% if form.toolsTemplate %}
+            <div class="float-right">
+                {% include form.toolsTemplate ~ ".twig" %}
+            </div>
+            {% endif %}
+        </div>
+        <div class="clearfix"></div>
+    {% endif %}
+
+    {% include form.view ~ '.twig' %}
+
+    {% if form.buttons|length > 0 %}
+        <div class="d-flex">
+            <div class="justify-content-end ml-auto">
+                {% for button in form.buttons %}
+                    {% if button.showInViewer and not button.isHidden %}
+                    {{ formBuilder.button(button) }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro form_header(table) %}
+	{% import _self as tools %}
+
+    {% if table.form %}
+        <div class="text-muted mb-2">
+            <i class="fas fa-angle-left"></i> <a href="{{ table.form.buttons.cancel.link }}" class="text-muted">{{ _(table.form.header.parent) }}</a>
+        </div>
+
+        {% if table.form.header.selectionText %}
+            <h3>{{ table.form.header.selectionText|raw }}</h3>
+        {% else %}
+            <H3>
+            {% if table.form.header.raw %}
+                {{ table.form.header.title|raw }}
+            {% else %}
+                {{ _(table.form.header.title) }}
+            {% endif %}
+            </H3>
+        {% endif %}
+
+        {% if table.form.header.subtitle != '' %}
+            <div class="subtitle">
+                {% if table.form.header.raw %}{{ table.form.header.subtitle|raw }}{% else %}{{ _(table.form.header.subtitle) }}{% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <h3>{{ _(table.header) }}</h3>
+    {% endif %}
+
+{% endmacro %}
+
+{% macro table_cell(table_name, keyvalue, column, val, row, readonly = false, table = false) %}
+	{% import "form_elements.twig" as form_elements %}
+	{% if column.type == 'number' %}<div{% if val > 0 %} class="text-success"{% elseif val < 0 %} class="text-danger"{% endif %}>{% endif %}
+	{% if column.templatestring is not empty %}
+		{{ include(template_from_string( column.templatestring )) }}
+	{% elseif column.type == 'options' %}
+		{% if column.options[val] is iterable %}
+			{% if column.options[val].class is not empty %}<div class="btn btn-block btn-sm {{ column.options[val].class }}">{% endif %}
+			{{ _(column.options[val].name) }}
+			{% if column.options[val].class is not empty %}</div>{% endif %}
+		{% elseif column.options[val] is not empty %}
+			{{ _(column.options[val]) }}
+		{% else %}
+			{%  for opt in column.options %}
+				{% if opt is iterable and opt[val] is not empty %}
+					{{ _(opt[val]) }}
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% elseif column.type == 'checkgroup' %}
+		{% set val = val|split('|') %}
+		{% for opt in val %}{% if opt is not empty %}{{ column.options[opt] }}, {% endif %}{% endfor %}
+	{% elseif column.type == 'checkbox' or column.type == 'radio' %}
+		<div class="text-center">
+		{% if readonly %}
+			{% if val %}
+				<i class="fas fa-check text-success"></i>
+			{% else %}
+				<i class="fas fa-times text-danger"></i>
+			{% endif %}
+		{% else %}
+			{% set params = {
+                    'id' : table_name ~ '|' ~ column.field ~ '|' ~ keyvalue|replace({'|': '-'}),
+                    'name' : table_name ~ '[' ~ column.field ~ '][' ~ keyvalue|replace({'|': '-'}) ~ ']',
+                    'outerclass' : ' table-check',
+                    'data': {
+                        'table': table_name,
+                        'keyvalue': keyvalue,
+                        'field': column.field,
+                        'method': column.method
+                    }
+               }
+            %}
+			{{ form_elements._checkbox(params, 1, val) }}
+		{% endif %}
+		</div>
+    {% elseif column.type == 'checkboxslider' %}
+		<div class="text-center">
+		{% if readonly %}
+			{% if val %}
+                <i class="fas fa-check text-success"></i>
+            {% else %}
+                <i class="fas fa-times text-danger"></i>
+			{% endif %}
+		{% else %}
+			{% set params = {
+                    'color': 'primary',
+                    'id' : table_name ~ '|' ~ column.field ~ '|' ~ keyvalue|replace({'|': '-'}),
+                    'name' : table_name ~ '[' ~ column.field ~ '][' ~ keyvalue|replace({'|': '-'}) ~ ']',
+                    'outerclass' : 'table-check',
+                    'data': {
+                        'table': table_name,
+                        'keyvalue': keyvalue,
+                        'field': column.field,
+                        'method': column.method
+                    }
+                }
+            %}
+            {{ form_elements._checkboxslider(params, 1, val) }}
+		{% endif %}
+		</div>
+	{% elseif column.type == 'icon' %}
+		<i class="fa fa-{{ column.icons[ val ] }}{% if column.colors %} text-{{ column.colors[val] }}{% endif %}"></i>
+    {% elseif column.type == 'styled' %}
+        <div class="{{ column.cellclass }}">{{ val }}</div>
+    {% elseif column.type == 'binoptions' %}
+        {% set item = false %}
+        {% for key, name in column.options %}{% if (val b-and key) == key %}{% if item %}, {% endif %}{{ name }}{% set item = true %}{% endif %}{% endfor %}
+	{% else %}
+		{{ val|raw }}{% if column.unit is not empty %} {{ column.unit|raw }}{% endif %}
+	{% endif %}
+	{% if column.type == 'number' %}</div>{% endif %}
+{% endmacro %}
+
+{% macro table_options(keyvalue, table, row) %}
+    <div class="table-options">
+	{% if table.optionTemplate is not empty %}
+		{% include table.optionTemplate ~ constant('TWIG_FILE_EXTENSION') %}
+	{% else %}
+        {% if table.subTable %}
+            {% if table.readonly %}
+                {% if table.view %}<a data-toggle="modal" data-target="#ajax-modal"{% if table.modalSize or table.viewModalSize %} data-size="{% if table.viewModalSize %}{{ table.viewModalSize }}{% else %}{{ table.modalSize }}{% endif %}"{% endif %} href="/ajax/forms/{% if table.viewForm %}{{ table.viewForm }}{% else %}{{ table.formName }}{% endif %}/{{ keyvalue }}/?view=1" class="btn btn-light btn-h-info" data-backdrop="static" data-keyboard="false"><i class="far fa-eye text-muted"></i></a>{% endif %}
+            {% else %}
+                {% if table.view %}<a data-toggle="modal" data-target="#ajax-modal"{% if table.modalSize or table.viewModalSize %} data-size="{% if table.viewModalSize %}{{ table.viewModalSize }}{% else %}{{ table.modalSize }}{% endif %}"{% endif %} href="/ajax/forms/{% if table.viewForm %}{{ table.viewForm }}{% else %}{{ table.formName }}{% endif %}/{{ keyvalue }}/?view=1" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
+                {% if table.edit and ((row['options'].edit is defined and row['options'].edit != false) or row['options'].edit is not defined) %}<a data-toggle="modal" data-target="#ajax-modal"{% if table.modalSize %} data-size="{{ table.modalSize }}"{% endif %} href="/ajax/forms/{{ table.formName }}/{{ keyvalue }}/{{ table.name }}/" class="btn btn-light h-info" data-backdrop="static" data-keyboard="false"><i class="far fa-edit"></i></a>{% endif %}
+            {% endif %}
+        {% else %}
+            {% if table.readonly %}
+                {% if table.view %}<a href="{% if table.customUrl %}{{ table.customUrl|replace({'%keyvalue%': keyvalue, '%id%': row.__id }) }}{% else %}view|{{ table.name }}/{{ keyvalue }}/{% endif %}" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
+            {% else %}
+                {% if table.view %}<a href="view|{{ table.name }}/{{ keyvalue }}/" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
+                {% if table.edit and ((row['options'].edit is defined and row['options'].edit != false) or row['options'].edit is not defined) %}<a href="edit|{{ table.name }}/{{ keyvalue }}/" class="btn btn-light h-info"><i class="far fa-edit"></i></a>{% endif %}
+            {% endif %}
+        {% endif %}
+
+        {% if not table.readonly %}
+            {% if table.copy %}<a data-confirm-action="tables.copy('{{ table.name }}', '{{ keyvalue }}')" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-button="{{ _('BTN_COPY') }}" data-confirm-question="{{ _('CONFIRM_COPY_TABLE_RECORD')|e }}" data-title="{{ _('LBL_COPY_TABLE_RECORD_TITLE')|e }}" data-color="warning" class="btn btn-light h-warning"><i class="far fa-clone"></i></a>{% endif %}
+
+            {% if table.delete and row['options'].delete != false %}
+                {% if table.deleteField %}
+                    {% if row['options'].isDeleted %}
+                        {% if table.undelete %}
+                            <a data-confirm-action="tables.unDelete('{{ table.name }}', '{{ keyvalue }}')" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-button="{{ _('BTN_UNARCHIVE') }}" data-confirm-question="{{ _('CONFIRM_UNARCHIVE_TABLE_RECORD')|e }}" class="btn btn-light h-danger"><i class="fa fa-undo"></i> </a>
+                        {% endif %}
+                    {% else %}
+                        <a data-confirm-action="tables.delete('{{ table.name }}', '{{ keyvalue }}')" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-button="{{ _('BTN_ARCHIVE') }}" data-confirm-question="{{ _('CONFIRM_ARCHIVE_TABLE_RECORD')|e }}" class="btn btn-light h-danger"><i class="fa fa-archive"></i> </a>
+                    {% endif %}
+                {% else %}
+                    <a data-confirm-action="tables.delete('{{ table.name }}', '{{ keyvalue }}')" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-question="{{ _('CONFIRM_DELETE_TABLE_RECORD')|e }}" class="btn btn-light h-danger"><i class="far fa-trash-alt"></i></a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    {% if table.additionalOptionsTemplate is not empty %}
+        {% include table.additionalOptionsTemplate ~ constant('TWIG_FILE_EXTENSION') %}
+    {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro infinite_scroll(id, container, current, pagenum, url, callback) %}
+    <div id="{{ id }}" class="infinite_scroll text-center{% if current == pagenum %} hidden{% endif %}" data-container="{{ container }}" data-current="{{ current }}" data-pagenum="{{ pagenum }}"{% if url != '' %} data-url="{{ url }}"{% endif %}{% if callback != '' %} data-callback="{{ callback }}"{% endif %}>
+        <i class="fas fa-circle-notch fa-spin text-muted"></i>
+    </div>
+{% endmacro %}
+
+{% macro label_editor(key, value, post) %}
+    <div class="card mb-3" data-key="{{ key }}">
+        <div class="card-header border-bottom bg-gray-200 d-flex">
+            <div class="font-weight-bold mr-auto">{{ key }}</div>
+            {% if value[ post.langfrom ].original.new == 1 %}<div class="badge badge-warning">{{ _('LBL_NEW') }}</div>{% endif %}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="dict-original{% if value[ post.langfrom ].custom.value is not empty %} d-none{% endif %}">
+                        {{ value[ post.langfrom ].original.value|nl2br|raw }}
+                    </div>
+                </div>
+                <div class="col-lg-6 border-left">
+                    <textarea class="form-control dict-editor" name="label[{{ key }}]" placeholder="{{ value[ post.langto ].original.value }}" id="label-value-{{ key }}">{{ value[ post.langto ].original.value|raw }}</textarea>
+                    <div class="d-none lang-unchanged">{{ value[ post.langto ].custom.value|raw }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body bg-gray-100 border-top">
+            <div class="row">
+                <div class="col-md-6 float-left">
+                    <span class="small text-muted">{{ _('LBL_MODIFIED') }}: <span class="dict-date">{{ _date(value[ post.langto ].original.date, 5) }}</span></span>
+                </div>
+                <div class="col-md-6 float-right">
+                    <div class="float-right ml-3">
+                        <button type="button" class="dict-btn-delete btn btn-danger btn-sm" title="{{ _('BTN_DELETE') }}" data-toggle="tooltip"><i class="fas fa-fw fa-trash-alt"></i></button>
+                    </div>
+                    <div class="float-right d-none dict-tools">
+                        <button type="button" class="dict-btn-save btn btn-primary btn-sm" title="{{ _('LBL_ACCEPT') }}" data-toggle="tooltip"><i class="fas fa-fw fa-check"></i></button>
+                        <button type="button" class="dict-btn-cancel btn btn-warning btn-sm" title="{{ _('LBL_REVERT') }}" data-toggle="tooltip"><i class="fas fa-fw fa-times"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro pager(data) %}
+    {% if data.totalpages > 1 %}
+
+        {% set total_pages = data.totalpages %}
+        {% set pager_buttons = 8 %}
+
+        <ul class="pagination justify-content-center">
+            <li class="page-item{% if data.page == 1 %} active{% endif %}"><a href="{{ data.dir }}?page=1{{ data.urlparams }}" class="page-link" data-page="1">1</a></li>
+            {% if total_pages > 2 %}
+
+                {% set ellipsis_left = 0 %}
+                {% set ellipsis_right = 0 %}
+
+                {% if total_pages > pager_buttons %}
+
+                    {% if data.page >= pager_buttons %}
+                        {% if total_pages > pager_buttons + 1 %}
+                            {% set ellipsis_left = 1 %}
+                        {% endif %}
+                        {% set ellipsis_right = 1 %}
+
+                        {% set p_start = data.page - 2 %}
+                        {% set p_end = data.page + 2 %}
+
+                        {% if data.page > total_pages - (pager_buttons - 1) %}
+                            {% set ellipsis_right = 0 %}
+                            {% set p_start = total_pages - (pager_buttons - 1) %}
+                            {% set p_end = total_pages - 1 %}
+                        {% endif %}
+
+                    {% else %}
+                        {% set p_start = 2 %}
+
+                        {% if total_pages > pager_buttons %}
+                            {% set p_end = pager_buttons %}
+                            {% set ellipsis_right = 1 %}
+                        {% else %}
+                            {% set p_end = total_pages - 1 %}
+                        {% endif %}
+
+                        {% if total_pages > pager_buttons + 1 %}
+                            {% set ellipsis_right = 1 %}
+                        {% endif %}
+
+                    {% endif %}
+
+                {% else %}
+                    {% set p_start = 2 %}
+                    {% set p_end = total_pages - 1 %}
+                {% endif %}
+
+                {% if ellipsis_left == 1 %}
+                    <li class="page-item"><a class="page-link">...</a></li>
+                {% endif %}
+
+                {% for page in p_start..p_end %}
+                    <li class="page-item{% if page == data.page %} active{% endif %}"><a href="{{ data.dir }}?page={{ page }}{{ data.urlparams }}" class="page-link" data-page="{{ page }}">{{ page }}</a></li>
+                {% endfor %}
+
+                {% if ellipsis_right == 1 %}
+                    <li class="page-item"><a class="page-link">...</a></li>
+                {% endif %}
+
+            {% endif %}
+
+            <li class="page-item{% if total_pages == data.page %} active{% endif %}"><a href="{{ data.dir }}?page={{ total_pages }}{{ data.urlparams }}" class="page-link" data-page="{{ total_pages }}">{{ total_pages }}</a></li>
+
+            <li class="page-item"><a href="{{ data.dir }}?page={{ data.page + 1 }}{{ data.urlparams }}" class="page-link" data-page="{{ data.page + 1 }}"><i class="fas fa-angle-right"></i></a></li>
+
+        </ul>
+
+    {% endif %}
+{% endmacro %}
+
+{% macro mailAvatar(from) %}
+    {% set name = from.name|split(' ') %}
+    <div class="profile-img-container mt-2">
+        {% set monogramm = name[0][0:1] ~ name[1][0:1] %}
+        <div class="avatar__content profile-img profile-avatar-monogram bg-{{ _color(monogramm) }} profile-img-50">
+            {{ monogramm }}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro percentWidget(id, title, total, value, unit, isPrice, bgColor) %}
+    {% set cutout = 75 %}
+    {% set size = 120 %}
+    {% if not total %}
+        {% set percent = 0 %}
+    {% else %}
+        {% set percent = (value / total) * 100 %}
+    {% endif %}
+    {% set percent = percent|round %}
+
+    <div class="card h-100 d-flex align-items-center p-3">
+        <div class="text-center position-relative ml-1">
+            <canvas id="{{ id }}-chart" class="chart-percent" data-chart-type="doughnut" data-dataset="[{{ percent }},{{ (100 - percent) }}]" data-label="" data-background-colors='[{% if bgColor %}"{{ bgColor }}"{% else %}"#6775b3"{% endif %},"#e1e3f0"]' data-cutout="{{ cutout }}" style="height: {{ size }}px; width: {{ size }}px; max-height: {{ size }}px; max-width: {{ size }}px; display: block;" width="{{ size }}" height="{{ size }}"></canvas>
+            <span class="position-center position-absolute">{{ percent }}%</span>
+        </div>
+        <div class="pt-2">
+            <div class="text-600 text-center">{{ _(title) }}</div>
+            {% if isPrice %}
+                <div class="text-center">{{ _price(total, unit) }} / {{ _price(value, unit)  }}</div>
+            {% else %}
+            <div class="text-center">{{ total }} / {{ value  }} {{ _(unit) }}</div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}

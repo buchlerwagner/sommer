@@ -1,0 +1,23 @@
+.toast-wrapper {
+  position: fixed;
+  z-index: $zindex-tooltip;
+  > .toast {
+    margin: ($main-body-padding / 2);
+  }
+  &.top-right {
+    top: 0;
+    right: 0;
+  }
+  &.top-left {
+    top: 0;
+    left: 0;
+  }
+  &.bottom-right {
+    right: 0;
+    bottom: 0;
+  }
+  &.bottom-left {
+    left: 0;
+    bottom: 0;
+  }
+}

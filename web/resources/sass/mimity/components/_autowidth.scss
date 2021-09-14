@@ -1,0 +1,14 @@
+.autowidth-hidden {
+  position: absolute;
+  top: 0;
+  left: -9999px;
+  overflow: hidden;
+  visibility: hidden;
+  white-space: nowrap;
+  border: 0 solid;
+}
+.autowidth {
+  min-width: $autowidth-minwidth;
+  width: $autowidth-minwidth;
+  max-width: 100%;
+}

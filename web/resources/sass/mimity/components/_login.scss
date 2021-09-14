@@ -1,0 +1,8 @@
+.login-page {
+  background: $login-bg;
+  .card {
+    display: inline-flex;
+    max-width: $login-width;
+    width: 100%;
+  }
+}

@@ -1,0 +1,51 @@
+{% import "tools" ~ constant('TWIG_FILE_EXTENSION') as tools %}
+<div class="row gutters-sm">
+    <div class="col-md-4 d-none d-md-block">
+        <div class="card">
+            <div class="card-body">
+                <nav class="nav flex-column nav-pills nav-gap-y-1">
+                    <a href="#profile" data-toggle="tab" class="nav-item nav-link has-icon nav-link-faded{% if not tab or tab == 'profile' %} active{% endif %}">
+                        <i data-feather="user" class="mr-2"></i>
+                        {{ _('LBL_PROFLE') }}
+                    </a>
+                    <a href="#security" data-toggle="tab" class="nav-item nav-link has-icon nav-link-faded{% if tab == 'security' %} active{% endif %}">
+                        <i data-feather="lock" class="mr-2"></i>
+                        {{ _('LBL_CHANGE_PASSWORD') }}
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header border-bottom mb-3 d-flex d-md-none">
+                <ul class="nav nav-tabs card-header-tabs nav-gap-x-1" role="tablist">
+                    <li class="nav-item">
+                        <a href="#profile" data-toggle="tab" class="nav-link has-icon{% if not tab or tab == 'profile' %} active{% endif %}">
+                            <i data-feather="user"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#security" data-toggle="tab" class="nav-link has-icon{% if tab == 'security' %} active{% endif %}">
+                            <i data-feather="lock"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body tab-content">
+                <div class="tab-pane{% if not tab or tab == 'profile' %} active{% endif %}" id="profile">
+                    {% set form = forms['myProfile'] %}
+                    {{ tools.form(form) }}
+
+                    <form method="post" action="/ajax/fileupload/upload-profile-img/" enctype="multipart/form-data" id="img-upload-form">
+                        <input type="file" name="picture" id="fileInput" style="display:none"/>
+                    </form>
+                </div>
+                <div class="tab-pane{% if tab == 'security' %} active{% endif %}" id="security">
+                    {% set form = forms['changePassword'] %}
+                    {{ tools.form(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

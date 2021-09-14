@@ -1,0 +1,140 @@
+.swiper-container {
+  width: 100%;
+}
+.swiper-wrapper {
+  margin-bottom: 1px; // Fix border disappears on Firefox
+}
+
+// Pagination
+.swiper-pagination-bullet-active {
+  background-color: rgba(#fff, .75);
+  box-shadow: 0 0 5px 0 #333;
+}
+.swiper-pagination-fraction {
+  color: rgba(#fff, .75);
+  text-shadow: 0 0 5px #333;
+}
+:root {
+  --swiper-pagination-color: #6c757d; // Override default swiper pagination color
+}
+
+// Navigation
+.swiper-button-next,
+.swiper-button-prev {
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  &:focus {
+    outline: 0;
+  }
+  &.vertical {
+    left: 50%;
+    margin-top: 0;
+    margin-left: -20px;
+  }
+}
+.swiper-button-next-sm,
+.swiper-button-prev-sm {
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  &.vertical {
+    margin-left: -13px;
+  }
+}
+.swiper-button-next,
+.swiper-button-prev,
+.swiper-container-rtl .swiper-button-next,
+.swiper-container-rtl .swiper-button-prev {
+  &::after {
+    content: '';
+  }
+  background: none;
+  > i {
+    color: #868a8f;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: $box-shadow-sm;
+    font-size: 40px;
+  }
+}
+.swiper-button-next-sm > i,
+.swiper-button-prev-sm > i {
+  font-size: 26px;
+}
+.swiper-button-next.swiper-button-disabled,
+.swiper-button-prev.swiper-button-disabled {
+  > i {
+    box-shadow: none;
+  }
+}
+.swiper-button-next.vertical {
+  top: auto;
+  bottom: 10px;
+}
+.swiper-button-prev.vertical {
+  top: 10px;
+}
+.swiper-button-prev2,
+.swiper-button-next2 {
+  &:not(.vertical) {
+    top: 0;
+    right: 0;
+    margin-top: 0;
+    &:not(.swiper-button-disabled) {
+      opacity: .7;
+      &:hover {
+        opacity: .9;
+      }
+    }
+    > i {
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+}
+.swiper-button-prev2:not(.vertical) {
+  right: 40px;
+  left: auto;
+  &.swiper-button-prev-sm {
+    right: 26px;
+  }
+}
+
+// Autohide navigations
+@include media-breakpoint-up('lg') {
+  .swiper-button-next,
+  .swiper-button-prev,
+  .swiper-container-rtl .swiper-button-next,
+  .swiper-container-rtl .swiper-button-prev {
+    &.autohide {
+      transition: transform .2s ease-out;
+      .swiper-container:hover & {
+        transform: translateX(0);
+      }
+    }
+  }
+}
+.swiper-button-next,
+.swiper-container-rtl .swiper-button-prev {
+  &.autohide {
+    transform: translateX(50px);
+    &.vertical {
+      transform: translateX(0);
+      transform: translateY(50px);
+    }
+  }
+}
+.swiper-button-prev,
+.swiper-container-rtl .swiper-button-next {
+  &.autohide {
+    transform: translateX(-50px);
+    &.vertical {
+      transform: translateX(0);
+      transform: translateY(-50px);
+    }
+    &.swiper-button-prev2 {
+      transform: translateX(100px);
+    }
+  }
+}

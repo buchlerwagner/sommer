@@ -1,0 +1,157 @@
+.bootstrap-select {
+  > .dropdown-toggle {
+    color: $input-color;
+    border-color: $custom-select-border-color;
+    background-color: $custom-select-bg;
+    border: none;
+    &.disabled {
+      opacity: 1;
+      color: $custom-select-disabled-color;
+      background-color: $custom-select-disabled-bg;
+    }
+    &:focus {
+      outline: 0 !important;
+    }
+    &:not(:disabled):not(.disabled):active {
+      top: 0;
+    }
+  }
+  &:not(.is-valid):not(.is-invalid) > .dropdown-toggle:not(:disabled):not(.disabled):focus,
+  &:not(.is-valid):not(.is-invalid) > .dropdown-toggle:not(:disabled):not(.disabled):active,
+  &.show:not(.is-valid):not(.is-invalid) > .dropdown-toggle {
+    border-color: $custom-select-focus-border-color;
+    background-color: $custom-select-bg;
+  }
+  > .dropdown-menu {
+    border-color: $custom-select-border-color;
+    > .inner {
+      scrollbar-width: thin;
+    }
+  }
+  .dropdown-item {
+    &:focus {
+      outline: 0;
+    }
+    &.active {
+      color: $dropdown-link-hover-color;
+      @include gradient-bg(darken($dropdown-link-hover-bg, 5%));
+    }
+    &:active:not(.active) {
+      color: $dropdown-link-hover-color;
+      @include gradient-bg($dropdown-link-hover-bg);
+    }
+  }
+  &.show-tick .dropdown-menu .selected span.check-mark {
+    right: 5px;
+  }
+  .bs-ok-default::after { // Select multiple check mark
+    content: '';
+    border: 0;
+    transform: none;
+    width: 18px;
+    background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black' width='18px' height='18px'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z'/%3E%3C/svg%3E");
+  }
+  .no-results {
+    padding: 3px 9px;
+    margin: 0 8px;
+  }
+  // Validation
+  &.is-valid,
+  &.is-invalid {
+    padding-right: 0;
+    @if $enable-validation-icons {
+      > .dropdown-toggle {
+        padding-right: $input-height-inner;
+        background-repeat: no-repeat;
+        background-position: center right $input-height-inner-quarter;
+        background-size: $input-height-inner-half $input-height-inner-half;
+      }
+    }
+  }
+  @if $enable-validation-icons {
+    &.is-valid > .dropdown-toggle {
+      background-image: $form-feedback-icon-valid;
+    }
+    &.is-invalid > .dropdown-toggle {
+      background-image: $form-feedback-icon-invalid;
+    }
+  }
+  >.dropdown-toggle.bs-placeholder,
+  >.dropdown-toggle.bs-placeholder:active,
+  >.dropdown-toggle.bs-placeholder:focus,
+  >.dropdown-toggle.bs-placeholder:hover {
+    color: $text-muted; // placeholder
+  }
+}
+// Small size
+.bs-select-sm .dropdown-menu.inner {
+  font-size: $font-size-sm;
+}
+// Large size
+.bs-select-lg .dropdown-menu.inner {
+  font-size: $font-size-lg;
+}
+.bs-searchbox {
+  padding: 0 8px 8px;
+  .form-control {
+    @extend .form-control-sm;
+    border-color: $input-border-color !important;
+    box-shadow: none !important;
+  }
+}
+.bootstrap-select.is-valid .dropdown-toggle,
+.was-validated .bootstrap-select > select:valid+.dropdown-toggle {
+  border-color: $success !important;
+  &.focus,
+  &:focus {
+    box-shadow: 0 0 0 $input-focus-width rgba($success, .25) !important;
+  }
+}
+.bootstrap-select.is-invalid .dropdown-toggle,
+.was-validated .bootstrap-select > select:invalid+.dropdown-toggle {
+  border-color: $danger !important;
+  &.focus,
+  &:focus {
+    box-shadow: 0 0 0 $input-focus-width rgba($danger, .25) !important;
+  }
+}
+.bootstrap-select .dropdown-menu li a span.text {
+  display: flex;
+}
+.bootstrap-select .dropdown-menu li small {
+  align-self: center;
+}
+.bootstrap-select .dropdown-menu li.active small {
+  color: $text-muted !important;
+}
+// Clearable
+.bs-select-clear {
+  display: none;
+  color: $text-muted;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  text-align: center;
+}
+.bs-select-clear::before {
+  font-family: 'Material Icons';
+  content: '\e14c';
+  font-size: 1rem;
+  font-weight: 400;
+}
+.bs-select-clear:hover {
+  color: $body-color;
+  cursor: pointer;
+}
+.bs-select + .bs-select-clear {
+  margin-top: 7px;
+  margin-left: -47px;
+}
+.bs-select.form-control-sm + .bs-select-clear {
+  margin-top: 3px;
+  margin-left: -40px;
+}
+.bs-select.form-control-lg + .bs-select-clear {
+  margin-top: 12px;
+  margin-left: -59px;
+}

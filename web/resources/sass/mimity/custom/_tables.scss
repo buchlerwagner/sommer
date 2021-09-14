@@ -1,0 +1,13 @@
+.table-options .btn {
+  padding: 0 .25rem !important;
+}
+
+.no-hover {
+  pointer-events:none;
+}
+
+.bg-deleted {
+  background-color: #fbf2f0;
+  text-decoration: line-through;
+  text-decoration-color: #c2573c;
+}
