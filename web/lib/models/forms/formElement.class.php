@@ -39,6 +39,10 @@ abstract class formElement extends formControl {
         return $this->getType();
     }
 
+    public function setInlineJs(){
+        return false;
+    }
+
     final public function getDefault(){
         return $this->default;
     }

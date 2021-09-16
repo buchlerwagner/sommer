@@ -1,0 +1,12 @@
+{% import "formBuilderMacros.twig" as self %}
+{% if value %}
+<div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}">
+    {% set inputName = formName ~ '[' ~ element.getName ~ ']' %}
+    <input type="hidden" name="{{ inputName }}" value="{{ value }}">
+    <img class="img-thumbnail" src="/i.php?src={{ element.getPath }}{{ value }}&w={{ element.getSize.width }}&h={{ element.getSize.height }}&m={{ element.getCropMode }}" alt="">
+    {#
+    <a href="{{ element.getPreviewUrl }}" data-target="#ajax-modal" data-toggle="modal" data-size="xl" class="{{ element.getClass }}"{{ self.attributes(element.getAttributes) }}>
+    </a>
+    #}
+</div>
+{% endif %}

@@ -55,7 +55,7 @@ class loginForm extends form {
 
 	public function signin() {
 		if (!empty($this->values['email']) && !empty($this->values['password'])) {
-			$login = $this->owner->user->login($this->values['email'], $this->values['password']);
+			$login = $this->owner->user->login($this->values['email'], $this->values['password'], USER_GROUP_ADMINISTRATORS);
 
 			if (!empty($login)) {
 				$redirect = trim($this->values['redirect']);

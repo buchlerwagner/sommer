@@ -27,12 +27,6 @@ class administratorForm extends formBuilder {
 
         $role = (new groupFieldset('user-role'))->addElements(
             (new inputSelect('us_role', 'LBL_ROLE', 'USER'))
-                ->changeState('FLEETADMIN', enumChangeAction::Show(), '#user_groups-formgroup')
-                ->changeDefaultState(enumChangeAction::Hide(), '#user_groups-formgroup'),
-            (new inputCheckGroup('user_groups', 'LBL_PARTNER_GROUP'))
-                ->notDBField()
-                ->setOptions($this->owner->lib->getList('groups'))
-                ->setGroupClass('d-none')
         );
 
         $this->addTabs(
@@ -76,7 +70,7 @@ class administratorForm extends formBuilder {
 	public function onValidate() {
 		if (!empty($this->values['us_email'])) {
 			$res = $this->owner->db->getFirstRow(
-				"SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_email LIKE \"" . $this->owner->db->escapeString($this->values['us_email']) . "\" AND us_id != '" . $this->keyFields['us_id'] . "'"
+				"SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_shop_id = " . $this->owner->shopId . " AND us_email LIKE \"" . $this->owner->db->escapeString($this->values['us_email']) . "\" AND us_id != '" . $this->keyFields['us_id'] . "'"
 			);
 			if (!empty($res)) {
 				$this->addError('ERR_10009', self::FORM_ERROR, ['us_email']);
@@ -91,18 +85,10 @@ class administratorForm extends formBuilder {
 		}
 
 		$this->keyFields['us_group'] = USER_GROUP_ADMINISTRATORS;
-		$this->keyFields['us_ug_id'] = 1; // special user_group
+		$this->values['us_shop_id'] = $this->owner->shopId;
 	}
 
 	public function onAfterSave($statement) {
-
-        if($this->values['us_role'] == USER_ROLE_FLEET_ADMIN){
-            $this->owner->user->setUserGroups($this->values['user_groups'], $this->keyFields['us_id']);
-            unset($this->values['user_groups']);
-        }else{
-            $this->owner->user->deleteUserGroups($this->keyFields['us_id']);
-        }
-
         $this->owner->user->clearUserDataCache($this->keyFields['us_id']);
     }
 

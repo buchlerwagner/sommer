@@ -32,6 +32,7 @@ class translate extends ancestor {
 		$this->setContext($context);
 
 		$this->memcache_key = APPLICATION_NAME . '-labels-';
+		//$this->companyId = $this->owner->shopId;
 		$this->companyId = 0;
 
 		if(!$forceReload AND self::USE_CACHE) {

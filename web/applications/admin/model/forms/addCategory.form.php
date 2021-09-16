@@ -29,7 +29,21 @@ class addCategoryForm extends formBuilder {
         );
 	}
 
+    public function onValidate() {
+        if (!empty($this->values['cat_url'])) {
+            $this->values['cat_url'] = strtolower(safeURL($this->values['cat_url']));
+
+            $res = $this->owner->db->getFirstRow(
+                "SELECT cat_id FROM " . DB_NAME_WEB . ".product_categories WHERE cat_shop_id = " . $this->owner->shopId . " AND cat_url LIKE \"" . $this->owner->db->escapeString($this->values['cat_url']) . "\""
+            );
+            if (!empty($res)) {
+                $this->addError('ERR_10015', self::FORM_ERROR, ['cat_url']);
+            }
+        }
+    }
+
     public function onBeforeSave() {
+        $this->values['cat_shop_id'] = $this->owner->shopId;
         $this->values['cat_visible'] = 0;
 
         if(Empty($this->values['cat_url'])) {
@@ -39,15 +53,24 @@ class addCategoryForm extends formBuilder {
         }
 
         $this->values['cat_url'] = strtolower($this->values['cat_url']);
+        $res = $this->owner->db->getFirstRow(
+            "SELECT cat_id FROM " . DB_NAME_WEB . ".product_categories WHERE cat_shop_id = " . $this->owner->shopId . " AND cat_url LIKE \"" . $this->owner->db->escapeString($this->values['cat_url']) . "\""
+        );
+        if (!empty($res)) {
+            $this->values['cat_url'] .= '-' . rand(10000, 99999);
+        }
     }
 
     private function getMaxOrder(){
         $order = 0;
         $row = $this->owner->db->getFirstRow(
           $this->owner->db->genSQLSelect(
-              'product_categories',
+              $this->dbTable,
               [
                   'MAX(cat_order) AS maxOrder'
+              ],
+              [
+                  'cat_shop_id' => $this->owner->shopId
               ]
           )
         );

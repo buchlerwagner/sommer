@@ -229,3 +229,28 @@
 .hidden-edit:hover .edit-tools {
   display: inline-block;
 }
+
+.input-group-text {
+  background-color: $white;
+  color: $gray-500;
+}
+
+
+.input-group-append .input-group-text {
+  border-left: 0 !important;
+}
+
+/*
+.input-group input {
+  border-right: 0 !important;
+}
+*/
+
+.input-group-focus .input-group-append .input-group-text {
+  border-color: $input-focus-border-color !important;
+}
+
+.fileuploader {
+  background: none !important;
+  margin-top: 0 !important;
+}

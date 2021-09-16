@@ -5,7 +5,7 @@ class administratorsTable extends table {
 		$this->dbTable = 'users';
 		$this->keyFields = ['us_id'];
 		$this->foreignKeyFields = ['us_group'];
-		$this->where = 'us_group = "' . USER_GROUP_ADMINISTRATORS . '" AND us_ug_id IN (0, 1)';
+		$this->where = 'us_group = "' . USER_GROUP_ADMINISTRATORS . '" AND us_shop_id = ' . $this->owner->shopId;
 
 		$this->subTable = true;
 		$this->delete = true;
@@ -40,7 +40,7 @@ class administratorsTable extends table {
 	}
 
 	public function onAfterDelete($keyFields, $real = true) {
-		$sql = "SELECT us_email FROM " . DB_NAME_WEB . ".users WHERE us_id = '" . $keyFields['us_id'] . "'";
+		$sql = "SELECT us_email FROM " . DB_NAME_WEB . ".users WHERE us_id = '" . $keyFields['us_id'] . "' AND us_shop_id = " . $this->owner->shopId;
 		$email = $this->owner->db->getFirstRow($sql);
 
 		if($email) {
@@ -113,7 +113,7 @@ class administratorsTable extends table {
 	public function isDeleteable($keyFields) {
 		$deleteAble = true;
 
-        $sql = "SELECT us_id, us_role FROM " . DB_NAME_WEB . ".users WHERE us_id = '" . (int) $keyFields['us_id'] . "' LIMIT 1";
+        $sql = "SELECT us_id, us_role FROM " . DB_NAME_WEB . ".users WHERE us_shop_id = " . $this->owner->shopId . " AND  us_id = '" . (int) $keyFields['us_id'] . "' LIMIT 1";
         $user = $this->owner->db->getFirstRow($sql);
         if($user){
             $deleteAble = $this->hasHigherRole($user['us_id'], $user['us_role']);

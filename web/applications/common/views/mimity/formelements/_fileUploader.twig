@@ -1,0 +1,6 @@
+{% import "formBuilderMacros.twig" as self %}
+<div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}">
+    {{ self.label(element) }}
+    <input id="{{ element.getId }}" name="{{ element.getName }}" type="file" value="" class="{{ element.getClass }}"{% if element.isDisabled %} disabled{% endif %}{% if element.isReadonly %} readonly{% endif %}{{ self.attributes(element.getAttributes) }}>
+
+</div>

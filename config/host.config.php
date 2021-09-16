@@ -1,6 +1,7 @@
 <?php
 $GLOBALS['HOSTS'] = [
     HOST_ADMIN => [
+		'shopId'	 	=> 1,
 		'forceSSL'	 	=> false,
 		'application' 	=> 'admin',
 		'language'		=> 'hu',
@@ -34,6 +35,7 @@ $GLOBALS['HOSTS'] = [
 		]
 	],
     HOST_CLIENTS => [
+        'shopId'	 	=> 1,
         'forceSSL'	 	=> false,
         'application' 	=> 'shop',
         'language'		=> 'hu',

@@ -68,7 +68,12 @@ $GLOBALS['MENU'] = [
                 'access'  => true,
                 'userGroups' => [USER_GROUP_ADMINISTRATORS]
             ],
-            'deliverymodes' => [
+            'shippingmodes' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
+            'properties' => [
                 'display' => 1,
                 'access'  => true,
                 'userGroups' => [USER_GROUP_ADMINISTRATORS]

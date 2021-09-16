@@ -1662,6 +1662,13 @@ const lime   = '#cddc39'
             });
         }));
 
+        $('body').on('click', '.fileuploader-action-multiselect', function () {
+            var $this = $(this);
+            $this.parents('.fileuploader-item-inner').toggleClass('selected');
+            $this.parents('.fileuploader-item-inner').find('.fileuploader-item-image img').toggleClass('selected-img');
+            $this.find('i').toggleClass('fa-square fa-check-square');
+        });
+
         $(".chk-notification").on("click",
             function(e){
                 var $this = $(this);
@@ -2420,6 +2427,10 @@ function postModalForm(form, btnValue, btnName) {
             }
         }
     });
+}
+
+function pageRedirect(url){
+    document.location = url;
 }
 
 function modalFormPageRefresh(formname) {

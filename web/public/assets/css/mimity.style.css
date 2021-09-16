@@ -14862,6 +14862,29 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-block;
 }
 
+.input-group-text {
+  background-color: #fff;
+  color: #a0aec0;
+}
+
+.input-group-append .input-group-text {
+  border-left: 0 !important;
+}
+
+/*
+.input-group input {
+  border-right: 0 !important;
+}
+*/
+.input-group-focus .input-group-append .input-group-text {
+  border-color: #467bcb !important;
+}
+
+.fileuploader {
+  background: none !important;
+  margin-top: 0 !important;
+}
+
 .flag {
   background: rgba(0, 0, 0, 0) url("../../images/flags.png") no-repeat scroll 0 0;
   display: inline-block;

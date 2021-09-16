@@ -4,12 +4,17 @@ class categoriesTable extends table {
 	public function setup() {
 		$this->dbTable = 'product_categories';
 		$this->keyFields = ['cat_id'];
+        $this->where = 'cat_shop_id = ' . $this->owner->shopId;
+
 		$this->formName = 'editCategory';
 		$this->header = true;
 		$this->copy = true;
 		$this->copyChangeFields = [
 		    'add' => [
 		        'cat_title' => ' (másolat)'
+            ],
+            'replace' => [
+                'cat_visible' => 0
             ]
         ];
 
@@ -44,7 +49,7 @@ class categoriesTable extends table {
             )
         );
         if($row){
-            $savePath = DIR_UPLOAD_IMG . 'products/' . $keyFields['cat_id'] . '/';
+            $savePath = DIR_UPLOAD_IMG . 'products/' . $this->owner->shopId . '/' . $keyFields['cat_id'] . '/';
 
             if(!Empty($row['cat_page_img']) && file_exists($savePath . $row['cat_page_img'])) {
                 unlink($savePath . $row['cat_page_img']);

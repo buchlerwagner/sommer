@@ -1,6 +1,6 @@
 <?php
 class user extends ancestor {
-    const MEMCACHE_KEY = 'cl-user-profile-';
+    const MEMCACHE_KEY = 'ws-user-profile-';
 
 	public $id = 0;
 	public $group = false;
@@ -50,7 +50,7 @@ class user extends ancestor {
 	}
 
 	public function getUser(){
-		return ($this->data ? $this->data : false);
+		return ($this->data ?: false);
 	}
 
     public function clearUserDataCache($userId){
@@ -66,7 +66,7 @@ class user extends ancestor {
                 $row = $this->owner->db->getFirstRow(
                     "SELECT * 
 					    FROM " . DB_NAME_WEB . ".users
-					        WHERE us_deleted = 0 AND us_id='" . (int)$userId . "' LIMIT 1"
+					        WHERE us_deleted = 0 AND us_id='" . (int)$userId . "' AND us_shop_id = " . $this->owner->shopId . " LIMIT 1"
                 );
                 if(!$row) {
                     $user['id'] = (int) $userId;
@@ -191,7 +191,7 @@ class user extends ancestor {
 		$db = $this->owner->db;
 
 		$user = $db->getFirstRow(
-			"SELECT us_password FROM " . DB_NAME_WEB . ".users WHERE us_deleted = 0 AND us_enabled = 1 AND us_id = '" . $db->escapestring($this->id) . "'" . ($email ? ' AND us_email="' . $db->escapestring($email) . '"' : '')
+			"SELECT us_password FROM " . DB_NAME_WEB . ".users WHERE us_shop_id = " . $this->owner->shopId . " AND us_deleted = 0 AND us_enabled = 1 AND us_id = '" . $db->escapestring($this->id) . "'" . ($email ? ' AND us_email="' . $db->escapestring($email) . '"' : '')
 		);
 		if($user && password_verify($password, $user['us_password'])){
 			$valid = true;
@@ -207,7 +207,7 @@ class user extends ancestor {
 		$db = $this->owner->db;
 
 		$user = $db->getFirstRow(
-			"SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_deleted = 0 AND us_enabled = 1 AND us_email = '" . $db->escapestring($email) . "'"
+			"SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_shop_id = " . $this->owner->shopId . " AND us_deleted = 0 AND us_enabled = 1 AND us_email = '" . $db->escapestring($email) . "'"
 		);
 
 		if($user){
@@ -225,7 +225,7 @@ class user extends ancestor {
 		$db = $this->owner->db;
 
 		$user = $db->getFirstRow(
-			"SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_deleted = 0 AND us_enabled = 1 AND us_hash = '" . $db->escapestring($uuid) . "'"
+			"SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_shop_id = " . $this->owner->shopId . " AND us_deleted = 0 AND us_enabled = 1 AND us_hash = '" . $db->escapestring($uuid) . "'"
 		);
 
 		if($user){
@@ -247,7 +247,7 @@ class user extends ancestor {
 
 		$user = $db->getFirstRow(
 			"SELECT us_id, us_password FROM " . DB_NAME_WEB . ".users
-			    WHERE us_deleted = 0 AND us_enabled = 1 AND us_email = '" . $db->escapestring($email) . "'" . ($userGroup ? " AND us_group = '" . $userGroup . "'" : '')
+			    WHERE us_shop_id = " . $this->owner->shopId . " AND us_deleted = 0 AND us_enabled = 1 AND us_email = '" . $db->escapestring($email) . "'" . ($userGroup ? " AND us_group = '" . $userGroup . "'" : '')
 		);
 
 		if (!empty($user) && password_verify($password, $user['us_password'])) {
@@ -421,7 +421,7 @@ class user extends ancestor {
 			$db = $this->owner->db;
 			$user = $db->getFirstRow(
 				"SELECT * FROM " . DB_NAME_WEB . ".users
-					WHERE us_deleted = 0 AND us_enabled = 1 AND us_id='" . $this->id . "'"
+					WHERE us_shop_id = " . $this->owner->shopId . " AND us_deleted = 0 AND us_enabled = 1 AND us_id='" . $this->id . "'"
 			);
 
 			if (!empty($user)) {
@@ -459,12 +459,6 @@ class user extends ancestor {
 					$this->group,
 					$this->role
 				);
-
-                if($this->role === USER_ROLE_FLEET_ADMIN){
-                    $this->data['user_groups'] = $this->getUserGroups();
-                }else{
-                    $this->data['user_groups'] = false;
-                }
 			}
 		}
 
@@ -644,115 +638,5 @@ class user extends ancestor {
         );
 
         return $success;
-    }
-
-    public function getUserGroups($id = false){
-	    $out = [];
-
-	    if(!$id){
-	        $id = $this->id;
-        }
-
-        $results = $this->owner->db->getRows(
-            $this->owner->db->genSQLSelect(
-                'user_assigned_groups',
-                [
-                    'uag_ug_id'
-                ],
-                [
-                    'uag_us_id' => $id
-                ]
-            )
-        );
-        if ($results) {
-            foreach($results AS $row){
-                $out[] = $row['uag_ug_id'];
-            }
-        }
-
-        return $out;
-    }
-
-    public function setUserGroups($groupIds = [], $id = false){
-        if(!$id){
-            $id = $this->id;
-        }
-
-        $this->deleteUserGroups($id);
-
-        if(!Empty($groupIds)){
-            foreach($groupIds AS $groupId) {
-                $this->owner->db->sqlQuery(
-                    $this->owner->db->genSQLInsert(
-                        'user_assigned_groups',
-                        [
-                            'uag_ug_id' => $groupId,
-                            'uag_us_id' => $id
-                        ]
-                    )
-                );
-            }
-        }
-
-    }
-
-    public function deleteUserGroups($id = false){
-        if(!$id){
-            $id = $this->id;
-        }
-        $this->owner->db->sqlQuery(
-            $this->owner->db->genSQLDelete(
-                'user_assigned_groups',
-                [
-                    'uag_us_id' => $id
-                ]
-            )
-        );
-    }
-
-    public function getNotificationOptions($event = false): array {
-        $options = [];
-
-        $sql = "SELECT * FROM " . DB_NAME_WEB . ".property_types 
-					LEFT JOIN " . DB_NAME_WEB . ".user_notifications ON (prop_id = un_prop_id AND un_us_id = " . $this->id . ")
-						WHERE (prop_notification_changeable = 1 OR prop_email_changeable = 1 OR prop_sms_changeable = 1) AND prop_has_notification = 1";
-        $sql .= ' AND JSON_CONTAINS(prop_notification_scope, \'"' . $this->role .  '"\', \'$.' . $this->group . '\')';
-
-        if($event){
-            $sql .= " AND prop_event = '" . $this->owner->db->escapeString($event) . "'";
-        }
-
-        $sql .= " ORDER BY prop_category";
-
-        $results = $this->owner->db->getRows($sql);
-        if ($results) {
-            foreach ($results AS $row) {
-                $options[$row['prop_id']] = [
-                    'id' => $row['prop_id'],
-                    'category' => $row['prop_category'],
-                    'title' => $row['prop_notification_title'],
-                    'level' => $row['prop_level'],
-                    'notification' => [
-                        'value' => (($row['un_notification'] !== NULL && $row['prop_notification_changeable']) ? $row['un_notification'] : $row['prop_notification']),
-                        'change' => (bool) $row['prop_notification_changeable'],
-                        'allow' => (bool) $row['prop_notification'],
-                    ],
-                    'email' => [
-                        'value' => (($row['un_email'] !== NULL && $row['prop_email_changeable']) ? $row['un_email'] : $row['prop_email']),
-                        'change' => (bool) $row['prop_email_changeable'],
-                        'allow' => (bool) $row['prop_email'],
-                    ],
-                    'sms' => [
-                        'value' => (($row['un_sms'] !== NULL && $row['prop_sms_changeable']) ? $row['un_sms'] : $row['prop_sms']),
-                        'change' => (bool) $row['prop_sms_changeable'],
-                        'allow' => (bool) $row['prop_sms'],
-                    ],
-
-                ];
-
-            }
-        }
-
-        return ($event ? $options[$event] : $options);
     }
 }

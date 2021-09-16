@@ -20,23 +20,7 @@ if(!$action) {
 $id = (int) $this->db->escapeString($_REQUEST['id']);
 
 $tables = [
-    'events' => [
-        'id' => 'f_id',
-        'list' => 'getEventsForInvoice',
-        'scope' => [
-            'f_id' => 'id',
-            'e_id' => $_REQUEST['eventId'],
-            'date' => $_REQUEST['date'],
-        ]
-    ],
-    'fleet' => [
-        'id' => 'ug_id',
-        'list' => 'getCars',
-        'json' => true,
-        'scope' => [
-            'ug_id' => 'id',
-        ]
-    ]
+
 ];
 
 if($tables[$listName]){

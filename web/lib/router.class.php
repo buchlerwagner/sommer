@@ -22,6 +22,7 @@ class router extends model {
 	public $data = [];
 
 	public $sessionId;
+	public $shopId = 0;
 	public $language = DEFAULT_LANGUAGE;
 	public $machineId;
 	public $currency = 'HUF';
@@ -104,6 +105,7 @@ class router extends model {
 		$this->domain = $protocol . $this->host . '/';
 
 		if(isset($GLOBALS['HOSTS'][$this->host])){
+			$this->shopId = $GLOBALS['HOSTS'][$this->host]['shopId'];
 			$this->language = $GLOBALS['HOSTS'][$this->host]['language'];
 			$this->application = $GLOBALS['HOSTS'][$this->host]['application'];
 			$this->theme = $GLOBALS['HOSTS'][$this->host]['sitedata']['theme']['name'];

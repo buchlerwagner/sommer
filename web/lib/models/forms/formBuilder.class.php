@@ -727,7 +727,8 @@ abstract class formBuilder extends model {
             'title' => $section->getTitle(),
             'icon' => $section->getIcon(),
             'active' => $section->isActive(),
-            'text' => $section->getText()
+            'text' => $section->getText(),
+            'class' => $section->getClass(),
         ];
     }
 
@@ -774,6 +775,10 @@ abstract class formBuilder extends model {
                 foreach($js AS $name => $file){
                     $this->owner->view->addJs($file, $name);
                 }
+            }
+
+            if($inlineJs = $control->setInlineJs()){
+                $this->owner->view->addInlineJs($inlineJs);
             }
         }
     }

@@ -81,7 +81,7 @@ $GLOBALS['PERSONAL_TITLES'] = [
 ];
 
 const USER_GROUP_ADMINISTRATORS = 'ADMINISTRATORS';
-const USER_GROUP_CLIENTS       = 'CLIENTS';
+const USER_GROUP_CUSTOMERS      = 'CUSTOMERS';
 
 $GLOBALS['USER_GROUPS'] = [
     USER_GROUP_ADMINISTRATORS => [
@@ -89,8 +89,8 @@ $GLOBALS['USER_GROUPS'] = [
 		'color' => 'danger',
 		'app'   => 'admin',
 	],
-    USER_GROUP_CLIENTS => [
-		'label' => 'LBL_GROUP_CLIENTS',
+    USER_GROUP_CUSTOMERS => [
+		'label' => 'LBL_GROUP_CUSTOMERS',
 		'color' => 'primary',
         'app'   => 'admin',
 	],
@@ -111,7 +111,7 @@ $GLOBALS['USER_ROLES'] = [
             'color' => 'warning',
         ],
     ],
-    USER_GROUP_CLIENTS => [
+    USER_GROUP_CUSTOMERS => [
         USER_ROLE_USER => [
             'label' => 'LBL_ROLE_USER',
             'color' => 'primary',
@@ -128,3 +128,18 @@ const CHUNK_SIZE            = 1024 * 1024;
 
 const PROFILE_IMG_SIZE      = 200;
 
+const FILEUPLOAD_MAX_FILES  = 100;
+const FILEUPLOAD_MAX_FILESIZE = 10; // Mb
+
+$GLOBALS['IMAGE_SIZES'] = [
+    'default' => [
+        'width'  => 1000,
+        'height' => null,
+        'crop' => false,
+    ],
+    'thumbnail' => [
+        'width'  => 250,
+        'height' => 250,
+        'crop' => true,
+    ],
+];
