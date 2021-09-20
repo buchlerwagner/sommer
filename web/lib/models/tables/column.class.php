@@ -6,6 +6,7 @@ class column {
     private $headerClass = [];
     private $cellClass = [];
     private $width = 1;
+    private $colspan = false;
     private $template = false;
 
     public function __construct($field, $caption = false, $width = false, enumTableColTypes $type = null){
@@ -46,6 +47,11 @@ class column {
         return $this;
     }
 
+    public function setColspan(int $colspan):column{
+        $this->colspan = $colspan;
+        return $this;
+    }
+
     public function setTemplate(string $template):column{
         $this->template = $template;
         return $this;
@@ -80,6 +86,10 @@ class column {
 
         if($this->type == enumTableColTypes::Radio()){
             $column['method'] = 'mark';
+        }
+
+        if($this->colspan){
+            $column['colspan'] = $this->colspan;
         }
 
         return $column;

@@ -11,7 +11,8 @@ class categoriesTable extends table {
 		$this->copy = true;
 		$this->copyChangeFields = [
 		    'add' => [
-		        'cat_title' => ' (másolat)'
+		        'cat_title' => ' (másolat)',
+		        'cat_url' => '-masolat'
             ],
             'replace' => [
                 'cat_visible' => 0
@@ -23,7 +24,8 @@ class categoriesTable extends table {
 		$this->settings['orderdir']   = 'asc';
 
         $this->addColumns(
-            (new column('cat_visible', 'LBL_VISIBLE', 1, enumTableColTypes::Checkbox())),
+            (new column('cat_visible', 'LBL_VISIBLE', 1, enumTableColTypes::Checkbox()))
+                ->addClass('text-center'),
             (new column('cat_title', 'LBL_TITLE', 9))
         );
 

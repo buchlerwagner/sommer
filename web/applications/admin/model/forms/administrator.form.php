@@ -54,8 +54,6 @@ class administratorForm extends formBuilder {
 			}else{
                 $options = $this->owner->lib->getList('roles', ['group' => USER_GROUP_ADMINISTRATORS, 'limit' => $editorRole]);
 			}
-
-            $this->values['user_groups'] = $this->owner->user->getUserGroups($this->keyFields['us_id']);
         }
 
         $this->changeControlProperty('us_role', 'setOptions', $options);

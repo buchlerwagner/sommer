@@ -143,3 +143,22 @@ $GLOBALS['IMAGE_SIZES'] = [
         'crop' => true,
     ],
 ];
+
+$GLOBALS['PAGE_NAMES'] = [
+    'hu' => [
+        'login'     => 'login',
+        'register'  => 'regisztracio',
+        'products'  => 'termekek',
+        'cart'      => 'kosar',
+        'checkout'  => 'fizetes',
+        'finish'    => 'sikeres-megrendeles',
+    ],
+    'en' => [
+        'login'     => 'login',
+        'register'  => 'register',
+        'products'  => 'products',
+        'cart'      => 'cart',
+        'checkout'  => 'checkout',
+        'finish'    => 'finish',
+    ],
+];

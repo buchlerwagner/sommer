@@ -6,13 +6,15 @@ class productsTable extends table {
         $this->join  = 'LEFT JOIN product_categories ON (cat_id = prod_cat_id)';
         $this->where = 'prod_shop_id = ' . $this->owner->shopId;
 
+        $this->buttonsPosition = 'top';
         $this->keyFields = ['prod_id'];
 		$this->formName = 'editProduct';
 		$this->header = true;
 		$this->copy = true;
 		$this->copyChangeFields = [
 		    'add' => [
-		        'prod_name' => ' (másolat)'
+		        'prod_name' => ' (másolat)',
+		        'prod_url' => '-masolat',
             ],
             'replace' => [
                 'prod_visible' => 0,
@@ -35,9 +37,13 @@ class productsTable extends table {
 		$this->settings['orderdir']   = 'asc';
 
         $this->addColumns(
-            (new column('prod_visible', 'LBL_ENABLED', 1, enumTableColTypes::Checkbox())),
-            (new column('prod_available', 'LBL_AVAILABLE', 1, enumTableColTypes::Checkbox())),
+            (new column('prod_visible', 'LBL_VISIBLE', 1, enumTableColTypes::Checkbox()))
+                ->addClass('text-center'),
+            (new column('prod_available', 'LBL_AVAILABLE', 1, enumTableColTypes::Checkbox()))
+                ->addClass('text-center'),
             (new column('prod_name', 'LBL_PRODUCT_TITLE', 8))
+            //(new columnHidden('prod_cat_id'))
+            //(new columnHidden('prod_img'))
         );
 
         $this->addButton(
@@ -100,9 +106,53 @@ class productsTable extends table {
         return $where;
     }
 
-    public function onAfterDelete($keyFields, $real = true) {
-        /**
-         * @todo delete images and relevant records
-         */
+    public function onAfterCopy($keyFields, $newId) {
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'product_variants',
+                [],
+                [
+                    'pv_prod_id' => $keyFields['prod_id']
+                ]
+            )
+        );
+        if ($result) {
+            foreach($result AS $row){
+                unset($row['pv_id']);
+                $row['pv_prod_id'] = $newId;
+
+                $this->owner->db->sqlQuery(
+                    $this->owner->db->genSqlInsert(
+                        'product_variants',
+                        $row
+                    )
+                );
+            }
+        }
+
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'product_properties',
+                [
+                    'pp_prop_id'
+                ],
+                [
+                    'pp_prod_id' => $keyFields['prod_id']
+                ]
+            )
+        );
+        if ($result) {
+            foreach($result AS $row){
+                $row['pp_prod_id'] = $newId;
+
+                $this->owner->db->sqlQuery(
+                    $this->owner->db->genSqlInsert(
+                        'product_properties',
+                        $row
+                    )
+                );
+            }
+        }
+
     }
 }

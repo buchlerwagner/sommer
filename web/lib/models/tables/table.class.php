@@ -66,6 +66,7 @@ class table extends model {
 	public $modalSize = false;
 	public $viewModalSize = false;
 	public $pagerOnBottom = true;
+	public $buttonsPosition = 'bottom'; // both, top, bottom
 	public $hideCounter = false;
 	public $summarize = [];
 	public $totals = [];

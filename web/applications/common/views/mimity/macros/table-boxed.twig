@@ -1,5 +1,11 @@
 {% import "form_elements.twig" as form_elements %}
 <div class="card">
+    {% if table.buttons|length > 0 and (table.buttonsPosition == 'top' or table.buttonsPosition == 'both') %}
+        <div class="card-header">
+            {% include "table_buttons.twig" %}
+        </div>
+    {% endif %}
+
     <div class="card-body">
         {% if table.headerCaption %}
             <div class="d-flex justify-content-between flex-column flex-sm-row mb-3 px-2 px-sm-0">
@@ -53,7 +59,7 @@
         </div>
 
     </div>
-    {% if table.buttons|length > 0 %}
+    {% if table.buttons|length > 0 and (table.buttonsPosition == 'bottom' or table.buttonsPosition == 'both') %}
         <div class="card-footer">
             {% include "table_buttons.twig" %}
         </div>

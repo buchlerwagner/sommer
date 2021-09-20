@@ -126,7 +126,7 @@ abstract class formElement extends formControl {
         return $this;
     }
 
-    final public function getAppend():string{
+    final public function getAppend(){
         return $this->append;
     }
 

@@ -15,7 +15,7 @@ class editVariantForm extends formBuilder {
 
             (new inputSelect('pv_pimg_id', 'LBL_PRODUCT_IMAGE'))
                 ->makeSelectPicker(false)
-                ->setOptions($this->owner->lists->setEmptyItem('LBL_NONE')->getProductImages($this->keyFields['pv_prod_id'])),
+                ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_NONE')->getProductImages($this->keyFields['pv_prod_id'])),
 
             (new groupRow('row1'))->addElements(
                 (new inputText('pv_price', 'LBL_PRICE', 0))
@@ -31,6 +31,7 @@ class editVariantForm extends formBuilder {
             ),
             (new groupRow('row2'))->addElements(
                 (new inputSelect('pv_pack_unit', 'LBL_PACKAGE_UNIT'))
+                    ->addClass('change-label')
                     ->setColSize('col-6')
                     ->setOptions($this->owner->lists->reset()->getUnits()),
                 (new inputText('pv_pack_quantity', 'LBL_PACKAGE_QUANTITY', 1))
@@ -54,6 +55,21 @@ class editVariantForm extends formBuilder {
                     ->setColSize('col-4')
                     ->addEmptyLabel()
                     ->setOptions($this->owner->lists->reset()->getWeights())
+            ),
+            (new groupRow('row4'))->addElements(
+                (new inputText('pv_min_sale', 'LBL_PRODUCT_MIN_SALE', 1))
+                    ->setColSize('col-6')
+                    ->onlyNumbers()
+                    ->setAppend('LBL_PCS')
+                    ->addClass('has-label')
+                    ->addClass('text-right'),
+                (new inputText('pv_max_sale', 'LBL_PRODUCT_MAX_SALE', 0))
+                    ->setHelpText('LBL_MAX_SALE_HELP_TEXT')
+                    ->setColSize('col-6')
+                    ->onlyNumbers()
+                    ->setAppend('LBL_PCS')
+                    ->addClass('has-label')
+                    ->addClass('text-right')
             )
         );
 
@@ -64,6 +80,12 @@ class editVariantForm extends formBuilder {
             new buttonCancel()
         );
 	}
+
+    public function onAfterInit() {
+        $units = $this->owner->lists->getUnits();
+        $this->getControl('pv_min_sale')->setAppend($units[$this->values['pv_pack_unit']]);
+        $this->getControl('pv_max_sale')->setAppend($units[$this->values['pv_pack_unit']]);
+    }
 
     public function onBeforeSave() {
         $this->values['pv_currency'] = $this->owner->currency;

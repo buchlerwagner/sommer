@@ -21,7 +21,7 @@ class editPayModeForm extends formBuilder {
                     ->setRequired()
             ),
             (new groupRow('row2'))->addElements(
-                (new inputText('pm_price', 'LBL_PRICE', 0))
+                (new inputText('pm_price', 'LBL_FEE', 0))
                     ->setColSize('col-12 col-lg-3')
                     ->addClass('text-right')
                     ->onlyNumbers()

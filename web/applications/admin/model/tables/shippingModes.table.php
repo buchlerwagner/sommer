@@ -25,7 +25,8 @@ class shippingModesTable extends table {
 		$this->settings['orderdir']   = 'asc';
 
         $this->addColumns(
-            (new column('sm_enabled', 'LBL_ENABLED', 1, enumTableColTypes::Checkbox())),
+            (new column('sm_enabled', 'LBL_ENABLED', 1, enumTableColTypes::Checkbox()))
+                ->addClass('text-center'),
             (new column('sm_name', 'LBL_NAME', 9))
         );
 

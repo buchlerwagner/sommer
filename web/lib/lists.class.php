@@ -97,7 +97,6 @@ class lists extends ancestor {
         return $this->getList();
     }
 
-
     public function getProperties(){
         $this->sqlQuery(
             $this->owner->db->genSQLSelect(
@@ -126,7 +125,9 @@ class lists extends ancestor {
          */
         $product = $this->owner->addByClassName('product');
         $product->init($productId);
-        
+
+        $this->list = [];
+
         if($images = $product->getImages()){
             foreach($images AS $image){
                 $attributes = [
@@ -135,6 +136,35 @@ class lists extends ancestor {
                 $this->addItem($image['data']['id'], $image['name'], false, $attributes);
             }
         }
+
+        return $this->getList();
+    }
+
+    public function getTopPages($exclude = []){
+        if(!is_array($exclude)) $exclude = [$exclude];
+
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'contents',
+                [
+                    'c_id AS list_key',
+                    'c_title AS list_value',
+                    'c_order AS list_order',
+                ],
+                [
+                    'c_parent_id' => 0,
+                    'c_id' => [
+                        'notin' => $exclude
+                    ],
+                    'c_shop_id' => $this->owner->shopId
+                ],
+                [],
+                [],
+                [
+                    'list_order'
+                ]
+            )
+        );
 
         return $this->getList();
     }

@@ -17,17 +17,45 @@ class product extends ancestor {
 
     public function getProduct(){
         $this->getImages();
-        $this->getProperties();
-        $this->getProductVariants();
+        $this->getProperties(true);
 
-        if($this->data['hasVariants'] && $this->data['variants']){
-            $this->data['prices'] = [];
-            foreach ($this->data['variants'] as $variant) {
-                $this->data['prices'][] = $variant['price'];
-            }
+        if($this->data['hasVariants']){
+            $this->getProductVariants();
         }
 
         return $this->data;
+    }
+
+    public function getMinSale($variantId = 0){
+        if($this->data['variants'][$variantId]){
+            return $this->data['variants'][$variantId]['minSale'];
+        }
+
+        return false;
+    }
+
+    public function getMaxSale($variantId = 0){
+        if($this->data['variants'][$variantId]){
+            return $this->data['variants'][$variantId]['maxSale'];
+        }
+
+        return false;
+    }
+
+    public function getStock($variantId = 0){
+        if($this->data['variants'][$variantId]){
+            return $this->data['variants'][$variantId]['stock'];
+        }
+
+        return false;
+    }
+
+    public function getVariant($variantId = 0){
+        if($this->data['variants'][$variantId]){
+            return $this->data['variants'][$variantId];
+        }
+
+        return false;
     }
 
 	public function reorderImages($orderList = false){
@@ -158,15 +186,32 @@ class product extends ancestor {
 		$row = $this->owner->db->getFirstRow($sql);
 		if($row){
             $this->categoryId = $row['prod_cat_id'];
-            $url = '/termekek/' . $row['cat_url'] . '/' . $row['prod_id'] . '-' . $row['prod_url'];
-
+            $url = '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products'] . '/' . $row['cat_url'] . '/' . $row['prod_id'] . '-' . $row['prod_url'] . '/';
 			$path = $this->getImagePath();
 
-			$price = [
-				'value' => $row['prod_price'],
-				'discount' => $row['prod_price_discount'],
-				'currency' => $row['prod_currency'],
-			];
+            $packageUnits = $this->owner->lists->getUnits();
+            $weightUnits = $this->owner->lists->getWeights();
+
+            $variant = [
+                'id' => 0,
+                'imgId' => 0,
+                'price' => [
+                    'value' => $row['prod_price'],
+                    'discount' => $row['prod_price_discount'],
+                    'currency' => $row['prod_currency'],
+                ],
+                'minSale' => $row['prod_min_sale'],
+                'maxSale' => $row['prod_max_sale'],
+                'stock' => $row['prod_stock'],
+                'packaging' => [
+                    'quantity' => $row['prod_pack_quantity'],
+                    'packageUnit' => $row['prod_pack_unit'],
+                    'packageUnitName' => $packageUnits[$row['prod_pack_unit']],
+                    'weight' => $packageUnits[$row['prod_weight']],
+                    'weightUnit' => $packageUnits[$row['prod_weight_unit']],
+                    'weightUnitName' => $weightUnits[$row['prod_weight_unit']],
+                ],
+            ];
 
             $this->data = [
 				'id' => $row['prod_id'],
@@ -178,27 +223,22 @@ class product extends ancestor {
 				'category' => [
 					'id' => $row['cat_id'],
 					'name' => $row['cat_name'],
-					'url' => '/termekek/' . $row['cat_url'] . '/',
+					'url' => '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products'] . '/' . $row['cat_url'] . '/',
 				],
-                'prices' => [
-                    0 => $price
-                ],
 
-                'hasVariants' => $row['prod_variants'],
-                'variants' => false,
+                'hasVariants' => ($row['prod_variants']),
+                'variants' => [
+                    $variant
+                ],
 
 				'defaultImage' => $path . $row['prod_img'],
 				'images' => [],
 
-				'weight' => [
-					'value' => $row['prod_weight'],
-					'unit' => $row['prod_weight_unit'],
-				],
 				'stats' => [
 					'views' => $row['prod_views'],
 					'orders' => $row['prod_orders'],
 				],
-				'rating' => [
+				'ratings' => [
 					'value' => $row['prod_rating'],
 					'reviews' => $row['prod_reviews'],
 				],
@@ -211,6 +251,7 @@ class product extends ancestor {
                     'absolute' => 'https://' . HOST_CLIENTS . $url,
                 ]
 			];
+
 		}
 
 		return $this;
@@ -225,21 +266,30 @@ class product extends ancestor {
 	    						ORDER BY pv_price, pv_name";
 		$result = $this->owner->db->getRows($sql);
 		if($result) {
+            $packageUnits = $this->owner->lists->getUnits();
+            $weightUnits = $this->owner->lists->getWeights();
+
 			foreach ($result AS $row) {
                 $variants[$row['pv_id']] = [
-					'id' => $row['pv_id'],
-					'name' => $row['pv_name'],
-					'imgId' => $row['pv_pimg_id'],
-					'price' => [
-						'value' => $row['pv_price'],
-						'discount' => $row['pv_price_discount'],
-						'currency' => $row['pv_currency'],
-					],
-					'weight' => [
-						'value' => $row['pv_weight'],
-						'unit' => $row['pv_weight_unit'],
-					],
-				];
+                    'id' => $row['pv_id'],
+                    'imgId' => $row['pv_pimg_id'],
+                    'price' => [
+                        'value' => $row['pv_price'],
+                        'discount' => $row['pv_price_discount'],
+                        'currency' => $row['pv_currency'],
+                    ],
+                    'minSale' => $row['pv_min_sale'],
+                    'maxSale' => $row['pv_max_sale'],
+                    'stock' => $row['pv_stock'],
+                    'packaging' => [
+                        'quantity' => $row['pv_pack_quantity'],
+                        'packageUnit' => $row['pv_pack_unit'],
+                        'packageUnitName' => $packageUnits[$row['pv_pack_unit']],
+                        'weight' => $packageUnits[$row['pv_weight']],
+                        'weightUnit' => $packageUnits[$row['pv_weight_unit']],
+                        'weightUnitName' => $weightUnits[$row['pv_weight_unit']],
+                    ],
+                ];
 			}
 
             $this->data['variants'] = $variants;
@@ -248,7 +298,7 @@ class product extends ancestor {
 		return $variants;
 	}
 
-    public function getProperties(){
+    public function getProperties($withIcons = false){
         $properties = [];
 
         $result = $this->owner->db->getRows(
@@ -257,6 +307,7 @@ class product extends ancestor {
                 [
                     'prop_id',
                     'prop_name',
+                    'prop_icon',
                 ],
                 [
                     'pp_prod_id' => $this->productId,
@@ -273,7 +324,12 @@ class product extends ancestor {
         );
         if($result){
             foreach($result AS $row){
-                $properties[$row['prop_id']] = $row['prop_name'];
+                if($withIcons) {
+                    $properties[$row['prop_id']]['name'] = $row['prop_name'];
+                    $properties[$row['prop_id']]['icon'] = $row['prop_icon'];
+                }else{
+                    $properties[$row['prop_id']] = $row['prop_name'];
+                }
             }
 
             $this->data['properties'] = $properties;

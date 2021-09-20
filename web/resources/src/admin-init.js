@@ -244,11 +244,11 @@ var app = {
             $editor.summernote('editor.insertText', $this.html());
         });
 
-        $(document).on('change', '.change-currency-sign', function () {
+        $(document).on('change', '.change-label', function () {
             var $this = $(this);
             if($this.val() != '0') {
                 var text = $this.find('option:selected').text();
-                $('.has-currency-sign').parents('.input-group').find('.input-group-text').html(text);
+                $('.has-label').parents('.input-group').find('.input-group-text').html(text);
             }
         });
 
@@ -372,7 +372,7 @@ var app = {
             }
         });
 
-        $('[data-toggle="tooltip"]').tooltip();
+        //$('[data-toggle="tooltip"]').tooltip();
 
         $("table.user_level_rights input:checkbox").on("click",
             function(e){
@@ -1046,6 +1046,8 @@ var app = {
         if ($input.length) {
             $input.fileinput();
         }
+
+        $('[data-toggle="tooltip"]').tooltip();
 
         $('.img-zoom').zoom();
 

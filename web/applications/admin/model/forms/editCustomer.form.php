@@ -69,7 +69,7 @@ class editCustomerForm extends formBuilder {
                     ->setColSize('col-7'),
                 (new inputText('us_invoice_address', 'LBL_ADDRESS'))
                     ->setColSize('col-12'),
-                (new inputText('us_vat', 'LBL_VAT'))
+                (new inputText('us_vat', 'LBL_VAT_NUMBER'))
                     ->onlyNumbers('-')
                     ->setColSize('col-12')
             )

@@ -22,15 +22,13 @@
                         <form class="mb-3" action="/login/" method="post">
                             <input type="hidden" name="login[redirect]" value="{{ forms.login.values.redirect }}">
                             <div class="form-group{% if forms.login.errors %} has-error{% endif %}">
-                                <div class="floating-label input-icon">
-                                    <i data-feather="mail" stroke-width="1"></i>
+                                <div class="floating-label">
                                     <input type="email" class="form-control" name="login[email]" value="{{ forms.login.values.email }}" id="emailAdress" aria-describedby="emailHelp" placeholder="{{ _('LBL_EMAIL') }}">
                                     <label for="emailAdress">{{ _('LBL_EMAIL') }}</label>
                                 </div>
                             </div>
                             <div class="form-group{% if forms.login.errors %} has-error{% endif %}">
-                                <div class="floating-label input-icon">
-                                    <i data-feather="lock" stroke-width="1"></i>
+                                <div class="floating-label">
                                     <input type="password" class="form-control" name="login[password]" value="{{ forms.login.values.password }}" id="password" placeholder="{{ _('LBL_PASSWORD') }}">
                                     <label for="password">{{ _('LBL_PASSWORD') }}</label>
                                 </div>
@@ -69,8 +67,7 @@
                             <form action="/login/" id="forgotpassword" method="post" autocomplete="off" class="mb-3">
                                 <div class="form-group{% if forms.forgotPassword.errors %} has-error{% endif %}">
                                     <div class="form-group">
-                                        <div class="floating-label input-icon">
-                                            <i data-feather="mail" stroke-width="1"></i>
+                                        <div class="floating-label">
                                             <input type="email" class="form-control" id="id-recover-email" name="forgotPassword[email]" value="{{ forms.forgotPassword.values.email }}" placeholder="{{ _('LBL_EMAIL') }}">
                                             <label for="id-recover-email">{{ _('LBL_EMAIL') }}</label>
                                         </div>

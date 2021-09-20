@@ -25,9 +25,11 @@ class payModesTable extends table {
 		$this->settings['orderdir']   = 'asc';
 
         $this->addColumns(
-            (new column('pm_enabled', 'LBL_ENABLED', 1, enumTableColTypes::Checkbox())),
+            (new column('pm_enabled', 'LBL_ENABLED', 1, enumTableColTypes::Checkbox()))
+                ->addClass('text-center'),
             (new column('pm_name', 'LBL_NAME', 7)),
             (new columnOptions('pm_type', 'LBL_TYPE', 2))
+                ->addClass('text-center')
                 ->setOptions($this->owner->lists->getPaymentTypes())
         );
 

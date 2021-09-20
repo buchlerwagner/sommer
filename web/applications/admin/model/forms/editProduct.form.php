@@ -20,7 +20,7 @@ class editProductForm extends formBuilder {
         $general = (new groupFieldset('general'))->addElements(
             (new inputSelect('prod_cat_id', 'LBL_CATEGORY'))
                 ->makeSelectPicker()
-                ->setOptions($this->owner->lists->getCategories())
+                ->setOptions($this->owner->lists->reset()->getCategories())
                 ->setRequired(),
             (new inputText('prod_name', 'LBL_PRODUCT_TITLE'))
                 ->setRequired(),
@@ -42,6 +42,7 @@ class editProductForm extends formBuilder {
             ),
             (new groupRow('row3'))->addElements(
                 (new inputSelect('prod_pack_unit', 'LBL_PACKAGE_UNIT'))
+                    ->addClass('change-label')
                     ->setColSize('col-12 col-lg-3')
                     ->setOptions($this->owner->lists->reset()->getUnits()),
                 (new inputText('prod_pack_quantity', 'LBL_PACKAGE_QUANTITY', 1))
@@ -64,8 +65,23 @@ class editProductForm extends formBuilder {
                 (new inputSelect('prod_weight_unit', false))
                     ->setColSize('col-4 col-lg-2')
                     ->addEmptyLabel()
+                    ->setAppend('LBL_PACKAGE_QUANTITY_UNIT')
                     ->setOptions($this->owner->lists->reset()->getWeights())
-
+            ),
+            (new groupRow('row5'))->addElements(
+                (new inputText('prod_min_sale', 'LBL_PRODUCT_MIN_SALE', 1))
+                    ->setColSize('col-12 col-lg-3')
+                    ->onlyNumbers()
+                    ->setAppend('LBL_PCS')
+                    ->addClass('has-label')
+                    ->addClass('text-right'),
+                (new inputText('prod_max_sale', 'LBL_PRODUCT_MAX_SALE', 0))
+                    ->setColSize('col-12 col-lg-3')
+                    ->setHelpText('LBL_MAX_SALE_HELP_TEXT')
+                    ->onlyNumbers()
+                    ->setAppend('LBL_PCS')
+                    ->addClass('has-label')
+                    ->addClass('text-right')
             )
         );
 
@@ -107,10 +123,14 @@ class editProductForm extends formBuilder {
         $tabProperties = (new sectionBox('properties', 'LBL_PRODUCT_PROPERTIES', 'far fa-tags'))
             ->addClass('col-12 col-lg-8')
             ->addElements(
-                (new inputCheckbox('prod_visible', 'LBL_VISIBLE', 0))
+                (new inputSwitch('prod_visible', 'LBL_VISIBLE', 0))
+                    ->setGroupClass('mb-0')
                     ->setColor(enumColors::Primary()),
-                (new inputCheckbox('prod_available', 'LBL_PRODUCT_AVAILABLE', 0))
-                    ->setColor(enumColors::Primary()),
+                (new inputSwitch('prod_available', 'LBL_PRODUCT_AVAILABLE', 0))
+                    ->setGroupClass('mb-0')
+                    ->setColor(enumColors::Warning()),
+                (new inputSwitch('prod_highlight', 'LBL_PRODUCT_HIGHLIGHT', 0))
+                    ->setColor(enumColors::Success()),
 
                 (new inputCheckGroup('prod_properties', 'LBL_PRODUCT_TAGS'))
                     ->setColor(enumColors::Primary())
@@ -141,7 +161,7 @@ class editProductForm extends formBuilder {
                 (new inputText('prod_page_title', 'LBL_PAGE_TITLE')),
                 (new inputTextarea('prod_page_description', 'LBL_PAGE_DESCRIPTION')),
                 (new inputText('prod_url', 'LBL_PAGE_URL'))
-                    ->setPrepend('https://' . HOST_CLIENTS . '/termekek/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-')
+                    ->setPrepend('https://' . HOST_CLIENTS . '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-')
         );
 
         $this->addSections($tabGeneral, $tabPricing, $tabDescription, $tabProperties, $tabImages, $tabSeo);
@@ -186,6 +206,10 @@ class editProductForm extends formBuilder {
 
     public function onAfterLoadValues() {
         $this->values['prod_properties'] = array_keys($this->product->getProperties());
+
+        $units = $this->owner->lists->getUnits();
+        $this->getControl('prod_min_sale')->setAppend($units[$this->values['prod_pack_unit']]);
+        $this->getControl('prod_max_sale')->setAppend($units[$this->values['prod_pack_unit']]);
     }
 
     public function onAfterInit() {

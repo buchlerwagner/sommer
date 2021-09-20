@@ -9,15 +9,13 @@ class editPropertyForm extends formBuilder {
         $this->title = 'LBL_EDIT_PROPERTY';
 		$this->dbTable = 'properties';
 
-        $group = (new groupFieldset('general'))->addElements(
+        $this->addControls(
             (new inputText('prop_name', 'LBL_NAME'))
                 ->setColSize('col-12')
                 ->setRequired(),
             (new inputText('prop_icon', 'LBL_ICON'))
                 ->setColSize('col-12')
         );
-
-        $this->addControls($group);
 
         $this->addButtons(
             new buttonSave(),

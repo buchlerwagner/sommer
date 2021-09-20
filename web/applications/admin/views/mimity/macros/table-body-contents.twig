@@ -1,0 +1,36 @@
+{% import "tools" ~ constant('TWIG_FILE_EXTENSION') as tools %}
+{% import "form_elements.twig" as form_elements %}
+<tbody>
+{% for i, row in table.rows %}
+    {% set column = table.columns.c_published %}
+    <tr class="d-flex tr-clickable" data-id="{{ row.__id }}" data-edit="./{{ table.defaultAction }}|{{ table.name }}/{{ row.__id }}/">
+        <td class="col-1 text-center">
+            {{ tools.table_cell(table.name, row.__id, column, row.c_published, row, (table.readonly or row['options'].readonly))|raw }}
+        </td>
+        <td class="col-9" colspan="2">
+            {{ row.c_title }}
+        </td>
+        {% if table.options %}
+            <td class="text-right col-2">
+                {{ tools.table_options(row.__id, table, row, table.readonly)|trim|raw }}
+            </td>
+        {% endif %}
+    </tr>
+    {% if row.items %}
+        {% for id, item in row.items %}
+            <tr class="d-flex tr-clickable" data-id="{{ id }}" data-edit="./{{ table.defaultAction }}|{{ table.name }}/{{ id }}/">
+                <td class="col-1"></td>
+                <td class="col-1 text-center">
+                    {% set column = table.columns.c_published %}
+                    {{ tools.table_cell(table.name, id, column, item.c_published, item, (table.readonly or row['options'].readonly))|raw }}
+                </td>
+                <td class="col-8">{{ item.c_title }}</td>
+                {% if table.options %}
+                    <td class="col-{{ table.optionsWidth }} text-right text-nowrap">{{ tools.table_options(id, table, item, table.readonly)|trim|raw }}</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+</tbody>
+
