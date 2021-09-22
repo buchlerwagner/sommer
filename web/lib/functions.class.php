@@ -76,18 +76,6 @@ class functions extends ancestor {
 				if($params['empty']) $list[0] = '---';
 				$sql = "SELECT country_code as list_key, IFNULL(country_name_" . $this->owner->language . ", country_name_en) as list_value FROM " . DB_NAME_WEB . ".countries ORDER BY list_value ASC";
 				break;
-			case 'groups':
-				if($params['empty']) $list[0] = '---';
-				$sql  = "SELECT ug_id as list_key, ug_name as list_value FROM " . DB_NAME_WEB . ".user_groups WHERE ug_enabled = 1 AND ug_deleted = 0 ";
-				if($params['limit'] && is_array($params['limit'])){
-				    $sql .= "AND ug_id IN (" . implode(',', $params['limit']) . ") ";
-                }
-                if($params['exclude'] && is_array($params['exclude'])){
-                    $sql .= "AND ug_id NOT IN (" . implode(',', $params['exclude']) . ") ";
-                }
-
-				$sql .= "ORDER BY list_value ASC";
-				break;
 
 			case 'users':
 				if($params['empty']) $list[0] = '---';
@@ -782,4 +770,202 @@ class functions extends ancestor {
         return $out;
     }
 
+    public function setContentPageMenus(){
+        $result = $this->owner->mem->get(CACHE_PAGES);
+        if(!$result) {
+            $result = $this->owner->db->getRows(
+                $this->owner->db->genSQLSelect(
+                    'contents',
+                    [
+                        'c_id',
+                        'c_parent_id',
+                        'c_show_in_header',
+                        'c_show_in_footer',
+                        'c_empty_menu',
+                        'c_title',
+                        'c_page_url',
+                        'c_order',
+                    ],
+                    [
+                        'c_shop_id' => $this->owner->shopId,
+                        'c_deleted' => 0,
+                        'c_published' => 1,
+                        'c_language' => $this->owner->language,
+                    ],
+                    [],
+                    false,
+                    'c_parent_id, c_order'
+                )
+            );
+
+            $this->owner->mem->set(CACHE_PAGES, $result);
+        }
+
+        if($result){
+            $parents = [];
+
+            foreach($result AS $row){
+                $display = 0;
+                $header = false;
+                $footer = false;
+
+                if($row['c_show_in_header']){
+                    $display = 1;
+                    $header = true;
+                }
+
+                if ($row['c_show_in_footer']) {
+                    $display = 1;
+                    $footer = true;
+                }
+
+                if($row['c_parent_id']){
+                    $url = $parents[$row['c_parent_id']]['url'];
+
+                    $GLOBALS['MENU'][$url]['display'] = ($parents[$row['c_parent_id']]['empty'] ? 2 : 1);
+
+                    if(!isset($GLOBALS['MENU'][$url]['items'])) $GLOBALS['MENU'][$url]['items'] = [];
+                    $GLOBALS['MENU'][$url]['items'][$row['c_page_url']] = [
+                        'display' => $display,
+                        'header' => false,
+                        'footer' => false,
+                        'pagemodel' => 'content',
+                        'title' => $row['c_title'],
+                    ];
+                }else{
+                    $parents[$row['c_id']]['url'] = $row['c_page_url'];
+                    $parents[$row['c_id']]['empty'] = ($row['c_empty_menu']);
+
+                    $GLOBALS['MENU'][$row['c_page_url']] = [
+                        'display' => $display,
+                        'header' => $header,
+                        'footer' => $footer,
+                        'pagemodel' => 'content',
+                        'title' => $row['c_title'],
+                        'position' => $row['c_order'],
+                    ];
+                }
+            }
+        }
+    }
+
+    public function setProductCategories(){
+        if($GLOBALS['MENU']['products']){
+            $result = $this->owner->mem->get(CACHE_CATEGORIES);
+            if(!$result) {
+                $result = $this->owner->db->getRows(
+                    $this->owner->db->genSQLSelect(
+                        'product_categories',
+                        [
+                            'cat_id',
+                            'cat_title',
+                            'cat_url',
+                            'cat_order',
+                        ],
+                        [
+                            'cat_shop_id' => $this->owner->shopId,
+                            'cat_visible' => 1
+                        ],
+                        [],
+                        false,
+                        'cat_order'
+                    )
+                );
+
+                $this->owner->mem->set(CACHE_CATEGORIES, $result);
+            }
+            if($result){
+                $GLOBALS['MENU']['products']['display'] = 2;
+                $GLOBALS['MENU']['products']['items'] = [];
+
+                foreach($result AS $row){
+                    $GLOBALS['MENU']['products']['items'][$row['cat_url']] = [
+                        'title' => $row['cat_title'],
+                        'display' => 1
+                    ];
+                }
+            }
+        }
+    }
+
+    public function sortMenu(){
+        uasort($GLOBALS['MENU'], function ($item1, $item2) {
+            return $item1['position'] <=> $item2['position'];
+        });
+    }
+
+    public function getWebShopSettings(){
+        $settings = $this->owner->mem->get(CACHE_SETTINGS);
+        if(!$settings) {
+            $settings = $this->owner->db->getFirstRow(
+                $this->owner->db->genSQLSelect(
+                    'webshop_settings',
+                    [
+                        'ws_settings'
+                    ],
+                    [
+                        'ws_shop_id' => $this->owner->shopId,
+                    ]
+                )
+            );
+            if ($settings) {
+                $settings = json_decode($settings['ws_settings'], true);
+                $this->owner->mem->set(CACHE_SETTINGS, $settings);
+            }
+        }
+
+        return $settings;
+    }
+
+    public function getSliders(){
+        $sliders = $this->owner->mem->get(CACHE_SLIDERS);
+        if(!$sliders) {
+            $result = $this->owner->db->getRows(
+                $this->owner->db->genSQLSelect(
+                    'sliders',
+                    [
+                        's_id AS id',
+                        's_title AS title',
+                        's_text AS text',
+                        's_link AS link',
+                        's_image AS image',
+                        's_title_size AS titleSize',
+                        's_text_size AS textSize',
+                        's_hide_title AS hideTitle',
+                    ],
+                    [
+                        's_shop_id' => $this->owner->shopId,
+                        's_visible' => 1
+                    ],
+                    [],
+                    false,
+                    's_order'
+                )
+            );
+            if($result){
+                $sliders = [];
+
+                foreach($result AS $row){
+                    $sliders[$row['id']] = $row;
+                    $sliders[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/sliders/' . $row['image'];
+                }
+
+                $this->owner->mem->set(CACHE_SLIDERS, $sliders);
+            }
+        }
+
+        return $sliders;
+    }
+
+    public function getHighlightedItems(){
+        //$items = $this->owner->mem->get(CACHE_HIGHLIGHTS);
+        $items = [];
+        return $items;
+    }
+
+    public function getPopularItems(){
+        //$items = $this->owner->mem->get(CACHE_POPULARS);
+        $items = [];
+        return $items;
+    }
 }

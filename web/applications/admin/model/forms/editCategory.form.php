@@ -14,7 +14,7 @@ class editCategoryForm extends formBuilder {
             (new inputText('cat_title', 'LBL_TITLE'))
                 ->setRequired(),
             (new inputText('cat_url', 'LBL_URL'))
-                ->setPrepend('https://' . HOST_CLIENTS . '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products'] . '/'),
+                ->setPrepend('https://' . HOST_CLIENTS . '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/'),
             (new groupRow('row1'))->addElements(
                 (new inputText('cat_order', 'LBL_POSITION'))
                     ->setColSize('col-6 col-lg-2')
@@ -51,8 +51,9 @@ class editCategoryForm extends formBuilder {
                         ->addData('show-preview', 'false')
                         ->notDBField(),
                     (new previewImage('cat_page_img'))
-                        ->setSize(200, 200)
-                        ->setPath('products/' . $this->owner->shopId . '/' . $this->keyFields['cat_id'] . '/'),
+                        //->setSize(200, 200)
+                        ->setResponsive(true)
+                        ->setPath(FOLDER_UPLOAD . $this->owner->shopId . '/products/' . $this->keyFields['cat_id'] . '/'),
                     (new inputCheckbox('removeImg', 'LBL_REMOVE_IMAGE', 0))
                         ->notDBField()
                 );
@@ -96,6 +97,10 @@ class editCategoryForm extends formBuilder {
         }
     }
 
+    public function onAfterSave($statement) {
+        $this->owner->mem->delete(CACHE_CATEGORIES);
+    }
+
     public function onAfterInit() {
         $this->setSubtitle($this->values['cat_title']);
     }
@@ -108,11 +113,11 @@ class editCategoryForm extends formBuilder {
 
     private function uploadFile(){
         if (!empty($_FILES[$this->name]['name']['upload_file']) && empty($_FILES[$this->name]['error']['upload_file'])) {
-            $savePath = DIR_UPLOAD_IMG . 'products/' . $this->owner->shopId . '/' . $this->keyFields['cat_id'] . '/';
+            $savePath = DIR_UPLOAD . $this->owner->shopId . '/products/' . $this->keyFields['cat_id'] . '/';
             $this->deleteImage();
 
             $pathParts = pathinfo($_FILES[$this->name]['name']['upload_file']);
-            $this->values['cat_page_img'] = '_cat-' . uuid::v4() . '.' . $pathParts['extension'];
+            $this->values['cat_page_img'] = uuid::v4() . '.' . $pathParts['extension'];
 
             if(!is_dir($savePath)){
                 @mkdir($savePath, 0777, true);
@@ -126,7 +131,7 @@ class editCategoryForm extends formBuilder {
     }
 
     private function deleteImage(){
-        $savePath = DIR_UPLOAD_IMG . 'products/' . $this->owner->shopId . '/' .$this->keyFields['cat_id'] . '/';
+        $savePath = DIR_UPLOAD . $this->owner->shopId . '/products/' . $this->keyFields['cat_id'] . '/';
 
         if(!Empty($this->values['cat_page_img']) && file_exists($savePath . $this->values['cat_page_img'])) {
             unlink($savePath . $this->values['cat_page_img']);

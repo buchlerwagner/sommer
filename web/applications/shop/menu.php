@@ -1,5 +1,7 @@
 <?php
 /**
+ * @var $this router
+ *
  * $menuItem = [
  *	'display'  => 0,
  *	'access'   => true,      	// if missing, access right must be calculated from submenu access rights
@@ -23,25 +25,27 @@
 
 $GLOBALS['MENU'] = [
 	'index' => [
-		'display'  => 0,
-		'access'   => true,
+		'display' => 1,
+        'header' => true,
 	],
     'ajax' => [
 		'display' => 0,
 	],
 	'login' => [
-		'layout'  => 'simple',
 		'display' => 0
 	],
 	'logout' => [
 		'display' => 0,
 	],
-	'set-new-password' => [
-		'layout'  => 'simple',
-		'display' => 0,
-	],
-    'pprofilom' => [
-        'display' => 0,
-        'access'  => true,
-    ],
 ];
+
+// Generic pages
+foreach($GLOBALS['PAGE_NAMES'][$this->language] AS $pageName => $localisedPage){
+    $GLOBALS['MENU'][$pageName] = $localisedPage;
+    $GLOBALS['MENU'][$pageName]['pagemodel'] = $pageName;
+}
+
+// Content pages
+$this->lib->setContentPageMenus();
+$this->lib->setProductCategories();
+$this->lib->sortMenu();

@@ -1,0 +1,111 @@
+<!-- Main Header-->
+<header class="main-header">
+    <!-- Menu Wave -->
+    <div class="menu_wave"></div>
+
+    <!-- Main box -->
+    <div class="main-box">
+        <div class="menu-box">
+            <div class="logo"><a href="/"><img src="{{ uploads }}logo-main.svg" width="250" alt="{{ settings.shopName }}" title=""></a></div>
+
+            <!--Nav Box-->
+            <div class="nav-outer clearfix">
+                {% include 'menu.twig' %}
+
+                <div class="outer-box clearfix">
+                    <!-- Shoppping Car -->
+                    <div class="cart-btn">
+                        <a href="{{ getPageName('cart') }}"><i class="icon flaticon-commerce"></i>
+                            <span id="cart-counter" class="count{% if not cart.getCartItemsNumber %} d-none{% endif %}">{{ cart.getCartItemsNumber }}</span>
+                        </a>
+
+                        <div class="shopping-cart">
+                            <ul class="shopping-cart-items">
+                                <li class="cart-item">
+                                    <img src="https://via.placeholder.com/300x300" alt="#" class="thumb" />
+                                    <span class="item-name">Birthday Cake</span>
+                                    <span class="item-quantity">1 x <span class="item-amount">$84.00</span></span>
+                                    <a href="shop-single.html" class="product-detail"></a>
+                                    <button class="remove-item"><span class="fa fa-times"></span></button>
+                                </li>
+
+                                <li class="cart-item">
+                                    <img src="https://via.placeholder.com/300x300" alt="#" class="thumb"  />
+                                    <span class="item-name">French Macaroon</span>
+                                    <span class="item-quantity">1 x <span class="item-amount">$13.00</span></span>
+                                    <a href="shop-single.html" class="product-detail"></a>
+                                    <button class="remove-item"><span class="fa fa-times"></span></button>
+                                </li>
+                            </ul>
+
+                            <div class="cart-footer">
+                                <div class="shopping-cart-total"><strong>{{ _('LBL_SUB_TOTAL') }}</strong> $97.00</div>
+                                <a href="{{ getPageName('cart') }}" class="theme-btn">{{ _('LBL_VIEW_CART') }}</a>
+                                <a href="{{ getPageName('checkout') }}" class="theme-btn">{{ _('LBL_CHECKOUT') }}</a>
+                            </div>
+                        </div> <!--end shopping-cart -->
+                    </div>
+
+                    <!-- Search Btn -->
+                    <div class="search-box">
+                        <button class="search-btn"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Header  -->
+    <div class="sticky-header">
+        <div class="auto-container clearfix">
+            <!--Logo-->
+            <div class="logo">
+                <a href="/"><img src="{{ uploads }}logo-small.svg" width="110" alt="{{ settings.shopName }}"></a>
+            </div>
+
+            <!--Nav Outer-->
+            <div class="nav-outer">
+                <!-- Main Menu -->
+                <nav class="main-menu">
+                    <!--Keep This Empty / Menu will come through Javascript-->
+                </nav><!-- Main Menu End-->
+            </div>
+        </div>
+    </div><!-- End Sticky Menu -->
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="logo"><a href="/"><img src="{{ uploads }}logo-small.svg" width="110" alt="{{ settings.shopName }}" title=""></a></div>
+
+        <!--Nav Box-->
+        <div class="nav-outer clearfix">
+            <!--Keep This Empty / Menu will come through Javascript-->
+        </div>
+    </div>
+
+    <!-- Mobile Menu  -->
+    <div class="mobile-menu">
+        <nav class="menu-box">
+            <div class="nav-logo"><a href="/"><img src="{{ uploads }}logo-small.svg" width="110" alt="{{ settings.shopName }}" title=""></a></div>
+            <!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header-->
+        </nav>
+    </div><!-- End Mobile Menu -->
+
+    <!-- Header Search -->
+    <div class="search-popup">
+        <span class="search-back-drop"></span>
+
+        <div class="search-inner">
+            <button class="close-search"><span class="fa fa-times"></span></button>
+            <form method="post" action="/">
+                <div class="form-group">
+                    <input type="search" name="search-field" value="" placeholder="{{ _('LBL_SEARCH') }}..." required="">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End Header Search -->
+
+</header>
+<!--End Main Header -->

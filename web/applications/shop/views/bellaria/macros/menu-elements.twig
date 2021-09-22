@@ -1,0 +1,41 @@
+{% macro menuitem(menukey, menuitem, link, level = 0, loggedin = false) %}
+    {% import _self as menu_elements %}
+    {% set pageName = menukey %}
+
+    {% if menukey != 'index' %}
+        {% if menuitem.name %}
+            {% set pageName = menuitem.name %}
+        {% endif %}
+
+        {% if link != '' %}
+            {% set href = '/' ~ link ~ '/' ~ pageName ~ '/' %}
+        {% else %}
+            {% set href = '/' ~ pageName ~ '/' %}
+        {% endif %}
+    {% else %}
+        {% set href = '/' %}
+    {% endif %}
+
+    {% if menuitem.withoutlogin and not loggedin %}
+        {% set href = '/' ~ menuitem.withoutlogin ~ '/' %}
+    {% endif %}
+
+    {% if menuitem.url %}
+        {% set href = menuitem.url %}
+    {% endif %}
+
+    {% if menuitem.items|length > 0 %}
+        <a href="{% if menuitem.display == 2 %}#{% else %}{{ href }}{% endif %}">{{ menu_elements.menulabel(menukey, menuitem) }}</a>
+    {% else %}
+        <a href="{{ href }}{% if menuitem.hash is not empty %}{{ menuitem.hash }}/{% endif %}">{{ menu_elements.menulabel(menukey, menuitem) }}</a>
+    {% endif %}
+{% endmacro %}
+
+{% macro menulabel(menukey, menuitem) %}
+    {% if menuitem.title is not empty %}
+        {{ _(menuitem.title) }}
+    {% else %}
+        {{ _('MENU_' ~ menukey) }}
+    {% endif %}
+    {% if menuitem.badge is defined %}<span id="menu-badge-{{ menukey }}" class="label label-danger pull-right{% if not menuitem.badge %} hidden{% endif %}">{{ menuitem.badge }}</span>{% endif %}
+{% endmacro %}

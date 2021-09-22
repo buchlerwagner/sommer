@@ -78,6 +78,11 @@ $GLOBALS['MENU'] = [
                 'access'  => true,
                 'userGroups' => [USER_GROUP_ADMINISTRATORS]
             ],
+            'settings' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
         ]
 	],
 
@@ -136,7 +141,7 @@ $GLOBALS['MENU'] = [
                         'access'  => true,
                         'userGroups' => [USER_GROUP_ADMINISTRATORS]
                     ],
-                    'banners' => [
+                    'sliders' => [
                         'display' => 1,
                         'access'  => true,
                         'userGroups' => [USER_GROUP_ADMINISTRATORS]

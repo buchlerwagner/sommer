@@ -20,6 +20,8 @@ class pagesTable extends table {
             ]
         ];
 
+        $this->deleteField = 'c_deleted';
+
 		$this->settings['display']    = 50;
 		$this->settings['orderfield'] = 'c_order, c_title';
 		$this->settings['orderdir']   = 'asc';
@@ -77,5 +79,13 @@ class pagesTable extends table {
         }
 
         return $out;
+    }
+
+    public function onAfterDelete($keyFields, $real = true) {
+        $this->owner->mem->delete(CACHE_PAGES);
+    }
+
+    public function onCheck($keyValues, $field, $value) {
+        $this->owner->mem->delete(CACHE_PAGES);
     }
 }

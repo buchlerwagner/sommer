@@ -24,6 +24,7 @@ if($GLOBALS['USER_GROUPS'][$this->data['group']]['app']){
 
 $this->data['pages'] = $this->getAllAccessMenus($menu, ['index'], $this->data['group']);
 $this->data['userGroups'] = $this->lib->getList('userGroups');
+//dd($this->data['pages']);
 
 $this->data['roles'] = $this->lib->getList('roles', ['group' => $this->data['group']]);
 

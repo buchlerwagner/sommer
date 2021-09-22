@@ -1,0 +1,57 @@
+{% import "menu-elements.twig" as menu_elements %}
+{% set level = 0 %}
+{% set counter = 1 %}
+<nav class="main-menu navbar-expand-md navbar-light">
+    <div class="collapse navbar-collapse clearfix" id="navbarSupportedContent">
+        <ul class="navigation menu-left clearfix">
+            {% for mkey, mvalue in menu %}
+                {% if (mvalue.display == 1 or mvalue.display == 2) and mvalue.header %}
+                    {% if mvalue.items|length > 0 %}
+                        <li class="dropdown{% if mvalue.selected is not empty %} current{% endif %}">
+                            {{ menu_elements.menuitem(mkey, mvalue, rootdir, level, loggedin) }}
+                            {% set level = 1 %}
+                            <ul>
+                                {% for gkey, gvalue in mvalue.items %}
+                                    {% if mvalue.name %}
+                                        {% set mkey = mvalue.name %}
+                                    {% endif %}
+                                    {% if gvalue.position == 'all' or gvalue.position == 'header' or gvalue.position is empty %}
+                                        <li>{{ menu_elements.menuitem(gkey, gvalue, mkey, level, loggedin) }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% elseif mvalue.items is not defined %}
+                        {% set level = 0 %}
+                        <li class="{% if mvalue.selected is not empty %}current{% endif %}">
+                            {{ menu_elements.menuitem(mkey, mvalue, rootdir, level, loggedin) }}
+                        </li>
+                    {% endif %}
+                {% endif %}
+                {% if counter == settings.menuBreakPoint %}
+        </ul>
+            <ul class="navigation menu-right clearfix">
+                {% endif %}
+                {% set counter = counter + 1 %}
+            {% endfor %}
+
+
+            <li class="dropdown">
+                <a href="#">{{ _('MENU_ACCOUNT') }}</a>
+                <ul>
+                    {% if loggedin %}
+                        <li class="mb-3" style="white-space:normal;">
+                            {{ _('LBL_USER_WELCOME', user.firstname) }}
+                        </li>
+                        <li><a href="/{{ menu.profile.name }}/">{{ _('MENU_PROFILE') }}</a></li>
+                        <li><a href="/logout/">{{ _('MENU_LOGOUT') }}</a></li>
+                    {% else %}
+                        <li><a href="/login/">{{ _('MENU_LOGIN') }}</a></li>
+                        <li><a href="/{{ menu.register.name }}/">{{ _('MENU_REGISTER') }}</a></li>
+                    {% endif %}
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</nav>

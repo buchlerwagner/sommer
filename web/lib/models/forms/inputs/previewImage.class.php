@@ -6,6 +6,7 @@ class previewImage extends formElement {
     private $preview = true;
     private $imgSize = [];
     private $cropMode = false;
+    private $responsive = false;
 
     public function __construct($id, $class = ''){
         parent::__construct($id, false, null, $class);
@@ -38,6 +39,15 @@ class previewImage extends formElement {
 
     public function getSrc(){
         return $this->src;
+    }
+
+    public function setResponsive($responsive){
+        $this->responsive = $responsive;
+        return $this;
+    }
+
+    public function isResponsive(){
+        return $this->responsive;
     }
 
     public function setCropMode(enumCrop $cropMode){

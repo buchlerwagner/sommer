@@ -1,0 +1,115 @@
+<!--Page Title-->
+<section class="page-title" style="background-image:url({{ theme }}images/backgrounds/34.jpg)">
+    <div class="auto-container">
+        <h1>{{ _('MENU_ACCOUNT') }}</h1>
+        {#
+        <ul class="page-breadcrumb">
+            <li><a href="/">{{ _('MENU_INDEX') }}</a></li>
+            <li>{{ _('MENU_ACCOUNT') }}</li>
+        </ul>
+        #}
+    </div>
+</section>
+<!--End Page Title-->
+
+<!--Login Section-->
+<section class="login-section">
+    <div class="auto-container">
+        <!-- Login Form -->
+        <div class="login-form">
+            <div class="tab-content">
+
+                <div class="tab-pane{% if login %} active show{% endif %}" id="id-tab-login">
+                    <h2>{{ _('MENU_LOGIN') }}</h2>
+
+                    {% if forms['login'].errors|length > 0 %}
+                        <div class="message-box with-icon warning">
+                            <div class="icon-box">
+                                <span class="icon fa fa-exclamation"></span>
+                            </div>
+                            <h4>{{ _('ERR_WARNING') }}</h4>
+                            {% for error in forms['login'].errors %}
+                                <p>{{ _('ERR_' ~ error['code']) }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="/login/">
+                        <input type="hidden" name="login[redirect]" value="{{ forms.login.values.redirect }}">
+
+                        <div class="form-group">
+                            <label>{{ _('LBL_EMAIL') }}</label>
+                            <input type="email" name="login[email]" value="{{ forms.login.values.email }}" id="emailAddress" aria-describedby="emailHelp" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label>{{ _('LBL_PASSWORD') }}</label>
+                            <input type="password" name="login[password]" value="{{ forms.login.values.password }}" id="password" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" name="login[signin]" class="theme-btn">
+                                {{ _('BTN_SIGN_IN') }}
+                            </button>
+                        </div>
+
+                        <div class="form-group pass mt-4">
+                            <a href="/" class="psw" data-toggle="tab" data-target="#id-tab-forgot">
+                                {{ _('LBL_FORGOT_PASSWORD') }}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="tab-pane{% if forgotpassword %} active show{% endif %}" id="id-tab-forgot" data-swipe-prev="#id-tab-login">
+                    <h2>{{ _('LBL_RECOVER_PASSWORD') }}</h2>
+
+                    {% if forms['forgotPassword'].errors|length > 0 %}
+                        <div class="message-box with-icon warning">
+                            <div class="icon-box">
+                                <span class="icon fa fa-exclamation"></span>
+                            </div>
+                            <h4>{{ _('ERR_WARNING') }}</h4>
+                            {% for error in forms['forgotPassword'].errors %}
+                                <p>{{ _('ERR_' ~ error['code']) }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+
+                    {% if not success %}
+                        <form action="/login/" id="forgotpassword" method="post" autocomplete="off" class="mb-3">
+                            <div class="form-group{% if forms.forgotPassword.errors %} has-error{% endif %}">
+                                <label>{{ _('LBL_EMAIL') }}</label>
+                                <input type="email" name="forgotPassword[email]" value="{{ forms.forgotPassword.values.email }}" id="id-recover-email" placeholder="">
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" name="forgotPassword[sendpwd]" class="theme-btn">
+                                    {{ _('BTN_CONTINUE') }}
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="message-box with-icon success">
+                            <div class="icon-box">
+                                <span class="icon fa fa-check"></span>
+                            </div>
+                            <h4>{{ _('ERR_SUCCESS') }}</h4>
+                            {{ _('LBL_RECOVER_PASSWORD_SENT') }}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group pass mt-4">
+                        <a href="/" class="psw" data-toggle="tab" data-target="#id-tab-login">
+                            {{ _('LBL_BACK_TO_LOGIN') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End Login Form -->
+    </div>
+</section>
+<!--End Login Section-->

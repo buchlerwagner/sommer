@@ -12,7 +12,7 @@ $GLOBALS['HOSTS'] = [
 		],
 		'emails' => [
 		    'default' => [
-                'name' 	  => 'Sommer Cukraszda',
+                'name' 	  => 'Sommer Cukrászda',
                 'address' => 'info@sommer-cukraszda.hu',
             ]
 		],
@@ -25,8 +25,6 @@ $GLOBALS['HOSTS'] = [
             'title'	=> 'sommer-cukraszda.hu Admin',
             'theme' => [
                 'name'      => 'mimity',
-                'version'   => 'dark',
-                'color'     => 'success',
             ],
 			'facebook' => [
 			],
@@ -46,7 +44,7 @@ $GLOBALS['HOSTS'] = [
         ],
         'emails' => [
             'default' => [
-                'name' 	  => 'Sommer Cukraszda',
+                'name' 	  => 'Sommer Cukrászda',
                 'address' => 'info@sommer-cukraszda.hu',
             ]
         ],
@@ -58,9 +56,7 @@ $GLOBALS['HOSTS'] = [
         'sitedata' => [
             'title'	=> 'Sommer Cukrászda',
             'theme' => [
-                'name'      => 'ace',
-                'version'   => 'dark',
-                'color'     => 'success',
+                'name'      => 'bellaria',
             ],
             'facebook' => [
             ],

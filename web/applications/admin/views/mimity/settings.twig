@@ -1,0 +1,7 @@
+{% import "tools" ~ constant('TWIG_FILE_EXTENSION') as tools %}
+<div class="row gutters-sm">
+    <div class="col-12 col-lg-6">
+        {% set form = forms['shopSettings'] %}
+        {{ tools.form(form) }}
+    </div>
+</div>

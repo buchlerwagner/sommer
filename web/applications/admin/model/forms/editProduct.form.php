@@ -161,7 +161,7 @@ class editProductForm extends formBuilder {
                 (new inputText('prod_page_title', 'LBL_PAGE_TITLE')),
                 (new inputTextarea('prod_page_description', 'LBL_PAGE_DESCRIPTION')),
                 (new inputText('prod_url', 'LBL_PAGE_URL'))
-                    ->setPrepend('https://' . HOST_CLIENTS . '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-')
+                    ->setPrepend('https://' . HOST_CLIENTS . '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-')
         );
 
         $this->addSections($tabGeneral, $tabPricing, $tabDescription, $tabProperties, $tabImages, $tabSeo);

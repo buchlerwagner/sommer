@@ -5,6 +5,14 @@
         {% include 'navbar.twig' %}
     </div>
     <div class="main-body">
+        {% if settings.stopSale %}
+            <div class="alert alert-danger alert-accent">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ _('LBL_STOP_SALE_ON') }}
+                <div><a class="small" href="/webshop/settings/">{{ _('LBL_TURN_OFF') }}</a></div>
+            </div>
+        {% endif %}
+
         {% if pageName and page != 'index' %}
             <h1 class="{% if pageSubTitle  %}mb-0{% else %}mb-3{% endif %} text-primary">{{ _(pageName)|raw }}</h1>
         {% endif %}

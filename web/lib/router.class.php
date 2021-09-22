@@ -27,6 +27,7 @@ class router extends model {
 	public $machineId;
 	public $currency = 'HUF';
 	public $currencySign = 'Ft';
+	public $settings = false;
 
 	/**
 	 * @var view
@@ -67,6 +68,11 @@ class router extends model {
 	 * @var user
 	 */
 	public $user;
+
+	/**
+	 * @var cart
+	 */
+	public $cart = null;
 
 	public $output = OUTPUT_HTML;
 	protected $messages = [];
@@ -111,7 +117,19 @@ class router extends model {
 			$this->theme = $GLOBALS['HOSTS'][$this->host]['sitedata']['theme']['name'];
 			$this->currency = $GLOBALS['HOSTS'][$this->host]['currency'];
 			$this->currencySign = $GLOBALS['HOSTS'][$this->host]['currencies'][$this->currency];
+			$this->settings = $this->lib->getWebShopSettings();
 		}
+
+        if(SESSION_ON_SUBDOMAINS) {
+            if(substr_count($this->host, '.') > 1) {
+                $mainDomain = substr($this->host, strpos($this->host, '.'), 100);
+            }else{
+                $mainDomain = '.' . $this->host;
+            }
+
+            session_set_cookie_params(0, '/', $mainDomain);
+            ini_set('session.cookie_domain', $mainDomain);
+        }
 
 		define('APP_ROOT', DOC_ROOT . 'web/applications/' . $this->application . '/');
 	}
@@ -129,15 +147,23 @@ class router extends model {
 		$this->menu = $GLOBALS['MENU'];
 
 		if ($this->user->isLoggedIn()) {
-            /*
-            if($this->user->getGroup() == USER_GROUP_ADMINISTRATORS){
-            }
-            */
+            //
+
 		}else{
-			$this->page = 'login';
-			if (!empty($this->menu['login']['layout'])) {
-				$this->layout = $this->menu['login']['layout'];
-			}
+            if($this->application == 'admin'){
+                $this->page = 'login';
+                if (!empty($this->menu['login']['layout'])) {
+                    $this->layout = $this->menu['login']['layout'];
+                }
+            }elseif($this->application == 'shop'){
+                /**
+                 * @var $cart cart
+                 */
+                $this->cart = $this->addByClassName('cart');
+                $this->cart->init(false, false);
+
+                //$fbLogin = $this->user->getFBLoginUrl();
+            }
 		}
 
 		$this->setLanguage();
@@ -196,6 +222,8 @@ class router extends model {
 			$menuItems =& $this->menu;
 
 			foreach($uri as $i => $mKey) {
+                $mKey = $this->findRealMenuKey($this->menu, $mKey);
+
 				if (!empty($menuItems[$mKey])) {
 					$menuItems[$mKey]['selected'] = 1;
 					$this->currentMenu = $menuItems[$mKey];
@@ -233,7 +261,7 @@ class router extends model {
 					}
 				} else {
 					if (empty($this->page)) {
-						$this->data['pageTitle'] = $this->translate->getTranslation('MENU_404');
+						$this->data['pageTitle'] = 'MENU_404';
 						$this->page = '404';
 					}
 
@@ -261,6 +289,23 @@ class router extends model {
 			$this->root = './';
 		}
 	}
+
+    private function findRealMenuKey($menu, $needle){
+        $page = $needle;
+
+        foreach($menu AS $key => $menu){
+            if($menu['name'] == $needle){
+                $page = $key;
+                break;
+            }
+
+            if(!Empty($menu['items'])){
+                $page = $this->findRealMenuKey($menu['items'], $needle);
+            }
+        }
+
+        return $page;
+    }
 
 	private function setLanguage(){
 		if(isset($_REQUEST['lang']) AND isset($GLOBALS['LANGUAGES'][strtolower($_REQUEST['lang'])])){
@@ -326,9 +371,10 @@ class router extends model {
 				$result[$i]['name'] = $key;
 			}else {
 				if (!empty($m['items'])) {
-					$res = $this->getAllAccessRights($m['items'], $userGroup);
-					$result[$i]['name'] = $key;
-					$result[$i]['items'] = $res;
+					if($res = $this->getAllAccessRights($m['items'], $userGroup)) {
+                        $result[$i]['name'] = $key;
+                        $result[$i]['items'] = $res;
+                    }
 				}
 			}
 

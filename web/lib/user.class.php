@@ -221,7 +221,9 @@ class user extends ancestor {
 	}
 
 	public function validateUserByUUID($uuid){
-		$result = false;
+        $result = [
+            'valid' => false
+        ];
 		$db = $this->owner->db;
 
 		$user = $db->getFirstRow(
@@ -229,11 +231,34 @@ class user extends ancestor {
 		);
 
 		if($user){
-			$result = (int) $user['us_id'];
-		}
+            $result = [
+                'valid' => true,
+                'userid' => $user['us_id'],
+            ];
+        }
 
 		return $result;
 	}
+
+    public function validateUserFBId($id){
+        $result = [
+            'valid' => false
+        ];
+        $db = $this->owner->db;
+
+        $user = $db->getFirstRow(
+            "SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_shop_id = " . $this->owner->shopId . " AND us_deleted = 0 AND us_enabled = 1 AND us_facebook_id = '" . $db->escapestring($id) . "'"
+        );
+
+        if($user){
+            $result = [
+                'valid' => true,
+                'userid' => $user['us_id'],
+            ];
+        }
+
+        return $result;
+    }
 
 	/**
 	 * @param $email
@@ -374,7 +399,7 @@ class user extends ancestor {
 		}
 
 		if(!$page){
-			$page = 'set-new-password';
+			$page = $GLOBALS['PAGE_NAMES'][$this->owner->language]['set-new-password']['name'];
 		}
 
 		return $this->domain . $page . '/?token=' . urlencode($this->createLoginToken($type, $expiry));
@@ -616,7 +641,7 @@ class user extends ancestor {
 
 	private function setProfilePicture($data){
         if($data['img']){
-            $src = FOLDER_UPLOAD . 'profiles/' . $data['img'];
+            $src = FOLDER_UPLOAD . $this->owner->shopId . '/profiles/' . $data['img'];
         }else{
             if(Empty($data['title'])) $data['title'] = 'MR';
             $src = '/images/' . strtolower($data['title']) . '.svg';
@@ -638,5 +663,112 @@ class user extends ancestor {
         );
 
         return $success;
+    }
+
+    public function getFBLoginUrl($redirect = false){
+        $url = false;
+        if($GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['appid']){
+            if(!$redirect){
+                $redirect = $this->owner->domain . 'oauth/login/';
+            }
+
+            $fb = new Facebook\Facebook([
+                'app_id' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['appid'],
+                'app_secret' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['secret'],
+                'default_graph_version' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['version'],
+            ]);
+
+            $helper = $fb->getRedirectLoginHelper();
+
+            $permissions = ['email'];
+            $url = $helper->getLoginUrl($redirect, $permissions);
+        }
+
+        return $url;
+    }
+
+    public function getFBProfilePicture($accessToken, $userid = 'me'){
+        $error = false;
+        $img = '';
+
+        if($GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['appid']) {
+            $fb = new Facebook\Facebook([
+                'app_id' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['appid'],
+                'app_secret' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['secret'],
+                'default_graph_version' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['version'],
+            ]);
+
+            try {
+                $response = $fb->get('/' . $userid . '/picture?redirect=0&height=200&width=200&type=normal', $accessToken);
+                $graphNode = $response->getDecodedBody();
+            } catch(Facebook\Exception\FacebookResponseException $e) {
+                // When Graph returns an error
+                $error = 'Graph returned an error: ' . $e->getMessage();
+            } catch(Facebook\Exception\FacebookSDKException $e) {
+                // When validation fails or other local issues
+                $error = 'Facebook SDK returned an error: ' . $e->getMessage();
+            }
+
+            if(!$error) {
+                if ($graphNode['data']['url']) {
+                    $img = $graphNode['data']['url'];
+                } else {
+                    $img = '';
+                }
+            }
+        }
+
+        return $img;
+    }
+
+    public function registerUser($data, $role = USER_ROLE_USER){
+        $existingUser = $this->validateUserByEmail($data['email']);
+        if($existingUser['valid']) {
+            $userId = $existingUser['userid'];
+
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    DB_NAME_WEB . ".users",
+                    [
+                        'us_facebook_id' => $data['id'],
+                        'us_img' => $data['profile_img']
+                    ],
+                    [
+                        'us_id' => $userId,
+                        'us_shop_id' => $this->owner->shopId
+                    ]
+                )
+            );
+
+        }else {
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLInsert(
+                    DB_NAME_WEB . '.users',
+                    [
+                        'us_shop_id' => $this->owner->shopId,
+                        'us_group' => USER_GROUP_CUSTOMERS,
+                        'us_role' => $role,
+                        'us_email' => $data['email'],
+                        'us_lastname' => $data['last_name'],
+                        'us_firstname' => $data['first_name'],
+                        'us_facebook_id' => $data['id'],
+                        'us_registered' => 'NOW()',
+                        'us_language' => $this->owner->language,
+                        'us_enabled' => 1,
+                        'us_img' => $data['profile_img'],
+                    ]
+                )
+            );
+            $userId = $this->owner->db->getInsertRecordId();
+
+            $data = [
+                'id' => $userId,
+                'link' => $this->setUserId($userId)->getPasswordChangeLink('REGISTER'),
+            ];
+
+            $this->owner->email->prepareEmail('fb-register', $userId, $data);
+        }
+
+        return $userId;
     }
 }

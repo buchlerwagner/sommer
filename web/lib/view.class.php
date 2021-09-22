@@ -48,8 +48,12 @@ class view extends ancestor {
 			'loggedin'      => $this->owner->user->isLoggedIn(),
 			'accessLevel'   => $this->owner->user->getAccessLevel($this->owner->page),
 			'images'  		=> $this->owner->root . 'images/',
+			'theme'  		=> '/themes/' . $this->owner->theme . '/',
+			'uploads'  		=> FOLDER_UPLOAD . $this->owner->shopId . '/',
 			'production'  	=> (SERVER_ID == 'development' ? false : true),
 			'sitedata'  	=> $GLOBALS['HOSTS'][$this->owner->host]['sitedata'],
+			'settings'  	=> $this->owner->settings,
+			'cart'  	    => $this->owner->cart,
 		];
 	}
 

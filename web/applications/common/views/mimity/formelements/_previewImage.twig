@@ -3,7 +3,11 @@
 <div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}">
     {% set inputName = formName ~ '[' ~ element.getName ~ ']' %}
     <input type="hidden" name="{{ inputName }}" value="{{ value }}">
-    <img class="img-thumbnail" src="/i.php?src={{ element.getPath }}{{ value }}&w={{ element.getSize.width }}&h={{ element.getSize.height }}&m={{ element.getCropMode }}" alt="">
+    {% if element.isResponsive %}
+        <img class="img-thumbnail" src="{{ element.getPath }}{{ value }}" alt="">
+    {% else %}
+        <img class="img-thumbnail" src="/i.php?src={{ element.getPath }}{{ value }}&w={{ element.getSize.width }}&h={{ element.getSize.height }}&m={{ element.getCropMode }}" alt="">
+    {% endif %}
     {#
     <a href="{{ element.getPreviewUrl }}" data-target="#ajax-modal" data-toggle="modal" data-size="xl" class="{{ element.getClass }}"{{ self.attributes(element.getAttributes) }}>
     </a>

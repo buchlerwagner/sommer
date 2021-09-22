@@ -559,7 +559,9 @@ var app = {
                 callbacks :{
                     onInit: function() {
                         $(this).data('image_dialog_images_url', "/ajax/gallery-content/");
-                        $(this).data('image_dialog_title', "");
+                        $(this).data('image_dialog_title', "Gallery");
+                        $(this).data('image_dialog_close_btn_text', "Close");
+                        $(this).data('image_dialog_ok_btn_text', "OK");
                     }
                 }
             });

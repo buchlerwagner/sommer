@@ -232,7 +232,7 @@ class myProfileForm extends form {
         if(Empty($this->values['us_img'])){
             $imgSrc = '/images/' . strtolower($this->values['us_title']) . '.svg';
         }else{
-            $imgSrc = FOLDER_UPLOAD . '/profiles/' . $this->values['us_img'];
+            $imgSrc = FOLDER_UPLOAD . $this->owner->shopId . '/profiles/' . $this->values['us_img'];
         }
 
         $this->controls[1]['group'][0]['data']['src'] = $imgSrc;

@@ -28,17 +28,21 @@ class editPageForm extends formBuilder {
             ->addElements(
                 //(new inputEditor('c_headline', 'LBL_HEADLINE')),
                 (new inputEditor('c_content', 'LBL_CONTENT'))
+                    ->hasGallery()
             );
 
         $properties = (new sectionBox('properties', 'LBL_PROPERTIES', 'fal fa-check-double'))
             ->addClass('col-12 col-lg-8')
             ->addElements(
-                (new inputSwitch('c_published', 'LBL_PUBLISHED', 1))
+                (new inputSwitch('c_published', 'LBL_PUBLISHED'))
                     ->setColor(enumColors::Danger())
                     ->setGroupClass('mb-0'),
-                (new inputSwitch('c_show_in_header', 'LBL_SHOW_IN_HEADER', 1))
+                (new inputSwitch('c_empty_menu', 'LBL_EMPTY_MENU'))
+                    ->setColor(enumColors::Warning())
                     ->setGroupClass('mb-0'),
-                (new inputSwitch('c_show_in_footer', 'LBL_SHOW_IN_FOOTER', 0)),
+                (new inputSwitch('c_show_in_header', 'LBL_SHOW_IN_HEADER'))
+                    ->setGroupClass('mb-0'),
+                (new inputSwitch('c_show_in_footer', 'LBL_SHOW_IN_FOOTER')),
                 (new groupRow('row1'))->addElements(
                     (new inputText('c_order', 'LBL_POSITION'))
                         ->setColSize('col-12 col-lg-3')
@@ -69,8 +73,9 @@ class editPageForm extends formBuilder {
                         ->addData('show-preview', 'false')
                         ->notDBField(),
                     (new previewImage('c_page_img'))
-                        ->setSize(200, 200)
-                        ->setPath('pages/' . $this->owner->shopId . '/' . $this->keyFields['c_id'] . '/'),
+                        //->setSize(200, 200)
+                        ->setResponsive(true)
+                        ->setPath(FOLDER_UPLOAD . $this->owner->shopId . '/pages/' . $this->keyFields['c_id'] . '/'),
                     (new inputCheckbox('removeImg', 'LBL_REMOVE_IMAGE', 0))
                         ->notDBField()
                 );
@@ -107,6 +112,7 @@ class editPageForm extends formBuilder {
         }
         $this->values['c_page_url'] = strtolower($this->values['c_page_url']);
 
+        if(Empty($this->values['c_empty_menu'])) $this->values['c_empty_menu'] = 0;
         if(Empty($this->values['c_show_in_header'])) $this->values['c_show_in_header'] = 0;
         if(Empty($this->values['c_show_in_footer'])) $this->values['c_show_in_footer'] = 0;
         if(Empty($this->values['c_published'])) $this->values['c_published'] = 0;
@@ -127,11 +133,20 @@ class editPageForm extends formBuilder {
         if(Empty($this->values['c_page_img'])){
             $this->removeControl('removeImg');
         }
+        if($this->values['c_parent_id']){
+            $this->removeControl('c_show_in_header');
+            $this->removeControl('c_show_in_footer');
+            $this->removeControl('c_empty_menu');
+        }
+    }
+
+    public function onAfterSave($statement) {
+        $this->owner->mem->delete(CACHE_PAGES);
     }
 
     private function uploadFile(){
         if (!empty($_FILES[$this->name]['name']['upload_file']) && empty($_FILES[$this->name]['error']['upload_file'])) {
-            $savePath = DIR_UPLOAD_IMG . 'pages/' . $this->owner->shopId . '/' . $this->keyFields['c_id'] . '/';
+            $savePath = DIR_UPLOAD . $this->owner->shopId  . '/pages/' . $this->keyFields['c_id'] . '/';
             $this->deleteImage();
 
             $pathParts = pathinfo($_FILES[$this->name]['name']['upload_file']);
@@ -149,7 +164,7 @@ class editPageForm extends formBuilder {
     }
 
     private function deleteImage(){
-        $savePath = DIR_UPLOAD_IMG . 'pages/' . $this->owner->shopId . '/' .$this->keyFields['c_id'] . '/';
+        $savePath = DIR_UPLOAD . $this->owner->shopId . '/pages/' . $this->keyFields['c_id'] . '/';
 
         if(!Empty($this->values['c_page_img']) && file_exists($savePath . $this->values['c_page_img'])) {
             unlink($savePath . $this->values['c_page_img']);

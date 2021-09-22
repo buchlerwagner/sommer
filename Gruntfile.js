@@ -9,7 +9,7 @@ module.exports = function(grunt) {
                 },
                 files: {
                     'web/public/assets/css/mimity.style.css':   'web/resources/sass/mimity.main.scss',
-                    //'web/public/assets/css/ace.style.css':      'web/resources/sass/ace.main.scss',
+                    'web/public/assets/css/bellaria.style.css':  'web/resources/sass/bellaria.main.scss',
                 }
             }
         },
@@ -21,7 +21,7 @@ module.exports = function(grunt) {
             target: {
                 files: {
                     'web/public/assets/css/mimity.style.min.css': 'web/public/assets/css/mimity.style.css',
-                    //'web/public/assets/css/ace.style.min.css': 'web/public/assets/css/ace.style.css',
+                    'web/public/assets/css/bellaria.style.min.css': 'web/public/assets/css/bellaria.style.css',
                 }
             }
         },
@@ -42,11 +42,35 @@ module.exports = function(grunt) {
 
             shop: {
                 src: [
-                    'web/resources/src/shop-theme.js',
                     'web/resources/src/shop-init.js',
                 ],
                 dest: 'web/public/assets/js/shop.js'
             },
+
+            bellaria: {
+                src: [
+                    'web/public/vendor/revolution/js/jquery.themepunch.revolution.js',
+                    'web/public/vendor/revolution/js/jquery.themepunch.tools.js',
+                    //'web/public/vendor/revolution/js/extensions/revolution.extension.actions.js',
+                    //'web/public/vendor/revolution/js/extensions/revolution.extension.carousel.js',
+                    'web/public/vendor/revolution/js/extensions/revolution.extension.layeranimation.js',
+                    //'web/public/vendor/revolution/js/extensions/revolution.extension.kenburn.js',
+                    //'web/public/vendor/revolution/js/extensions/revolution.extension.migration.js',
+                    'web/public/vendor/revolution/js/extensions/revolution.extension.navigation.js',
+                    //'web/public/vendor/revolution/js/extensions/revolution.extension.parallax.js',
+                    'web/public/vendor/revolution/js/extensions/revolution.extension.slideanims.js',
+                    //'web/public/vendor/revolution/js/extensions/revolution.extension.video.js',
+
+                    'web/resources/src/bellaria/main-slider-script.js',
+                    'web/resources/src/bellaria/jquery.fancybox.js',
+                    'web/resources/src/bellaria/owl.js',
+                    'web/resources/src/bellaria/wow.js',
+                    'web/resources/src/bellaria/appear.js',
+                    'web/resources/src/bellaria/script.js'
+                ],
+                dest: 'web/public/assets/js/bellaria.js'
+
+            }
         },
 
         uglify: {
@@ -62,6 +86,11 @@ module.exports = function(grunt) {
             shop: {
                 files: {
                     'web/public/assets/js/shop.min.js': ['<%= concat.shop.dest %>'],
+                }
+            },
+            bellaria: {
+                files: {
+                    'web/public/assets/js/bellaria.min.js': ['<%= concat.bellaria.dest %>'],
                 }
             },
         },

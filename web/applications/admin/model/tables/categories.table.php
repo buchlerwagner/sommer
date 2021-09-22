@@ -51,13 +51,19 @@ class categoriesTable extends table {
             )
         );
         if($row){
-            $savePath = DIR_UPLOAD_IMG . 'products/' . $this->owner->shopId . '/' . $keyFields['cat_id'] . '/';
+            $savePath = DIR_UPLOAD . $this->owner->shopId . '/products/' . $keyFields['cat_id'] . '/';
 
             if(!Empty($row['cat_page_img']) && file_exists($savePath . $row['cat_page_img'])) {
                 unlink($savePath . $row['cat_page_img']);
             }
         }
 
+        $this->owner->mem->delete(CACHE_CATEGORIES);
+
         return true;
+    }
+
+    public function onCheck($keyValues, $field, $value) {
+        $this->owner->mem->delete(CACHE_CATEGORIES);
     }
 }

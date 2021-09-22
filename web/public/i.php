@@ -45,8 +45,8 @@ if($_GET['src']){
         }
     }
 
-    if(file_exists(DIR_UPLOAD_IMG . $src)){
-        $fileName = DIR_UPLOAD_IMG . $src;
+    if(file_exists(DIR_UPLOAD . $src)){
+        $fileName = DIR_UPLOAD . $src;
 
         if($_GET['w']=='max' OR $_GET['h'] == 'max') {
 

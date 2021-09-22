@@ -171,9 +171,9 @@ class product extends ancestor {
 
 	public function getImagePath($absolutePath = false){
         if($absolutePath) {
-			return  DIR_UPLOAD_IMG . 'products/' . $this->shopId . '/' . $this->categoryId . '/' . $this->productId . '/';
+			return  DIR_UPLOAD . $this->owner->shopId . '/products/' . $this->categoryId . '/' . $this->productId . '/';
 		}else{
-			return '/uploads/products/' . $this->shopId . '/' . $this->categoryId . '/' . $this->productId . '/';
+			return FOLDER_UPLOAD . $this->owner->shopId . '/products/' . $this->categoryId . '/' . $this->productId . '/';
 		}
 	}
 

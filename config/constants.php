@@ -1,5 +1,5 @@
 <?php
-const APPLICATION_NAME      = 'sommer-cukraszda.hu';
+const APPLICATION_NAME      = 'webshop';
 const SERVER_TIME_ZONE      = 'UTC';
 const DEFAULT_TIMEZONE_ID   = 29;            // (UTC+01:00) Belgrade, Bratislava, Budapest, Ljublj
 
@@ -7,6 +7,14 @@ const DEFAULT_TIMEZONE_ID   = 29;            // (UTC+01:00) Belgrade, Bratislava
 const SESSION_USER          = 'sc-userdata';
 const SESSION_LOCALE        = 'sc-locale';
 const SESSION_MESSAGES      = 'sc-messages';
+
+// content cache keys
+const CACHE_PAGES           = APPLICATION_NAME . '-pages';
+const CACHE_CATEGORIES      = APPLICATION_NAME . '-categories';
+const CACHE_SLIDERS         = APPLICATION_NAME . '-sliders';
+const CACHE_HIGHLIGHTS      = APPLICATION_NAME . '-highlights';
+const CACHE_POPULARS        = APPLICATION_NAME . '-popular';
+const CACHE_SETTINGS        = APPLICATION_NAME . '-settings';
 
 // cookie keys
 const COOKIE_MACHINEID      = 'sc-mid';
@@ -92,7 +100,7 @@ $GLOBALS['USER_GROUPS'] = [
     USER_GROUP_CUSTOMERS => [
 		'label' => 'LBL_GROUP_CUSTOMERS',
 		'color' => 'primary',
-        'app'   => 'admin',
+        'app'   => 'shop',
 	],
 ];
 
@@ -146,19 +154,83 @@ $GLOBALS['IMAGE_SIZES'] = [
 
 $GLOBALS['PAGE_NAMES'] = [
     'hu' => [
-        'login'     => 'login',
-        'register'  => 'regisztracio',
-        'products'  => 'termekek',
-        'cart'      => 'kosar',
-        'checkout'  => 'fizetes',
-        'finish'    => 'sikeres-megrendeles',
+        'register'  => [
+            'name' => 'regisztracio',
+            'display' => 0,
+        ],
+        'account'   => [
+            'name' => 'fiokom',
+            'display' => 0,
+        ],
+        'products'  => [
+            'name' => 'termekek',
+            'display' => 1,
+            'position' => 1,
+            'header' => true,
+            'footer' => false,
+        ],
+        'cart'      => [
+            'name' => 'kosar',
+            'display' => 0,
+        ],
+        'checkout'  => [
+            'name' => 'fizetes',
+            'display' => 0,
+        ],
+        'finish'    => [
+            'name' => 'sikeres-megrendeles',
+            'display' => 0,
+        ],
+        'set-new-password' => [
+            'name' => 'uj-jelszo',
+            'display' => 0,
+        ],
+        'contact'   => [
+            'name' => 'kapcsolat',
+            'display' => 1,
+            'header' => true,
+            'footer' => true,
+            'position' => 3,
+        ]
     ],
     'en' => [
-        'login'     => 'login',
-        'register'  => 'register',
-        'products'  => 'products',
-        'cart'      => 'cart',
-        'checkout'  => 'checkout',
-        'finish'    => 'finish',
+        'register'  => [
+            'name' => 'register',
+            'display' => 0,
+        ],
+        'account'   => [
+            'name' => 'account',
+            'display' => 0,
+        ],
+        'products'  => [
+            'name' => 'products',
+            'header' => true,
+            'footer' => false,
+            'display' => 1,
+            'position' => 1,
+        ],
+        'cart'      => [
+            'name' => 'cart',
+            'display' => 0,
+        ],
+        'checkout'  => [
+            'name' => 'checkout',
+            'display' => 0,
+        ],
+        'finish'    => [
+            'name' => 'finish',
+            'display' => 0,
+        ],
+        'set-new-password' => [
+            'name' => 'set-new-password',
+            'display' => 0,
+        ],
+        'contact'   => [
+            'name' => 'contact',
+            'display' => 1,
+            'header' => true,
+            'footer' => true,
+            'position' => 3,
+        ]
     ],
 ];

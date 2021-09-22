@@ -47,7 +47,7 @@ switch($action) {
                 )
             );
 
-            $img = FOLDER_UPLOAD . '/profiles/' . $filename;
+            $img = FOLDER_UPLOAD . $this->shopId . '/profiles/' . $filename;
 
             $this->data = [];
             $this->user->clearUserDataCache($userid);

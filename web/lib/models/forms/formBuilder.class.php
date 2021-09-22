@@ -239,8 +239,9 @@ abstract class formBuilder extends model {
 	}
 
 	private function handleRequest($request) {
-		foreach($this->inputs as $key => $val) {
-			if (in_array($val['type'], ['checkbox', 'checkboxonoff'])) $this->values[ $val['name'] ] = $val['valueoff'];
+        foreach($this->inputs as $key => $val) {
+			if (in_array($val['type'], ['checkbox', 'checkboxonoff']) && Empty($val['name'])) $this->values[ $val['id'] ] = $val['valueoff'];
+
 			if (!empty($val['name'])) {
 				if (isset($request[$val['name']])) {
 					$this->values[$val['name']] = $request[$val['name']];
@@ -259,7 +260,7 @@ abstract class formBuilder extends model {
 				}
 			}
 		}
-	}
+    }
 
 	protected function addError($message, $type = self::FORM_ERROR, $controls = []) {
 		$this->isValid = false;
