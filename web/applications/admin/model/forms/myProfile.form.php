@@ -252,6 +252,7 @@ class myProfileForm extends form {
     }
 
     public function onAfterSave($statement) {
+        $this->owner->addMessage(router::MESSAGE_SUCCESS, '', 'LBL_DATA_SAVED_SUCCESSFULLY');
         $this->owner->pageRedirect('/my-profile/');
     }
 }

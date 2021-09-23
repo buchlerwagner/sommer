@@ -10,7 +10,6 @@ class administratorsTable extends table {
 		$this->subTable = true;
 		$this->delete = true;
 		$this->header = true;
-		$this->view = true;
         $this->modalSize = 'lg';
 		$this->deleteField = 'us_deleted';
 		$this->additionalOptionsTemplate = 'table_options_user';

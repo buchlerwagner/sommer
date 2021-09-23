@@ -139,6 +139,7 @@ class shopSettingsForm extends formBuilder {
 
         $this->owner->mem->delete(CACHE_SETTINGS . $this->owner->shopId);
 
+        $this->owner->addMessage(router::MESSAGE_SUCCESS, '', 'LBL_DATA_SAVED_SUCCESSFULLY');
         $this->owner->pageRedirect('/webshop/settings/');
     }
 
