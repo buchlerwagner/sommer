@@ -49,5 +49,7 @@ const DEFAULT_COUNTRY       = 'HU';
 const DEFAULT_LANGUAGE      = 'hu';
 const SESSION_ON_SUBDOMAINS = true;
 
+const IPAPI_KEY             = '20966a71b200633664995f6b35b7e081';
+
 const HOST_ADMIN            = 'admin.sommer-cukraszda.hu';
 const HOST_CLIENTS          = 'sommer-cukraszda.hu';
