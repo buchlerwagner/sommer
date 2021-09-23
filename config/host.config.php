@@ -61,4 +61,7 @@ $GLOBALS['HOSTS'] = [
 if(SERVER_ID === 'development'){
     $GLOBALS['HOSTS']['admin.sommer.test'] = $GLOBALS['HOSTS'][HOST_ADMIN];
     $GLOBALS['HOSTS']['sommer.test'] = $GLOBALS['HOSTS'][HOST_CLIENTS];
+
+    $GLOBALS['HOSTS']['admin.wagnr.hu'] = $GLOBALS['HOSTS'][HOST_ADMIN];
+    $GLOBALS['HOSTS']['shop.wagnr.hu'] = $GLOBALS['HOSTS'][HOST_CLIENTS];
 }
