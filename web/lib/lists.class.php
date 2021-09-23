@@ -44,6 +44,19 @@ class lists extends ancestor {
         return $this->getList();
     }
 
+    public function getContentPageWidgets(){
+        $this->setList([
+            'null' => 'LBL_NONE',
+            'home' => 'LBL_PAGE_HOME',
+            'contact' => 'LBL_PAGE_CONTACT',
+            'cart' => 'LBL_PAGE_CART',
+            'checkout' => 'LBL_PAGE_CHECKOUT',
+            'finish' => 'LBL_PAGE_FINISH',
+        ]);
+
+        return $this->getList();
+    }
+
     public function getUnits(){
         $this->setList([
             0 => '-',

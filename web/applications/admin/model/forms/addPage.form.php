@@ -12,12 +12,19 @@ class addPageForm extends formBuilder {
         $group = (new groupFieldset('card-general'))->addElements(
             (new inputSelect('c_parent_id', 'LBL_PARENT'))
                 ->makeSelectPicker(true, 10)
+                ->changeState(0, enumChangeAction::Show(), '#row1')
+                ->changeDefaultState(enumChangeAction::Hide(), '#row1')
                 ->setOptions($this->owner->lists->setEmptyItem('LBL_NONE')->getTopPages()),
             (new inputText('c_title', 'LBL_PAGE_TITLE'))
                 ->setRequired(),
             (new inputText('c_page_url', 'LBL_PAGE_URL'))
                 ->setPrepend('https://' . HOST_CLIENTS . '/'),
             (new groupRow('row1'))->addElements(
+                (new inputSelect('c_widget', 'LBL_SPECIAL_PAGE_CONTENT', 'null'))
+                    ->setColSize('col-12')
+                    ->changeState('null', enumChangeAction::Show(), '#c_show_in_header-formgroup, #c_show_in_footer-formgroup')
+                    ->changeDefaultState(enumChangeAction::Hide(), '#c_show_in_header-formgroup, #c_show_in_footer-formgroup')
+                    ->setOptions($this->owner->lists->reset()->getContentPageWidgets()),
                 (new inputSwitch('c_show_in_header', 'LBL_SHOW_IN_HEADER', 1))
                     ->setGroupClass('mb-0')
                     ->setColSize('col-12'),
@@ -71,6 +78,11 @@ class addPageForm extends formBuilder {
 
         if(Empty($this->values['c_show_in_header'])) $this->values['c_show_in_header'] = 0;
         if(Empty($this->values['c_show_in_footer'])) $this->values['c_show_in_footer'] = 0;
+        if($this->values['c_widget'] == 'null' || Empty($this->values['c_widget'])) {
+            $this->values['c_widget'] = null;
+        }else{
+            $this->values['c_order'] = -1;
+        }
     }
 
     private function getMaxOrder(){

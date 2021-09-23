@@ -31,8 +31,8 @@ class pagesTable extends table {
             (new column('c_published', 'LBL_PUBLISHED', 1, enumTableColTypes::Checkbox()))
                 ->addClass('text-center'),
             (new column('c_title', 'LBL_PAGE_TITLE', 9))
-                ->setColspan(2)
-
+                ->setColspan(2),
+            new columnHidden('c_widget')
         );
 
         $this->addButton(
@@ -81,11 +81,32 @@ class pagesTable extends table {
         return $out;
     }
 
-    public function onAfterDelete($keyFields, $real = true) {
-        $this->owner->mem->delete(CACHE_PAGES);
+    public function onBeforeDelete($keyFields, $real = true) {
+        $this->owner->mem->delete(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $this->getPageWidget($keyFields['c_id']));
     }
 
     public function onCheck($keyValues, $field, $value) {
-        $this->owner->mem->delete(CACHE_PAGES);
+        $this->owner->mem->delete(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $this->getPageWidget($keyValues['c_id']));
+    }
+
+    private function getPageWidget($id){
+        $widget = '';
+
+        $row = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                $this->dbTable,
+                [
+                    'c_widget',
+                ],
+                [
+                    'c_id' => (int) $id,
+                ]
+            )
+        );
+        if($row){
+            $widget = $row['c_widget'];
+        }
+
+        return $widget;
     }
 }

@@ -4,7 +4,7 @@
     <div class="checkbox{% if element.getColor %} checkbox-slider-{{ element.getColor }}{% endif %} checkbox-slider--b-flat">
         <label>
             <input id="{{ element.getId }}" name="{{ inputName }}" type="checkbox" value="{{ element.getValueOn }}"{% if element.isDisabled %} disabled="disabled"{% endif %}{% if element.getValueOn == value %} checked="checked"{% endif %} class="{{ element.getClass }}"{{ self.attributes(element.getAttributes) }} />
-            <span class="ml-2">{% if element.getLabel %}{{ _(element.getLabel) }}{% endif %}</span>
+            <span class="ml-2">{% if element.getLabel %}{{ self.label(element, false) }}{% endif %}</span>
         </label>
     </div>
 </div>

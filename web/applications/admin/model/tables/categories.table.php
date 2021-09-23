@@ -58,12 +58,12 @@ class categoriesTable extends table {
             }
         }
 
-        $this->owner->mem->delete(CACHE_CATEGORIES);
+        $this->owner->mem->delete(CACHE_CATEGORIES . $this->owner->shopId);
 
         return true;
     }
 
     public function onCheck($keyValues, $field, $value) {
-        $this->owner->mem->delete(CACHE_CATEGORIES);
+        $this->owner->mem->delete(CACHE_CATEGORIES . $this->owner->shopId);
     }
 }

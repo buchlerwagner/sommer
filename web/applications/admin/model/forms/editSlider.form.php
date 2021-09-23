@@ -10,9 +10,14 @@ class editSliderForm extends formBuilder {
 		$this->dbTable = 'sliders';
         $this->upload = true;
 
+        $fontSizes = array_combine(range(100,400), array_map(function($a){ return $a . '%'; }, range(100, 400)));
+
         $group = (new groupFieldset('gen'))->addElements(
             (new inputText('s_title', 'LBL_HEADLINE'))
                 ->setRequired(),
+
+            (new inputSwitch('s_hide_title', 'LBL_HIDE_HEADLINE')),
+
             (new inputTextarea('s_text', 'LBL_TEXT'))
                 ->setRows(4),
             (new inputText('s_link', 'LBL_LINK')),
@@ -24,14 +29,12 @@ class editSliderForm extends formBuilder {
 
                 (new inputSelect('s_title_size', 'LBL_TITLE_FONT_SIZE', 250))
                     ->setColSize('col-4 col-lg-2')
-                    ->setOptions(array_combine(range(100,400), range(100, 400))),
+                    ->setOptions($fontSizes),
 
                 (new inputSelect('s_text_size', 'LBL_TEXT_FONT_SIZE', 100))
                     ->setColSize('col-4 col-lg-2')
-                    ->setOptions(array_combine(range(100, 400), range(100, 400)))
+                    ->setOptions($fontSizes)
             ),
-
-            (new inputSwitch('s_hide_title', 'LBL_HIDE_HEADLINE')),
 
             (new inputFile('upload_file', 'LBL_IMAGE'))
                 ->addData('max-file-size', 10240)
@@ -87,7 +90,7 @@ class editSliderForm extends formBuilder {
     }
 
     public function onAfterSave($statement) {
-        $this->owner->mem->delete(CACHE_SLIDERS);
+        $this->owner->mem->delete(CACHE_SLIDERS . $this->owner->shopId);
     }
 
     private function uploadFile(){

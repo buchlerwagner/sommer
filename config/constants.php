@@ -9,12 +9,13 @@ const SESSION_LOCALE        = 'sc-locale';
 const SESSION_MESSAGES      = 'sc-messages';
 
 // content cache keys
-const CACHE_PAGES           = APPLICATION_NAME . '-pages';
-const CACHE_CATEGORIES      = APPLICATION_NAME . '-categories';
-const CACHE_SLIDERS         = APPLICATION_NAME . '-sliders';
-const CACHE_HIGHLIGHTS      = APPLICATION_NAME . '-highlights';
-const CACHE_POPULARS        = APPLICATION_NAME . '-popular';
-const CACHE_SETTINGS        = APPLICATION_NAME . '-settings';
+const CACHE_PAGES           = APPLICATION_NAME . '-pages-';
+const CACHE_CATEGORIES      = APPLICATION_NAME . '-categories-';
+const CACHE_SLIDERS         = APPLICATION_NAME . '-sliders-';
+const CACHE_HIGHLIGHTS      = APPLICATION_NAME . '-highlights-';
+const CACHE_POPULARS        = APPLICATION_NAME . '-popular-';
+const CACHE_TAGGED          = APPLICATION_NAME . '-tagged-';
+const CACHE_SETTINGS        = APPLICATION_NAME . '-settings-';
 
 // cookie keys
 const COOKIE_MACHINEID      = 'sc-mid';
@@ -146,8 +147,8 @@ $GLOBALS['IMAGE_SIZES'] = [
         'crop' => false,
     ],
     'thumbnail' => [
-        'width'  => 250,
-        'height' => 250,
+        'width'  => 300,
+        'height' => 300,
         'crop' => true,
     ],
 ];

@@ -16,6 +16,7 @@ class router extends model {
 	public $theme = 'admin';
 	public $layout = 'main';
 	public $customHeaders = false;
+	public $httpHeaders = [];
 	public $root = '';
 	public $host = '';
 	public $domain = '';
@@ -384,7 +385,10 @@ class router extends model {
 		return $result;
 	}
 
-	public function pageRedirect($url){
+	public function pageRedirect($url, enumHTTPHeaders $header = null){
+        if($header){
+            $this->addHttpHeader($header);
+        }
 		header("Location: " . $url);
 		exit();
 	}
@@ -459,5 +463,59 @@ class router extends model {
 
 	public function setPageSubTitle($title){
         $this->data['pageSubTitle'] = $title;
+    }
+
+    public function setPageMetaData($data){
+        if($data['seo']['title']) {
+            $this->setPageTitle($data['seo']['title']);
+        }elseif($data['pageTitle']) {
+            $this->setPageTitle($data['pageTitle']);
+        }
+
+        if($data['pageKeyWords']) {
+            $this->data['pageKeyWords'] = $data['pageKeyWords'];
+        }
+
+        if($data['seo']['url']) {
+            $this->data['meta']['og:url'] = $data['seo']['url'];
+        }elseif($data['pageUrl']) {
+            $this->data['meta']['og:url'] = $data['pageUrl'];
+        }
+
+        if($data['pageType']) {
+            $this->data['meta']['og:type'] = $data['pageType'];
+        }else{
+            $this->data['meta']['og:type'] = 'article';
+        }
+
+        if($data['name']) {
+            $this->data['meta']['og:title'] = $data['name'];
+        }
+
+        if($data['seo']['description']) {
+            $this->data['pageDescription'] = $data['seo']['description'];
+            $this->data['meta']['og:description'] = $data['seo']['description'];
+        }elseif($data['pageDescription']){
+            $this->data['pageDescription'] = $data['pageDescription'];
+            $this->data['meta']['og:description'] = $data['pageDescription'];
+        }elseif($data['description']){
+            $this->data['meta']['og:description'] = $data['description'];
+        }
+
+        if($data['seo']['image']) {
+            $this->data['meta']['og:image'] = $data['seo']['image'];
+            $this->data['meta']['og:image:secure_url'] = $data['seo']['image'];
+        }elseif($data['pageImage']['absolute']) {
+            $this->data['meta']['og:image'] = $data['pageImage']['absolute'];
+            $this->data['meta']['og:image:secure_url'] = $data['pageImage']['absolute'];
+        }
+
+        if($this->settings['facebookAppId']) {
+            $this->data['meta']['fb:app_id'] = $this->settings['facebookAppId'];
+        }
+    }
+
+    public function addHttpHeader(enumHTTPHeaders $header){
+        $this->httpHeaders[] = $header;
     }
 }

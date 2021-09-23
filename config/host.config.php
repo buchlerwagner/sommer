@@ -26,10 +26,6 @@ $GLOBALS['HOSTS'] = [
             'theme' => [
                 'name'      => 'mimity',
             ],
-			'facebook' => [
-			],
-			'google' => [
-			],
 		]
 	],
     HOST_CLIENTS => [
@@ -57,10 +53,6 @@ $GLOBALS['HOSTS'] = [
             'title'	=> 'Sommer Cukrászda',
             'theme' => [
                 'name'      => 'bellaria',
-            ],
-            'facebook' => [
-            ],
-            'google' => [
             ],
         ]
     ],

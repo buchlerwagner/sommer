@@ -771,7 +771,7 @@ class functions extends ancestor {
     }
 
     public function setContentPageMenus(){
-        $result = $this->owner->mem->get(CACHE_PAGES);
+        $result = $this->owner->mem->get(CACHE_PAGES . $this->owner->shopId . $this->owner->language);
         if(!$result) {
             $result = $this->owner->db->getRows(
                 $this->owner->db->genSQLSelect(
@@ -790,6 +790,9 @@ class functions extends ancestor {
                         'c_shop_id' => $this->owner->shopId,
                         'c_deleted' => 0,
                         'c_published' => 1,
+                        'c_widget' => [
+                            'is' => NULL
+                        ],
                         'c_language' => $this->owner->language,
                     ],
                     [],
@@ -798,7 +801,7 @@ class functions extends ancestor {
                 )
             );
 
-            $this->owner->mem->set(CACHE_PAGES, $result);
+            $this->owner->mem->set(CACHE_PAGES . $this->owner->shopId . $this->owner->language, $result);
         }
 
         if($result){
@@ -849,9 +852,76 @@ class functions extends ancestor {
         }
     }
 
+    public function getWidgetContents($widget){
+        $content = $this->owner->mem->get(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $widget);
+        if(!$content) {
+            $result = $this->owner->db->getRows(
+                $this->owner->db->genSQLSelect(
+                    'contents',
+                    [
+                        'c_id AS id',
+                        'c_title AS title',
+                        'c_widget AS widget',
+                        'c_subtitle AS subtitle',
+                        'c_page_img AS image',
+                        'c_content AS content',
+                        'c_page_title AS pageTitle',
+                        'c_page_description AS pageDescription',
+                        'c_page_url AS pageUrl',
+                        'c_order AS order',
+                    ],
+                    [
+                        'c_shop_id' => $this->owner->shopId,
+                        'c_deleted' => 0,
+                        'c_published' => 1,
+                        'c_widget' => $widget,
+                        'c_language' => $this->owner->language,
+                    ],
+                    [],
+                    false,
+                    'c_order'
+                )
+            );
+
+            $this->owner->mem->set(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $widget, $result);
+        }
+
+        if($result){
+            $content = [];
+
+            foreach($result AS $row){
+                $content[$row['id']] = $row;
+                $content[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/pages/' . $row['image'];
+            }
+
+            $this->owner->mem->set(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $widget, $content);
+        }
+
+        return $content;
+    }
+
+    public function getSections($sections){
+        $out = [];
+        if(!is_array($sections)) $sections = [$sections];
+        foreach($sections AS $section){
+            $widgets = $this->getWidgetContents($section);
+            foreach($widgets AS $id => $widget){
+                $out[$id] = $widget;
+            }
+        }
+
+        if(!Empty($out)){
+            uasort($out, function ($item1, $item2) {
+                return $item1['order'] <=> $item2['order'];
+            });
+        }
+
+        return $out;
+    }
+
     public function setProductCategories(){
         if($GLOBALS['MENU']['products']){
-            $result = $this->owner->mem->get(CACHE_CATEGORIES);
+            $result = $this->owner->mem->get(CACHE_CATEGORIES . $this->owner->shopId);
             if(!$result) {
                 $result = $this->owner->db->getRows(
                     $this->owner->db->genSQLSelect(
@@ -872,7 +942,7 @@ class functions extends ancestor {
                     )
                 );
 
-                $this->owner->mem->set(CACHE_CATEGORIES, $result);
+                $this->owner->mem->set(CACHE_CATEGORIES . $this->owner->shopId, $result);
             }
             if($result){
                 $GLOBALS['MENU']['products']['display'] = 2;
@@ -881,6 +951,7 @@ class functions extends ancestor {
                 foreach($result AS $row){
                     $GLOBALS['MENU']['products']['items'][$row['cat_url']] = [
                         'title' => $row['cat_title'],
+                        'pagemodel' => 'products',
                         'display' => 1
                     ];
                 }
@@ -895,7 +966,7 @@ class functions extends ancestor {
     }
 
     public function getWebShopSettings(){
-        $settings = $this->owner->mem->get(CACHE_SETTINGS);
+        $settings = $this->owner->mem->get(CACHE_SETTINGS . $this->owner->shopId);
         if(!$settings) {
             $settings = $this->owner->db->getFirstRow(
                 $this->owner->db->genSQLSelect(
@@ -910,7 +981,7 @@ class functions extends ancestor {
             );
             if ($settings) {
                 $settings = json_decode($settings['ws_settings'], true);
-                $this->owner->mem->set(CACHE_SETTINGS, $settings);
+                $this->owner->mem->set(CACHE_SETTINGS . $this->owner->shopId, $settings);
             }
         }
 
@@ -918,7 +989,7 @@ class functions extends ancestor {
     }
 
     public function getSliders(){
-        $sliders = $this->owner->mem->get(CACHE_SLIDERS);
+        $sliders = $this->owner->mem->get(CACHE_SLIDERS . $this->owner->shopId);
         if(!$sliders) {
             $result = $this->owner->db->getRows(
                 $this->owner->db->genSQLSelect(
@@ -950,7 +1021,7 @@ class functions extends ancestor {
                     $sliders[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/sliders/' . $row['image'];
                 }
 
-                $this->owner->mem->set(CACHE_SLIDERS, $sliders);
+                $this->owner->mem->set(CACHE_SLIDERS . $this->owner->shopId, $sliders);
             }
         }
 
@@ -958,13 +1029,19 @@ class functions extends ancestor {
     }
 
     public function getHighlightedItems(){
-        //$items = $this->owner->mem->get(CACHE_HIGHLIGHTS);
+        //$items = $this->owner->mem->get(CACHE_HIGHLIGHTS . $this->owner->shopId);
         $items = [];
         return $items;
     }
 
     public function getPopularItems(){
-        //$items = $this->owner->mem->get(CACHE_POPULARS);
+        //$items = $this->owner->mem->get(CACHE_POPULARS . $this->owner->shopId);
+        $items = [];
+        return $items;
+    }
+
+    public function getTaggedItems($tag){
+        //$items = $this->owner->mem->get(CACHE_TAGGED . $this->owner->shopId . $tag);
         $items = [];
         return $items;
     }

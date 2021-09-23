@@ -2,6 +2,14 @@
     {% include 'slider.twig' %}
 {% endif %}
 
+{% if sections %}
+    {% include 'slider.twig' %}
+    {% for section in sections %}
+        {{ include(template_from_string(section.content)) }}
+    {% endfor %}
+{% endif %}
+
+
 <!-- Services Section -->
 <section class="services-section" style="background-image: url({{ theme }}images/backgrounds/1.jpg);">
     <div class="auto-container">

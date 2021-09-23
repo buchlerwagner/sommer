@@ -5,22 +5,29 @@ class product extends ancestor {
 
     private $shopId = 0;
 	private $data = [];
+    private $isAdmin = false;
 
 	public function init($productId){
         $this->productId = (int) $productId;
         $this->shopId = $this->owner->shopId;
 
-        $this->loadProduct();
+        if($_REQUEST['show'] == 'all' && $this->owner->user->getGroup() == USER_GROUP_ADMINISTRATORS){
+            $this->isAdmin = true;
+        }
 
         return $this;
 	}
 
     public function getProduct(){
-        $this->getImages();
-        $this->getProperties(true);
+        $this->loadProduct();
 
-        if($this->data['hasVariants']){
-            $this->getProductVariants();
+        if($this->data) {
+            $this->getImages();
+            $this->getProperties(true);
+
+            if ($this->data['hasVariants']) {
+                $this->getProductVariants();
+            }
         }
 
         return $this->data;
@@ -146,7 +153,7 @@ class product extends ancestor {
 		if($result){
 			$i = 0;
 			foreach($result AS $row){
-				$path = $this->getImagePath();
+				$path = $this->getImagePath(false, $row['prod_cat_id']);
 
 				$img[$i] = [
 					'name' => $row['pimg_orig_filename'],
@@ -169,11 +176,27 @@ class product extends ancestor {
 		return $img;
 	}
 
-	public function getImagePath($absolutePath = false){
+    public function getCategoryId(){
+        if($this->productId && !$this->categoryId) {
+            $row = $this->owner->db->getFirstRow(
+                "SELECT prod_cat_id FROM " . DB_NAME_WEB . ".products WHERE prod_id='" . $this->productId . "' LIMIT 1"
+            );
+            if ($row) {
+                $this->categoryId = $row['prod_cat_id'];
+            }
+        }
+    }
+
+	public function getImagePath($absolutePath = false, $categoryId = false){
+
+        if(!$categoryId){
+            $this->getCategoryId();
+        }
+
         if($absolutePath) {
-			return  DIR_UPLOAD . $this->owner->shopId . '/products/' . $this->categoryId . '/' . $this->productId . '/';
+			return DIR_UPLOAD . $this->owner->shopId . '/products/' . ($categoryId ?: $this->categoryId) . '/' . $this->productId . '/';
 		}else{
-			return FOLDER_UPLOAD . $this->owner->shopId . '/products/' . $this->categoryId . '/' . $this->productId . '/';
+			return FOLDER_UPLOAD . $this->owner->shopId . '/products/' . ($categoryId ?: $this->categoryId) . '/' . $this->productId . '/';
 		}
 	}
 
@@ -186,72 +209,7 @@ class product extends ancestor {
 		$row = $this->owner->db->getFirstRow($sql);
 		if($row){
             $this->categoryId = $row['prod_cat_id'];
-            $url = '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products'] . '/' . $row['cat_url'] . '/' . $row['prod_id'] . '-' . $row['prod_url'] . '/';
-			$path = $this->getImagePath();
-
-            $packageUnits = $this->owner->lists->getUnits();
-            $weightUnits = $this->owner->lists->getWeights();
-
-            $variant = [
-                'id' => 0,
-                'imgId' => 0,
-                'price' => [
-                    'value' => $row['prod_price'],
-                    'discount' => $row['prod_price_discount'],
-                    'currency' => $row['prod_currency'],
-                ],
-                'minSale' => $row['prod_min_sale'],
-                'maxSale' => $row['prod_max_sale'],
-                'stock' => $row['prod_stock'],
-                'packaging' => [
-                    'quantity' => $row['prod_pack_quantity'],
-                    'packageUnit' => $row['prod_pack_unit'],
-                    'packageUnitName' => $packageUnits[$row['prod_pack_unit']],
-                    'weight' => $packageUnits[$row['prod_weight']],
-                    'weightUnit' => $packageUnits[$row['prod_weight_unit']],
-                    'weightUnitName' => $weightUnits[$row['prod_weight_unit']],
-                ],
-            ];
-
-            $this->data = [
-				'id' => $row['prod_id'],
-				'key' => $row['prod_key'],
-				'name' => $row['prod_name'],
-				'brand' => $row['prod_brand_name'],
-				'description' => $row['prod_description'],
-
-				'category' => [
-					'id' => $row['cat_id'],
-					'name' => $row['cat_name'],
-					'url' => '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products'] . '/' . $row['cat_url'] . '/',
-				],
-
-                'hasVariants' => ($row['prod_variants']),
-                'variants' => [
-                    $variant
-                ],
-
-				'defaultImage' => $path . $row['prod_img'],
-				'images' => [],
-
-				'stats' => [
-					'views' => $row['prod_views'],
-					'orders' => $row['prod_orders'],
-				],
-				'ratings' => [
-					'value' => $row['prod_rating'],
-					'reviews' => $row['prod_reviews'],
-				],
-				'seo' => [
-					'title' => $row['prod_page_title'],
-					'description' => $row['prod_page_description'],
-				],
-                'url' => [
-                    'relative' => $url,
-                    'absolute' => 'https://' . HOST_CLIENTS . $url,
-                ]
-			];
-
+            $this->data = $this->buildItem($row);
 		}
 
 		return $this;
@@ -361,5 +319,84 @@ class product extends ancestor {
                 );
             }
         }
+    }
+
+    public function buildItem($row){
+        static $packageUnits = [];
+        static $weightUnits = [];
+
+        if(Empty($packageUnits)) {
+            $packageUnits = $this->owner->lists->getUnits();
+        }
+
+        if(Empty($weightUnits)) {
+            $weightUnits = $this->owner->lists->getWeights();
+        }
+
+        $url = '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $row['cat_url'] . '/' . $row['prod_id'] . '-' . $row['prod_url'] . '/';
+        $path = $this->getImagePath(false, $row['prod_cat_id']);
+
+        $variant = [
+            'id' => 0,
+            'imgId' => 0,
+            'price' => [
+                'value' => $row['prod_price'],
+                'discount' => $row['prod_price_discount'],
+                'currency' => $row['prod_currency'],
+            ],
+            'minSale' => $row['prod_min_sale'],
+            'maxSale' => $row['prod_max_sale'],
+            'stock' => $row['prod_stock'],
+            'packaging' => [
+                'quantity' => $row['prod_pack_quantity'],
+                'packageUnit' => $row['prod_pack_unit'],
+                'packageUnitName' => $packageUnits[$row['prod_pack_unit']],
+                'weight' => $packageUnits[$row['prod_weight']],
+                'weightUnit' => $packageUnits[$row['prod_weight_unit']],
+                'weightUnitName' => $weightUnits[$row['prod_weight_unit']],
+            ],
+        ];
+
+        $data = [
+            'id' => $row['prod_id'],
+            'key' => $row['prod_key'],
+            'name' => $row['prod_name'],
+            'brand' => $row['prod_brand_name'],
+            'description' => $row['prod_description'],
+
+            'category' => [
+                'id' => $row['cat_id'],
+                'name' => $row['cat_title'],
+                'url' => '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $row['cat_url'] . '/',
+            ],
+
+            'hasVariants' => ($row['prod_variants']),
+            'variants' => [
+                $variant
+            ],
+
+            'thumbnail' => $path . str_replace('.', '_thumbnail.', $row['prod_img']),
+            'images' => [
+                0 => $path . $row['prod_img']
+            ],
+
+            'stats' => [
+                'views' => $row['prod_views'],
+                'orders' => $row['prod_orders'],
+            ],
+            'ratings' => [
+                'value' => $row['prod_rating'],
+                'reviews' => $row['prod_reviews'],
+            ],
+            'seo' => [
+                'image' => 'https://' . $this->owner->host . $path . $row['prod_img'],
+                'title' => $row['prod_page_title'],
+                'description' => $row['prod_page_description'],
+                'url' => 'https://' . $this->owner->host . $url,
+            ],
+            'url' => $url
+        ];
+
+        return $data;
     }
 }

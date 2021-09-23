@@ -105,6 +105,11 @@ class view extends ancestor {
 	}
 
 	public function beforeRenderPage() {
+        if($this->owner->httpHeaders){
+            foreach($this->owner->httpHeaders AS $header){
+                header($header);
+            }
+        }
 	}
 
 	public function renderPage(){
@@ -137,8 +142,8 @@ class view extends ancestor {
 		if($this->owner->page != 'ajax'){
 			$headerData = [
 				'title'         => $this->owner->data['pageTitle'],
-				'description'   => $this->owner->data['pageDescription'],
-				'keywords'      => $this->owner->data['keyWords'],
+				'pageDescription'   => $this->owner->data['pageDescription'],
+				'pageKeyWords'  => $this->owner->data['pageKeyWords'],
 				'language'      => $this->owner->language,
 				'css'           => $this->css,
 				'js'            => $this->js,

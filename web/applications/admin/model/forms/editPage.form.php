@@ -38,6 +38,7 @@ class editPageForm extends formBuilder {
                     ->setColor(enumColors::Danger())
                     ->setGroupClass('mb-0'),
                 (new inputSwitch('c_empty_menu', 'LBL_EMPTY_MENU'))
+                    ->setHelpText('LBL_HELP_EMPTY_MENU', true)
                     ->setColor(enumColors::Warning())
                     ->setGroupClass('mb-0'),
                 (new inputSwitch('c_show_in_header', 'LBL_SHOW_IN_HEADER'))
@@ -45,9 +46,12 @@ class editPageForm extends formBuilder {
                 (new inputSwitch('c_show_in_footer', 'LBL_SHOW_IN_FOOTER')),
                 (new groupRow('row1'))->addElements(
                     (new inputText('c_order', 'LBL_POSITION'))
-                        ->setColSize('col-12 col-lg-3')
+                        ->setColSize('col-6 col-lg-3')
                         ->addClass('text-right')
-                        ->onlyNumbers()
+                        ->onlyNumbers(),
+                    (new inputSelect('c_widget', 'LBL_SPECIAL_PAGE_CONTENT', 'null'))
+                        ->setOptions($this->owner->lists->reset()->getContentPageWidgets())
+                        ->setColSize('col-6 col-lg-3')
                 )
             );
 
@@ -112,10 +116,16 @@ class editPageForm extends formBuilder {
         }
         $this->values['c_page_url'] = strtolower($this->values['c_page_url']);
 
+        if(Empty($this->values['c_order'])) $this->values['c_order'] = 0;
         if(Empty($this->values['c_empty_menu'])) $this->values['c_empty_menu'] = 0;
         if(Empty($this->values['c_show_in_header'])) $this->values['c_show_in_header'] = 0;
         if(Empty($this->values['c_show_in_footer'])) $this->values['c_show_in_footer'] = 0;
         if(Empty($this->values['c_published'])) $this->values['c_published'] = 0;
+        if($this->values['c_widget'] == 'null' || Empty($this->values['c_widget'])) {
+            $this->values['c_widget'] = null;
+        }else{
+            $this->values['c_order'] = -1;
+        }
 
         if($this->values['removeImg']){
             $this->deleteImage();
@@ -133,15 +143,26 @@ class editPageForm extends formBuilder {
         if(Empty($this->values['c_page_img'])){
             $this->removeControl('removeImg');
         }
+
         if($this->values['c_parent_id']){
             $this->removeControl('c_show_in_header');
             $this->removeControl('c_show_in_footer');
             $this->removeControl('c_empty_menu');
+            $this->removeControl('c_widget');
+        }elseif(!Empty($this->values['c_widget'])){
+            $this->removeControl('c_show_in_header');
+            $this->removeControl('c_show_in_footer');
+            $this->removeControl('c_empty_menu');
+            $this->removeControl('c_order');
         }
     }
 
     public function onAfterSave($statement) {
-        $this->owner->mem->delete(CACHE_PAGES);
+        if($this->values['c_widget']){
+            $this->owner->mem->delete(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $this->values['c_widget']);
+        }else {
+            $this->owner->mem->delete(CACHE_PAGES . $this->owner->shopId . $this->owner->language);
+        }
     }
 
     private function uploadFile(){

@@ -98,7 +98,7 @@ class editCategoryForm extends formBuilder {
     }
 
     public function onAfterSave($statement) {
-        $this->owner->mem->delete(CACHE_CATEGORIES);
+        $this->owner->mem->delete(CACHE_CATEGORIES . $this->owner->shopId);
     }
 
     public function onAfterInit() {

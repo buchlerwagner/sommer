@@ -8,6 +8,12 @@
             {{ tools.table_cell(table.name, row.__id, column, row.c_published, row, (table.readonly or row['options'].readonly))|raw }}
         </td>
         <td class="col-9" colspan="2">
+            {% if row.c_widget %}
+                <span class="text-primary">
+                    <i class="far fa-file-exclamation mr-1"></i>
+                    {{ _('LBL_PAGE_' ~ row.c_widget) }} -
+                </span>
+            {% endif %}
             {{ row.c_title }}
         </td>
         {% if table.options %}

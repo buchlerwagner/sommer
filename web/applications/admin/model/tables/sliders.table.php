@@ -58,13 +58,13 @@ class slidersTable extends table {
             }
         }
 
-        $this->owner->mem->delete(CACHE_SLIDERS);
+        $this->owner->mem->delete(CACHE_SLIDERS . $this->owner->shopId);
 
         return true;
     }
 
     public function onCheck($keyValues, $field, $value) {
-        $this->owner->mem->delete(CACHE_SLIDERS);
+        $this->owner->mem->delete(CACHE_SLIDERS . $this->owner->shopId);
     }
 
 }
