@@ -399,7 +399,11 @@ class user extends ancestor {
 		}
 
 		if(!$page){
-			$page = $GLOBALS['PAGE_NAMES'][$this->owner->language]['set-new-password']['name'];
+            if($this->owner->application == 'admin'){
+                $page = $GLOBALS['PAGE_NAMES']['en']['set-new-password']['name'];
+            }else {
+                $page = $GLOBALS['PAGE_NAMES'][$this->owner->language]['set-new-password']['name'];
+            }
 		}
 
 		return $this->domain . $page . '/?token=' . urlencode($this->createLoginToken($type, $expiry));
