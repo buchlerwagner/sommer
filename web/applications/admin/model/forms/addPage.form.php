@@ -66,7 +66,6 @@ class addPageForm extends formBuilder {
             $this->values['c_page_url'] = safeURL($this->values['c_page_url']);
         }
 
-        $this->values['c_page_url'] = strtolower($this->values['c_page_url']);
         $res = $this->owner->db->getFirstRow(
             "SELECT c_id FROM " . DB_NAME_WEB . ".contents WHERE c_shop_id = " . $this->owner->shopId . " AND c_page_url LIKE \"" . $this->owner->db->escapeString($this->values['c_page_url']) . "\""
         );

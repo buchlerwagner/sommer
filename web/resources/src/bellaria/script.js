@@ -459,6 +459,7 @@
 	}
 
 	//Price Range Slider
+	/*
 	if($('.price-range-slider').length){
 		$( ".price-range-slider" ).slider({
 			range: true,
@@ -472,6 +473,7 @@
 		
 		$( "input.property-amount" ).val( $( ".price-range-slider" ).slider( "values", 0 ) + " - $" + $( ".price-range-slider" ).slider( "values", 1 ) );	
 	}
+	*/
 
 	//LightBox / Fancybox
 	if($('.lightbox-image').length) {

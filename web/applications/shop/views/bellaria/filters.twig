@@ -1,0 +1,36 @@
+<aside class="sidebar theiaStickySidebar">
+    <div class="sticky-sidebar">
+        <div class="sidebar-widget search-widget">
+            <div class="form-group">
+                <input type="search" name="search" value="{{ products.filters.search.query }}" placeholder="{{ _('LBL_SEARCH_PRODUCT') }}" required>
+                <button type="submit"><span class="icon fa fa-search"></span></button>
+            </div>
+        </div>
+
+        {#
+        <div class="sidebar-widget rangeslider-widget">
+            <div class="widget-content">
+                <h3 class="widget-title">{{ _('LBL_PRODUCT_FILTERS') }}</h3>
+
+
+            </div>
+        </div>
+        #}
+
+        {% if tags %}
+        <div class="sidebar-widget tags-widget">
+            <h3 class="widget-title">{{ _('LBL_TAGS') }}</h3>
+            <ul class="tag-list clearfix">
+                {% for tag in tags %}
+                    <li>
+                        <a href="#" data-id="{{ tag.id }}">
+                            {% if tag.icon %}<i class="{{ tag.icon }} mr-1"></i>{% endif %}
+                            {{ tag.name }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</aside>

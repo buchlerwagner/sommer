@@ -1,6 +1,188 @@
-<br>
-<br>
-<br>
-<br>
-<br>
-single product
+<section class="page-title" style="background-image:url({% if item.category.image %}{{ item.category.image }}{% else %}{{ theme }}images/backgrounds/34.jpg{% endif %})">
+    <div class="auto-container">
+        <h1>{{ item.name }}</h1>
+        <ul class="page-breadcrumb">
+            <li><a href="/">{{ _('MENU_HOME') }}</a></li>
+            <li><a href="{{ item.category.url }}">{{ item.category.name }}</a></li>
+        </ul>
+    </div>
+</section>
+
+<div class="sidebar-page-container">
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="content-side col-lg-9 col-md-12 col-sm-12">
+                <div class="shop-single">
+                    <div class="product-details">
+                        <div class="basic-details">
+                            <div class="row clearfix">
+                                <div class="image-column col-md-6 col-sm-12">
+                                    <figure class="image">
+                                        <a class="MagicZoom" id="zoom" href="{{ item.images[0].file }}" data-options="zoomMode: false;hint:off;cssClass: thumbnails-style-shaded">
+                                            <img src="{{ item.images[0].data.medium }}" alt="{{ item.name }}" width="500" height="500"/>
+                                        </a>
+                                    </figure>
+                                    <div class="selectors text-center">
+                                        {% if item.images|length > 1 %}
+                                            {% for img in item.images %}
+                                                <a id="img-{{ img.data.id }}" data-zoom-id="zoom" href="{{ img.file }}" data-image="{{ img.data.medium }}" title="">
+                                                    <img class="rounded" src="{{ img.data.thumbnail }}" width="80" height="80" />
+                                                </a>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="info-column col-md-6 col-sm-12">
+                                    <div class="details-header">
+                                        <h4>{{ item.name }}</h4>
+                                        {% if item.ratings.reviews %}
+                                            <div class="rating">
+                                                <span class="fa fa-star"></span>
+                                                <span class="fa fa-star"></span>
+                                                <span class="fa fa-star"></span>
+                                                <span class="fa fa-star"></span>
+                                                <span class="fa fa-star"></span>
+                                            </div>
+                                            <a class="reviews" href="#">({{ item.ratings.reviews }})</a>
+                                        {% endif %}
+
+                                        {% for variant in item.variants %}
+                                        <div id="item-price-{{ variant.id }}" class="item-price{% if loop.index > 1 %} d-none{% endif %}" data-id="{{ item.id }}" data-variant="{{ variant.id }}" data-name="{{ variant.name }}" data-weight="{{ variant.packaging.weight }} {{ variant.packaging.weightUnitName }}" data-min="{{ variant.minSale }}" data-max="{{ variant.maxSale }}" data-img="{{ variant.imgId }}">
+                                            {% if variant.price.discount > 0 and variant.price.value > variant.price.discount  %}
+                                                <del class="small">{{ _price(variant.price.value, variant.price.currency) }}</del>
+                                                {{ _price(variant.price.discount, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
+                                            {% else %}
+                                                {{ _price(variant.price.value, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+
+                                        <div class="text">
+                                            {{ item.intro|nl2br }}
+                                        </div>
+                                    </div>
+
+                                    {% if item.variants|length > 1 %}
+                                    <div class="other-options clearfix mb-3">
+                                        <select name="variant" class="form-control select-variant">
+                                            {% for variant in item.variants %}
+                                                <option value="{{ variant.id }}">{{ variant.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="other-options clearfix">
+                                        {% if not settings.stopSale %}
+                                            {% if item.available %}
+
+                                                <div class="item-quantity form-row align-items-center">
+                                                    <div class="col-12 col-lg-6">
+                                                        <label class="mb-0" for="quantity">{{ _('LBL_QUANTITY') }}</label>
+                                                        <div class="input-group input-spinner">
+                                                            <div class="input-group-prepend">
+                                                                <button class="btn btn-light quantity-select btn-minus" data-value="-1" type="button" disabled id="button-minus"> - </button>
+                                                            </div>
+                                                            <input type="text" name="quantity" id="quantity" data-min="{{ item.variants[0].minSale }}" data-max="{{ item.variants[0].maxSale }}" readonly class="form-control bg-white text-center" value="{{ item.variants[0].minSale }}">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text bg-white" id="quantity-unit">{{ item.variants[0].packaging.packageUnitName }}</span>
+                                                            </div>
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-light quantity-select btn-plus" data-value="1" type="button" id="button-plus"> + </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-lg-6 pt-4 text-center">
+                                                        <button type="button" class="theme-btn btn-pink add-to-cart mt-3">
+                                                            <span class="btn-title">{{ _('LBL_ADD_TO_CART') }}</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <button type="button" class="theme-btn btn-pink request-offer">
+                                                    <span class="btn-title">{{ _('LBL_REQUEST_OFFER') }}</span>
+                                                </button>
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="alert alert-danger">
+                                                <i class="far fa-info-circle"></i>
+                                                {{ settings.stopSaleText }}
+                                            </div>
+                                        {% endif %}
+
+                                        <ul class="product-meta">
+                                            <li class="posted_in">
+                                                {{ _('LBL_CATEGORY') }}: <a href="{{ item.category.url }}">{{ item.category.name }}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-info-tabs">
+                            <div class="prod-tabs tabs-box">
+                                <ul class="tab-btns tab-buttons clearfix">
+                                    <li data-tab="#prod-details" class="tab-btn active-btn">{{ _('LBL_PROPERTIES') }}</li>
+                                    {% if item.ratings.reviews %}
+                                    <li data-tab="#prod-reviews" class="tab-btn">{{ _('LBL_REVIEWS') }} ({{ item.ratings.reviews }})</li>
+                                    {% endif %}
+                                </ul>
+
+                                <div class="tabs-content">
+                                    <div class="tab active-tab" id="prod-details">
+                                        {% if item.description %}
+                                        <div class="content">
+                                            {{ item.description|raw }}
+                                        </div>
+                                        {% endif %}
+
+                                        <p class="content mt-3">
+                                            {{ _('LBL_PRODUCT_ID') }}: <b>{{ item.id }}</b>
+                                        </p>
+                                        <p class="content{% if not item.variants[0].packaging.weight %} d-none{% endif %}">
+                                            {{ _('LBL_PRODUCT_WEIGHT') }}:
+                                            <span id="weight">{{ item.variants[0].packaging.weight }} {{ item.variants[0].packaging.weightUnitName }}</span>
+                                        </p>
+
+                                        {% if item.properties %}
+                                        <div class="cws_divider mt-4">
+                                            <img src="{{ theme }}images/icons/divider_12.png" alt="">
+                                        </div>
+
+                                        <div class="content mt-3 item-tags">
+                                            <ul>
+                                            {% for tag in item.properties %}
+                                                <li class="mb-2">{% if tag.icon %}<i class="{{ tag.icon }} fa-fw fa-2x mr-2 text-pink" style="vertical-align: middle;"></i>{% endif %}{{ tag.name }}</li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if item.ratings.reviews %}
+                                        {% include 'product-reviews.twig' %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if relatedProducts %}
+                        {% include 'related-products.twig' %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {#
+            <div class="sidebar-side sticky-container col-lg-3 col-md-12 col-sm-12">
+                <aside class="sidebar theiaStickySidebar">
+                    <div class="sticky-sidebar">
+
+                    </div>
+                </aside>
+            </div>
+            #}
+        </div>
+    </div>
+</div>

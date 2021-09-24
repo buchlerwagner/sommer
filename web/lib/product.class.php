@@ -161,11 +161,16 @@ class product extends ancestor {
 					'type' => $row['pimg_mimetype'],
 					'file' => $path . $row['pimg_filename'] . '.' . $row['pimg_extension'],
 					'data' => [
-                        'thumbnail' => $path . $row['pimg_filename'] . '_thumbnail.' . $row['pimg_extension'],
 						'name' => $row['pimg_filename'] . '.' . $row['pimg_extension'],
 						'id' => $row['pimg_id'],
 					]
 				];
+
+                foreach ($GLOBALS['IMAGE_SIZES'] AS $key => $imageSize){
+                    if($key != 'default') {
+                        $img[$i]['data'][$key] = $path . $row['pimg_filename'] . '_' . $key . '.' . $row['pimg_extension'];
+                    }
+                }
 
 				$i++;
 			}
@@ -218,7 +223,7 @@ class product extends ancestor {
 	public function getProductVariants(){
 		$variants = [];
 
-		$sql = "SELECT pv_id, pv_name, pv_price, pv_price_discount, pv_currency, pv_pimg_id
+		$sql = "SELECT *
                     FROM " . DB_NAME_WEB . ".product_variants
     						WHERE pv_prod_id='" . $this->productId . "'
 	    						ORDER BY pv_price, pv_name";
@@ -228,9 +233,10 @@ class product extends ancestor {
             $weightUnits = $this->owner->lists->getWeights();
 
 			foreach ($result AS $row) {
-                $variants[$row['pv_id']] = [
+                $variants[] = [
                     'id' => $row['pv_id'],
                     'imgId' => $row['pv_pimg_id'],
+                    'name' => $row['pv_name'],
                     'price' => [
                         'value' => $row['pv_price'],
                         'discount' => $row['pv_price_discount'],
@@ -243,7 +249,7 @@ class product extends ancestor {
                         'quantity' => $row['pv_pack_quantity'],
                         'packageUnit' => $row['pv_pack_unit'],
                         'packageUnitName' => $packageUnits[$row['pv_pack_unit']],
-                        'weight' => $packageUnits[$row['pv_weight']],
+                        'weight' => $row['pv_weight'],
                         'weightUnit' => $packageUnits[$row['pv_weight_unit']],
                         'weightUnitName' => $weightUnits[$row['pv_weight_unit']],
                     ],
@@ -351,7 +357,7 @@ class product extends ancestor {
                 'quantity' => $row['prod_pack_quantity'],
                 'packageUnit' => $row['prod_pack_unit'],
                 'packageUnitName' => $packageUnits[$row['prod_pack_unit']],
-                'weight' => $packageUnits[$row['prod_weight']],
+                'weight' => $row['prod_weight'],
                 'weightUnit' => $packageUnits[$row['prod_weight_unit']],
                 'weightUnitName' => $weightUnits[$row['prod_weight_unit']],
             ],
@@ -362,11 +368,14 @@ class product extends ancestor {
             'key' => $row['prod_key'],
             'name' => $row['prod_name'],
             'brand' => $row['prod_brand_name'],
+            'intro' => $row['prod_intro'],
             'description' => $row['prod_description'],
+            'available' => $row['prod_available'],
 
             'category' => [
                 'id' => $row['cat_id'],
                 'name' => $row['cat_title'],
+                'image' => ($row['cat_page_img'] ? FOLDER_UPLOAD . $this->shopId . '/products/' . $row['cat_id'] . '/' . $row['cat_page_img'] : false),
                 'url' => '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $row['cat_url'] . '/',
             ],
 
@@ -375,7 +384,7 @@ class product extends ancestor {
                 $variant
             ],
 
-            'thumbnail' => $path . str_replace('.', '_thumbnail.', $row['prod_img']),
+            'thumbnail' => ($row['prod_img'] ? $path . str_replace('.', '_thumbnail.', $row['prod_img']) : false),
             'images' => [
                 0 => $path . $row['prod_img']
             ],

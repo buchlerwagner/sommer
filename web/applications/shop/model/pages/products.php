@@ -2,15 +2,17 @@
 /**
  * @var $this router
  * @var $shop webShop
+ * @var $cart cart
  */
-
-
 
 $shop = $this->addByClassName('webShop');
 $shop->init($this->shopId);
 
+$cart = $this->addByClassName('cart');
+//$cart->init($this->shopId);
+
 $params = $this->getSession('params');
-if(!$params) {
+if(!$params || $_REQUEST['clear']) {
     $params = [
         'filters' => [],
         'sorters' => [],
@@ -28,7 +30,9 @@ if($this->originalPage != $this->page) {
     if ($categoryData = $shop->getCategoryIdByUrl($this->originalPage)) {
         $this->data['category'] = $categoryData;
         $params['filters']['categories'][$categoryData['id']] = $categoryData['id'];
-    }else{
+    }
+}else{
+    if($this->originalPage == 'products' && !Empty($this->params[0])){
         $this->pageRedirect('/' . $GLOBALS['PAGE_NAMES'][$this->language]['products']['name'] . '/');
     }
 }
@@ -39,6 +43,13 @@ if($this->params[0]){
 
     if($this->data['item'] = $shop->getProductDetails((int)$productId)){
         $this->setPageMetaData($this->data['item']);
+
+        $this->data['relatedProducts'] = $shop->getHighlightedProducts($categoryData['id'], $productId, 3);
+
+        $this->view->addCss('magiczoomplus/magiczoomplus.css', 'magiczoom', false, false);
+        $this->view->addJs('magiczoomplus/magiczoomplus.js', 'magiczoom', false, false, false);
+
+        //dd($this->data['relatedProducts']);
     }else{
         $this->addHttpHeader(enumHTTPHeaders::NotFound404());
         $this->page = '404';
@@ -55,7 +66,5 @@ if($this->params[0]){
     $this->setSession('params', $params);
     $this->setPageMetaData($categoryData);
     $this->data['products'] = $shop->getProducts($params);
+    $this->data['tags'] = $shop->getActiveTags($categoryData['id']);
 }
-
-d($this->data['category']);
-dd($this->data['products']);

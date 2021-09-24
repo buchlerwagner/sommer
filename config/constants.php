@@ -146,6 +146,11 @@ $GLOBALS['IMAGE_SIZES'] = [
         'height' => null,
         'crop' => false,
     ],
+    'medium' => [
+        'width'  => 500,
+        'height' => 500,
+        'crop' => true,
+    ],
     'thumbnail' => [
         'width'  => 300,
         'height' => 300,

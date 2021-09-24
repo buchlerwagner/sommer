@@ -88,7 +88,6 @@ class editCategoryForm extends formBuilder {
         }else{
             $this->values['cat_url'] = safeURL($this->values['cat_url']);
         }
-        $this->values['cat_url'] = strtolower($this->values['cat_url']);
 
         if($this->values['removeImg']){
             $this->deleteImage();

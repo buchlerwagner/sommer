@@ -19,6 +19,7 @@ class productsTable extends table {
             'replace' => [
                 'prod_visible' => 0,
                 'prod_available' => 0,
+                'prod_img' => '',
             ]
         ];
 

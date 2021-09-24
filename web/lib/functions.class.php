@@ -1028,6 +1028,7 @@ class functions extends ancestor {
         return $sliders;
     }
 
+    /*
     public function getHighlightedItems(){
         //$items = $this->owner->mem->get(CACHE_HIGHLIGHTS . $this->owner->shopId);
         $items = [];
@@ -1045,4 +1046,5 @@ class functions extends ancestor {
         $items = [];
         return $items;
     }
+    */
 }

@@ -61,11 +61,14 @@ module.exports = function(grunt) {
                     'web/public/vendor/revolution/js/extensions/revolution.extension.slideanims.js',
                     //'web/public/vendor/revolution/js/extensions/revolution.extension.video.js',
 
+                    'web/public/vendor/select2/js/select2.js',
+
                     'web/resources/src/bellaria/main-slider-script.js',
                     'web/resources/src/bellaria/jquery.fancybox.js',
                     'web/resources/src/bellaria/owl.js',
                     'web/resources/src/bellaria/wow.js',
                     'web/resources/src/bellaria/appear.js',
+                    'web/resources/src/bellaria/sticky_sidebar.min.js',
                     'web/resources/src/bellaria/script.js'
                 ],
                 dest: 'web/public/assets/js/bellaria.js'

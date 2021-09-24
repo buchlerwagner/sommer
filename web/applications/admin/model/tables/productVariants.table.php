@@ -10,6 +10,7 @@ class productVariantsTable extends table {
 		$this->header = false;
 		$this->hideCounter = true;
 		$this->subTable = true;
+		$this->copy = true;
 
 		$this->settings['display']    = 25;
 		$this->settings['orderfield'] = 'pv_name';

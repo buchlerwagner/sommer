@@ -114,7 +114,6 @@ class editPageForm extends formBuilder {
         }else{
             $this->values['c_page_url'] = safeURL($this->values['c_page_url']);
         }
-        $this->values['c_page_url'] = strtolower($this->values['c_page_url']);
 
         if(Empty($this->values['c_order'])) $this->values['c_order'] = 0;
         if(Empty($this->values['c_empty_menu'])) $this->values['c_empty_menu'] = 0;

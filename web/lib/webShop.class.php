@@ -48,7 +48,7 @@ class webShop extends ancestor {
 
 	public function getCategoryIdByUrl($url){
         $where = [
-            'cat_url' => $url,
+            'cat_url' => strtolower($url),
             'cat_shop_id' => $this->shopId
         ];
 
@@ -63,6 +63,7 @@ class webShop extends ancestor {
                     'cat_id AS id',
                     'cat_title AS name',
                     'cat_page_title AS pageTitle',
+                    'cat_description AS description',
                     'cat_page_description AS pageDescription',
                     'cat_page_img AS image',
                     'cat_url AS pageUrl'
@@ -122,57 +123,222 @@ class webShop extends ancestor {
 		return $out;
 	}
 
-    public function getActiveTags(){
+    public function getActiveTags($categoryId = false){
+        $out = [];
 
+        $where = [
+            'prod_shop_id' => $this->shopId,
+            'prop_shop_id' => $this->shopId
+        ];
+
+        if($categoryId){
+            $where['prod_cat_id'] = (int)$categoryId;
+        }
+
+        if(!$this->isAdmin){
+            $where['cat_visible'] = 1;
+            $where['prod_visible'] = 1;
+        }
+
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'product_properties',
+                [
+                    'DISTINCT(prop_id) AS id',
+                    'prop_name AS name',
+                    'prop_icon AS icon',
+                ],
+                $where,
+                [
+                    'properties' => [
+                        'on' => [
+                            'prop_id' => 'pp_prop_id'
+                        ]
+                    ],
+                    'products' => [
+                        'on' => [
+                            'prod_id' => 'pp_prod_id'
+                        ]
+                    ],
+                    'product_categories' => [
+                        'on' => [
+                            'cat_id' => 'prod_cat_id'
+                        ]
+                    ],
+                ],
+                false,
+                'prop_name'
+            )
+        );
+
+        if($result){
+            foreach($result AS $row){
+                $out[$row['id']] = $row;
+            }
+        }
+
+        return $out;
     }
 
-	public function getHighlightedProducts(){
+	public function getHighlightedProducts($categoryId = false, $exclude = [], $limit = 5, $random = true){
 		$out = [];
-		$sql = "SELECT prod_id, prod_shop_id, prod_name, prod_url, prod_price, prod_currency, prod_price_discount, prod_brand_name, prod_img, prod_variants, cat_name, cat_id, cat_url FROM " . DB_NAME_WEB . ".products 
-					LEFT JOIN " . DB_NAME_WEB . ".categories ON (prod_cat_id = cat_id) 
-						WHERE prod_highlight = 1 AND prod_visible = 1 AND prod_shop_id = " . $this->shopId . "
-							ORDER BY prod_price, prod_name";
-		$result = $this->owner->db->getRows($sql);
-		if($result){
-			foreach($result AS $row){
-				$price = [];
 
-				if($row['prod_variants']){
-					$variants = $this->product->setProductId($row['prod_id'])->getProductVariants();
-					if($variants){
-						foreach ($variants as $variant) {
-							$price = $variant['price'];
-							break;
-						}
-					}
-				}else{
-					$price = [
-						'value' => $row['prod_price'],
-						'compared' => $row['prod_price_compare'],
-						'currency' => $row['prod_currency'],
-					];
-				}
+        $where = [
+            'prod_shop_id' => $this->shopId,
+            'prod_highlight' => 1,
+        ];
 
-				$out[$row['prod_id']] = [
-					'id' => $row['prod_id'],
-					'name' => $row['prod_name'],
-					'brand' => $row['prod_brand_name'],
-					//'url' => '/item/' . $row['prod_id'] . '/' . $row['prod_url'],
-					'price' => $price,
-					'category' => [
-						'id' => $row['cat_id'],
-						'name' => $row['cat_name'],
-					],
-					'shop' => [
-						'id' => $row['prod_shop_id']
-					]
-				];
-			}
-		}
+        if($exclude) {
+            if (!is_array($exclude)) {
+                $exclude = [$exclude];
+            }
+
+            $where['prod_id'] = [
+                'notin' => $exclude
+            ];
+        }
+
+        if($categoryId){
+            $where['prod_cat_id'] = (int)$categoryId;
+        }
+
+        if(!$this->isAdmin){
+            $where['cat_visible'] = 1;
+            $where['prod_visible'] = 1;
+        }
+
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'products',
+                [
+                    'prod_id',
+                    'prod_key',
+                    'prod_shop_id',
+                    'prod_cat_id',
+                    'prod_name',
+                    'prod_url',
+                    'prod_price',
+                    'prod_currency',
+                    'prod_price_discount',
+                    'prod_brand_name',
+                    'prod_img',
+                    'prod_variants',
+                    'prod_available',
+                    'prod_stock',
+                    'prod_pack_quantity',
+                    'prod_pack_unit',
+                    'prod_weight',
+                    'prod_weight_unit',
+                    'cat_id',
+                    'cat_title',
+                    'cat_url',
+                ],
+                $where,
+                [
+                    'product_categories' => [
+                        'on' => [
+                            'cat_id' => 'prod_cat_id'
+                        ]
+                    ],
+                ],
+                false,
+                ($random ? 'RAND()' : ''),
+                ($limit ?: false)
+            )
+        );
+
+        if($result){
+            foreach($result AS $row){
+                $out[$row['prod_id']] = $this->product->init($row['prod_id'])->buildItem($row);
+                if($out[$row['prod_id']]['hasVariants']){
+                    $out[$row['prod_id']]['variants'] = $this->product->getProductVariants();
+                }
+            }
+        }
+
 		return $out;
 	}
 
-	public function getProducts($params) {
+    public function getPopularProducts($categoryId = false, $minViews = 10, $exclude = [], $limit = 5, $random = true) {
+        $out = [];
+
+        $where = [
+            'prod_shop_id' => $this->shopId,
+            'prod_views >' => $minViews,
+        ];
+
+        if($exclude) {
+            if (!is_array($exclude)) {
+                $exclude = [$exclude];
+            }
+
+            $where['prod_id'] = [
+                'notin' => $exclude
+            ];
+        }
+
+        if($categoryId){
+            $where['prod_cat_id'] = (int)$categoryId;
+        }
+
+        if(!$this->isAdmin){
+            $where['cat_visible'] = 1;
+            $where['prod_visible'] = 1;
+        }
+
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'products',
+                [
+                    'prod_id',
+                    'prod_key',
+                    'prod_shop_id',
+                    'prod_cat_id',
+                    'prod_name',
+                    'prod_url',
+                    'prod_price',
+                    'prod_currency',
+                    'prod_price_discount',
+                    'prod_brand_name',
+                    'prod_img',
+                    'prod_variants',
+                    'prod_available',
+                    'prod_stock',
+                    'prod_pack_quantity',
+                    'prod_pack_unit',
+                    'prod_weight',
+                    'prod_weight_unit',
+                    'cat_id',
+                    'cat_title',
+                    'cat_url',
+                ],
+                $where,
+                [
+                    'product_categories' => [
+                        'on' => [
+                            'cat_id' => 'prod_cat_id'
+                        ]
+                    ],
+                ],
+                false,
+                ($random ? 'RAND()' : ''),
+                ($limit ?: false)
+            )
+        );
+
+        if($result){
+            foreach($result AS $row){
+                $out[$row['prod_id']] = $this->product->init($row['prod_id'])->buildItem($row);
+                if($out[$row['prod_id']]['hasVariants']){
+                    $out[$row['prod_id']]['variants'] = $this->product->getProductVariants();
+                }
+            }
+        }
+
+        return $out;
+    }
+
+    public function getProducts($params) {
 		$out = [
 			'filters' => $this->getFilters($params['filters']),
 			'items' => [],
@@ -185,7 +351,6 @@ class webShop extends ancestor {
 			'prod_shop_id',
 			'prod_cat_id',
 			'prod_name',
-			//'prod_description',
 			'prod_url',
 			'prod_price',
 			'prod_currency',
@@ -193,6 +358,7 @@ class webShop extends ancestor {
 			'prod_brand_name',
 			'prod_img',
 			'prod_variants',
+			'prod_available',
 			'prod_stock',
 			'prod_pack_quantity',
 			'prod_pack_unit',
@@ -292,6 +458,7 @@ class webShop extends ancestor {
         if(!$this->isAdmin) {
             $where[] = 'prod_visible = 1';
         }
+
 		$where[] = 'prod_archived = 0';
 		$where[] = 'prod_shop_id = ' . $this->shopId;
 
@@ -319,7 +486,7 @@ class webShop extends ancestor {
 						prod_name LIKE "%' . $text . '%" OR 
 						prod_brand_name LIKE "%' . $text . '%" OR 
 						prod_description LIKE "%' . $text . '%" OR 
-						prod_code LIKE "%' . $text . '%"
+						prod_code LIKE "%' . $text . '%" OR
 						prod_id LIKE "%' . $text . '%"
 					)';
 				}

@@ -54,3 +54,19 @@
   color: $white !important;
   text-decoration: underline;
 }
+
+.btn-light {
+  border-color: #ced4da !important;
+}
+
+#quantity {
+  border-right: none !important;
+}
+
+.item-tags {
+  font-size: 17px;
+}
+
+.text-pink {
+  color: $pink;
+}

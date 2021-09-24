@@ -1,3 +1,67 @@
-products
+{% import "tools.twig" as tools %}
+<section class="page-title" style="background-image:url({% if category.pageImage.relative %}{{ category.pageImage.relative }}{% else %}{{ theme }}images/backgrounds/34.jpg{% endif %})">
+    <div class="auto-container">
+        <h1>{% if category %}{{ category.name }}{% else %}{{ _('LBL_OUR_PRODUCTS') }}{% endif %}</h1>
+    </div>
+</section>
 
-{{ _d(category) }}
+{% if category.description %}
+<section class="content-elements">
+    <div class="auto-container">
+        <div class="mt-5 mb-3">
+        {{ category.description|raw }}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<form action="." method="post" name="frmProducts" id="product-filter">
+<div class="sidebar-page-container">
+    <div class="auto-container">
+        <div class="row clearfix">
+            {% if products %}
+                <div class="content-side col-lg-9 col-md-12 col-sm-12">
+                    <div class="our-shop">
+                        <div class="shop-upper-box clearfix">
+                            <div id="result-label" class="items-label">{{ _('LBL_PRODUCT_LIST_RESULT', products.pager.items) }}</div>
+                            <div class="orderby">
+                                <select name="orderby" class="sortby-select select2-offscreen" data-minimum-results-for-search="Infinity">
+                                    {#
+                                    <option value="popularity">Sort by popularity</option>
+                                    <option value="rating" >Sort by average rating</option>
+                                    <option value="date" >Sort by newness</option>
+                                    #}
+                                    <option value="price">{{ _('LBL_SORT_BY_PRICE_AZ') }}</option>
+                                    <option value="price-desc">{{ _('LBL_SORT_BY_PRICE_ZA') }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="product-list" class="row clearfix">
+                            {% for id, item in products.items %}
+                                {{ tools.productItem(item, settings.stopSale, not category.id, _context) }}
+                            {% endfor %}
+                        </div>
+
+                        {% if products.pager.totalpages > 1 %}
+                            <div class="pager">
+                                {{ tools.pager(products.pager) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="sidebar-side sticky-container col-lg-3 col-md-12 col-sm-12">
+                    {% include 'filters.twig' %}
+                </div>
+
+            {% else %}
+                <div class="message-box with-icon warning">
+                    <div class="icon-box"><span class="icon fa fa-exclamation"></span></div>
+                    <p>{{ _('LBL_NO_PRODUCTS') }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</form>

@@ -20,11 +20,11 @@
         {{ h|raw }}
     {% endfor %}
 {% endif %}
-{% if description is not empty %}
-        <meta name="description" content="{{ description }}">
+{% if pageDescription is not empty %}
+        <meta name="description" content="{{ pageDescription }}">
 {% endif %}
-{% if keywords is not empty %}
-        <meta name="keywords" content="{{ keywords }}">
+{% if pageKeyWords is not empty %}
+        <meta name="keywords" content="{{ pageKeyWords }}">
 {% endif %}
 
 {% for file in css.files %}

@@ -292,16 +292,16 @@ class router extends model {
 	}
 
     private function findRealMenuKey($menu, $needle){
-        $page = $needle;
+        $page = strtolower($needle);
 
-        foreach($menu AS $key => $menu){
-            if($menu['name'] == $needle){
+        foreach($menu AS $key => $m){
+            if($m['name'] == $needle){
                 $page = $key;
                 break;
             }
 
-            if(!Empty($menu['items'])){
-                $page = $this->findRealMenuKey($menu['items'], $needle);
+            if(!Empty($m['items'])){
+                $page = $this->findRealMenuKey($m['items'], $needle);
             }
         }
 

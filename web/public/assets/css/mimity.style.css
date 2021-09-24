@@ -16657,4 +16657,181 @@ Sizes
   transform: translate(-50%, -50%);
 }
 
+/*
+      www.OnlineWebFonts.Com 
+      You must credit the author Copy this link on your web 
+      <div>Font made from <a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>is licensed by CC BY 3.0</div>
+      OR
+      <a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>
+*/
+@font-face {
+  font-family: "foodfonts";
+  src: url("../fonts/food-fonts.eot");
+  src: url("../fonts/food-fonts.eot?#iefix") format("embedded-opentype"), url("../fonts/food-fonts.woff2") format("woff2"), url("../fonts/food-fonts.woff") format("woff"), url("../fonts/food-fonts.ttf") format("truetype"), url("../fonts/food-fonts.svg#onlinewebfonts") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+[class^=i-]:before, [class*=" i-"]:before {
+  font-family: "foodfonts";
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+.i-corn:before {
+  content: "";
+}
+
+.i-corn-2:before {
+  content: "";
+}
+
+.i-crustacean:before {
+  content: "";
+}
+
+.i-crustacean-4:before {
+  content: "";
+}
+
+.i-dairy:before {
+  content: "";
+}
+
+.i-dairy-6:before {
+  content: "";
+}
+
+.i-egg:before {
+  content: "";
+}
+
+.i-egg-8:before {
+  content: "";
+}
+
+.i-fish:before {
+  content: "";
+}
+
+.i-fish-10:before {
+  content: "";
+}
+
+.i-gluten:before {
+  content: "";
+}
+
+.i-gluten-12:before {
+  content: "";
+}
+
+.i-gluten-13:before {
+  content: "";
+}
+
+.i-gmo:before {
+  content: "";
+}
+
+.i-gmo-free:before {
+  content: "";
+}
+
+.i-halal:before {
+  content: "";
+}
+
+.i-kosher:before {
+  content: "";
+}
+
+.i-kosher-k:before {
+  content: "";
+}
+
+.i-lupin:before {
+  content: "";
+}
+
+.i-lupins:before {
+  content: "";
+}
+
+.i-meat:before {
+  content: "";
+}
+
+.i-meat-22:before {
+  content: "";
+}
+
+.i-mustard:before {
+  content: "";
+}
+
+.i-mustard-24:before {
+  content: "";
+}
+
+.i-nuts:before {
+  content: "";
+}
+
+.i-nuts-free:before {
+  content: "";
+}
+
+.i-organic:before {
+  content: "";
+}
+
+.i-peanut:before {
+  content: "";
+}
+
+.i-peanuts:before {
+  content: "";
+}
+
+.i-shellfish:before {
+  content: "";
+}
+
+.i-shellfish-31:before {
+  content: "";
+}
+
+.i-soy:before {
+  content: "";
+}
+
+.i-soy-33:before {
+  content: "";
+}
+
+.i-sugar:before {
+  content: "";
+}
+
+.i-sugar-35:before {
+  content: "";
+}
+
+.i-trans-fat:before {
+  content: "";
+}
+
+.i-trans-fat-37:before {
+  content: "";
+}
+
+.i-vegan:before {
+  content: "";
+}
+
 /*# sourceMappingURL=mimity.style.css.map */

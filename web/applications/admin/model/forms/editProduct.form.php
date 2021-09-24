@@ -17,6 +17,8 @@ class editProductForm extends formBuilder {
         $this->title = 'LBL_EDIT_PRODUCT';
 		$this->dbTable = 'products';
 
+        $url = $GLOBALS['HOSTS'][$this->owner->host]['publicUrl'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-';
+
         $general = (new groupFieldset('general'))->addElements(
             (new inputSelect('prod_cat_id', 'LBL_CATEGORY'))
                 ->makeSelectPicker()
@@ -24,7 +26,11 @@ class editProductForm extends formBuilder {
                 ->setRequired(),
             (new inputText('prod_name', 'LBL_PRODUCT_TITLE'))
                 ->setRequired(),
-            (new inputText('prod_brand_name', 'LBL_PRODUCT_BRAND_NAME'))
+            (new inputText('prod_brand_name', 'LBL_PRODUCT_BRAND_NAME')),
+            (new link('preview', 'LBL_PREVIEW_PRODUCT', $url ))
+                ->setGroupClass('mb-0')
+                ->setTarget('_blank')
+                ->setIcon('fas fa-eye')
         );
 
         $pricing = (new groupFieldset('pricing', ''))->addElements(
@@ -114,10 +120,12 @@ class editProductForm extends formBuilder {
             ->addElements($pricing, $variations);
 
 
-        $tabDescription = (new sectionBox('description', 'LBL_PRODUCT_DESCRIPTION', 'far fa-book-open'))
+        $tabDescription = (new sectionBox('description', 'LBL_DESCRIPTIONS', 'far fa-book-open'))
             ->addClass('col-12 col-lg-8')
             ->addElements(
-                new inputEditor('prod_description')
+                (new inputTextarea('prod_intro', 'LBL_PRODUCT_INTRO'))
+                    ->setRows(3),
+                new inputEditor('prod_description', 'LBL_PRODUCT_DESCRIPTION')
             );
 
         $tabProperties = (new sectionBox('properties', 'LBL_PRODUCT_PROPERTIES', 'far fa-tags'))
@@ -161,7 +169,7 @@ class editProductForm extends formBuilder {
                 (new inputText('prod_page_title', 'LBL_PAGE_TITLE')),
                 (new inputTextarea('prod_page_description', 'LBL_PAGE_DESCRIPTION')),
                 (new inputText('prod_url', 'LBL_PAGE_URL'))
-                    ->setPrepend('https://' . HOST_CLIENTS . '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-')
+                    ->setPrepend($url)
         );
 
         $this->addSections($tabGeneral, $tabPricing, $tabDescription, $tabProperties, $tabImages, $tabSeo);
@@ -210,6 +218,9 @@ class editProductForm extends formBuilder {
         $units = $this->owner->lists->getUnits();
         $this->getControl('prod_min_sale')->setAppend($units[$this->values['prod_pack_unit']]);
         $this->getControl('prod_max_sale')->setAppend($units[$this->values['prod_pack_unit']]);
+
+        $url = $GLOBALS['HOSTS'][$this->owner->host]['publicUrl'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-' . $this->values['prod_url'] . '?show=all';
+        $this->getControl('preview')->setUrl($url);
     }
 
     public function onAfterInit() {
@@ -224,8 +235,6 @@ class editProductForm extends formBuilder {
         }else{
             $this->values['prod_url'] = safeURL($this->values['prod_url']);
         }
-
-        $this->values['prod_url'] = strtolower($this->values['prod_url']);
 
         if(!Empty($this->values['prod_properties'])){
             $this->product->setProperties($this->values['prod_properties']);

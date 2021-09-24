@@ -658,7 +658,7 @@ function safeURL($link){
 	$pattern = '/[^0-9a-zA-Z- _]/';
 	$link = preg_replace($pattern, '', $link);
 
-	$link = trim($link);
+	$link = strtolower(trim($link));
 
 	//changing _ and space to -
 	$pattern = '/[_ ]/';
