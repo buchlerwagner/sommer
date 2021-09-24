@@ -325,8 +325,8 @@ class email extends ancestor {
 
 	private function getEmailSender(){
 		$result = [
-			'name'  => ($GLOBALS['HOSTS'][$this->owner->host]['emails']['default']['name'] ?: EMAIL_SENDER_NAME),
-			'email' => ($GLOBALS['HOSTS'][$this->owner->host]['emails']['default']['address'] ?:  EMAIL_SENDER_EMAIL),
+			'name'  => ($this->owner->settings['emailSenderName'] ?: EMAIL_SENDER_NAME),
+			'email' => ($this->owner->settings['outgoingEmail'] ?:  EMAIL_SENDER_EMAIL),
 		];
 
 		return $result;
