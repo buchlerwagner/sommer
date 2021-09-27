@@ -18,6 +18,14 @@ class addCategoryForm extends formBuilder {
                     ->setColSize('col-12 col-lg-3')
                     ->addClass('text-right')
                     ->onlyNumbers()
+            ),
+            (new inputSwitch('cat_smart', 'LBL_COLLECT_BY_TAGS'))
+                ->changeState(1, enumChangeAction::Show(), '#smart')
+                ->changeDefaultState(enumChangeAction::Hide(), '#smart'),
+            (new groupFieldset('smart'))->addElements(
+                (new inputCheckGroup('cat_tags', 'LBL_TAGS'))
+                    ->setColor(enumColors::Primary())
+                    ->setOptions($this->owner->lists->getProperties())
             )
         );
 
