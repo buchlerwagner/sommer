@@ -1,5 +1,4 @@
 <?php
-
 // directories
 const DIR_WEB               = '/var/www/sommer-cukraszda.hu/web/';
 const DIR_CACHE             = '/var/www/sommer-cukraszda.hu/cache/';
@@ -31,7 +30,6 @@ const AUTH_PWD              = '';
 
 const DEBUG_ON              = false;
 const TWIG_CACHE_ENABLED    = false;
-const RELOAD_DICTIONARY     = true;
 const IMG_CACHE_ENABLED     = false;
 
 const EMAIL_SENDER_NAME     = 'sommer-cukraszda.hu';
@@ -45,11 +43,11 @@ const EMAIL_SMTP_HOST       = 'smtp.gmail.com';
 
 // default environment values
 const DEFAULT_HOST          = 'sommer-cukraszda.hu';
+const DEFAULT_APPLICATION   = 'admin';
+const DEFAULT_THEME         = 'mimity';
 const DEFAULT_COUNTRY       = 'HU';
 const DEFAULT_LANGUAGE      = 'hu';
+const DEFAULT_CURRENCY      = 'HUF';
 const SESSION_ON_SUBDOMAINS = true;
 
 const IPAPI_KEY             = '20966a71b200633664995f6b35b7e081';
-
-const HOST_ADMIN            = 'admin.sommer-cukraszda.hu';
-const HOST_CLIENTS          = 'sommer-cukraszda.hu';

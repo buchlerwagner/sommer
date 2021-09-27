@@ -66,7 +66,9 @@ class webShop extends ancestor {
                     'cat_description AS description',
                     'cat_page_description AS pageDescription',
                     'cat_page_img AS image',
-                    'cat_url AS pageUrl'
+                    'cat_url AS pageUrl',
+                    'cat_smart AS isSmart',
+                    'cat_tags AS tags',
                 ],
                 $where
             )
@@ -75,6 +77,12 @@ class webShop extends ancestor {
         if($cat['image']){
             $cat['pageImage']['relative'] = FOLDER_UPLOAD . $this->shopId . '/products/' . $cat['id'] . '/' . $cat['image'];
             $cat['pageImage']['absolute'] = 'https://' . $this->owner->host . $cat['pageImage']['relative'];
+        }
+
+        if($cat['isSmart']){
+            $cat['tags'] = explode('|', trim($cat['tags'], '|'));
+        }else{
+            $cat['tags'] = false;
         }
 
         if($cat['pageUrl']){

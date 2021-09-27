@@ -3,7 +3,7 @@ class myProfileForm extends form {
 	public function setup() {
 		$this->dbTable = DB_NAME_WEB . '.users';
 		$this->keyFields['us_id'] = $this->owner->user->id;
-		$this->owner->view->setPageTitle('LBL_EDIT_PROFILE');
+		$this->owner->setPageTitle('LBL_EDIT_PROFILE');
 		$this->displayErrors = true;
         $this->boxed = false;
 
@@ -29,7 +29,7 @@ class myProfileForm extends form {
                         'name'    => 'us_title',
                         'label'   => 'LBL_PERSON_TITLE',
                         'class'   => 'col-4',
-                        'options' => $this->owner->lib->getList('titles'),
+                        'options' => $this->owner->lists->getTitles(),
                         'default' => 'MR',
                         'col'     => 12,
                     ],
@@ -160,7 +160,7 @@ class myProfileForm extends form {
                         'label'   => 'LBL_COUNTRY',
                         'class'   => 'col-6',
                         'default' => 'HU',
-                        'options' => $this->owner->lib->getList('countries'),
+                        'options' => $this->owner->lists->getCountries(),
                         'col'     => 12,
                     ],
                     1 => [
@@ -201,8 +201,8 @@ class myProfileForm extends form {
                         'type'    => 'select',
                         'name'    => 'us_timezone',
                         //'label'   => 'LBL_TIMEZONE',
-                        'options' => $this->owner->lib->getList('timezone'),
-                        'default' => $GLOBALS['HOSTS'][$this->owner->host]['timezone'],
+                        'options' => $this->owner->lists->getTimeZones(),
+                        'default' => $this->owner->hostConfig['timeZoneId'],
                         'col'     => 12,
                         'class'   => 'selectpicker show-tick col-12 col-lg-6',
                         'data' => [

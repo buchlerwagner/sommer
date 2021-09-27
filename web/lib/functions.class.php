@@ -15,23 +15,6 @@ class functions extends ancestor {
 		$orderByListValue = false;
 
 		switch($name) {
-			case 'timezone':
-				$list[0] = '---';
-				$sql = "SELECT tz_id as list_key, tz_name as list_value FROM " . DB_NAME_WEB . ".timezones";
-				break;
-			case 'language':
-				$list = $GLOBALS['HOSTS'][$this->owner->host]['languages'];
-				break;
-			case 'currency':
-				$list = $GLOBALS['HOSTS'][$this->owner->host]['currencies'];
-				break;
-			case 'notifications':
-				$list = $GLOBALS['NOTIFICATIONS'];
-				break;
-			case 'titles':
-				$list = array_combine($GLOBALS['PERSONAL_TITLES'], $GLOBALS['PERSONAL_TITLES']);
-				if ($params['empty']) $list = [0 => '---'] + $list;
-				break;
 			case 'userGroups':
 				$translate = false;
 				if ($params['empty']) $list = [0 => '---'] + $list;
@@ -71,10 +54,6 @@ class functions extends ancestor {
 					}
 					$level++;
 				}
-				break;
-			case 'countries':
-				if($params['empty']) $list[0] = '---';
-				$sql = "SELECT country_code as list_key, IFNULL(country_name_" . $this->owner->language . ", country_name_en) as list_value FROM " . DB_NAME_WEB . ".countries ORDER BY list_value ASC";
 				break;
 
 			case 'users':

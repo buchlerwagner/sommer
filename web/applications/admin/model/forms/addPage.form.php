@@ -18,7 +18,7 @@ class addPageForm extends formBuilder {
             (new inputText('c_title', 'LBL_PAGE_TITLE'))
                 ->setRequired(),
             (new inputText('c_page_url', 'LBL_PAGE_URL'))
-                ->setPrepend('https://' . HOST_CLIENTS . '/'),
+                ->setPrepend($this->owner->hostConfig['publicSite']),
             (new groupRow('row1'))->addElements(
                 (new inputSelect('c_widget', 'LBL_SPECIAL_PAGE_CONTENT', 'null'))
                     ->setColSize('col-12')

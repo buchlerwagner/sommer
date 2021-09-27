@@ -64,7 +64,7 @@ class editPageForm extends formBuilder {
                     (new inputText('c_page_title', 'LBL_PAGE_TITLE')),
                     (new inputTextarea('c_page_description', 'LBL_PAGE_DESCRIPTION')),
                     (new inputText('c_page_url', 'LBL_PAGE_URL'))
-                        ->setPrepend('https://' . HOST_CLIENTS . '/'),
+                        ->setPrepend($this->owner->hostConfig['publicSite']),
                     (new inputFile('upload_file', 'LBL_IMAGE'))
                         ->addData('max-file-size', 10240)
                         ->addData('theme', 'fas')
@@ -203,7 +203,7 @@ class editPageForm extends formBuilder {
                 $this->parentURL = $res['c_page_url'];
 
                 $this->getControl('c_page_url')
-                    ->setPrepend('https://' . HOST_CLIENTS . '/' . $this->parentURL . '/');
+                    ->setPrepend($this->owner->hostConfig['publicSite']);
             }
         }
     }

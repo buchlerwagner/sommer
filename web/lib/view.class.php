@@ -39,9 +39,9 @@ class view extends ancestor {
 		$this->common = [
 			'domain'        => $this->owner->domain,
 			'host'        	=> $this->owner->host,
-			'languages'     => $GLOBALS['HOSTS'][$this->owner->host]['languages'],
-			'currencies'    => $GLOBALS['HOSTS'][$this->owner->host]['currencies'],
-			'language'      => $this->owner->language,
+            'language'      => $this->owner->language,
+            'languages'     => $this->owner->lists->getLanguages(),
+            'currencies'    => $this->owner->lists->getCurrencies(),
 			'menu'          => $this->owner->lib->getAccessibleMenu($this->owner->menu),
 			'params'        => $this->owner->params,
 			'user'          => $this->owner->user->getUser(),
@@ -51,7 +51,7 @@ class view extends ancestor {
 			'theme'  		=> '/themes/' . $this->owner->theme . '/',
 			'uploads'  		=> FOLDER_UPLOAD . $this->owner->shopId . '/',
 			'production'  	=> (SERVER_ID == 'development' ? false : true),
-			'sitedata'  	=> $GLOBALS['HOSTS'][$this->owner->host]['sitedata'],
+			//'sitedata'  	=> $GLOBALS['HOSTS'][$this->owner->host]['sitedata'],
 			'settings'  	=> $this->owner->settings,
 			'cart'  	    => $this->owner->cart,
 		];
@@ -142,7 +142,8 @@ class view extends ancestor {
 		if($this->owner->page != 'ajax'){
 			$headerData = [
 				'title'         => $this->owner->data['pageTitle'],
-				'pageDescription'   => $this->owner->data['pageDescription'],
+				'siteName'      => $this->owner->hostConfig['name'],
+				'pageDescription' => $this->owner->data['pageDescription'],
 				'pageKeyWords'  => $this->owner->data['pageKeyWords'],
 				'language'      => $this->owner->language,
 				'css'           => $this->css,
@@ -302,9 +303,4 @@ class view extends ancestor {
 			array_push($this->headers, $header);
 		}
 	}
-
-	public function setPageTitle($title){
-		$this->owner->data['pageTitle'] = $title;
-	}
-
 }

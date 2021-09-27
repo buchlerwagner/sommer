@@ -24,10 +24,11 @@ class router extends model {
 
 	public $sessionId;
 	public $shopId = 0;
-	public $language = DEFAULT_LANGUAGE;
+	public $language;
 	public $machineId;
-	public $currency = 'HUF';
-	public $currencySign = 'Ft';
+	public $currency;
+	public $currencySign;
+	public $hostConfig = [];
 	public $settings = false;
 
 	/**
@@ -99,27 +100,7 @@ class router extends model {
 		$this->user = $this->addByClassName('user');
 		$this->email = $this->addByClassName('email');
 
-		$protocol = 'http://';
-		if(!Empty($_SERVER['HTTPS']) AND $_SERVER['HTTPS'] !== 'off' OR $_SERVER['SERVER_PORT'] == 443) {
-			$protocol = 'https://';
-		}
-		if($_SERVER['HTTP_HOST']){
-            $this->host = $_SERVER['HTTP_HOST'];
-		}else{
-            $this->host = DEFAULT_HOST;
-		}
-
-		$this->domain = $protocol . $this->host . '/';
-
-		if(isset($GLOBALS['HOSTS'][$this->host])){
-			$this->shopId = $GLOBALS['HOSTS'][$this->host]['shopId'];
-			$this->language = $GLOBALS['HOSTS'][$this->host]['language'];
-			$this->application = $GLOBALS['HOSTS'][$this->host]['application'];
-			$this->theme = $GLOBALS['HOSTS'][$this->host]['sitedata']['theme']['name'];
-			$this->currency = $GLOBALS['HOSTS'][$this->host]['currency'];
-			$this->currencySign = $GLOBALS['HOSTS'][$this->host]['currencies'][$this->currency];
-			$this->settings = $this->lib->getWebShopSettings();
-		}
+        $this->setHost($_SERVER['HTTP_HOST']);
 
         if(SESSION_ON_SUBDOMAINS) {
             if(substr_count($this->host, '.') > 1) {
@@ -134,6 +115,77 @@ class router extends model {
 
 		define('APP_ROOT', DOC_ROOT . 'web/applications/' . $this->application . '/');
 	}
+
+    private function setHost($host){
+        if($this->hostConfig = $this->getHostConfig($host)){
+            $this->host = $this->hostConfig['host'];
+
+            $this->shopId = $this->hostConfig['shopId'];
+            $this->language = $this->hostConfig['defaultLanguage'];
+            $this->application = $this->hostConfig['application'];
+            $this->theme = $this->hostConfig['theme'];
+            $this->currency = $this->hostConfig['defaultCurrency'];
+            $this->settings = $this->lib->getWebShopSettings();
+        }else{
+            $this->shopId = 1;
+            $this->host = DEFAULT_HOST;
+            $this->host = DEFAULT_HOST;
+            $this->language = DEFAULT_LANGUAGE;
+            $this->application = DEFAULT_APPLICATION;
+            $this->theme = DEFAULT_THEME;
+            $this->currency = DEFAULT_CURRENCY;
+            $this->settings = [];
+        }
+
+        $this->currencySign = $GLOBALS['CURRENCIES'][$this->currency]['sign'];
+
+        $protocol = 'http://';
+        if(!Empty($_SERVER['HTTPS']) AND $_SERVER['HTTPS'] !== 'off' OR $_SERVER['SERVER_PORT'] == 443) {
+            $protocol = 'https://';
+        }
+
+        $this->domain = $protocol . $this->host . '/';
+    }
+
+    private function getHostConfig($host){
+        $host = strtolower(trim($host));
+
+        $config = $this->mem->get(HOST_SETTINGS . $host);
+        if(!$config){
+            $h = $this->db->getFirstRow(
+                $this->db->genSQLSelect(
+                    'hosts',
+                    [],
+                    [
+                        'host_host' => $host
+                    ]
+                )
+            );
+            if($h){
+                $config = [
+                    'shopId' => (int) $h['host_shop_id'],
+                    'host' => $h['host_host'],
+                    'name' => $h['host_name'],
+                    'forceSSL' => ($h['host_force_ssl']),
+                    'defaultLanguage' => $h['host_default_language'],
+                    'languages' => explode('|', trim($h['host_languages'], '|')),
+                    'application' => $h['host_application'],
+                    'theme' => $h['host_theme'],
+                    'defaultCurrency' => $h['host_default_currency'],
+                    'currencies' => explode('|', trim($h['host_currencies'], '|')),
+                    'timeZoneID' => $h['host_timezone'],
+                    'country' => $h['host_country'],
+                    'publicSite' => rtrim($h['host_public_site'], '/') . '/',
+                    'defaultEmail' => $h['host_default_email'],
+                    'production' => ($h['host_production']),
+                ];
+
+                $this->mem->set(HOST_SETTINGS . $host, $config);
+            }
+        }
+
+        return $config;
+    }
 
 	public function init(){
 		session_start();
@@ -156,18 +208,10 @@ class router extends model {
                 if (!empty($this->menu['login']['layout'])) {
                     $this->layout = $this->menu['login']['layout'];
                 }
-            }elseif($this->application == 'shop'){
-                /**
-                 * @var $cart cart
-                 */
-                $this->cart = $this->addByClassName('cart');
-                $this->cart->init(false, false);
-
-                //$fbLogin = $this->user->getFBLoginUrl();
             }
 		}
 
-		$this->setLanguage();
+        $this->setLanguage();
 		$this->translate = $this->addByClassName('translate');
 		$this->translate->init($this->context);
 		$this->parseUrl();
@@ -176,12 +220,23 @@ class router extends model {
 			$this->view = $this->addByClassName('view');
 		}
 
-		if($this->user->getUser() && $this->user->getUser()['force_pwchange'] && $this->page != 'logout'){
+        if($this->application == 'shop'){
+            /**
+             * @var $cart cart
+             */
+            $this->cart = $this->addByClassName('cart');
+            $this->cart->init(false, false);
+            //$fbLogin = $this->user->getFBLoginUrl();
+        }
+
+        /*
+        if($this->user->getUser() && $this->user->getUser()['force_pwchange'] && $this->page != 'logout'){
 			if (!empty($this->user->getUser()['force_pwchange'])) {
 				$this->addMessage('warning', 'LBL_PASSWORD_CHANGE_NEEDED', 'LBL_PASSWORD_CHANGE_NEEDED');
 			}
 			$this->page = 'change-pwd';
 		}
+        */
 
 		$this->view->init();
 		if ($this->page == 'ajax') {

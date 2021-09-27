@@ -1300,5 +1300,5 @@ function isAssociativeArray($array) {
 }
 
 function decodeCurrencyCode($currency){
-    return $GLOBALS['HOSTS'][HOST_ADMIN]['currencies'][$currency];
+    return $GLOBALS['CURRENCIES'][$currency];
 }

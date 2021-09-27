@@ -671,15 +671,15 @@ class user extends ancestor {
 
     public function getFBLoginUrl($redirect = false){
         $url = false;
-        if($GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['appid']){
+        if($this->owner->settings['facebookAppId']){
             if(!$redirect){
                 $redirect = $this->owner->domain . 'oauth/login/';
             }
 
             $fb = new Facebook\Facebook([
-                'app_id' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['appid'],
-                'app_secret' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['secret'],
-                'default_graph_version' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['version'],
+                'app_id' => $this->owner->settings['facebookAppId'],
+                'app_secret' => $this->owner->settings['facebookSecret'],
+                'default_graph_version' => $this->owner->settings['facebookVersion'],
             ]);
 
             $helper = $fb->getRedirectLoginHelper();
@@ -695,11 +695,11 @@ class user extends ancestor {
         $error = false;
         $img = '';
 
-        if($GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['appid']) {
+        if($this->owner->settings['facebookAppId']){
             $fb = new Facebook\Facebook([
-                'app_id' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['appid'],
-                'app_secret' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['secret'],
-                'default_graph_version' => $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['facebook']['version'],
+                'app_id' => $this->owner->settings['facebookAppId'],
+                'app_secret' => $this->owner->settings['facebookSecret'],
+                'default_graph_version' => $this->owner->settings['facebookVersion'],
             ]);
 
             try {

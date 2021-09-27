@@ -8,6 +8,9 @@ const SESSION_USER          = 'sc-userdata';
 const SESSION_LOCALE        = 'sc-locale';
 const SESSION_MESSAGES      = 'sc-messages';
 
+const HOST_SETTINGS         = APPLICATION_NAME . '-hosts-';
+const LABELS_KEY            = APPLICATION_NAME . '-labels-';
+
 // content cache keys
 const CACHE_PAGES           = APPLICATION_NAME . '-pages-';
 const CACHE_CATEGORIES      = APPLICATION_NAME . '-categories-';
@@ -51,6 +54,7 @@ const VERSION_CSS           = '1.0.0';
  */
 $GLOBALS['REGIONAL_SETTINGS'] = [
 	'en' => [
+		'name'          => 'English',
 		'text'          => 'ltr',
 		'firstday'      => 1,
 		'dateformat'    => 'dd/mm/yy',
@@ -63,6 +67,7 @@ $GLOBALS['REGIONAL_SETTINGS'] = [
 		'nameorder'     => 'first-last'
 	],
 	'hu' => [
+		'name'          => 'Magyar',
 		'text'          => 'ltr',
 		'firstday'      => 1,
 		'dateformat'    => 'yy-mm-dd',
@@ -87,6 +92,24 @@ $GLOBALS['PERSONAL_TITLES'] = [
 	'MR',
 	'MS',
 	'MRS',
+];
+
+$GLOBALS['CURRENCIES'] = [
+    'HUF' => [
+        'sign' => 'Ft',
+        'name' => 'forint',
+        'round' => 0,
+    ],
+    'EUR' => [
+        'sign' => '€',
+        'name' => 'euro',
+        'round' => 2,
+    ],
+    'USD' => [
+        'sign' => '$',
+        'name' => 'usdollar',
+        'round' => 2,
+    ],
 ];
 
 const USER_GROUP_ADMINISTRATORS = 'ADMINISTRATORS';

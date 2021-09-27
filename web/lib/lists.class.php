@@ -11,11 +11,101 @@ class lists extends ancestor {
         return $this->setList($list)->getList();
     }
 
+    public function getLanguages(){
+        $this->list = [];
+        if($this->owner->hostConfig['languages']){
+            foreach($this->owner->hostConfig['languages'] AS $lang){
+                $this->list[$lang] = $GLOBALS['REGIONAL_SETTINGS'][$lang]['name'];
+            }
+        }
+
+        return $this->getList();
+    }
+
+    public function getAllLanguages(){
+        $this->list = [];
+        foreach($GLOBALS['REGIONAL_SETTINGS'] AS $lang => $setting){
+            if($lang != 'default') {
+                $this->list[$lang] = $setting['name'];
+            }
+        }
+
+        return $this->getList();
+    }
+
     public function getCurrencies($withSign = true){
+        $this->list = [];
+        if($this->owner->hostConfig['currencies']){
+            foreach($this->owner->hostConfig['currencies'] AS $currency){
+                $this->list[$currency] = ($withSign ? $GLOBALS['CURRENCIES'][$currency]['sign'] : $currency);
+            }
+        }
+
+        return $this->getList();
+    }
+
+    public function getAllCurrencies($withSign = true){
+        $this->list = [];
+        foreach($GLOBALS['CURRENCIES'] AS $key => $currency){
+            $this->list[$key] = ($withSign ? $currency['sign'] : $key);
+        }
+
+        return $this->getList();
+    }
+
+    public function getApplications(){
         $this->setList([
-            'HUF' => ($withSign ? 'Ft' : 'HUF'),
-            'EUR' => ($withSign ? '€' : 'EUR'),
-            'USD' => ($withSign ? '$' : 'USD'),
+            'admin' => 'LBL_APPLICATION_ADMIN',
+            'shop'  => 'LBL_APPLICATION_SHOP',
+            'api'   => 'LBL_APPLICATION_API',
+        ]);
+
+        return $this->getList();
+    }
+
+    public function getCountries(){
+        $validLanguages = ['en', 'de', 'hu', 'sk', 'bg'];
+
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'countries',
+                [
+                    'country_code AS list_key',
+                    'country_name_' . (in_array($this->owner->language, $validLanguages) ? strtolower($this->owner->language) : 'en') . ' AS list_value'
+                ],
+                [],
+                [],
+                false,
+                'list_value'
+            )
+        );
+
+        return $this->getList();
+    }
+
+    public function getTimeZones(){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'timezones',
+                [
+                    'tz_id AS list_key',
+                    'tz_name AS list_value'
+                ],
+                [],
+                [],
+                false,
+                'list_value'
+            )
+        );
+
+        return $this->getList();
+    }
+
+    public function getThemes(){
+        $this->setList([
+            'none' => 'none',
+            'mimity' => 'Mimity',
+            'bellaria' => 'Bellaria',
         ]);
 
         return $this->getList();
@@ -87,7 +177,16 @@ class lists extends ancestor {
         return $this->getList();
     }
 
-    public function getCategories(){
+    public function getCategories($includeSmartCategories = false){
+        $where = [
+            'cat_shop_id' => $this->owner->shopId,
+            'cat_smart' => 0
+        ];
+
+        if($includeSmartCategories){
+            unset($where['cat_smart']);
+        }
+
         $this->sqlQuery(
             $this->owner->db->genSQLSelect(
                 'product_categories',
@@ -96,9 +195,7 @@ class lists extends ancestor {
                     'cat_title AS list_value',
                     'cat_order AS list_order'
                 ],
-                [
-                    'cat_shop_id' => $this->owner->shopId
-                ],
+                $where,
                 [],
                 [],
                 [

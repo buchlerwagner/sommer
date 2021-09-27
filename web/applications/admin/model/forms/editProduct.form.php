@@ -17,7 +17,7 @@ class editProductForm extends formBuilder {
         $this->title = 'LBL_EDIT_PRODUCT';
 		$this->dbTable = 'products';
 
-        $url = $GLOBALS['HOSTS'][$this->owner->host]['publicUrl'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-';
+        $url = $this->owner->hostConfig['publicSite'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-';
 
         $general = (new groupFieldset('general'))->addElements(
             (new inputSelect('prod_cat_id', 'LBL_CATEGORY'))
@@ -219,7 +219,7 @@ class editProductForm extends formBuilder {
         $this->getControl('prod_min_sale')->setAppend($units[$this->values['prod_pack_unit']]);
         $this->getControl('prod_max_sale')->setAppend($units[$this->values['prod_pack_unit']]);
 
-        $url = $GLOBALS['HOSTS'][$this->owner->host]['publicUrl'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-' . $this->values['prod_url'] . '?show=all';
+        $url = $this->owner->hostConfig['publicSite'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-' . $this->values['prod_url'] . '?show=all';
         $this->getControl('preview')->setUrl($url);
     }
 

@@ -354,7 +354,7 @@ class form extends model {
 							});
 						\n");
 					} else if ($control['type'] == 'geolocation') {
-						$this->owner->view->addJs("https://maps.googleapis.com/maps/api/js?key=" . $GLOBALS['HOSTS'][$this->owner->host]['sitedata']['google']['maps'] . "&callback=", 'googlemaps', true, true, false);
+						$this->owner->view->addJs("https://maps.googleapis.com/maps/api/js?key=" . $this->owner->settings['googleMapsAPI'] . "&callback=", 'googlemaps', true, true, false);
 						$this->owner->view->addJs("geolocation.js", 'geolocation');
 						$this->owner->view->addInlineJs(
 							"initMap('" . $control['id'] . "');\n"
@@ -368,14 +368,14 @@ class form extends model {
 						$this->owner->view->addCss("fileuploader/fileuploader-theme-gallery.css", 'fileupload-gallery');
 						$this->owner->view->addJs("fileuploader/jquery.fileuploader.min.js", 'fileupload');
 
-						$inline = $this->owner->view->renderContent(($control['config'] ? $control['config'] : 'fileupload.config'), $control['options'], false, false);
+						$inline = $this->owner->view->renderContent(($control['config'] ?: 'fileupload.config'), $control['options'], false, false);
 						$this->owner->view->addInlineJs($inline);
 					} else if ($control['type'] == 'recaptcha' && $this->reCaptcha['sitekey']){
 						$this->owner->view->addJs('https://www.google.com/recaptcha/api.js?render=' . $this->reCaptcha['sitekey'], 'recaptcha', true);
 						$this->owner->view->addInlineJs("
 							grecaptcha.ready(function() {
-								grecaptcha.execute('" . $this->reCaptcha['sitekey'] . "', {action: '" . ($this->reCaptcha['action'] ? $this->reCaptcha['action'] : $this->reCaptchaActionName) . "'}).then(function(token) {
-									$('#" . ($this->reCaptcha['token'] ? $this->reCaptcha['token'] : $this->reCaptchaTokenName) . "').val(token);									
+								grecaptcha.execute('" . $this->reCaptcha['sitekey'] . "', {action: '" . ($this->reCaptcha['action'] ?: $this->reCaptchaActionName) . "'}).then(function(token) {
+									$('#" . ($this->reCaptcha['token'] ?: $this->reCaptchaTokenName) . "').val(token);									
 								});
 							});"
 						);

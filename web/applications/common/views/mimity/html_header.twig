@@ -9,7 +9,7 @@
         <link rel="icon" type="image/png" sizes="113x113" href="{{ images }}favicon-113.png">
         <link rel="icon" type="image/png" sizes="250x250" href="{{ images }}favicon-250.png">
         #}
-		<title>{% if title is not empty %}{{ _(title) }} | {% endif %}{{ sitedata.title }}</title>
+		<title>{% if title is not empty %}{{ _(title) }} | {% endif %}{{ siteName }}</title>
 {% if meta %}
     {% for property, content in meta %}
         <meta property="{{ property }}" content="{{ content }}" />
@@ -26,11 +26,9 @@
 {% if pageKeyWords is not empty %}
         <meta name="keywords" content="{{ pageKeyWords }}">
 {% endif %}
-
 {% for file in css.files %}
         <link rel="stylesheet" type="text/css" href="{{ file }}">
 {% endfor %}
-
 {% if css.inline|length > 0 %}
         <style>
             {% for cssline in css.inline %}
@@ -38,19 +36,8 @@
             {% endfor %}
         </style>
 {% endif %}
-{% if sitedata.google.analytics %}
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ sitedata.google.analytics }}"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', '{{ sitedata.google.analytics }}');
-    </script>
-{% endif %}
-        <script>
-            var APP_LANGUAGE = '{{ language }}';
+        var APP_LANGUAGE = '{{ language }}';
     {% if messages %}
         var _messages = {{ messages|raw }};
     {% endif %}

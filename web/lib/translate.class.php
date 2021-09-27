@@ -31,7 +31,7 @@ class translate extends ancestor {
 		$this->mem = $this->owner->mem;
 		$this->setContext($context);
 
-		$this->memcache_key = APPLICATION_NAME . '-labels-';
+		$this->memcache_key = LABELS_KEY;
 		//$this->companyId = $this->owner->shopId;
 		$this->companyId = 0;
 
@@ -683,12 +683,10 @@ class translate extends ancestor {
 		$res = $this->owner->db->getRows($sql);
 		if($res){
 			foreach($res AS $row){
-				foreach($GLOBALS['HOSTS'][$this->owner->host] AS $lang => $name){
-					foreach($shops AS $shopId) {
-						$key = $this->memcache_key . $shopId . '-' . $row['context'] . '-' . $lang;
-						$this->owner->mem->delete($key);
-					}
-				}
+                foreach($shops AS $shopId) {
+                    $key = $this->memcache_key . $shopId . '-' . $row['context'] . '-' . $this->owner->language;
+                    $this->owner->mem->delete($key);
+                }
 			}
 		}
 	}

@@ -106,6 +106,11 @@ $GLOBALS['MENU'] = [
 			'system' => [
 				'display' => 2,
 				'items'   => [
+                    'hosts' => [
+                        'display' => 1,
+                        'access'  => true,
+                        'userGroups' => [USER_GROUP_ADMINISTRATORS]
+                    ],
 					'useraccesslevel' => [
 						'display' => 1,
 						'access'  => true,

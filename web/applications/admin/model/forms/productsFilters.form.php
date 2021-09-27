@@ -15,7 +15,7 @@ class productsFiltersForm extends filterForm {
                     ->setColSize('col-12 col-sm-3'),
                 (new inputSelect('prod_cat_id', 'LBL_CATEGORY'))
                     ->makeSelectPicker()
-                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getCategories())
+                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getCategories(true))
                     ->setColSize('col-12 col-sm-3')
             )
         );

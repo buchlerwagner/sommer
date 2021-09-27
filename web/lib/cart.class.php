@@ -26,7 +26,7 @@ class cart extends ancestor {
 	public $items = [];
 
 	public function init($key = false, $create = true) {
-		$this->currency = $GLOBALS['HOSTS'][$this->owner->host]['currency'];
+		$this->currency = $this->owner->currency;
 		$this->getKey($key, $create)->loadCart();
 
 		return $this;
@@ -162,7 +162,7 @@ class cart extends ancestor {
 			$data,
 			false,  // from
 			false,  // cc
-			($GLOBALS['HOSTS'][$this->owner->host]['emails']['orders'] ? $GLOBALS['HOSTS'][$this->owner->host]['emails']['orders'] : false) // bcc
+			($this->owner->settings['incomingEmail'] ?: false) // bcc
 		);
 
 		$key = $this->key;

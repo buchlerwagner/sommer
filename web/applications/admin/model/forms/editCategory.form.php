@@ -14,7 +14,7 @@ class editCategoryForm extends formBuilder {
             (new inputText('cat_title', 'LBL_TITLE'))
                 ->setRequired(),
             (new inputText('cat_url', 'LBL_URL'))
-                ->setPrepend('https://' . HOST_CLIENTS . '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/'),
+                ->setPrepend($this->owner->hostConfig['publicSite'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/'),
             (new groupRow('row1'))->addElements(
                 (new inputText('cat_order', 'LBL_POSITION'))
                     ->setColSize('col-6 col-lg-2')
@@ -32,6 +32,22 @@ class editCategoryForm extends formBuilder {
                         ->addElements($group, $editor);
 
         $this->addSections($general);
+
+
+        $smartCategory = (new sectionBox('smart-group', 'LBL_SMART_CATEGORY', 'fa fa-layer-group'))
+            ->addClass('col-12 col-lg-6')
+            ->addElements(
+                (new inputSwitch('cat_smart', 'LBL_COLLECT_BY_TAGS'))
+                    ->changeState(1, enumChangeAction::Show(), '#smart')
+                    ->changeDefaultState(enumChangeAction::Hide(), '#smart'),
+                (new groupFieldset('smart'))->addElements(
+                    (new inputCheckGroup('cat_tags', 'LBL_TAGS'))
+                        ->setColor(enumColors::Primary())
+                        ->setOptions($this->owner->lists->getProperties())
+                )
+            );
+
+        $this->addSections($smartCategory);
 
         if($this->keyFields['cat_id']){
             $seo = (new sectionBox('seo', 'LBL_SEO', 'fab fa-google'))
@@ -87,6 +103,11 @@ class editCategoryForm extends formBuilder {
             $this->values['cat_url'] = safeURL($this->values['cat_title']);
         }else{
             $this->values['cat_url'] = safeURL($this->values['cat_url']);
+        }
+
+        if(Empty($this->values['cat_smart'])){
+            $this->values['cat_smart'] = 0;
+            $this->values['cat_tags'] = '';
         }
 
         if($this->values['removeImg']){

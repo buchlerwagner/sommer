@@ -12,7 +12,7 @@ class addCategoryForm extends formBuilder {
         $group = (new groupFieldset('card-general'))->addElements(
             (new inputText('cat_title', 'LBL_TITLE'))->setRequired(),
             (new inputText('cat_url', 'LBL_URL'))
-                ->setPrepend('https://' . HOST_CLIENTS . '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/'),
+                ->setPrepend($this->owner->hostConfig['publicSite'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/'),
             (new groupRow('row1'))->addElements(
                 (new inputText('cat_order', 'LBL_POSITION', $this->getMaxOrder()))
                     ->setColSize('col-12 col-lg-3')
