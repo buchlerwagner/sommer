@@ -131,6 +131,7 @@ $GLOBALS['USER_GROUPS'] = [
 const USER_ROLE_SUPERVISOR  = 'SUPERVISOR';
 const USER_ROLE_ADMIN       = 'ADMIN';
 const USER_ROLE_USER        = 'USER';
+const USER_ROLE_NONE        = 'NONE';
 
 $GLOBALS['USER_ROLES'] = [
     USER_GROUP_ADMINISTRATORS => [
@@ -146,6 +147,10 @@ $GLOBALS['USER_ROLES'] = [
     USER_GROUP_CUSTOMERS => [
         USER_ROLE_USER => [
             'label' => 'LBL_ROLE_USER',
+            'color' => 'primary',
+        ],
+        USER_ROLE_NONE => [
+            'label' => 'LBL_ROLE_NONE',
             'color' => 'primary',
         ],
     ],
@@ -203,7 +208,7 @@ $GLOBALS['PAGE_NAMES'] = [
             'display' => 0,
         ],
         'checkout'  => [
-            'name' => 'fizetes',
+            'name' => 'megrendeles',
             'display' => 0,
         ],
         'finish'    => [

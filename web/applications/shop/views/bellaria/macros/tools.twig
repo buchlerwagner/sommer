@@ -13,7 +13,7 @@
                 </figure>
                 <div class="btn-box">
                     {% if data.available and not stopSale %}
-                        <a href=""><i class="far fa-cart-plus"></i> {{ _('LBL_ADD_TO_CART') }}</a>
+                        <a href="javascript:;" class="add-to-cart" data-id="{{ data.id }}" data-variant="{{ data.variants[0].id }}" data-quantity="1"><i class="far fa-cart-plus"></i> {{ _('LBL_ADD_TO_CART') }}</a>
                     {% else %}
                         <a href="{{ data.url }}"> {{ _('LBL_VIEW_DETAILS') }}</a>
                     {% endif %}
@@ -53,76 +53,85 @@
 {% endmacro %}
 
 {% macro pager(data) %}
-    {% if data.totalpages > 1 %}
+    {% if data.totalPages > 1 %}
 
-        {% set total_pages = data.totalpages %}
-        {% set pager_buttons = 8 %}
+        {% set totalPages = data.totalPages %}
+        {% set pagerButtons = 8 %}
 
-        <ul class="pagination justify-content-center">
-            <li class="page-item{% if data.page == 1 %} active{% endif %}"><a href="{{ data.dir }}?page=1{{ data.urlparams }}" class="page-link" data-page="1">1</a></li>
-            {% if total_pages > 2 %}
+        <div class="styled-pagination text-center">
+            <ul>
+                {% if data.page > 1 %}
+                    <li><a class="prev" href="{{ data.dir }}?page={{ data.page - 1 }}{{ data.urlParams }}" data-page="{{ data.page - 1 }}"><i class="fa fa-chevron-left"></i></a></li>
+                {% else %}
+                    <li><a class="disabled" href="javascript:;"><i class="fa fa-chevron-left"></i></a></li>
+                {% endif %}
+                <li class="{% if data.page == 1 %}current{% endif %}"><a href="{{ data.dir }}?page=1{{ data.urlParams }}" data-page="1">1</a></li>
 
-                {% set ellipsis_left = 0 %}
-                {% set ellipsis_right = 0 %}
+                {% if totalPages > 2 %}
 
-                {% if total_pages > pager_buttons %}
+                    {% set ellipsisLeft = 0 %}
+                    {% set ellipsisRight = 0 %}
 
-                    {% if data.page >= pager_buttons %}
-                        {% if total_pages > pager_buttons + 1 %}
-                            {% set ellipsis_left = 1 %}
-                        {% endif %}
-                        {% set ellipsis_right = 1 %}
+                    {% if totalPages > pagerButtons %}
 
-                        {% set p_start = data.page - 2 %}
-                        {% set p_end = data.page + 2 %}
+                        {% if data.page >= pagerButtons %}
+                            {% if totalPages > pagerButtons + 1 %}
+                                {% set ellipsisLeft = 1 %}
+                            {% endif %}
+                            {% set ellipsisRight = 1 %}
 
-                        {% if data.page > total_pages - (pager_buttons - 1) %}
-                            {% set ellipsis_right = 0 %}
-                            {% set p_start = total_pages - (pager_buttons - 1) %}
-                            {% set p_end = total_pages - 1 %}
+                            {% set pStart = data.page - 2 %}
+                            {% set pEnd = data.page + 2 %}
+
+                            {% if data.page > totalPages - (pagerButtons - 1) %}
+                                {% set ellipsisRight = 0 %}
+                                {% set pStart = totalPages - (pagerButtons - 1) %}
+                                {% set pEnd = totalPages - 1 %}
+                            {% endif %}
+
+                        {% else %}
+                            {% set pStart = 2 %}
+
+                            {% if totalPages > pagerButtons %}
+                                {% set pEnd = pagerButtons %}
+                                {% set ellipsisRight = 1 %}
+                            {% else %}
+                                {% set pEnd = totalPages - 1 %}
+                            {% endif %}
+
+                            {% if totalPages > pagerButtons + 1 %}
+                                {% set ellipsisRight = 1 %}
+                            {% endif %}
+
                         {% endif %}
 
                     {% else %}
-                        {% set p_start = 2 %}
-
-                        {% if total_pages > pager_buttons %}
-                            {% set p_end = pager_buttons %}
-                            {% set ellipsis_right = 1 %}
-                        {% else %}
-                            {% set p_end = total_pages - 1 %}
-                        {% endif %}
-
-                        {% if total_pages > pager_buttons + 1 %}
-                            {% set ellipsis_right = 1 %}
-                        {% endif %}
-
+                        {% set pStart = 2 %}
+                        {% set pEnd = totalPages - 1 %}
                     {% endif %}
 
+                    {% if ellipsisLeft == 1 %}
+                        <li><a class="">...</a></li>
+                    {% endif %}
+
+                    {% for page in pStart..pEnd %}
+                        <li class="{% if page == data.page %}current{% endif %}"><a href="{{ data.dir }}?page={{ page }}{{ data.urlParams }}" data-page="{{ page }}">{{ page }}</a></li>
+                    {% endfor %}
+
+                    {% if ellipsisRight == 1 %}
+                        <li><a class="">...</a></li>
+                    {% endif %}
+
+                {% endif %}
+                <li class="{% if totalPages == data.page %}current{% endif %}"><a href="{{ data.dir }}?page={{ totalPages }}{{ data.urlParams }}" data-page="{{ totalPages }}">{{ totalPages }}</a></li>
+
+                {% if data.page < totalPages %}
+                    <li class=""><a class="next" href="{{ data.dir }}?page={{ data.page + 1 }}{{ data.urlParams }}" data-page="{{ data.page + 1 }}"><i class="fa fa-chevron-right"></i></a></li>
                 {% else %}
-                    {% set p_start = 2 %}
-                    {% set p_end = total_pages - 1 %}
+                    <li class=""><a class="disabled" href="javasript:;"><i class="fa fa-chevron-right"></i></a></li>
                 {% endif %}
-
-                {% if ellipsis_left == 1 %}
-                    <li class="page-item"><a class="page-link">...</a></li>
-                {% endif %}
-
-                {% for page in p_start..p_end %}
-                    <li class="page-item{% if page == data.page %} active{% endif %}"><a href="{{ data.dir }}?page={{ page }}{{ data.urlparams }}" class="page-link" data-page="{{ page }}">{{ page }}</a></li>
-                {% endfor %}
-
-                {% if ellipsis_right == 1 %}
-                    <li class="page-item"><a class="page-link">...</a></li>
-                {% endif %}
-
-            {% endif %}
-
-            <li class="page-item{% if total_pages == data.page %} active{% endif %}"><a href="{{ data.dir }}?page={{ total_pages }}{{ data.urlparams }}" class="page-link" data-page="{{ total_pages }}">{{ total_pages }}</a></li>
-
-            <li class="page-item"><a href="{{ data.dir }}?page={{ data.page + 1 }}{{ data.urlparams }}" class="page-link" data-page="{{ data.page + 1 }}"><i class="fas fa-angle-right"></i></a></li>
-
-        </ul>
-
+            </ul>
+        </div>
     {% endif %}
 {% endmacro %}
 
@@ -151,4 +160,40 @@
             </div>
         </div>
     </div>
+{% endmacro %}
+
+{% macro cartItemHeader(item) %}
+<li class="cart-item cart-item-{{ item.id }}">
+    <img src="{{ item.image }}" alt="{{ item.name }}" class="thumb" />
+    <span class="item-name">
+        {{ item.name }}
+    </span>
+    {% if item.variant %}
+        <span class="text-muted">{{ item.variant }}</span>
+    {% endif %}
+    <span class="item-quantity">
+        <span class="item-quantity-{{ item.id }}">{{ item.quantity.amount }} {{ item.quantity.unit }}</span> x
+        <span class="item-price-{{ item.id }} item-price">{{ _price(item.price.value, item.price.currency) }}</span>
+    </span>
+    <a href="{{ item.url }}" class="product-detail"></a>
+    <button class="remove-item" data-id="{{ item.id }}"><span class="fa fa-times"></span></button>
+</li>
+{% endmacro %}
+
+{% macro pageSections(sections, context) %}
+    {% if sections %}
+        {% for section in sections %}
+            <section class="contact-section pt-3">
+                <div class="auto-container">
+                    <div class="sec-title text-center mb-1 mt-1">
+                        <h2>{{ section.title }}</h2>
+                        <div class="text">
+                            {{ include(template_from_string(section.content)) }}
+                        </div>
+                    </div>
+                    <div class="cws_divider mt-5"><img src="{{ context.theme }}images/icons/divider_11.png" alt=""></div>
+                </div>
+            </section>
+        {% endfor %}
+    {% endif %}
 {% endmacro %}

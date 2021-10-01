@@ -17,13 +17,13 @@
         </div>
         #}
 
-        {% if tags %}
+        {% if products.filters.tags.available %}
         <div class="sidebar-widget tags-widget">
             <h3 class="widget-title">{{ _('LBL_TAGS') }}</h3>
             <ul class="tag-list clearfix">
-                {% for tag in tags %}
+                {% for tag in products.filters.tags.available %}
                     <li>
-                        <a href="#" data-id="{{ tag.id }}">
+                        <a href="#"{% if tag.id in products.filters.tags.selected %} class="active"{% endif %} data-id="{{ tag.id }}">
                             {% if tag.icon %}<i class="{{ tag.icon }} mr-1"></i>{% endif %}
                             {{ tag.name }}
                         </a>

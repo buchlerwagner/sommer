@@ -33,33 +33,43 @@ class product extends ancestor {
         return $this->data;
     }
 
+    public function isProductLoaded(){
+        return !Empty($this->data['id']);
+    }
+
+    public function isAvailable(){
+        return ($this->data['available']);
+    }
+
     public function getMinSale($variantId = 0){
-        if($this->data['variants'][$variantId]){
-            return $this->data['variants'][$variantId]['minSale'];
+        $variant = $this->getVariant($variantId);
+        if($variant['minSale']){
+            return $variant['minSale'];
         }
 
-        return false;
+        return 1;
     }
 
     public function getMaxSale($variantId = 0){
-        if($this->data['variants'][$variantId]){
-            return $this->data['variants'][$variantId]['maxSale'];
+        $variant = $this->getVariant($variantId);
+        if($variant['maxSale']){
+            return $variant['maxSale'];
         }
 
-        return false;
+        return 0;
     }
 
     public function getStock($variantId = 0){
-        if($this->data['variants'][$variantId]){
-            return $this->data['variants'][$variantId]['stock'];
-        }
-
-        return false;
+        return $this->getVariant($variantId)['stock'];
     }
 
     public function getVariant($variantId = 0){
-        if($this->data['variants'][$variantId]){
-            return $this->data['variants'][$variantId];
+        if($this->data['variants']){
+            foreach($this->data['variants'] AS $var){
+                if($var['id'] == $variantId){
+                    return $var;
+                }
+            }
         }
 
         return false;
@@ -225,8 +235,8 @@ class product extends ancestor {
 
 		$sql = "SELECT *
                     FROM " . DB_NAME_WEB . ".product_variants
-    						WHERE pv_prod_id='" . $this->productId . "'
-	    						ORDER BY pv_price, pv_name";
+    					WHERE pv_prod_id='" . $this->productId . "'
+	    					ORDER BY pv_price, pv_name";
 		$result = $this->owner->db->getRows($sql);
 		if($result) {
             $packageUnits = $this->owner->lists->getUnits();

@@ -41,6 +41,7 @@ class editPayModeForm extends formBuilder {
                     ->setColSize('col-12')
                     ->setRows(4)
             )
+            //(new inputSwitch('pm_default', 'LBL_DEFAULT_PAYMENT_MODE', 0))
         );
 
         $this->addControls($group);
@@ -53,6 +54,23 @@ class editPayModeForm extends formBuilder {
 
     public function onBeforeSave() {
         $this->values['pm_shop_id'] = $this->owner->shopId;
+        /*
+        if(Empty($this->values['pm_default'])) {
+            $this->values['pm_default'] = 0;
+        }else{
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    $this->dbTable,
+                    [
+                        'pm_default' => 0
+                    ],
+                    [
+                        'pm_shop_id' => $this->owner->shopId,
+                    ]
+                )
+            );
+        }
+        */
     }
 
     private function getMaxOrder(){

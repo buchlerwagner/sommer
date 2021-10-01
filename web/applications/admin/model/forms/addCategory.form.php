@@ -60,6 +60,11 @@ class addCategoryForm extends formBuilder {
             $this->values['cat_url'] = safeURL($this->values['cat_url']);
         }
 
+        if(Empty($this->values['cat_smart'])){
+            $this->values['cat_smart'] = 0;
+            $this->values['cat_tags'] = '';
+        }
+
         $res = $this->owner->db->getFirstRow(
             "SELECT cat_id FROM " . DB_NAME_WEB . ".product_categories WHERE cat_shop_id = " . $this->owner->shopId . " AND cat_url LIKE \"" . $this->owner->db->escapeString($this->values['cat_url']) . "\""
         );

@@ -43,11 +43,9 @@
                             {% endfor %}
                         </div>
 
-                        {% if products.pager.totalpages > 1 %}
-                            <div class="pager">
-                                {{ tools.pager(products.pager) }}
-                            </div>
-                        {% endif %}
+                        <div class="pager">
+                            {{ tools.pager(products.pager) }}
+                        </div>
                     </div>
                 </div>
 

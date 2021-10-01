@@ -13,13 +13,14 @@ class productsTable extends table {
 		$this->copy = true;
 		$this->copyChangeFields = [
 		    'add' => [
-		        'prod_name' => ' (másolat)',
-		        'prod_url' => '-masolat',
+		        'prod_name' => ' (másolat)'
             ],
             'replace' => [
                 'prod_visible' => 0,
                 'prod_available' => 0,
                 'prod_img' => '',
+                'prod_page_title' => '',
+                'prod_url' => '',
             ]
         ];
 

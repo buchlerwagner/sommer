@@ -1,0 +1,36 @@
+{% if title %}
+<div class="modal-header bg-dark d-block text-white">
+    <h3 class="modal-title" id="customModalLabel">{{ _(title) }}</h3>
+    {% if subtitle %}
+        <h6 class="text-warning">{{ _(subtitle) }}</h6>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="modal-body{% if scroll %} overflow-auto{% endif %}">
+    {% if contentstring is not empty %}
+        {{ include(template_from_string( contentstring )) }}
+    {% elseif content is not empty %}
+        {% include content ~ '.twig' %}
+    {% endif %}
+</div>
+
+{% if not noFooter %}
+<div class="card-progress d-none">
+    <div class="card-progressbar bg-primary"></div>
+</div>
+<div class="modal-footer d-block">
+    {% if buttons and not readonly%}
+        {% for btn in buttons %}
+            {% if btn.include %}
+                {% include btn.include ~ constant('TWIG_FILE_EXTENSION') %}
+            {% else %}
+                {{ formBuilder.button(btn) }}
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <button type="button" class="btn btn-light float-right" data-dismiss="modal">{{ _('BTN_CLOSE') }}</button>
+    {% endif %}
+</div>
+{% endif %}
+<script>shoppingCart.reInit();</script>

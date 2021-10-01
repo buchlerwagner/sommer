@@ -1,1 +1,124 @@
-finish
+{% import "tools.twig" as tools %}
+<section class="page-title" style="background-image:url({{ theme }}images/backgrounds/34.jpg)">
+    <div class="auto-container">
+        <h1>{{ _('LBL_YOUR_ORDER') }}</h1>
+    </div>
+</section>
+
+{{ tools.pageSections(sections, _context) }}
+
+<section class="cart-section{% if sections %} pt-0{% else %} pt-3{% endif %}">
+    <div class="auto-container">
+
+        <div class="sec-title text-center margin-top-50">
+            <div class="divider"><img src="{{ theme }}images/icons/divider_1.png" alt=""></div>
+            <h2>{{ _('LBL_ORDERED_ITEMS') }}</h2>
+        </div>
+
+        {% if cart.items %}
+            <div class="mb-3">
+                {{ _('LBL_ORDER_DATE') }}: <b>{{ _date(cart.orderDate, 1) }}</b>
+                <br>
+                {{ _('LBL_ORDER_STATUS') }}: <b>{{ cart.orderStatus }}</b>
+            </div>
+
+            <div class="cart-outer on-cart mb-4">
+                <div class="table-outer">
+                    <table class="cart-table">
+                        <thead class="cart-header">
+                        <tr>
+                            <th class="product-name" colspan="2">{{ _('LBL_PRODUCT') }}</th>
+                            <th class="product-price">{{ _('LBL_PRICE') }}</th>
+                            <th class="product-quantity">{{ _('LBL_QUANTITY') }}</th>
+                            <th class="product-subtotal">{{ _('LBL_TOTAL') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in cart.items %}
+                            <tr class="cart-item cart-item-{{ item.id }}">
+                                <td class="product-thumbnail"><a href="{{ item.url }}"><img src="{{ item.image }}" alt="{{ item.name }}"></a></td>
+                                <td class="product-name">
+                                    <a href="{{ item.url }}">
+                                        {{ item.name }}
+                                        {% if item.variant %}
+                                            <div class="text-muted">({{ item.variant }})</div>
+                                        {% endif %}
+                                    </a>
+                                </td>
+                                <td class="product-price">
+                                    {{ _price(item.price.finalPrice, cart.currency) }} / {{ item.quantity.unit }}
+                                </td>
+                                <td class="product-quantity">
+                                    {{ item.quantity.amount }} {{ item.quantity.unit }}
+                                </td>
+                                <td class="product-subtotal"><span class="item-total-{{ item.id }}">{{ _price(item.price.total, cart.currency) }}</span></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-12 col-lg-6 pr-lg-3 mb-3 mb-lg-0 border-right border-gray-500">
+                <h5>{{ _('LBL_SELECTED_SHIPPING_MODE') }}</h5>
+                <p>
+                    <b>{{ cart.getSelectedShippingMode.name }}</b>
+                    <br>
+                    {{ cart.getSelectedShippingMode.text|nl2br }}
+                </p>
+            </div>
+            <div class="col-12 col-lg-6 pl-lg-3">
+                <h5>{{ _('LBL_SELECTED_PAYMENT_MODE') }}</h5>
+                <p>
+                    <b>{{ cart.getSelectedPaymentMode.name }}</b>
+                    <br>
+                    {{ cart.getSelectedPaymentMode.text }}
+                </p>
+            </div>
+        </div>
+
+        <div class="cws_divider mt-4 mb-4"><img src="{{ theme }}images/icons/divider_12.png" alt=""></div>
+
+        <div class="row justify-content-between">
+            <div class="column col-lg-4 offset-lg-8 col-md-6 col-sm-12">
+                <ul class="totals-table">
+                    <li><h3>{{ _('LBL_CART_TOTAL') }}</h3></li>
+                    <li class="clearfix">
+                        <span class="col">
+                            {{ _('LBL_SUB_TOTAL') }}
+                        </span>
+                        <span class="col total-price cart-total">{{ _price(cart.subtotal, cart.currency) }}</span>
+                    </li>
+
+                    <li class="clearfix">
+                        <span class="col">{{ _('LBL_SHIPPING_FEE') }}</span>
+                        <span class="col total-price cart-total">
+                            {% if cart.shippingFee > 0 %}
+                                {{ _price(cart.shippingFee, cart.currency) }}
+                            {% else %}
+                                {{ _('LBL_FREE') }}
+                            {% endif %}
+                        </span>
+                    </li>
+
+                    {% if cart.paymentFee %}
+                    <li class="clearfix">
+                        <span class="col">{{ _('LBL_PAYMENT_FEE') }}</span>
+                        <span class="col total-price cart-total">{{ _price(cart.paymentFee, cart.currency) }}</span>
+                    </li>
+                    {% endif %}
+
+                    <li class="clearfix">
+                        <span class="col">
+                            {{ _('LBL_GRAND_TOTAL') }}
+                            <div class="text-muted small">({{ _('LBL_VAT_INCLUDED') }})</div>
+                        </span>
+                        <span class="col total-price cart-total">{{ _price(cart.total, cart.currency) }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>

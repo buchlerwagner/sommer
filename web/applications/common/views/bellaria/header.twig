@@ -1,3 +1,4 @@
+{% import "tools.twig" as tools %}
 <header class="main-header">
     <div class="menu_wave"></div>
     <div class="main-box">
@@ -9,36 +10,25 @@
                 <div class="outer-box clearfix">
                     <div class="cart-btn">
                         <a href="{{ getPageName('cart') }}"><i class="icon flaticon-commerce"></i>
-                            <span id="cart-counter" class="count{% if not cart.getCartItemsNumber %} d-none{% endif %}">{{ cart.getCartItemsNumber }}</span>
+                            <span class="on-cart cart-counter count{% if not cart.getNumberOfCartItems %} d-none{% endif %}">{{ cart.getNumberOfCartItems }}</span>
                         </a>
 
                         <div class="shopping-cart">
                             <ul class="shopping-cart-items">
-                                <li class="cart-item">
-                                    <img src="https://via.placeholder.com/300x300" alt="#" class="thumb" />
-                                    <span class="item-name">Birthday Cake</span>
-                                    <span class="item-quantity">1 x <span class="item-amount">$84.00</span></span>
-                                    <a href="shop-single.html" class="product-detail"></a>
-                                    <button class="remove-item"><span class="fa fa-times"></span></button>
-                                </li>
-
-                                <li class="cart-item">
-                                    <img src="https://via.placeholder.com/300x300" alt="#" class="thumb"  />
-                                    <span class="item-name">French Macaroon</span>
-                                    <span class="item-quantity">1 x <span class="item-amount">$13.00</span></span>
-                                    <a href="shop-single.html" class="product-detail"></a>
-                                    <button class="remove-item"><span class="fa fa-times"></span></button>
-                                </li>
+                                {% if cart.getNumberOfCartItems > 0 %}
+                                    {% for item in cart.getCartItems %}
+                                        {{ tools.cartItemHeader(item) }}
+                                    {% endfor %}
+                                {% endif %}
                             </ul>
-
-                            <div class="cart-footer">
-                                <div class="shopping-cart-total"><strong>{{ _('LBL_SUB_TOTAL') }}</strong> $97.00</div>
-                                <a href="{{ getPageName('cart') }}" class="theme-btn">{{ _('LBL_VIEW_CART') }}</a>
+                            <div class="on-cart cart-footer{% if not cart.getNumberOfCartItems %} d-none{% endif %}">
+                                <div class="shopping-cart-total"><strong>{{ _('LBL_TOTAL') }}: </strong><span class="cart-total">{{ _price(cart.subtotal, cart.currency) }}</span></div>
+                                <a href="{{ getPageName('cart') }}" class="theme-btn">{{ _('LBL_CART') }}</a>
                                 <a href="{{ getPageName('checkout') }}" class="theme-btn">{{ _('LBL_CHECKOUT') }}</a>
                             </div>
+                            <div class="on-empty-cart text-center{% if cart.getNumberOfCartItems > 0 %} d-none{% endif %}">{{ _('LBL_EMPTY_CART') }}</div>
                         </div>
                     </div>
-
                     {#
                     <!-- Search Btn -->
                     <div class="search-box">

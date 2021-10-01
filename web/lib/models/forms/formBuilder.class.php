@@ -702,6 +702,7 @@ abstract class formBuilder extends model {
 
     private function deleteElement(&$object, $id){
         unset($object[$id]);
+        unset($this->inputs[$id]);
 
         foreach($object AS $elementId => &$element){
             if ($element instanceof formControl) {
@@ -712,6 +713,7 @@ abstract class formBuilder extends model {
                 $this->deleteElement($element, $id);
             }
         }
+
         return $this;
     }
 
@@ -790,6 +792,10 @@ abstract class formBuilder extends model {
                 $this->addInputs($control);
             }
         }
+    }
+
+    public final function hasError($controlId){
+        return $this->getControl($controlId)->hasError();
     }
 
 	public function onBeforeLoadValues() {

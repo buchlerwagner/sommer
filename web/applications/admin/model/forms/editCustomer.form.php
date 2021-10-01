@@ -36,7 +36,9 @@ class editCustomerForm extends formBuilder {
         );
 
         $contact = (new groupFieldset('contact-data', 'LBL_CONTACT'))->addElements(
-            (new inputText('us_email', 'LBL_EMAIL'))->setRequired(),
+            (new inputText('us_email', 'LBL_EMAIL'))
+                ->setRequired(),
+            (new inputText('us_email2', 'LBL_EMAIL')),
             (new inputText('us_phone', 'LBL_PHONE'))
         );
 
@@ -100,14 +102,16 @@ class editCustomerForm extends formBuilder {
 	}
 
 	public function onValidate() {
-		if (!empty($this->values['us_email'])) {
-			$res = $this->owner->db->getFirstRow(
-				"SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_shop_id = " . $this->owner->shopId . " us_email LIKE \"" . $this->owner->db->escapeString($this->values['us_email']) . "\" AND us_id != '" . $this->keyFields['us_id'] . "'"
-			);
-			if (!empty($res)) {
-				$this->addError('ERR_10009', self::FORM_ERROR, ['us_email']);
-			}
-		}
+        if($this->values['us_role'] != USER_ROLE_NONE) {
+            if (!empty($this->values['us_email'])) {
+                $res = $this->owner->db->getFirstRow(
+                    "SELECT us_id FROM " . DB_NAME_WEB . ".users WHERE us_shop_id = " . $this->owner->shopId . " us_email LIKE \"" . $this->owner->db->escapeString($this->values['us_email']) . "\" AND us_id != '" . $this->keyFields['us_id'] . "'"
+                );
+                if (!empty($res)) {
+                    $this->addError('ERR_10009', self::FORM_ERROR, ['us_email']);
+                }
+            }
+        }
 	}
 
     public function onBeforeSave() {
@@ -117,5 +121,14 @@ class editCustomerForm extends formBuilder {
 
     public function onAfterLoadValues() {
         if(!$this->values['us_birth_date']) $this->values['us_birth_date'] = '';
+
+        /**
+         * @todo fix this
+         */
+        if($this->values['us_role'] == USER_ROLE_NONE){
+            $this->removeControl('us_email');
+        }else{
+            $this->removeControl('us_email2');
+        }
     }
 }

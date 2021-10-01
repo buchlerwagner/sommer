@@ -131,6 +131,8 @@ class editPageForm extends formBuilder {
         }else {
             $this->uploadFile();
         }
+
+        unset($this->values['removeImg']);
     }
 
     public function onAfterInit() {

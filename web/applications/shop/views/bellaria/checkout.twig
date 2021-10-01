@@ -1,1 +1,314 @@
-checkout
+{% import "tools.twig" as tools %}
+<section class="page-title" style="background-image:url({{ theme }}images/backgrounds/34.jpg)">
+    <div class="auto-container">
+        <h1>{{ _('LBL_CHECKOUT') }}</h1>
+    </div>
+</section>
+
+{{ tools.pageSections(sections, _context) }}
+
+<section class="checkout-page cart-section{% if sections %} pt-0{% endif %}">
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="content-side col-lg-8 col-md-12 col-sm-12 order-last order-lg-first">
+                {% if not loggedin %}
+                    <h3 class="mb-4">{{ _('LBL_SIGN_IN') }}</h3>
+
+                    {% if forms['login'].errors|length > 0 %}
+                        <div class="message-box with-icon error">
+                            <div class="icon-box">
+                                <span class="icon fa fa-exclamation"></span>
+                            </div>
+                            <h4 class="mb-2">{{ _('ERR_WARNING') }}</h4>
+                            {% for error in forms['login'].errors %}
+                                <p>{{ _('ERR_' ~ error['code']) }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form action="." method="post" class="parsley-form">
+                        <input type="hidden" name="login[redirect]" value="{{ getPageName('checkout') }}{{ cart.key }}/">
+                        <div class="form-row">
+                            <div class="col form-group col-lg-5 col-12 floating-label{% if 'email' in loginerror %} has-error{% endif %}">
+                                <input type="email" id="email" name="login[email]" class="form-control" value="{{ login.values.email }}" placeholder=" " data-parsley-required="1">
+                                <label class="control-label" for="email">{{ _('LBL_EMAIL') }}</label>
+                            </div>
+                            <div class="col form-group col-lg-4 col-12 floating-label{% if 'password' in loginerror %} has-error{% endif %}">
+                                <input type="password" id="password" name="login[password]" class="form-control" value="{{ login.values.password }}" placeholder=" " data-parsley-required="1">
+                                <label class="control-label" for="password">{{ _('LBL_PASSWORD') }}</label>
+                            </div>
+                            <div class="col col-lg-3 col-12">
+                                <button type="submit" name="login[signin]" class="theme-btn proceed-btn btn-block" style="min-height: 3rem;">{{ _('BTN_SIGN_IN') }}</button>
+                            </div>
+                        </div>
+                        <div class="form-group pass">
+                            <a href="/login/?forgot-password" class="psw">
+                                {{ _('LBL_FORGOT_PASSWORD') }}
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="cws_divider mt-4 mb-4"><span class="bg-white text-120 p-4">{{ _('LBL_WITHOUT_REGISTRATION') }}</span></div>
+                {% endif %}
+
+                {% if forms['order'].errors|length > 0 %}
+                    <div class="message-box with-icon error">
+                        <div class="icon-box">
+                            <span class="icon fa fa-exclamation"></span>
+                        </div>
+                        <h4>{{ _('ERR_WARNING') }}</h4>
+                        {% for error in forms['order'].errors %}
+                            <p>{{ _(error.message) }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <h3 class="mb-4">{{ _('LBL_CONTACT_DATA') }}</h3>
+
+                <form action="." method="post" id="frmOrder" class="parsley-form--">
+                    <input type="hidden" name="order[key]" value="{{ cart.key }}">
+
+                    <div class="form-row">
+                        <div class="col form-group col-md-6 floating-label{% if forms.order.hasError('lastname') %} has-error{% endif %}">
+                            <input type="text" id="o-lastname" name="order[lastname]" class="form-control" value="{{ forms.order.values.lastname }}" placeholder=" " data-parsley-required="1">
+                            <label class="control-label" for="o-lastname">{{ _('LBL_LASTNAME') }}</label>
+                        </div>
+                        <div class="col form-group col-md-6 floating-label{% if forms.order.hasError('firstname') %} has-error{% endif %}">
+                            <input type="text" id="o-firstname" name="order[firstname]" class="form-control" value="{{ forms.order.values.firstname }}" placeholder=" " data-parsley-required="1">
+                            <label class="control-label" for="o-firstname">{{ _('LBL_FIRSTNAME') }}</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col form-group col-md-12 floating-label{% if forms.order.hasError('email') %} has-error{% endif %}">
+                            <input{% if loggedin %} readonly{% endif %} type="email" id="o-email" name="order[email]" class="form-control" value="{{ forms.order.values.email }}" placeholder=" " data-parsley-required="1" data-parsley-type="email">
+                            <label class="control-label" for="o-email">{{ _('LBL_EMAIL') }}</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col form-group col-md-12 floating-label{% if forms.order.hasError('phone') %} has-error{% endif %}">
+                            <input type="text" id="o-phone" name="order[phone]" class="form-control numbersonly" data-chars="+" value="{{ forms.order.values.phone }}" placeholder=" " data-parsley-required="1" data-parsley-pattern="/^[+]{0,1}[0-9]{10,15}$/g">
+                            <label class="control-label" for="o-phone">{{ _('LBL_PHONE') }}</label>
+                        </div>
+                    </div>
+                    {% if not loggedin %}
+                    <div class="form-row">
+                        <div class="col form-group col-md-12">
+                            <div class="checkbox checkbox-primary">
+                                <input id="create-account" type="checkbox" name="order[createaccount]" value="1" {% if forms.order.values.createaccount %} checked{% endif %} data-parsley-excluded="true">
+                                <label for="create-account">{{ _('LBL_CREATE_ACCOUNT') }}</label>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <h3 class="mt-4 mb-4">{{ _('LBL_SHIPPING_ADDRESS') }}</h3>
+
+                    <div class="form-row">
+                        <div class="col form-group col-sm-3 col-4 floating-label{% if forms.order.hasError('zip') %} has-error{% endif %}">
+                            <input type="text" id="o-zip" name="order[zip]" class="form-control numbersonly" maxlength="4" value="{{ forms.order.values.zip }}" placeholder=" " data-parsley-minlength="4" data-parsley-required="1">
+                            <label class="control-label" for="o-zip">{{ _('LBL_ZIP') }}</label>
+                        </div>
+                        <div class="col form-group col-sm-9 col-8 floating-label{% if forms.order.hasError('city') %} has-error{% endif %}">
+                            <input type="text" id="o-city" name="order[city]" class="form-control" value="{{ forms.order.values.city }}" placeholder=" " data-parsley-required="1">
+                            <label class="control-label" for="o-city">{{ _('LBL_CITY') }}</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col form-group col-md-12 floating-label{% if forms.order.hasError('address') %} has-error{% endif %}">
+                            <input type="text" id="o-address" name="order[address]" class="form-control" value="{{ forms.order.values.address }}" placeholder=" " data-parsley-required="1">
+                            <label class="control-label" for="o-address">{{ _('LBL_ADDRESS') }}</label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col form-group col-md-12">
+                            <div class="checkbox checkbox-primary">
+                                <input id="set-invoice-address" type="checkbox" data-toggle="collapse" data-target="#company-details" name="order[invoiceaddress]" value="1" {% if forms.order.values.invoiceaddress %} checked{% endif %} data-parsley-excluded="true">
+                                <label for="set-invoice-address">{{ _('LBL_DIFFERENT_INVOICE_ADDRESS') }}</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="company-details" class="collapse{% if forms.order.values.invoiceaddress %} show{% endif %}">
+                        <h3 class="mt-4 mb-4">{{ _('LBL_INVOICE_ADDRESS') }}</h3>
+
+                        <div class="form-row">
+                            <div class="form-group col-12">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input set-invoice-type" type="radio" name="order[invoice_type]" id="invoice-type-1" value="1"{% if forms.order.values.invoice_type == 1 or not forms.order.values.invoice_type %} checked{% endif %}>
+                                    <label class="form-check-label" for="invoice-type-1">{{ _('LBL_INVOICE_PRIVATE') }}</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input set-invoice-type" type="radio" name="order[invoice_type]" id="invoice-type-2" value="2"{% if forms.order.values.invoice_type == 2 %} checked{% endif %}>
+                                    <label class="form-check-label" for="invoice-type-2">{{ _('LBL_INVOICE_COMPANY') }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col form-group col-md-6 floating-label{% if forms.order.hasError('invoice_name') %} has-error{% endif %}">
+                                <input type="text" id="o-invoice-name" name="order[invoice_name]" class="form-control" value="{{ forms.order.values.invoice_name }}" placeholder=" "{% if forms.order.values.invoiceaddress %} data-parsley-required="1"{% endif %}>
+                                <label class="control-label" for="o-invoice-name">{{ _('LBL_COMPANY_NAME') }}</label>
+                            </div>
+                            <div class="col form-group col-md-6 floating-label{% if forms.order.hasError('vat') %} has-error{% endif %}">
+                                <input type="text" id="o-invoice-vat" name="order[vat]" disabled class="form-control numbersonly" data-chars="-" value="{{ forms.order.values.vat }}" placeholder=" "{% if forms.order.values.invoiceaddress and forms.order.values.invoice_type == 2 %} data-parsley-required="1"{% endif %}>
+                                <label class="control-label" for="o-invoice-vat">{{ _('LBL_VAT_NUMBER') }}</label>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col form-group col-sm-3 col-4 floating-label{% if forms.order.hasError('invoice_zip') %} has-error{% endif %}">
+                                <input type="text" id="o-invoice-zip" name="order[invoice_zip]" class="form-control numbersonly" maxlength="4" value="{{ forms.order.values.invoice_zip }}" placeholder=" " data-parsley-minlength="4"{% if forms.order.values.invoiceaddress %} data-parsley-required="1"{% endif %}>
+                                <label class="control-label" for="o-invoice-zip">{{ _('LBL_ZIP') }}</label>
+                            </div>
+                            <div class="col form-group col-sm-9 col-8 floating-label{% if forms.order.hasError('invoice_city') %} has-error{% endif %}">
+                                <input type="text" id="o-invoice-city" name="order[invoice_city]" class="form-control" value="{{ forms.order.values.invoice_city }}" placeholder=" "{% if forms.order.values.invoiceaddress %} data-parsley-required="1"{% endif %}>
+                                <label class="control-label" for="o-invoice-city">{{ _('LBL_CITY') }}</label>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col form-group col-md-12 floating-label{% if forms.order.hasError('invoice_address') %} has-error{% endif %}">
+                                <input type="text" id="o-invoice-address" name="order[invoice_address]" class="form-control" value="{{ forms.order.values.invoice_address }}" placeholder=" "{% if forms.order.values.invoiceaddress %} data-parsley-required="1"{% endif %}>
+                                <label class="control-label" for="o-invoice-address">{{ _('LBL_ADDRESS') }}</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cws_divider mt-4 mb-4"><img src="{{ theme }}images/icons/divider_12.png" alt=""></div>
+                    <h3 class="mt-4 mb-4">{{ _('LBL_SHIPPING_MODE') }}</h3>
+
+                    <div class="payment-box">
+                        <div class="upper-box">
+                            <div class="payment-options">
+                                {% for item in cart.getShippingModes %}
+                                <ul>
+                                    <li>
+                                        <div class="radio-option">
+                                            <input type="radio" name="order[shipping]" id="shipping-{{ item.id }}" class="set-shipping-mode" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getShippingId == item.id %} checked{% endif %}>
+                                            <label for="shipping-{{ item.id }}">
+                                                <strong>{{ item.name }}</strong>
+                                                <span class="small-text">{{ item.text|nl2br }}</span>
+                                                <div class="item-fee">
+                                                    <span class="text-muted">
+                                                        {% if item.price > 0 %}
+                                                            {{ _price(item.price, cart.currency) }}
+                                                        {% else %}
+                                                            {{ _('LBL_FREE') }}
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </li>
+                                </ul>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cws_divider mt-4 mb-4"><img src="{{ theme }}images/icons/divider_12.png" alt=""></div>
+                    <h3 class="mt-4 mb-4">{{ _('LBL_PAYMENT_MODE') }}</h3>
+
+                    <div class="payment-box">
+                        <div class="upper-box">
+                            <div class="payment-options">
+                                {% for item in cart.getPaymentModes %}
+                                    <ul>
+                                        <li>
+                                            <div class="radio-option">
+                                                <input type="radio" name="order[payment]" id="payment-{{ item.id }}" class="set-payment-mode" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getPaymentId == item.id %} checked{% endif %}>
+                                                <label for="payment-{{ item.id }}">
+                                                    <strong>{{ item.name }}</strong>
+                                                    <span class="small-text">{{ item.text|nl2br }}</span>
+                                                    <div class="item-fee">
+                                                    <span class="text-muted">
+                                                        {% if item.price > 0 %}
+                                                            {{ _price(item.price, cart.currency) }}
+                                                        {% endif %}
+                                                    </span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cws_divider mt-4 mb-4"><img src="{{ theme }}images/icons/divider_12.png" alt=""></div>
+
+                    <div class="form-row">
+                        <div class="col form-group col-md-12">
+                            <div class="checkbox checkbox-primary{% if forms.order.hasError('agree_terms') %} has-error{% endif %}">
+                                <input id="agree_terms" type="checkbox" name="order[agree_terms]" value="1"{% if forms.order.values.agree_terms %} checked{% endif %} data-parsley-required="1" data-parsley-mincheck="1" data-parsley-errors-messages-disabled="1">
+                                <label for="agree_terms">{{ _('LBL_I_AGREE_TERMS_AND_CONDITIONS', '/ajax/content/terms-and-conditions/')|raw }}</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col form-group col-12">
+                            <button type="submit" name="order[save]" class="theme-btn proceed-btn">{{ _('BTN_ORDER') }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="sidebar-side sticky-container col-lg-4 col-md-12 col-sm-12 order-first order-lg-last mb-4 mb-lg-0">
+                <aside class="sidebar theiaStickySidebar">
+                    <div class="sticky-sidebar">
+                        <div class="sidebar-widget cart-widget">
+                            <div class="widget-content">
+                                <div class="shopping-cart">
+                                    <ul class="shopping-cart-items">
+                                        {% for item in cart.items %}
+                                        <li class="checkout-item">
+                                            <span class="item-name">
+                                                {{ item.name }}
+                                                {% if item.variant %}
+                                                    <div class="text-muted">({{ item.variant }})</div>
+                                                {% endif %}
+                                            </span>
+                                            <span class="item-quantity">
+                                                {{ item.quantity.amount }} {{ item.quantity.unit }}
+                                                <span class="item-amount text-right float-right">{{ _price(item.price.total, cart.currency) }}</span>
+                                            </span>
+                                        </li>
+                                        {% endfor %}
+                                        <li class="checkout-item">
+                                            <span class="item-sum">
+                                                <span>{{ _('LBL_SHIPPING_FEE') }}</span>
+                                                <span class="text-right float-right shipping-fee">
+                                                    {% if cart.shippingFee > 0 %}
+                                                        {{ _price(cart.shippingFee, cart.currency) }}
+                                                    {% else %}
+                                                        {{ _('LBL_FREE') }}
+                                                    {% endif %}
+                                                </span>
+                                            </span>
+                                        </li>
+
+                                        <li class="checkout-item payment-item{% if not cart.paymentFee %} d-none{% endif %}">
+                                            <span class="item-sum">
+                                                <span>{{ _('LBL_PAYMENT_FEE') }}</span>
+                                                <span class="text-right float-right payment-fee">{{ _price(cart.paymentFee, cart.currency) }}</span>
+                                            </span>
+                                        </li>
+
+                                        <li class="checkout-item">
+                                            <span class="item-sum text-130">
+                                                <b>{{ _('LBL_GRAND_TOTAL') }}</b>
+                                                <b class="text-right float-right cart-total">{{ _price(cart.total, cart.currency) }}</b>
+                                            </span>
+                                            <div class="text-muted small">({{ _('LBL_VAT_INCLUDED') }})</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</section>

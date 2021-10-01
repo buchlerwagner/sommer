@@ -5,7 +5,6 @@
 {% endif %}
 
 {% if sections %}
-    {% include 'slider.twig' %}
     {% for section in sections %}
         {{ include(template_from_string(section.content)) }}
     {% endfor %}

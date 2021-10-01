@@ -491,7 +491,7 @@ class functions extends ancestor {
 		$formats = $this->getLocaleSettings();
 
 		$out = number_format($price, $formats['currency_round'], $formats['decimal_point'], $formats['thousand_sep']);
-		$currencies = $this->getList('currency');
+		$currencies = $this->owner->lists->getCurrencies();
 
 		if($currency && $displaycurrency) {
 			if(!Empty($currencies[$currency])) $currency = $currencies[$currency];
@@ -847,7 +847,6 @@ class functions extends ancestor {
                         'c_page_title AS pageTitle',
                         'c_page_description AS pageDescription',
                         'c_page_url AS pageUrl',
-                        'c_order AS order',
                     ],
                     [
                         'c_shop_id' => $this->owner->shopId,
@@ -862,18 +861,18 @@ class functions extends ancestor {
                 )
             );
 
-            $this->owner->mem->set(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $widget, $result);
-        }
+            if($result){
+                $content = [];
 
-        if($result){
-            $content = [];
+                foreach($result AS $row){
+                    $content[$row['id']] = $row;
+                    if($row['image']) {
+                        $content[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/pages/' . $row['image'];
+                    }
+                }
 
-            foreach($result AS $row){
-                $content[$row['id']] = $row;
-                $content[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/pages/' . $row['image'];
+                $this->owner->mem->set(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $widget, $content);
             }
-
-            $this->owner->mem->set(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $widget, $content);
         }
 
         return $content;

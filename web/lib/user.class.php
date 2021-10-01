@@ -88,7 +88,10 @@ class user extends ancestor {
                         $user[$subKey] = $val;
                     }
 
-                    $user['name'] = localizeName($user['firstname'], $user['lastname'], $this->owner->language);;
+                    $user['name'] = localizeName($user['firstname'], $user['lastname'], $this->owner->language);
+                    $user['firstName'] = $user['firstname'];
+                    $user['lastName'] = $user['lastname'];
+
                     $user['img'] = $this->setProfilePicture($user);
                 }
 
@@ -292,7 +295,7 @@ class user extends ancestor {
         if (!empty($this->data)) {
             $db->sqlQuery(
                 $db->genSQLUpdate(
-                    DB_NAME_WEB . ".users",
+                    "users",
                     [
                         'us_last_login' => 'NOW()'
                     ],
@@ -305,7 +308,7 @@ class user extends ancestor {
             $this->setUserSession();
 
             //$this->loginCookie($this->data['hash'], $permanent, $social);
-            $this->owner->setSession(SESSION_LOCALE, $this->data['language']);
+            //$this->owner->setSession(SESSION_LOCALE, $this->data['language']);
         }
 
         return $this->data;

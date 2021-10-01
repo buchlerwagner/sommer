@@ -30,6 +30,9 @@ if($this->originalPage != $this->page) {
     if ($categoryData = $shop->getCategoryIdByUrl($this->originalPage)) {
         $this->data['category'] = $categoryData;
         $params['filters']['categories'][$categoryData['id']] = $categoryData['id'];
+        if($categoryData['isSmart'] && !Empty($categoryData['tags'])){
+            $params['filters']['tags'] = $categoryData['tags'];
+        }
     }
 }else{
     if($this->originalPage == 'products' && !Empty($this->params[0])){
@@ -66,5 +69,4 @@ if($this->params[0]){
     $this->setSession('params', $params);
     $this->setPageMetaData($categoryData);
     $this->data['products'] = $shop->getProducts($params);
-    $this->data['tags'] = $shop->getActiveTags($categoryData['id']);
 }

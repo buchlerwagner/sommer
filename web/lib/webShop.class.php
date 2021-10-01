@@ -27,7 +27,8 @@ class webShop extends ancestor {
                 [
                     'cat_id AS id',
                     'cat_title AS name',
-                    'cat_url AS url'
+                    'cat_url AS url',
+                    'cat_smart AS isSmart',
                 ],
                 [
                     'cat_visible' => 1,
@@ -87,6 +88,7 @@ class webShop extends ancestor {
 
         if($cat['pageUrl']){
             $cat['pageUrl'] = 'https://' . $this->owner->host . $GLOBALS['PAGE_NAMES'][$this->owner->language]['name'] . '/' . $cat['pageUrl'];
+            $cat['pageUrl'] = trim($cat['pageUrl'], '/') . '/';
         }
 
         return $cat;
@@ -131,7 +133,7 @@ class webShop extends ancestor {
 		return $out;
 	}
 
-    public function getActiveTags($categoryId = false){
+    public function getActiveTags($categories = false){
         $out = [];
 
         $where = [
@@ -139,8 +141,12 @@ class webShop extends ancestor {
             'prop_shop_id' => $this->shopId
         ];
 
-        if($categoryId){
-            $where['prod_cat_id'] = (int)$categoryId;
+        if($categories){
+            if(!is_array($categories)) $categories = [$categories];
+
+            $where['prod_cat_id'] = [
+                'in' => $categories
+            ];
         }
 
         if(!$this->isAdmin){
@@ -182,6 +188,59 @@ class webShop extends ancestor {
         if($result){
             foreach($result AS $row){
                 $out[$row['id']] = $row;
+            }
+        }
+
+        if($categories){
+            $result = $this->owner->db->getRows(
+                $this->owner->db->genSQLSelect(
+                    'product_categories',
+                    [
+                        'cat_tags AS tags',
+                    ],
+                    [
+                        'cat_id' => [
+                            'in' => $categories
+                        ],
+                        'cat_smart' => 1,
+                        'cat_visible' => 1,
+                    ]
+                )
+            );
+            if($result) {
+                $tags = [];
+
+                foreach ($result as $row) {
+                    $t = explode('|', trim($row['tags'], '|'));
+                    foreach($t AS $key) {
+                        if (!in_array($key, $tags)) $tags[] = $key;
+                    }
+                }
+
+                $result = $this->owner->db->getRows(
+                    $this->owner->db->genSQLSelect(
+                        'properties',
+                        [
+                            'prop_id AS id',
+                            'prop_name AS name',
+                            'prop_icon AS icon',
+                        ],
+                        [
+                            'prop_id' => [
+                                'in' => $tags
+                            ]
+                        ],
+                        [],
+                        false,
+                        'prop_name'
+                    )
+                );
+
+                if ($result) {
+                    foreach ($result as $row) {
+                        $out[$row['id']] = $row;
+                    }
+                }
             }
         }
 
@@ -378,6 +437,7 @@ class webShop extends ancestor {
 		];
 
 		$where = $this->buildFilterQuery($params['filters']);
+
 		$res = $this->owner->db->getFirstRow(
 			"SELECT COUNT(" . $fields[0] . ") as cnt FROM " . DB_NAME_WEB . ".products " . $where
 		);
@@ -433,7 +493,11 @@ class webShop extends ancestor {
 			'categories' => [
 				'available' => $this->getActiveCategories(),
 				'selected' => $params['categories']
-			]
+			],
+            'tags' => [
+                'available' => $this->getActiveTags($params['categories']),
+                'selected' => $params['tags']
+            ]
 		];
 	}
 
@@ -471,9 +535,11 @@ class webShop extends ancestor {
 		$where[] = 'prod_shop_id = ' . $this->shopId;
 
 		if($filters['categories']){
+            $allCategories = $this->getAllCategories();
+
 			$ids = [];
 			foreach($filters['categories'] AS $category){
-				if(!in_array($category, $ids)){
+				if(!in_array($category, $ids) && !$allCategories[$category]['isSmart']){
 					$ids[] = $category;
 				}
 			}
@@ -482,6 +548,10 @@ class webShop extends ancestor {
 				$where[] = 'prod_cat_id IN (' . implode(',', $ids) . ')';
 			}
 		}
+
+        if(!Empty($filters['tags']) && is_array($filters['tags'])){
+            $where[] = 'prod_id IN (' . implode(',', $this->getProductsByTags($filters['tags'])) . ')';
+        }
 
 		if($filters['query']) {
 			$query = preg_replace("/[^a-zA-Z0-9]+/", "", $filters['query']);
@@ -541,4 +611,33 @@ class webShop extends ancestor {
 			$this->owner->setSession('pw-' . $productId, true);
 		}
 	}
+
+    private function getProductsByTags(array $tags):array{
+        $ids = [];
+
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'product_properties',
+                [
+                    'DISTINCT pp_prod_id AS id'
+                ],
+                [
+                    'pp_prop_id' => [
+                        'in' => $tags
+                    ]
+                ]
+            )
+        );
+
+        if ($result) {
+            foreach ($result as $row) {
+                if(!in_array($row['id'], $ids)){
+                    $ids[] = $row['id'];
+                }
+            }
+        }
+
+        return $ids;
+    }
+
 }

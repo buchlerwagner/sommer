@@ -31,7 +31,7 @@ class AppExtension extends AbstractExtension {
             new TwigFunction('fileTypeIcon', [$this, 'fileTypeIcon']),
             new TwigFunction('extractArray', [$this, 'extractArray'], ['needs_context' => true]),
             new TwigFunction('valueHelper',  [$this, 'valueHelper']),
-            new TwigFunction('getPageName',  [$this, 'getPageName']),
+            new TwigFunction('getPageName',  [$framework, 'getPageName']),
 		];
 	}
 
@@ -234,15 +234,5 @@ class AppExtension extends AbstractExtension {
         }
 
         return $out;
-    }
-
-    public function getPageName($name){
-        global $framework;
-
-        if(isset($GLOBALS['PAGE_NAMES'][$framework->language][$name])){
-            $name = $GLOBALS['PAGE_NAMES'][$framework->language][$name]['name'];
-        }
-
-        return '/' . $name . '/';
     }
 }

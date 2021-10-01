@@ -7,9 +7,7 @@ var shoppingCart = {
 
     sendData: function(action, data){
         if(!shoppingCart.inProgress) {
-            shoppingCart.setProgress(true);
-
-            //console.log(data);
+            //shoppingCart.setProgress(true);
 
             $.ajax({
                 url: '/ajax/cart/' + action + '/',
@@ -20,47 +18,39 @@ var shoppingCart = {
                 success: function (data) {
                     if (data) {
                         processJSONResponse(data);
-                        shoppingCart.reinit();
+                        shoppingCart.reInit();
                     }
 
                     shoppingCart.setProgress(false);
-                }
+                },
             });
         }
     },
+
     setProgress: function(inProgress) {
         shoppingCart.inProgress = inProgress;
     },
 
     viewPopup: function(){
-        var $modal = $('#ajax-modal');
-        $('#ajax-modal .modal-dialog').addClass('modal-lg modal-dialog-centered');
+        var $modal = $('#modal');
+        $('#modal .modal-dialog').addClass('modal-lg modal-dialog-centered');
         $modal.find('.modal-content').load('/ajax/cart/popup/', function () {
             $modal.modal('show');
         });
     },
 
-    addNewHeaderItem: function(data){
-        console.log(data);
-        $('#header-cart .header-cart-items').append(
-            '<figure class="itemside mb-2 border-bottom pb-2 item-' + data.id + '">' +
-            '<div class="aside"><img src="/i.php?src=' + data.imgbase64 + '&w=80&h=80&m=1" class="img-sm border"></div>' +
-            '<figcaption class="info align-self-center text-nowrap w-100">' +
-            '<p class="title">' + data.name + '</p>' +
-            '<a href="#" class="float-right action-remove-item" data-id="' + data.id + '"><i class="fa fa-trash"></i></a>' +
-            '<div class="price item-price-' + data.id + '">' + data.price.formated + '</div>' +
-            '</figcaption>' +
-            '</figure>'
-        );
-    },
-
-    addToCart: function(obj){
-        var params = $(obj).serializeJSON();
-        shoppingCart.sendData('add', params);
+    addToCart: function(id, variant, quantity){
+        shoppingCart.sendData('add', {
+            id: id,
+            variant: variant,
+            quantity: quantity
+        });
     },
 
     removeFromCart: function(id){
-        shoppingCart.sendData('remove', {id: id});
+        shoppingCart.sendData('remove', {
+            id: id
+        });
     },
 
     setQuantity: function(value, min, max){
@@ -81,15 +71,49 @@ var shoppingCart = {
         }
     },
 
-    initControlls: function () {
-        $('.action-add-item').on('click', function () {
-            var $form = $(this).parents('form');
-            shoppingCart.addToCart($form);
+    initControls: function () {
+        $(document).on('click', '.add-to-cart', function () {
+            var $this = $(this);
+            var id = parseInt($this.data('id'));
+
+            if(id) {
+                var variant = parseInt($this.data('variant'));
+                if(!variant){
+                    variant = parseInt($('#variant').val());
+                }
+
+                var quantity = parseInt($this.data('quantity'));
+                if(!quantity){
+                    quantity = parseInt($('#quantity').val());
+                }
+
+                shoppingCart.addToCart(id, variant, quantity);
+            }
         });
 
-        $(document).on('click', '.action-remove-item', function () {
-            var id = $(this).data('id');
-            shoppingCart.removeFromCart(id);
+        $(document).on('click', '.remove-item', function () {
+            var id = parseInt($(this).data('id'));
+            if(id) {
+                shoppingCart.removeFromCart(id);
+            }
+        });
+
+        $(document).on('click', '.set-shipping-mode', function () {
+            var id = parseInt($(this).data('id'));
+            if(id) {
+                shoppingCart.sendData('setShippingMode', {
+                    id: id,
+                });
+            }
+        });
+
+        $(document).on('click', '.set-payment-mode', function () {
+            var id = parseInt($(this).data('id'));
+            if(id) {
+                shoppingCart.sendData('setPaymentMode', {
+                    id: id,
+                });
+            }
         });
 
         $('.quantity-select').on('click', function () {
@@ -105,6 +129,13 @@ var shoppingCart = {
             var quantity = parseInt($control.val());
             quantity += value;
 
+            if(quantity > max){
+                quantity = max;
+            }
+            if(quantity < min){
+                quantity = min;
+            }
+
             $control.val(quantity);
 
             if(quantity > min){
@@ -117,6 +148,39 @@ var shoppingCart = {
                 $this.parents('.input-group').find('.btn-plus').removeAttr('disabled');
             }else{
                 $this.parents('.input-group').find('.btn-plus').attr('disabled', 'disabled');
+            }
+
+            if($this.parents('.input-group').data('id')){
+                shoppingCart.sendData('change', {
+                    id: $this.parents('.input-group').data('id'),
+                    quantity: quantity,
+                });
+            }
+        });
+
+        $('.quantity-input').on('blur', function (){
+            var $this = $(this);
+            var quantity = parseInt($this.val());
+            var min = parseInt($this.parents('.input-group').find('input').attr('data-min') || 1);
+            var max = parseInt($this.parents('.input-group').find('input').attr('data-max') || 99999);
+            if(max === 0){
+                max = 99999;
+            }
+
+            if(quantity > max){
+                quantity = max;
+            }
+            if(quantity < min){
+                quantity = min;
+            }
+
+            $this.val(quantity);
+
+            if($this.parents('.input-group').data('id')){
+                shoppingCart.sendData('change', {
+                    id: $this.parents('.input-group').data('id'),
+                    quantity: quantity,
+                });
             }
         });
 
@@ -136,20 +200,217 @@ var shoppingCart = {
                 MagicZoom.switchTo('zoom', 0);
             }
         });
+
+        $('#set-invoice-address').on('change', function (){
+            var $this = $(this);
+            if($this.is(':checked')){
+                $('#company-details').find('input')
+                    .removeAttr('data-parsley-excluded')
+                    .attr('data-parsley-required', '1')
+                    .parsley();
+
+                $('.set-invoice-type').trigger('change');
+            }else{
+                $('#company-details')
+                    .find('input')
+                    .attr('data-parsley-excluded', '1')
+                    .removeAttr('data-parsley-required')
+                    .parsley();
+
+                $('#company-details')
+                    .find('.form-group')
+                    .removeClass('has-error has-success');
+            }
+        });
+
+        $('.set-invoice-type').on('change', function (){
+            var value = parseInt($('input.set-invoice-type:checked', '#frmOrder').val());
+            if(value === 2){
+                $('#o-invoice-vat')
+                    .removeAttr('data-parsley-excluded')
+                    .removeAttr('disabled')
+                    .attr('data-parsley-required', '1')
+                    .parsley();
+            }else{
+                $('#o-invoice-vat')
+                    .attr('data-parsley-excluded', '1')
+                    .attr('disabled', 'disabled')
+                    .removeAttr('data-parsley-required')
+                    .parsley();
+            }
+        });
+
+        if($('.set-invoice-type').length){
+            $('.set-invoice-type').trigger('change');
+        }
+
+        $(document).on('keyup', '.numbersonly', function(){
+            var chars = $(this).data('chars');
+            var replaceCharFrom = $(this).data('replace-from');
+            var replaceCharTo = $(this).data('replace-to');
+
+            if(replaceCharFrom && replaceCharTo){
+                this.value = this.value.replace(replaceCharFrom, replaceCharTo);
+            }
+
+            if(chars === '' || typeof chars === 'undefined'){
+                chars = '\\-.,';
+            }
+            var pattern = '[^0-9' + chars + ']';
+            var re = new RegExp(pattern, 'ig');
+            this.value = this.value.replace(re, "");
+        });
+
+        $(document).on('blur', '.numbersonly', function(){
+            var chars = $(this).data('chars');
+            if(chars === '' || typeof chars === 'undefined'){
+                chars = '\\-.,';
+            }
+
+            var pattern = '[^0-9' + chars + ']';
+            var re = new RegExp(pattern, 'ig');
+            this.value = this.value.replace(re, "");
+        });
+
+        $('#modal').on('show.bs.modal', function (e) {
+            var url = '';
+            var modal = $(this);
+            if(e.relatedTarget) {
+                var button = $(e.relatedTarget);
+                if (button.data('size')) {
+                    $('#modal .modal-dialog').addClass('modal-' + button.data('size'));
+                }
+
+                if (button.attr('href') !== '#' && button.attr('href') !== '') {
+                    url = button.attr('href');
+                } else if (button.data('href')) {
+                    url = button.data('href');
+                }
+            }
+
+            if (url !== '') {
+                modal.find('.modal-content').load(url);
+            }
+        }).on('hidden.bs.modal', function (e) {
+            $(e.target).removeData('bs.modal');
+            $('#ajax-modal .modal-dialog').removeClass('modal-sm modal-lg modal-xl');
+            $('#ajax-modal .modal-content').html('');
+        });
+
+        if ($.fn.parsley) {
+            $('.parsley-form:not(.inited)').each (function () {
+                $(this).addClass('inited');
+                $(this).parsley ({
+                    trigger: 'change',
+                    errorClass: 'is-invalid',
+                    successClass: 'is-valid',
+                    errorsWrapper: '<div></div>',
+                    errorTemplate: '<label class="error"></label>',
+                }).on('field:success', function (ParsleyField) {
+                    var $container = ParsleyField.$element.parents('.form-group');
+                    $container.removeClass('has-error').addClass('has-success');
+                }).on('field:error', function (ParsleyField) {
+                    var $container = ParsleyField.$element.parents('.form-group');
+                    $container.removeClass('has-success').addClass('has-error');
+                });
+            });
+        }
     },
 
-    reinit: function(){
+    reInit: function(){
 
     },
 
     init: function () {
-        shoppingCart.initControlls();
+        shoppingCart.initControls();
     }
 };
 
+function processJSONResponse(data){
+    if(typeof data !== 'object'){
+        data = JSON.parse(data);
+    }
+
+    $.each(data, function(selector, action){
+        $.each(action, function(method, value){
+
+            if(typeof window[selector] === 'object') {
+                if(typeof window[selector][method] === 'function') {
+                    window[selector][method](value);
+                }
+            }else{
+                if(method === 'show'){
+                    if(value === true){
+                        $(selector).hide().removeClass('d-none').show();
+                    }else{
+                        $(selector).hide();
+                    }
+                }else if(method === 'tagsinput'){
+                    $.each(value, function(i, avalue) {
+                        if(avalue) {
+                            $(selector).tagsinput('add', avalue);
+                        }
+                    });
+                }else if(method === 'summernote'){
+                    $(selector).summernote('code', value);
+                    crm.isdirty = false;
+                }else if(method === 'addclass'){
+                    $(selector).addClass(value);
+                }else if(method === 'removeclass'){
+                    $(selector).removeClass(value);
+                }else if(method === 'html'){
+                    $(selector).html(value);
+                }else if(method === 'remove'){
+                    $(selector).remove();
+                }else if(method === 'append'){
+                    $(selector).append(value);
+                }else if(method === 'closeModal'){
+                    $(selector).modal('hide');
+                }else if(method === 'attr'){
+                    $.each(value, function(attr, avalue) {
+                        if(avalue) {
+                            $(selector).attr(attr, avalue);
+                        }else{
+                            $(selector).removeAttr(attr, '');
+                        }
+                    });
+                }else if(method === 'value'){
+                    if($(selector).is(':checkbox') || $(selector).is(':radio')) {
+                        $(selector).prop('checked', value);
+                    }else {
+                        $(selector).val(value);
+                    }
+                }else if(method === 'options') {
+                    $(selector).find('option').remove();
+                    $(selector).append(value.map(function (val) {
+                        return '<option value="' + val.id + '">' + val.name + '</option>'
+                    }));
+                }else if(method === 'functions'){
+                    if(value.callback) {
+                        var fn = window[value.callback];
+                        if(typeof fn === 'function' ) {
+                            fn(value.arguments);
+                        }
+                    }
+                }else{
+                    if(typeof window[method] === 'object') {
+                        if(typeof window[method][selector] === 'function') {
+                            window[method][selector](value);
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    return data;
+}
+
 $(function() {
+    /*
     if(typeof autosize == 'function') {
         autosize($('textarea'));
     }
+    */
     shoppingCart.init();
 });

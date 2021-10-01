@@ -6,11 +6,11 @@ class cart extends ancestor {
 	const CART_STATUS_ABANDONED = 'ABANDONED';
 	const CART_STATUS_ORDERED = 'ORDERED';
 
-	/**
-	 * @var $products product
-	 */
-	private $products;
+	const ORDER_STATUS_NEW = 'NEW';
 
+	/**
+	 * @var $product product
+	 */
 	private $product;
 
 	public $currency;
@@ -18,55 +18,76 @@ class cart extends ancestor {
 	public $id;
 	public $key;
 	public $status;
+	public $orderStatus;
+	public $orderDate;
 	public $total = 0;
 	public $subtotal = 0;
-	public $discount = 0;
-	public $shipping = 0;
+	private $discount = 0;
+	public $shippingFee = 0;
+    private $shippingId = false;
+	public $paymentFee = 0;
+    private $paymentId = false;
+
+    private $userId;
 
 	public $items = [];
 
-	public function init($key = false, $create = true) {
+    public function init($key = false, $create = true) {
 		$this->currency = $this->owner->currency;
+
 		$this->getKey($key, $create)->loadCart();
+        $this->product = $this->owner->addByClassName('product');
 
 		return $this;
 	}
 
-	public function addProduct($id, $variant = 0, $quantity = 1){
+	public function addProduct($productId, $variantId = 0, $quantity = 1){
 		$key = false;
 		$new = false;
+		$error = false;
 
-		if($this->status == self::CART_STATUS_NEW) {
-			$id = (int)$id;
-			$variant = (int)$variant;
+		if($this->status != self::CART_STATUS_ORDERED && !$this->owner->settings['stopSale']) {
+			$productId = (int)$productId;
+			$variantId = (int)$variantId;
 			$quantity = (int)$quantity;
 
-			if ($quantity <= 0) $quantity = 1;
+            $item = $this->product->init($productId)->getProduct();
 
-			$this->products = $this->owner->addByClassName('product');
-			$this->checkProduct($id);
+			if ($this->product->isAvailable()) {
+                $quantity = $this->checkQuantity($quantity, $variantId);
 
-			if ($this->product) {
-				if ($key = $this->isProductInCart($id, $variant)) {
+				if ($key = $this->isProductInCart($productId, $variantId)) {
 					$this->updateItemInCart($key, $quantity);
 				} else {
-					$new = true;
-					$key = $this->saveItemToCart($id, $variant, $quantity);
-				}
-			}
-		}
+                    $key = $this->addItemToCart($item, $variantId, $quantity);
+                    $new = true;
+                }
+			}else{
+                $error = 2;
+            }
+		}else{
+            $error = 1;
+        }
 
 		return [
 			'id' => $key,
-			'new' => $new
+			'new' => $new,
+			'error' => $error
 		];
 	}
 
 	public function removeProduct($id){
 		if($this->status == self::CART_STATUS_NEW) {
 			if ($this->items[$id]) {
-				$sql = "DELETE FROM " . DB_NAME_WEB . ".cart_items WHERE citem_cart_id = '" . $this->id . "' AND citem_id='" . $id . "'";
-				$this->owner->db->sqlQuery($sql);
+				$this->owner->db->sqlQuery(
+                    $this->owner->db->genSQLDelete(
+                        'cart_items',
+                        [
+                            'citem_cart_id' => $this->id,
+                            'citem_id' => $id
+                        ]
+                    )
+                );
 			}
 
 			$this->loadCart()->summarize();
@@ -75,14 +96,20 @@ class cart extends ancestor {
 		return $this;
 	}
 
-	public function changeProduct($key, $quantity = 0){
+	public function changeProductQuantity($key, $quantity = 0){
 		if($this->status == self::CART_STATUS_NEW) {
 			$key = (int)$key;
 
 			if ($this->items[$key]) {
+                $productId = $this->items[$key]['productId'];
+                $variantId = $this->items[$key]['variantId'];
+
+                $this->product->init($productId)->getProduct();
+                $quantity = $this->checkQuantity($quantity, $variantId);
+
 				$this->owner->db->sqlQuery(
 					$this->owner->db->genSQLUpdate(
-						DB_NAME_WEB . '.cart_items',
+						'cart_items',
 						[
 							'citem_quantity' => $quantity,
 						],
@@ -104,7 +131,27 @@ class cart extends ancestor {
 		return $this->items;
 	}
 
-	public function getCartItemsNumber(){
+	public function getStatus(){
+		return $this->status;
+	}
+
+    public function isEmpty(){
+        return Empty($this->items);
+    }
+
+    public function getShippingId(){
+        return $this->shippingId;
+    }
+
+    public function getPaymentId(){
+        return $this->paymentId;
+    }
+
+    public function getDiscount(){
+        return $this->discount;
+    }
+
+	public function getNumberOfCartItems(){
 		$count = 0;
 
 		if($this->status == self::CART_STATUS_NEW) {
@@ -119,116 +166,168 @@ class cart extends ancestor {
 	public function makeOrder($userId){
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLUpdate(
-				DB_NAME_WEB . '.cart',
+				'cart',
 				[
 					'cart_us_id' => (int) $userId,
-					'cart_status' => 'ORDER',
+					'cart_status' => self::CART_STATUS_ORDERED,
+					'cart_order_status' => self::ORDER_STATUS_NEW,
+					'cart_ordered' => 'NOW()',
 				],
 				[
 					'cart_id' => $this->id,
+					'cart_shop_id' => $this->owner->shopId,
 					'cart_key' => $this->key
 				]
 			)
 		);
 
-		$cartMailBody = $this->owner->view->renderContent(
-			'order',
-			[
-				'items' => $this->items,
-				'currency' => $this->currency,
-				'subtotal' => $this->subtotal,
-				'discount' => $this->discount,
-				'total' => $this->total,
-				'key' => $this->key,
-				'id' => $this->id,
-				'status' => $this->status,
-			],
-			false,
-			true
-		);
+        $this->sendConfirmationEmail();
 
-		$data = [
-			'id' => $userId,
-			'link' => $this->owner->domain . '/finish/' .$this->key . '/',
-			'cart' => $cartMailBody,
-			'status' => $this->status,
-			'key' => $this->key,
-			'total' => $this->total,
-			'currency' => $this->currency,
-		];
-		$this->owner->email->prepareEmail(
-			'order-request',
-			$userId,
-			$data,
-			false,  // from
-			false,  // cc
-			($this->owner->settings['incomingEmail'] ?: false) // bcc
-		);
-
-		$key = $this->key;
 		$this->destroyKey();
-
-		return $key;
 	}
+
+    private function sendConfirmationEmail(){
+        $this->loadCart();
+
+        $cartMailBody = $this->owner->view->renderContent(
+            'mail-order',
+            [
+                'items' => $this->items,
+                'currency' => $this->currency,
+                'subtotal' => $this->subtotal,
+                'discount' => $this->discount,
+                'shippingFee' => $this->shippingFee,
+                'paymentFee' => $this->paymentFee,
+                'total' => $this->total,
+                'shippingMode' => $this->getSelectedShippingMode(),
+                'paymentMode' => $this->getSelectedPaymentMode(),
+                'key' => $this->key,
+                'id' => $this->id,
+                'status' => $this->status,
+                'domain' => $this->owner->domain,
+            ],
+            false
+        );
+
+        $data = [
+            'id' => $this->userId,
+            'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->key . '/',
+            'order' => $cartMailBody,
+            'status' => $this->status,
+            'key' => $this->key,
+            'total' => $this->total,
+            'currency' => $this->currency,
+        ];
+
+        $this->owner->email->prepareEmail(
+            'new-order',
+            $this->userId,
+            $data,
+            false,  // from
+            false,  // cc
+            ($this->owner->settings['incomingEmail'] ?: false) // bcc
+        );
+    }
 
 	private function loadCart(){
 		$this->items = [];
 		$this->id = 0;
-		$sql = "SELECT * FROM " . DB_NAME_WEB . ".cart WHERE cart_key = '" . $this->owner->db->escapeString($this->key) . "'";
-		$cart = $this->owner->db->getFirstRow($sql);
-		if($cart) {
-			$this->id = $cart['cart_id'];
-			$this->status = $cart['cart_status'];
-			$this->total = $cart['cart_total'];
-			$this->subtotal = $cart['cart_subtotal'];
-			$this->currency = $cart['cart_currency'];
 
-			$sql = "SELECT * FROM " . DB_NAME_WEB . ".cart_items WHERE citem_cart_id = '" . $this->id . "' ORDER BY citem_prod_id, citem_pv_id";
-			$result = $this->owner->db->getRows($sql);
-			if ($result) {
-				$packUnits = $this->owner->lib->getList('pack-units');
+        if($this->key) {
+            $cart = $this->owner->db->getFirstRow(
+                $this->owner->db->genSQLSelect(
+                    'cart',
+                    [],
+                    [
+                        'cart_key' => $this->key,
+                        'cart_shop_id' => $this->owner->shopId,
+                        /*
+                        'cart_status' => [
+                            'in' => [
+                                '"' . self::CART_STATUS_NEW . '"',
+                                '"' . self::CART_STATUS_ABANDONED . '"',
+                            ]
+                        ]
+                        */
+                    ]
+                )
+            );
+            if ($cart) {
+                $this->id = $cart['cart_id'];
+                $this->userId = $cart['cart_us_id'];
+                $this->status = $cart['cart_status'];
+                $this->orderStatus = $cart['cart_order_status'];
+                $this->orderDate = $cart['cart_ordered'];
+                $this->total = $cart['cart_total'];
+                $this->subtotal = $cart['cart_subtotal'];
+                $this->currency = $cart['cart_currency'];
+                $this->shippingFee = $cart['cart_shipping_fee'];
+                $this->shippingId = $cart['cart_sm_id'];
+                $this->paymentFee = $cart['cart_payment_fee'];
+                $this->paymentId = $cart['cart_pm_id'];
 
-				foreach ($result AS $row) {
-					$this->items[$row['citem_id']] = [
-						'id' => $row['citem_id'],
-						'cartid' => $row['citem_cart_id'],
-						'productid' => $row['citem_prod_id'],
-						'variantid' => $row['citem_pv_id'],
-						'name' => $row['citem_prod_name'],
-						'type' => $row['citem_prod_type'],
-						'variant' => $row['citem_prod_variant'],
-						'img' => $row['citem_prod_img'],
-						'imgbase64' => base64_encode($row['citem_prod_img']),
-						'price' => [
-							'value' => $row['citem_price'],
-							'currency' => $row['citem_currency'],
-							'discount' => $row['citem_discount'],
-							'total' => ($row['citem_price'] * $row['citem_quantity']),
-							'formated' => $this->owner->lib->formatPrice($row['citem_price'] * $row['citem_quantity'], $this->currency),
-						],
-						'quantity' => [
-							'amount' => $row['citem_quantity'],
-							'unit' =>$packUnits[$row['citem_pack_unit']],
-							'unitcode' => $row['citem_pack_unit'],
-						],
-						'weight' => [
-							'value' => $row['citem_weight'],
-							'unit' => $row['citem_weight_unit'],
-							'total' => ($row['citem_weight'] * $row['citem_quantity']),
-						]
-					];
-				}
-			}
-		}
+                $result = $this->owner->db->getRows(
+                    $this->owner->db->genSQLSelect(
+                        'cart_items',
+                        [],
+                        [
+                            'citem_cart_id' => $this->id
+                        ],
+                        [],
+                        false,
+                        'citem_prod_id, citem_pv_id'
+                    )
+                );
+                if ($result) {
+                    $this->product = $this->owner->addByClassName('product');
+
+                    foreach ($result as $row) {
+                        $price = (!empty($row['citem_discount']) && $row['citem_discount'] < $row['citem_price'] ? $row['citem_discount'] : $row['citem_price']);
+
+                        $this->product->init($row['citem_prod_id'])->getProduct();
+
+                        $this->items[$row['citem_id']] = [
+                            'id' => $row['citem_id'],
+                            'cartId' => $row['citem_cart_id'],
+                            'productId' => $row['citem_prod_id'],
+                            'variantId' => $row['citem_pv_id'],
+                            'name' => $row['citem_prod_name'],
+                            'type' => $row['citem_prod_type'],
+                            'variant' => $row['citem_prod_variant'],
+                            'image' => $row['citem_prod_img'],
+                            'url' => $row['citem_url'],
+                            'minSale' => $this->product->getMinSale($row['citem_pv_id']),
+                            'maxSale' => $this->product->getMaxSale($row['citem_pv_id']),
+                            'price' => [
+                                'value' => $row['citem_price'],
+                                'currency' => $row['citem_currency'],
+                                'discount' => $row['citem_discount'],
+                                'finalPrice' => $price,
+                                'total' => ($price * $row['citem_quantity']),
+                            ],
+                            'quantity' => [
+                                'amount' => $row['citem_quantity'],
+                                'unit' => $row['citem_pack_unit'],
+                            ],
+                            'weight' => [
+                                'value' => $row['citem_weight'],
+                                'unit' => $row['citem_weight_unit'],
+                                'total' => ($row['citem_weight'] * $row['citem_quantity']),
+                            ]
+                        ];
+                    }
+                }
+            }
+        }
 
 		return $this;
 	}
 
-	private function isProductInCart($prodctId, $variantId = 0){
+	private function isProductInCart($productId, $variantId = 0){
 		$out = false;
 		if($this->items){
 			foreach($this->items AS $key => $item){
-				if($item['productid'] == $prodctId && $item['variantid'] == $variantId){
+				if($item['productId'] == $productId && $item['variantId'] == $variantId){
 					$out = $key;
 					break;
 				}
@@ -237,43 +336,53 @@ class cart extends ancestor {
 		return $out;
 	}
 
-	private function saveItemToCart($prodctId, $variantId = 0, $quantity = 1){
-		if($this->product['variants'][$variantId]){
-			$price = $this->product['variants'][$variantId]['price']['value'];
-			$weight = $this->product['variants'][$variantId]['weight']['value'];
-			$weightUnit = $this->product['variants'][$variantId]['weight']['unit'];
-			$type = $this->product['variants'][$variantId]['type'];
-			$variant = $this->product['variants'][$variantId]['name'];
-		}else{
-			$price = $this->product['price']['value'];
-			$weight = $this->product['weight']['value'];
-			$weightUnit = $this->product['weight']['unit'];
+	private function addItemToCart($item, $variantId = 0, $quantity = 1){
+        if(!$this->id) return false;
 
-			$type = '';
-			$variant = '';
-		}
-		$img = $this->product['img'];
+        $variant = [];
 
-		$this->owner->db->sqlQuery(
+        foreach($item['variants'] AS $var){
+            if($var['id'] == $variantId){
+                $variant = $var;
+                break;
+            }
+        }
+
+        $image = $item['thumbnail'];
+        if($variant['imgId'] && $item['images']){
+            foreach($item['images'] AS $img){
+                if($img['data']['id'] == $variant['imgId']){
+                    $image = $img['data']['thumbnail'];
+                    break;
+                }
+            }
+        }
+
+        $subtotal = (!Empty($variant['price']['discount']) && $variant['price']['discount'] < $variant['price']['value'] ? $variant['price']['discount'] : $variant['price']['value']);
+
+        $this->owner->db->sqlQuery(
 			$this->owner->db->genSQLInsert(
-				DB_NAME_WEB . '.cart_items',
+				'cart_items',
 				[
 					'citem_cart_id' => $this->id,
-					'citem_prod_id' => $prodctId,
+					'citem_prod_id' => $item['id'],
 					'citem_pv_id' => $variantId,
-					'citem_prod_name' => $this->product['name'],
-					'citem_prod_img' => $img,
-					'citem_prod_type' => $type,
-					'citem_prod_variant' => $variant,
-					'citem_price' => $price,
-					'citem_currency' => $this->product['price']['currency'],
+					'citem_prod_name' => $item['name'],
+					'citem_prod_img' => $image,
+					'citem_prod_variant' => $variant['name'],
+					'citem_price' => $variant['price']['value'],
+					'citem_discount' => $variant['price']['discount'],
+					'citem_subtotal' => $subtotal,
+					'citem_currency' => $variant['price']['currency'],
 					'citem_quantity' => $quantity,
-					'citem_pack_unit' => $this->product['pack']['unitcode'],
-					'citem_weight' => $weight,
-					'citem_weight_unit' => $weightUnit,
+					'citem_pack_unit' => $variant['packaging']['packageUnitName'],
+					'citem_weight' => $variant['packaging']['weight'],
+					'citem_weight_unit' => $variant['packaging']['weightUnitName'],
+					'citem_url' => $item['url'],
 				]
 			)
 		);
+
 		$key = $this->owner->db->getInsertRecordId();
 
 		$this->loadCart()->summarize();
@@ -290,7 +399,7 @@ class cart extends ancestor {
 
 			$this->owner->db->sqlQuery(
 				$this->owner->db->genSQLUpdate(
-					DB_NAME_WEB . '.cart_items',
+					'cart_items',
 					[
 						'citem_quantity' => $this->items[$key]['quantity']['amount'],
 					],
@@ -310,28 +419,31 @@ class cart extends ancestor {
 	private function summarize(){
 		$this->total = 0;
 		$this->subtotal = 0;
-		$this->discount = 0;
-		$this->shipping = 0;
 
 		if($this->items){
 			foreach($this->items AS $item){
-				$this->total += $item['price']['total'];
 				$this->subtotal += $item['price']['total'];
 			}
 		}
 
+        $this->checkShippingFee();
+
+        $this->total = $this->subtotal + $this->shippingFee + $this->paymentFee - $this->discount;
+
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLUpdate(
-				DB_NAME_WEB . '.cart',
+				'cart',
 				[
-					'cart_us_id' => (int) $this->owner->user->getProfile()['id'],
+					'cart_us_id' => (int) $this->owner->user->getUser()['id'],
 					'cart_subtotal' => $this->subtotal,
 					'cart_total' => $this->total,
-					'cart_shipping' => $this->shipping,
+					'cart_shipping_fee' => $this->shippingFee,
+					//'cart_payment_fee' => $this->paymentFee,
 					'cart_discount' => $this->discount,
 				],
 				[
 					'cart_id' => $this->id,
+                    'cart_shop_id' => $this->owner->shopId,
 					'cart_key' => $this->key
 				]
 			)
@@ -341,35 +453,38 @@ class cart extends ancestor {
 	}
 
 	private function getKey($key = false, $create = true){
-		if(!Empty($key)) {
-			if (!$this->key = $this->checkCartKey($key)) {
-				if($create) {
-					$this->setKey();
-				}
-			}
-		}else {
-			if (!$this->key = $this->owner->getSession(self::CART_SESSION_KEY)) {
-				if (!$this->key = $_COOKIE[self::CART_SESSION_KEY]) {
-					if ($create) {
-						$this->setKey();
-					}
-				}
-			}
-		}
+        if(!Empty($key)) {
+            $this->key = $this->checkCartKey($key);
+        }else{
+            if (!$this->key = $this->owner->getSession(self::CART_SESSION_KEY)) {
+                $this->key = $_COOKIE[self::CART_SESSION_KEY];
+            }
+        }
+
+        if($create){
+            if(!$this->key) {
+                $this->setKey();
+            }
+
+            $this->initCart();
+        }
 
 		return $this;
 	}
 
-	private function setKey(){
-		if(!$this->key){
-			$this->key = uuid::v4();
-			$this->owner->setSession(self::CART_SESSION_KEY, $this->key);
-			setcookie(self::CART_SESSION_KEY, $this->key, 0, '/');
+	private function setKey($key = false){
+        if($key){
+            $this->key = $key;
+        }else {
+            if (!$this->key) {
+                $this->key = uuid::v4();
+            }
+        }
 
-			$this->initCart();
-		}
+        $this->owner->setSession(self::CART_SESSION_KEY, $this->key);
+        setcookie(self::CART_SESSION_KEY, $this->key, 0, '/');
 
-		return $this;
+        return $this;
 	}
 
 	private function destroyKey(){
@@ -379,8 +494,20 @@ class cart extends ancestor {
 	}
 
 	private function checkCartKey($key){
-		$row = $this->owner->db->getFirstRow("SELECT cart_key FROM " . DB_NAME_WEB . ".cart WHERE cart_key='" . $this->owner->db->escapeString($key) . "'");
-		if($row['cart_key']){
+		$row = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'cart',
+                [
+                    'cart_key'
+                ],
+                [
+                    'cart_key' => $key,
+                    'cart_shop_id' => $this->owner->shopId
+                ]
+            )
+        );
+
+        if($row['cart_key']){
 			return $row['cart_key'];
 		}else{
 			return false;
@@ -389,37 +516,248 @@ class cart extends ancestor {
 
 	private function initCart(){
 		if($this->owner->user->isLoggedIn()) {
-			$userId = $this->owner->user->getProfile()['id'];
+			$userId = $this->owner->user->getUser()['id'];
 		}else{
 			$userId = 0;
 		}
 
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLInsert(
-				DB_NAME_WEB . '.cart',
+				'cart',
 				[
 					'cart_key' => $this->key,
 					'cart_shop_id' => $this->owner->shopId,
 					'cart_us_id' => $userId,
 					'cart_created' => 'NOW()',
-					'cart_status' => 'NEW',
+					'cart_status' => self::CART_STATUS_NEW,
 					'cart_currency' => $this->currency,
 				],
 				[
-					'cart_key'
+					'cart_key',
+					'cart_shop_id'
 				]
 			)
 		);
 	}
 
-	public function checkProduct($productId){
-		$sql = "SELECT prod_id, prod_shop_id FROM " . DB_NAME_WEB . ".products WHERE prod_id = '" . $productId . "' AND prod_available = 1";
-		$row = $this->owner->db->getFirstRow($sql);
-		if($row){
-			$this->product = $this->products->setProductId($row['prod_id'], $row['prod_shop_id'])->getProduct(false);
-		}
+    private function checkQuantity($quantity, $variantId = 0){
+        if($this->product->isProductLoaded()) {
+            if ($quantity < $this->product->getMinSale($variantId)) {
+                $quantity = $this->product->getMinSale($variantId);
+            }
+            if ($quantity > $this->product->getMaxSale($variantId)) {
+                $quantity = $this->product->getMaxSale($variantId);
+            }
+        }
 
-		return $this;
-	}
+        if ($quantity <= 0) $quantity = 1;
+
+        return $quantity;
+    }
+
+    private function checkShippingFee(){
+        if($this->shippingId){
+            $row = $this->owner->db->getFirstRow(
+                $this->owner->db->genSQLSelect(
+                    'shipping_modes',
+                    [
+                        'sm_id AS id',
+                        'sm_name AS name',
+                        'sm_free_limit AS freeLimit',
+                        'sm_price AS price',
+                        'sm_default AS def',
+                        'sm_text AS text',
+                    ],
+                    [
+                        'sm_shop_id' => $this->owner->shopId,
+                        'sm_enabled' => 1,
+                        'sm_id' => $this->shippingId,
+                    ]
+                )
+            );
+            if($row){
+                if($row['price'] > 0 ){
+                    if($this->subtotal >= $row['freeLimit'] && !Empty($row['freeLimit'])) {
+                        $this->shippingFee = 0;
+                    }else {
+                        $this->shippingFee = $row['price'];
+                    }
+                }else{
+                    $this->shippingFee = 0;
+                }
+            }
+        }
+    }
+
+    public function getItem($id){
+        return $this->items[$id];
+    }
+
+    public function getPaymentModes(){
+        $out = [];
+
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'payment_modes',
+                [
+                    'pm_id AS id',
+                    'pm_name AS name',
+                    'pm_type AS type',
+                    'pm_price AS price',
+                    'pm_text AS text',
+                    'pm_default AS def',
+                ],
+                [
+                    'pm_shop_id' => $this->owner->shopId,
+                    'pm_enabled' => 1,
+                ],
+                [],
+                false,
+                'pm_default DESC, pm_order'
+            )
+        );
+        if ($result) {
+            foreach($result AS $row){
+                $out[$row['id']] = $row;
+            }
+        }
+
+        return $out;
+    }
+
+    public function getSelectedPaymentMode(){
+        static $out = [];
+
+        if($this->paymentId && Empty($out)) {
+            $out = $this->owner->db->getFirstRow(
+                $this->owner->db->genSQLSelect(
+                    'payment_modes',
+                    [
+                        'pm_id AS id',
+                        'pm_name AS name',
+                        'pm_text AS text',
+                        'pm_email_text AS emailText',
+                    ],
+                    [
+                        'pm_shop_id' => $this->owner->shopId,
+                        'pm_id' => $this->paymentId,
+                    ]
+                )
+            );
+        }
+
+        return $out;
+    }
+
+    public function getShippingModes(){
+        $out = [];
+
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'shipping_modes',
+                [
+                    'sm_id AS id',
+                    'sm_name AS name',
+                    'sm_free_limit AS freeLimit',
+                    'sm_price AS price',
+                    'sm_default AS def',
+                    'sm_text AS text',
+                ],
+                [
+                    'sm_shop_id' => $this->owner->shopId,
+                    'sm_enabled' => 1,
+                ],
+                [],
+                false,
+                'sm_default DESC, sm_order'
+            )
+        );
+        if ($result) {
+            foreach($result AS $row){
+                $out[$row['id']] = $row;
+
+                if($this->subtotal >= $row['freeLimit'] && !Empty($row['freeLimit'])){
+                    $out[$row['id']]['price'] = 0;
+                }
+            }
+        }
+
+        return $out;
+    }
+
+    public function getSelectedShippingMode(){
+        static $out = [];
+
+        if($this->shippingId && Empty($out)) {
+            $out = $this->owner->db->getFirstRow(
+                $this->owner->db->genSQLSelect(
+                    'shipping_modes',
+                    [
+                        'sm_id AS id',
+                        'sm_name AS name',
+                        'sm_text AS text',
+                        'sm_email_text AS emailText',
+                    ],
+                    [
+                        'sm_shop_id' => $this->owner->shopId,
+                        'sm_id' => $this->shippingId,
+                    ]
+                )
+            );
+        }
+
+        return $out;
+    }
+
+    public function setPaymentMode($id){
+        $paymentModes = $this->getPaymentModes();
+        if($paymentModes[$id]){
+            $this->paymentId = $id;
+            $this->paymentFee = $paymentModes[$id]['price'];
+
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'cart',
+                    [
+                        'cart_pm_id' => (int) $id,
+                        'cart_payment_fee' => $this->paymentFee,
+                    ],
+                    [
+                        'cart_id' => $this->id,
+                        'cart_shop_id' => $this->owner->shopId,
+                        'cart_key' => $this->key
+                    ]
+                )
+            );
+
+            $this->loadCart()->summarize();
+        }
+    }
+
+    public function setShippingMode($id){
+        $shippingModes = $this->getShippingModes();
+        if($shippingModes[$id]){
+            $this->shippingId = $id;
+            $this->shippingFee = $shippingModes[$id]['price'];
+
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'cart',
+                    [
+                        'cart_sm_id' => (int) $id,
+                        'cart_shipping_fee' => $this->shippingFee,
+                    ],
+                    [
+                        'cart_id' => $this->id,
+                        'cart_shop_id' => $this->owner->shopId,
+                        'cart_key' => $this->key
+                    ]
+                )
+            );
+
+            $this->loadCart()->summarize();
+        }
+    }
+
 
 }

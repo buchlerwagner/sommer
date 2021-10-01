@@ -26,7 +26,7 @@
                                         {% if item.images|length > 1 %}
                                             {% for img in item.images %}
                                                 <a id="img-{{ img.data.id }}" data-zoom-id="zoom" href="{{ img.file }}" data-image="{{ img.data.medium }}" title="">
-                                                    <img class="rounded" src="{{ img.data.thumbnail }}" width="80" height="80" />
+                                                    <img class="rounded" src="{{ img.data.thumbnail }}" width="80" height="80" alt="" />
                                                 </a>
                                             {% endfor %}
                                         {% endif %}
@@ -54,6 +54,10 @@
                                             {% else %}
                                                 {{ _price(variant.price.value, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
                                             {% endif %}
+
+                                            {% if variant.packaging.quantity > 1 %}
+                                                <div class="item-packaging small text-muted">({{ variant.packaging.quantity }} {{ _('LBL_PCS') }}/{{ variant.packaging.packageUnitName }})</div>
+                                            {% endif %}
                                         </div>
                                         {% endfor %}
 
@@ -64,38 +68,43 @@
 
                                     {% if item.variants|length > 1 %}
                                     <div class="other-options clearfix mb-3">
-                                        <select name="variant" class="form-control select-variant">
+                                        <select id="variant" name="variant" class="form-control select-variant">
                                             {% for variant in item.variants %}
                                                 <option value="{{ variant.id }}">{{ variant.name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
+                                    {% else %}
+                                        <input type="hidden" id="variant" name="variant" value="0">
                                     {% endif %}
 
                                     <div class="other-options clearfix">
                                         {% if not settings.stopSale %}
                                             {% if item.available %}
 
-                                                <div class="item-quantity form-row align-items-center">
-                                                    <div class="col-12 col-lg-6">
-                                                        <label class="mb-0" for="quantity">{{ _('LBL_QUANTITY') }}</label>
-                                                        <div class="input-group input-spinner">
-                                                            <div class="input-group-prepend">
-                                                                <button class="btn btn-light quantity-select btn-minus" data-value="-1" type="button" disabled id="button-minus"> - </button>
+                                                <div class="row align-items-center">
+                                                    <div class="col-12">
+                                                        <div class="form-inline">
+                                                            <div class="form-group">
+                                                                <div class="input-group input-spinner" style="width: 195px;">
+                                                                    <div class="input-group-prepend">
+                                                                        <button class="btn btn-light quantity-select btn-minus" data-value="-1" type="button" disabled id="button-minus"> - </button>
+                                                                    </div>
+                                                                    <input type="text" name="quantity" id="quantity" data-min="{{ item.variants[0].minSale }}" data-max="{{ item.variants[0].maxSale }}" class="form-control bg-white text-right numbersonly quantity-input" value="{{ item.variants[0].minSale }}">
+                                                                    <div class="input-group-append">
+                                                                        <span class="input-group-text bg-white" id="quantity-unit">{{ item.variants[0].packaging.packageUnitName }}</span>
+                                                                    </div>
+                                                                    <div class="input-group-append">
+                                                                        <button class="btn btn-light quantity-select btn-plus" data-value="1" type="button" id="button-plus"> + </button>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <input type="text" name="quantity" id="quantity" data-min="{{ item.variants[0].minSale }}" data-max="{{ item.variants[0].maxSale }}" readonly class="form-control bg-white text-right" value="{{ item.variants[0].minSale }}">
-                                                            <div class="input-group-append">
-                                                                <span class="input-group-text bg-white" id="quantity-unit">{{ item.variants[0].packaging.packageUnitName }}</span>
-                                                            </div>
-                                                            <div class="input-group-append">
-                                                                <button class="btn btn-light quantity-select btn-plus" data-value="1" type="button" id="button-plus"> + </button>
+                                                            <div class="form-group">
+                                                                <button type="button" class="theme-btn btn-pink add-to-cart ml-3" data-id="{{ item.id }}">
+                                                                    <span class="btn-title">{{ _('LBL_ADD_TO_CART') }}</span>
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-12 col-lg-6 pt-4 text-center">
-                                                        <button type="button" class="theme-btn btn-pink add-to-cart mt-3">
-                                                            <span class="btn-title">{{ _('LBL_ADD_TO_CART') }}</span>
-                                                        </button>
                                                     </div>
                                                 </div>
                                             {% else %}

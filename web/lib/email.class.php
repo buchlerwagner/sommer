@@ -324,12 +324,10 @@ class email extends ancestor {
 	}
 
 	private function getEmailSender(){
-		$result = [
+		return [
 			'name'  => ($this->owner->settings['emailSenderName'] ?: EMAIL_SENDER_NAME),
 			'email' => ($this->owner->settings['outgoingEmail'] ?:  EMAIL_SENDER_EMAIL),
 		];
-
-		return $result;
 	}
 
 	private function getAttachment($file){

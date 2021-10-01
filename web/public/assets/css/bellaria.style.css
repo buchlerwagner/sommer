@@ -5,7 +5,7 @@
  * Copyright 2011-2019 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
-@import url("https://fonts.googleapis.com/css?family=ABeeZee:400,400i|Roboto:300,400,500,700|Leckerli+One|Merienda+One&display=swap");
+@import url("https://fonts.googleapis.com/css?family=ABeeZee:400,400i|Roboto:300,400,500,700|Leckerli+One|Charm:wght@400;700&display=swap");
 :root {
   --blue: #007bff;
   --indigo: #6610f2;
@@ -10092,6 +10092,226 @@ h3 {
     border-bottom: 1px solid #dee2e6 !important;
   }
 }
+.text-40 {
+  font-size: 0.4em !important;
+}
+
+.text-50 {
+  font-size: 0.5em !important;
+}
+
+.text-60 {
+  font-size: 0.6em !important;
+}
+
+.text-70 {
+  font-size: 0.7em !important;
+}
+
+.text-80 {
+  font-size: 0.8em !important;
+}
+
+.text-90 {
+  font-size: 0.9em !important;
+}
+
+.text-100 {
+  font-size: 1em !important;
+}
+
+.text-110 {
+  font-size: 1.1em !important;
+}
+
+.text-120 {
+  font-size: 1.2em !important;
+}
+
+.text-130 {
+  font-size: 1.3em !important;
+}
+
+.text-140 {
+  font-size: 1.4em !important;
+}
+
+.text-150 {
+  font-size: 1.5em !important;
+}
+
+.text-160 {
+  font-size: 1.6em !important;
+}
+
+.text-170 {
+  font-size: 1.7em !important;
+}
+
+.text-180 {
+  font-size: 1.8em !important;
+}
+
+.text-190 {
+  font-size: 1.9em !important;
+}
+
+.text-200 {
+  font-size: 2em !important;
+}
+
+.text-95 {
+  font-size: 0.95em !important;
+}
+
+.text-85 {
+  font-size: 0.85em !important;
+}
+
+.text-75 {
+  font-size: 0.75em !important;
+}
+
+.text-105 {
+  font-size: 1.05em !important;
+}
+
+.text-115 {
+  font-size: 1.15em !important;
+}
+
+.text-125 {
+  font-size: 1.25em !important;
+}
+
+.text-xs {
+  font-size: 0.625rem !important;
+}
+
+.text-sm {
+  font-size: 0.875rem !important;
+}
+
+.text-md {
+  font-size: 1rem !important;
+}
+
+.text-lg {
+  font-size: 1.25rem !important;
+}
+
+.text-xl {
+  font-size: 1.5rem !important;
+}
+
+.text-700, .font-bold {
+  font-weight: bolder !important;
+}
+
+.text-600, .font-bolder {
+  font-weight: 700 !important;
+}
+
+.text-500, .font-medium {
+  font-weight: 500 !important;
+}
+
+.text-400, .font-normal {
+  font-weight: 400 !important;
+}
+
+.text-300, .font-light, .font-lighter {
+  font-weight: 300 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+}
+
+.no-underline {
+  text-decoration: none !important;
+}
+
+.line-through {
+  text-decoration: line-through !important;
+}
+
+.line-height-n {
+  line-height: normal !important;
+}
+
+.letter-spacing {
+  letter-spacing: 0.5px !important;
+}
+
+.letter-spacing-1 {
+  letter-spacing: 1px !important;
+}
+
+.letter-spacing-2 {
+  letter-spacing: 1.5px !important;
+}
+
+.letter-spacing-3 {
+  letter-spacing: 2px !important;
+}
+
+.letter-spacing-4 {
+  letter-spacing: 2.5px !important;
+}
+
+.text-blue {
+  color: #007bff;
+}
+
+.text-indigo {
+  color: #6610f2;
+}
+
+.text-purple {
+  color: #6f42c1;
+}
+
+.text-pink {
+  color: #e83e8c;
+}
+
+.text-red {
+  color: #dc3545;
+}
+
+.text-orange {
+  color: #fd7e14;
+}
+
+.text-yellow {
+  color: #ffc107;
+}
+
+.text-green {
+  color: #28a745;
+}
+
+.text-teal {
+  color: #20c997;
+}
+
+.text-cyan {
+  color: #17a2b8;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.text-gray {
+  color: #6c757d;
+}
+
+.text-gray-dark {
+  color: #343a40;
+}
+
 /*-----------------------------------------------------------------------------
 
 -	Revolution Slider 5.0 Default Style Settings -
@@ -20732,20 +20952,13 @@ Version: 1.0.0
 ====================================================================
 
 ***/
-/*
-	font-family: 'Merida One', cursive;
-	font-family: 'ABeeZee', sans-serif;
-	font-family: 'Leckerli One', cursive;
-
-	font-family: 'EB Garamond', serif;
-*/
 /***
 
-====================================================================
-		Reset
-====================================================================
+   ====================================================================
+           Reset
+   ====================================================================
 
- ***/
+    ***/
 * {
   margin: 0px;
   padding: 0px;
@@ -20764,7 +20977,6 @@ Version: 1.0.0
 body {
   font-size: 14px;
   color: #4b4342;
-  line-height: 28px;
   font-weight: 400;
   background: #ffffff;
   -webkit-font-smoothing: antialiased;
@@ -20792,7 +21004,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0px;
   background: none;
   line-height: 1.2em;
-  font-family: "Merienda One", cursive;
+  font-family: "Charm", cursive;
 }
 
 section {
@@ -21518,7 +21730,7 @@ ul, li {
   font-size: 23px;
   line-height: 36px;
   padding: 12px 33px;
-  font-family: "Merienda One";
+  font-family: "Charm";
   color: #4b4342;
   cursor: pointer;
   padding-bottom: 42px;
@@ -21602,7 +21814,7 @@ ul, li {
   padding-left: 55px;
   line-height: 1em;
   color: #4b4342;
-  font-family: "Merienda One";
+  font-family: "Charm";
   cursor: pointer;
   -webkit-transition: all 300ms ease;
   -moz-transition: all 300ms ease;
@@ -21711,7 +21923,7 @@ ul, li {
   left: 0;
   top: 50%;
   margin-top: -1.5px;
-  border-bottom: 3px solid;
+  border-bottom: 2px solid;
   border-color: inherit;
 }
 
@@ -21731,7 +21943,7 @@ ul, li {
 
 ***/
 .theme-btn {
-  font-family: "Merienda One", cursive;
+  font-family: "Charm", cursive;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -ms-transition: all 0.5s ease;
@@ -22007,42 +22219,42 @@ ul, li {
 /* Theme btn border-sky */
 .theme-btn.border-sky,
 .theme-btn.border-sky span:before {
-  color: #5fcac7;
-  background-color: #ffffff;
-  border-color: #5fcac7;
+  color: #5fcac7 !important;
+  background-color: #ffffff !important;
+  border-color: #5fcac7 !important;
 }
 
 .theme-btn.border-sky:hover,
 .theme-btn.border-sky:hover span:before {
-  color: #ffffff;
-  background-color: #5fcac7;
+  color: #ffffff !important;
+  background-color: #5fcac7 !important;
 }
 
 /* Theme btn bg-pink */
 .theme-btn.bg-pink,
 .theme-btn.bg-pink span:before {
   color: #ffffff;
-  background-color: #ff91a4;
-  border-color: #ff91a4;
+  background-color: #ff91a4 !important;
+  border-color: #ff91a4 !important;
 }
 
 .theme-btn.bg-pink:hover,
 .theme-btn.bg-pink:hover span:before {
-  color: #ff91a4;
-  background-color: #ffffff;
+  color: #ff91a4 !important;
+  background-color: #ffffff !important;
 }
 
 /* Theme btn border-pink */
 .theme-btn.border-pink,
 .theme-btn.border-pink span:before {
-  border-color: #ff91a4;
-  color: #ff91a4;
+  border-color: #ff91a4 !important;
+  color: #ff91a4 !important;
 }
 
 .theme-btn.border-pink:hover,
 .theme-btn.border-pink:hover span:before {
-  background-color: #ff91a4;
-  color: #ffffff;
+  background-color: #ff91a4 !important;
+  color: #ffffff !important;
 }
 
 /* Theme btn bg-parrot */
@@ -22194,7 +22406,7 @@ ul, li {
   right: -25px;
   top: -37px;
   font-size: 19px;
-  font-family: "Merienda One";
+  font-family: "Charm";
   font-weight: 500;
   color: #4b4342;
 }
@@ -22243,7 +22455,7 @@ ul, li {
   transform: translateY(-50%);
   line-height: 1em;
   font-weight: 500;
-  font-family: "Merienda One";
+  font-family: "Charm";
 }
 
 .pie-graph h4 {
@@ -22774,7 +22986,7 @@ hr {
   color: #4b4342;
   font-weight: 500;
   margin-right: 6px;
-  font-family: "Merienda One", cursive;
+  font-family: "Charm", cursive;
   -webkit-transition: all 300ms ease;
   -moz-transition: all 300ms ease;
   -ms-transition: all 300ms ease;
@@ -22787,9 +22999,9 @@ hr {
   display: block;
   text-align: center;
   opacity: 1;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 36px;
-  font-weight: 500;
+  font-weight: 700;
   color: #7E422D;
   padding-top: 20px;
   padding-left: 15px;
@@ -23390,6 +23602,7 @@ hr {
   opacity: 0;
   box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.2);
   border-radius: 15px;
+  width: 320px;
 }
 
 .main-header .shopping-cart:before {
@@ -23432,10 +23645,6 @@ hr {
   position: relative;
 }
 
-.main-header .shopping-cart .cart-item {
-  width: 270px;
-}
-
 .shopping-cart .cart-item {
   position: relative;
   width: 100%;
@@ -23469,7 +23678,7 @@ hr {
   display: block;
   font-size: 16px;
   color: #4b4342;
-  line-height: 2em;
+  line-height: normal;
   font-weight: 500;
   -webkit-transition: all 300ms ease;
   -moz-transition: all 300ms ease;
@@ -23816,7 +24025,7 @@ hr {
 .mobile-menu .navigation li > a {
   position: relative;
   display: block;
-  font-family: "Merienda One";
+  font-family: "Charm";
   font-size: 18px;
   line-height: 29px;
   color: #4b4342;
@@ -24202,7 +24411,7 @@ hr {
   font-size: 30px;
   color: #4b4342;
   margin-bottom: 20px;
-  font-family: "Merienda One";
+  font-family: "Charm";
 }
 
 /*** 
@@ -25680,7 +25889,7 @@ hr {
   cursor: pointer;
   padding: 8px 9px;
   z-index: 3;
-  font-family: "Merienda One";
+  font-family: "Charm";
   color: #4b4342;
   -webkit-transition: all 300ms ease;
   -moz-transition: all 300ms ease;
@@ -25965,7 +26174,7 @@ hr {
   color: #4b4342;
   cursor: pointer;
   padding: 0 51px;
-  font-family: "Merienda One";
+  font-family: "Charm";
   font-weight: 500;
   -webkit-transition: all 500ms ease;
   -moz-transition: all 500ms ease;
@@ -26217,7 +26426,7 @@ blockquote {
   line-height: 40px;
   margin-top: 20px;
   margin-bottom: 1em;
-  font-family: "Merienda One";
+  font-family: "Charm";
 }
 
 blockquote:before,
@@ -27111,7 +27320,7 @@ blockquote:after {
   display: block;
   font-weight: 500;
   color: #ff91a4;
-  font-family: "Merienda One";
+  font-family: "Charm";
   z-index: 1;
 }
 
@@ -27803,7 +28012,7 @@ blockquote:after {
   display: block;
   font-size: 24px;
   color: #ffffff;
-  font-family: "Merienda One", cursive;
+  font-family: "Charm", cursive;
   margin-bottom: 5px;
 }
 
@@ -28006,7 +28215,7 @@ blockquote:after {
   display: block;
   font-size: 24px;
   color: #4b4342;
-  font-family: "Merienda One", cursive;
+  font-family: "Charm", cursive;
 }
 
 .testimonial-block-two.style-two .testimonial_img .div_left,
@@ -28111,7 +28320,7 @@ blockquote:after {
   font-size: 48px;
   line-height: 1em;
   color: #4b4342;
-  font-family: "Merienda One";
+  font-family: "Charm";
   vertical-align: middle;
   margin-bottom: 20px;
 }
@@ -28808,7 +29017,7 @@ blockquote:after {
   display: block;
   font-weight: 500;
   color: #ff91a4;
-  font-family: "Merienda One";
+  font-family: "Charm";
   z-index: 1;
 }
 
@@ -29071,9 +29280,11 @@ blockquote:after {
   padding: 8px 6px;
   z-index: 3;
   color: #4b4342;
-  font-family: "Merienda One";
+  font-family: "Charm";
 }
 
+.styled-pagination li .disabled,
+.styled-pagination li .disabled:hover,
 .styled-pagination li .next,
 .styled-pagination li .prev {
   font-size: 13px;
@@ -29091,7 +29302,7 @@ blockquote:after {
 }
 
 .styled-pagination li a:hover,
-.styled-pagination li .current {
+.styled-pagination .current a {
   color: #ff91a4;
 }
 
@@ -29154,7 +29365,7 @@ blockquote:after {
   line-height: 40px;
   margin-top: 20px;
   margin-bottom: 1em;
-  font-family: "Merienda One";
+  font-family: "Charm";
 }
 
 .quote-box:before,
@@ -29335,15 +29546,15 @@ blockquote:after {
 }
 
 .contact-form .form-group input[type=submit],
-.contact-form .form-group button {
+.contact-form .form-group button,
+.btn-simple {
   position: relative;
   display: inline-block;
   background-color: #ffffff;
-  color: #4b4342;
+  color: #4b4342 !important;
   font-size: 17px;
   padding: 4px 20px;
   line-height: 30px;
-  font-family: "Merienda One";
   text-align: center;
   white-space: nowrap;
   min-width: 160px;
@@ -29355,6 +29566,12 @@ blockquote:after {
   -ms-transition: all 500ms ease;
   -o-transition: all 500ms ease;
   transition: all 500ms ease;
+}
+
+.btn-simple:hover {
+  text-decoration: none;
+  outline: none;
+  color: #5fcac7 !important;
 }
 
 .contact-form .form-group input[type=submit]:hover,
@@ -29981,8 +30198,8 @@ iframe#gmap_canvas {
   position: relative;
   padding: 20px 15px;
   margin-bottom: 60px;
-  border: 4px solid #edecec;
-  border-radius: 20px;
+  border: 2px solid #edecec;
+  border-radius: 15px;
 }
 
 .sidebar-widget:not(.search-widget):before {
@@ -30000,21 +30217,22 @@ iframe#gmap_canvas {
   margin-left: -43px;
 }
 
-.sidebar-widget:not(.search-widget):after {
-  content: "";
-  background-image: url(../../themes/bellaria/images/icons/widget_after.jpg);
-  width: 26px;
-  height: 25px;
-  display: inline-block;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: absolute;
-  bottom: -16px;
-  left: 50%;
-  margin-left: -13px;
+/*
+.sidebar-widget:not(.search-widget):after{
+    content: '';
+    background-image: url(../../themes/bellaria/images/icons/widget_after.jpg);
+    width: 26px;
+    height: 25px;
+    display: inline-block;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    margin-left: -13px;
 }
-
+*/
 .sidebar-side .sidebar-widget:last-child {
   margin-bottom: 0;
 }
@@ -30260,6 +30478,7 @@ iframe#gmap_canvas {
   transition: all 300ms ease;
 }
 
+.tag-list li a.active,
 .tag-list li a:hover {
   color: #ffffff;
   background-color: #5fcac7;
@@ -30597,7 +30816,7 @@ iframe#gmap_canvas {
   font-size: 17px;
   padding: 4px 20px;
   line-height: 30px;
-  font-family: "Merienda One";
+  font-family: "Charm";
   text-align: center;
   white-space: nowrap;
   min-width: 160px;
@@ -30766,7 +30985,7 @@ iframe#gmap_canvas {
 .highlighted-items .name,
 .shop-item .name {
   position: relative;
-  font-size: 20px;
+  font-size: 25px;
   line-height: 1.1em;
   color: #4b4342;
 }
@@ -30905,9 +31124,13 @@ iframe#gmap_canvas {
   font-size: 28px;
   font-weight: 400;
   color: #ff91a4;
-  line-height: 1.3em;
-  font-family: "Merienda One";
+  font-family: "Charm";
   margin-bottom: 10px;
+}
+
+.item-packaging {
+  font-family: "ABeeZee";
+  font-weight: normal;
 }
 
 .product-details .basic-details .details-header .item-price del {
@@ -31040,7 +31263,7 @@ iframe#gmap_canvas {
   line-height: 1.2em;
   font-weight: 500;
   color: #4b4342;
-  font-family: "Merienda One";
+  font-family: "Charm";
   margin-bottom: 0.5em;
 }
 
@@ -31289,7 +31512,6 @@ iframe#gmap_canvas {
   padding-top: 10px;
   padding: 0;
   padding-top: 10px;
-  text-transform: capitalize;
 }
 
 .cart-section .totals-table .col:last-child {
@@ -31316,6 +31538,7 @@ iframe#gmap_canvas {
   border: 2px solid #ff91a4;
   text-transform: unset;
   font-family: "ABeeZee";
+  display: inline-block;
 }
 
 .cart-section .totals-table .proceed-btn:hover {
@@ -31495,6 +31718,22 @@ iframe#gmap_canvas {
   background-color: #fa9928;
 }
 
+.checkout-item {
+  border-bottom: 1px solid #bfc3c9;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #4b4342;
+  line-height: normal;
+  font-weight: 500;
+}
+
+.checkout-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
 /*Coupon Box*/
 .coupon-box {
   position: relative;
@@ -31594,7 +31833,6 @@ iframe#gmap_canvas {
 
 .payment-box .upper-box {
   position: relative;
-  border-bottom: 1px solid #b7b7b7;
 }
 
 .payment-options {
@@ -31731,61 +31969,6 @@ iframe#gmap_canvas {
   margin-bottom: 50px;
 }
 
-.login-section h2 {
-  position: relative;
-  font-size: 48px;
-  color: #7E422D;
-  line-height: 1.2em;
-  margin-bottom: 24px;
-}
-
-.login-form {
-  position: relative;
-}
-
-.login-form .form-group {
-  position: relative;
-  margin-bottom: 15px;
-}
-
-.login-form .form-group label {
-  position: relative;
-  color: #7E422D;
-  font-weight: 400;
-  font-size: 17px;
-  margin-bottom: 0;
-}
-
-.login-form .form-group input[type=text],
-.login-form .form-group input[type=password],
-.login-form .form-group input[type=tel],
-.login-form .form-group input[type=email] {
-  position: relative;
-  display: block;
-  width: 100%;
-  line-height: 20px;
-  padding: 10px 20px;
-  height: 42px;
-  color: #4b4342;
-  font-size: 17px;
-  border: 1px solid #edecec;
-  background-color: #ffffff;
-  -webkit-transition: all 300ms ease;
-  -moz-transition: all 300ms ease;
-  -ms-transition: all 300ms ease;
-  -o-transition: all 300ms ease;
-  transition: all 300ms ease;
-}
-
-.login-form .form-group input[type=text]:focus,
-.login-form .form-group input[type=password]:focus,
-.login-form .form-group input[type=tel]:focus,
-.login-form .form-group input[type=email]:focus,
-.login-form .form-group select:focus,
-.login-form .form-group textarea:focus {
-  border-color: #edecec;
-}
-
 .login-form .form-group input[type=submit],
 .login-form button {
   position: relative;
@@ -31807,21 +31990,6 @@ iframe#gmap_canvas {
 .login-form button:hover {
   color: #5fcac7;
   background-color: #ffffff;
-}
-
-.login-form .psw {
-  position: relative;
-  color: #5fcac7;
-  font-size: 17px;
-  -webkit-transition: all 300ms ease;
-  -moz-transition: all 300ms ease;
-  -ms-transition: all 300ms ease;
-  -o-transition: all 300ms ease;
-  transition: all 300ms ease;
-}
-
-.login-form .psw:hover {
-  text-decoration: underline;
 }
 
 /*** 
@@ -33525,6 +33693,98 @@ iframe#gmap_canvas {
 
 .text-pink {
   color: #ff91a4;
+}
+
+.text-muted {
+  color: #bfc3c9 !important;
+}
+
+.small {
+  font-size: 80% !important;
+}
+
+.item-fee {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/** Floating labels **/
+.floating-label {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.floating-label input {
+  height: 50px;
+}
+
+.floating-label > input,
+.floating-label > label {
+  padding: 0.9rem 0.75rem;
+}
+
+.floating-label > label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  /* Override default `<label>` margin */
+  line-height: 1.5;
+  color: #343a40;
+  border: 1px solid transparent;
+  border-radius: 0.2rem;
+  transition: all 0.1s ease-in-out;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.floating-label input::-webkit-input-placeholder {
+  color: transparent;
+}
+
+.floating-label input:-ms-input-placeholder {
+  color: transparent;
+}
+
+.floating-label input::-ms-input-placeholder {
+  color: transparent;
+}
+
+.floating-label input::-moz-placeholder {
+  color: transparent;
+}
+
+.floating-label input::placeholder {
+  color: transparent;
+}
+
+.floating-label input:focus,
+.floating-label input:not(:placeholder-shown) {
+  padding-top: calc(1rem + 1rem * (2 / 3));
+  padding-bottom: calc(1rem / 3);
+}
+
+.floating-label input:focus ~ label,
+.floating-label input:not(:placeholder-shown) ~ label {
+  padding-top: calc(1rem / 3);
+  padding-bottom: calc(1rem / 3);
+  font-size: 12px;
+  color: #adb5bd;
+}
+
+.form-row .floating-label label:not(.error) {
+  padding-left: calc(1rem * 1.1);
+}
+
+.dropdown-menu {
+  z-index: 1025 !important;
 }
 
 /*# sourceMappingURL=bellaria.style.css.map */

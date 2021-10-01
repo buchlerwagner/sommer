@@ -17,8 +17,14 @@ class editShippingModeForm extends formBuilder {
             ),
             (new groupRow('row2'))->addElements(
                 (new inputText('sm_price', 'LBL_FEE', 0))
-                    ->setColSize('col-12 col-lg-3')
+                    ->setColSize('col-6 col-lg-3')
                     ->addClass('text-right')
+                    ->onlyNumbers()
+                    ->setAppend($this->owner->currencySign),
+                (new inputText('sm_free_limit', 'LBL_FREE_LIMIT', 0))
+                    ->setColSize('col-6 col-lg-4')
+                    ->addClass('text-right')
+                    ->setHelpText('LBL_HELP_SHIPPING_FREE_LIMIT')
                     ->onlyNumbers()
                     ->setAppend($this->owner->currencySign)
             ),
@@ -36,6 +42,7 @@ class editShippingModeForm extends formBuilder {
                     ->setColSize('col-12')
                     ->setRows(4)
             )
+            //(new inputSwitch('sm_default', 'LBL_DEFAULT_SHIPPING_MODE', 0))
         );
 
         $this->addControls($group);
@@ -48,6 +55,23 @@ class editShippingModeForm extends formBuilder {
 
     public function onBeforeSave() {
         $this->values['sm_shop_id'] = $this->owner->shopId;
+        /*
+        if(Empty($this->values['sm_default'])) {
+            $this->values['sm_default'] = 0;
+        }else{
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    $this->dbTable,
+                    [
+                        'sm_default' => 0
+                    ],
+                    [
+                        'sm_shop_id' => $this->owner->shopId,
+                    ]
+                )
+            );
+        }
+        */
     }
 
     private function getMaxOrder(){

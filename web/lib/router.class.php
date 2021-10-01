@@ -129,7 +129,6 @@ class router extends model {
         }else{
             $this->shopId = 1;
             $this->host = DEFAULT_HOST;
-            $this->host = DEFAULT_HOST;
             $this->language = DEFAULT_LANGUAGE;
             $this->application = DEFAULT_APPLICATION;
             $this->theme = DEFAULT_THEME;
@@ -240,11 +239,11 @@ class router extends model {
 
 		$this->view->init();
 		if ($this->page == 'ajax') {
-		    if($this->user->isLoggedIn()) {
-                $this->loadModel('ajax', $this->params[0]);
-            }else{
-		        exit();
+            if($this->application == 'admin' && !$this->user->isLoggedIn()){
+                exit();
             }
+
+            $this->loadModel('ajax', $this->params[0]);
 		} else {
 			$this->loadModel('pages', $this->page);
 		}
@@ -371,7 +370,7 @@ class router extends model {
 			if (!empty($language)) {
 				$this->language = $language;
 			} else if (empty($this->language)) {
-				$this->language = DEFAULT_LANGUAGE;
+				$this->language = $this->hostConfig['defaultLanguage'];
 			}
 		}
 
@@ -572,5 +571,13 @@ class router extends model {
 
     public function addHttpHeader(enumHTTPHeaders $header){
         $this->httpHeaders[] = $header;
+    }
+
+    public function getPageName($name){
+        if(isset($GLOBALS['PAGE_NAMES'][$this->language][$name])){
+            $name = $GLOBALS['PAGE_NAMES'][$this->language][$name]['name'];
+        }
+
+        return '/' . $name . '/';
     }
 }

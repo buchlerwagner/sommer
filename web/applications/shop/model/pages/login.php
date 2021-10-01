@@ -24,6 +24,11 @@ if($forgotPasswordForm->errors || isset($_REQUEST['success'])){
 	$this->data['success'] = false;
 }
 
+if(isset($_REQUEST['forgot-password'])){
+    $this->data['login'] = false;
+    $this->data['forgotpassword'] = true;
+}
+
 $this->view->addInlineJs("    
 	$('a[data-toggle=\"tab\"]')
 		.on('click', function() {
