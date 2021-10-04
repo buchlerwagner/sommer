@@ -11,11 +11,12 @@ class AppExtension extends AbstractExtension {
 
 		return [
 			new TwigFunction('_', 		     [$framework->translate, '_']),
-			new TwigFunction('_unit', 	     [$this, 'formatUnit']),
 			new TwigFunction('_date', 	     [$framework->lib, 'formatDate']),
 			new TwigFunction('_price', 	     [$framework->lib, 'formatPrice']),
 			new TwigFunction('_time', 	     [$framework->lib, 'formatTime']),
 			new TwigFunction('_dow', 	     [$framework->lib, 'formatDayOfWeek']),
+            new TwigFunction('getPageName',  [$framework, 'getPageName']),
+            new TwigFunction('_unit', 	     [$this, 'formatUnit']),
 			new TwigFunction('_d', 		     [$this, 'd']),
 			new TwigFunction('_bool', 	     [$this, 'bool']),
 			new TwigFunction('_null', 	     [$this, 'null']),
@@ -31,7 +32,7 @@ class AppExtension extends AbstractExtension {
             new TwigFunction('fileTypeIcon', [$this, 'fileTypeIcon']),
             new TwigFunction('extractArray', [$this, 'extractArray'], ['needs_context' => true]),
             new TwigFunction('valueHelper',  [$this, 'valueHelper']),
-            new TwigFunction('getPageName',  [$framework, 'getPageName']),
+            new TwigFunction('orderState',   [$this, 'orderState']),
 		];
 	}
 
@@ -235,4 +236,11 @@ class AppExtension extends AbstractExtension {
 
         return $out;
     }
+
+    public function orderState($type){
+        global $framework;
+
+        return '<span class="badge badge-sm badge-' . str_replace('bg-', '', $GLOBALS['ORDER_STATUSES'][$type]['class']) . '">' . $framework->translate->getTranslation($GLOBALS['ORDER_STATUSES'][$type]['name']) . '</span>';
+    }
+
 }

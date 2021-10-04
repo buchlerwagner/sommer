@@ -92,6 +92,11 @@ class user extends ancestor {
                     $user['firstName'] = $user['firstname'];
                     $user['lastName'] = $user['lastname'];
 
+                    if($user['role'] == USER_ROLE_NONE && $user['group'] == USER_GROUP_CUSTOMERS){
+                        $user['email'] = $user['email2'];
+                        unset($user['email2']);
+                    }
+
                     $user['img'] = $this->setProfilePicture($user);
                 }
 

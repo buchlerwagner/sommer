@@ -20,6 +20,7 @@ class cart extends ancestor {
 	public $status;
 	public $orderStatus;
 	public $orderDate;
+	public $orderNumber;
 	public $total = 0;
 	public $subtotal = 0;
 	private $discount = 0;
@@ -29,8 +30,10 @@ class cart extends ancestor {
     private $paymentId = false;
 
     private $userId;
+    public $userData = [];
 
 	public $items = [];
+	public $remarks;
 
     public function init($key = false, $create = true) {
 		$this->currency = $this->owner->currency;
@@ -163,15 +166,41 @@ class cart extends ancestor {
 		return $count;
 	}
 
-	public function makeOrder($userId){
+    public function getNumberOfNewOrders(){
+        $out = 0;
+        $row = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'cart',
+                [
+                    'COUNT(cart_id) AS num',
+                ],
+                [
+                    'cart_status' => self::CART_STATUS_ORDERED,
+                    'cart_order_status' => self::ORDER_STATUS_NEW,
+                    'cart_shop_id' => $this->owner->shopId
+                ]
+            )
+        );
+
+        if($row){
+            $out = (int) $row['num'];
+        }
+
+        return $out;
+    }
+
+	public function makeOrder($userId, $invoiceType = 0, $remarks = ''){
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLUpdate(
 				'cart',
 				[
 					'cart_us_id' => (int) $userId,
+					'cart_order_number' => $this->generateOrderNumber(),
 					'cart_status' => self::CART_STATUS_ORDERED,
 					'cart_order_status' => self::ORDER_STATUS_NEW,
 					'cart_ordered' => 'NOW()',
+					'cart_invoice_type' => (int) $invoiceType,
+					'cart_remarks' => $remarks,
 				],
 				[
 					'cart_id' => $this->id,
@@ -186,12 +215,14 @@ class cart extends ancestor {
 		$this->destroyKey();
 	}
 
-    private function sendConfirmationEmail(){
+    public function sendConfirmationEmail(){
         $this->loadCart();
 
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
             [
+                'key' => $this->key,
+                'id' => $this->id,
                 'items' => $this->items,
                 'currency' => $this->currency,
                 'subtotal' => $this->subtotal,
@@ -201,9 +232,12 @@ class cart extends ancestor {
                 'total' => $this->total,
                 'shippingMode' => $this->getSelectedShippingMode(),
                 'paymentMode' => $this->getSelectedPaymentMode(),
-                'key' => $this->key,
-                'id' => $this->id,
-                'status' => $this->status,
+                'orderNumber' => $this->orderNumber,
+                'orderStatus' => $this->orderStatus,
+                'contactData' => $this->userData['contactData'],
+                'shippingAddress' => $this->userData['shippingAddress'],
+                'invoiceAddress' => $this->userData['invoiceAddress'],
+                'remarks' => $this->remarks,
                 'domain' => $this->owner->domain,
             ],
             false
@@ -213,6 +247,7 @@ class cart extends ancestor {
             'id' => $this->userId,
             'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->key . '/',
             'order' => $cartMailBody,
+            'orderNumber' => $this->orderNumber,
             'status' => $this->status,
             'key' => $this->key,
             'total' => $this->total,
@@ -241,14 +276,6 @@ class cart extends ancestor {
                     [
                         'cart_key' => $this->key,
                         'cart_shop_id' => $this->owner->shopId,
-                        /*
-                        'cart_status' => [
-                            'in' => [
-                                '"' . self::CART_STATUS_NEW . '"',
-                                '"' . self::CART_STATUS_ABANDONED . '"',
-                            ]
-                        ]
-                        */
                     ]
                 )
             );
@@ -257,6 +284,7 @@ class cart extends ancestor {
                 $this->userId = $cart['cart_us_id'];
                 $this->status = $cart['cart_status'];
                 $this->orderStatus = $cart['cart_order_status'];
+                $this->orderNumber = $cart['cart_order_number'];
                 $this->orderDate = $cart['cart_ordered'];
                 $this->total = $cart['cart_total'];
                 $this->subtotal = $cart['cart_subtotal'];
@@ -265,6 +293,40 @@ class cart extends ancestor {
                 $this->shippingId = $cart['cart_sm_id'];
                 $this->paymentFee = $cart['cart_payment_fee'];
                 $this->paymentId = $cart['cart_pm_id'];
+                $this->remarks = $cart['cart_remarks'];
+
+                if($this->userId){
+                    $user = $this->owner->user->getUserProfile($this->userId);
+                    $this->userData['contactData'] = [
+                        'id' => $user['id'],
+                        'firstName' => $user['firstname'],
+                        'lastName' => $user['lastname'],
+                        'name' => $user['name'],
+                        'email' => ($user['role'] == USER_ROLE_NONE ? $user['email2'] : $user['email']),
+                        'phone' => $user['phone'],
+                    ];
+
+                    $this->userData['shippingAddress'] = [
+                        'name' => $user['name'],
+                        'country' => $user['country'],
+                        'zip' => $user['zip'],
+                        'city' => $user['city'],
+                        'address' => $user['address'],
+                    ];
+
+                    if($cart['cart_invoice_type']){
+                        $this->userData['invoiceAddress'] = [
+                            'name' => $user['invoice_name'],
+                            'country' => $user['invoice_country'],
+                            'zip' => $user['invoice_zip'],
+                            'city' => $user['invoice_city'],
+                            'address' => $user['invoice_address'],
+                            'vatNumber' => ($cart['cart_invoice_type'] == 2 ? $user['vat'] : false),
+                        ];
+                    }else {
+                        $this->userData['invoiceAddress'] = $this->userData['shippingAddress'];
+                    }
+                }
 
                 $result = $this->owner->db->getRows(
                     $this->owner->db->genSQLSelect(
@@ -454,7 +516,11 @@ class cart extends ancestor {
 
 	private function getKey($key = false, $create = true){
         if(!Empty($key)) {
-            $this->key = $this->checkCartKey($key);
+            $cart = $this->checkCartKey($key);
+
+            if($cart['carKey']){
+                $this->setKey($cart['carKey'], ($cart['cartStatus'] != self::CART_STATUS_ORDERED));
+            }
         }else{
             if (!$this->key = $this->owner->getSession(self::CART_SESSION_KEY)) {
                 $this->key = $_COOKIE[self::CART_SESSION_KEY];
@@ -472,7 +538,7 @@ class cart extends ancestor {
 		return $this;
 	}
 
-	private function setKey($key = false){
+	private function setKey($key = false, $storeKey = true){
         if($key){
             $this->key = $key;
         }else {
@@ -481,11 +547,23 @@ class cart extends ancestor {
             }
         }
 
-        $this->owner->setSession(self::CART_SESSION_KEY, $this->key);
-        setcookie(self::CART_SESSION_KEY, $this->key, 0, '/');
+        if($storeKey) {
+            $this->owner->setSession(self::CART_SESSION_KEY, $this->key);
+            setcookie(self::CART_SESSION_KEY, $this->key, 0, '/');
+        }
 
         return $this;
 	}
+
+    private function generateOrderNumber(){
+        $out = '';
+
+        if($this->id){
+            $out = date('Y') . '/' . str_pad($this->id, 5, '0', STR_PAD_LEFT);
+        }
+
+        return $out;
+    }
 
 	private function destroyKey(){
 		$this->owner->delSession(self::CART_SESSION_KEY);
@@ -494,11 +572,16 @@ class cart extends ancestor {
 	}
 
 	private function checkCartKey($key){
+        $out = [
+            'key' => false,
+            'status' => false,
+        ];
 		$row = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
                 'cart',
                 [
-                    'cart_key'
+                    'cart_key AS carKey',
+                    'cart_status AS cartStatus'
                 ],
                 [
                     'cart_key' => $key,
@@ -507,11 +590,11 @@ class cart extends ancestor {
             )
         );
 
-        if($row['cart_key']){
-			return $row['cart_key'];
-		}else{
-			return false;
+        if($row){
+			$out = $row;
 		}
+
+        return $out;
 	}
 
 	private function initCart(){

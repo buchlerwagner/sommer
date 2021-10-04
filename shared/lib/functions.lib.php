@@ -1302,3 +1302,27 @@ function isAssociativeArray($array) {
 function decodeCurrencyCode($currency){
     return $GLOBALS['CURRENCIES'][$currency];
 }
+
+function cryptString($key, $string, $cipher = 'aes-128-gcm'){
+    $ciphertext = [];
+
+    if (in_array($cipher, openssl_get_cipher_methods())){
+        $ivlen = openssl_cipher_iv_length($cipher);
+        $iv = openssl_random_pseudo_bytes($ivlen);
+        $ciphertext = openssl_encrypt($string, $cipher, $key, 0, $iv, $tag);
+    }
+
+    return [
+        'string' => $ciphertext,
+        'iv' => $iv,
+        'tag' => $tag,
+    ];
+}
+
+function deCryptString($key, $data, $cipher = 'aes-128-gcm'){
+    if(is_array($data) && !Empty($data['string']) && !Empty($data['iv']) && !Empty($data['tag'])) {
+        return openssl_decrypt($data['string'], $cipher, $key, 0, $data['iv'], $data['tag']);
+    }else{
+        return false;
+    }
+}

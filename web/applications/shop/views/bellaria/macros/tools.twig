@@ -180,7 +180,7 @@
 </li>
 {% endmacro %}
 
-{% macro pageSections(sections, context) %}
+{% macro pageSections(sections, addDividerImageId = 11, context) %}
     {% if sections %}
         {% for section in sections %}
             <section class="contact-section pt-3">
@@ -191,7 +191,9 @@
                             {{ include(template_from_string(section.content)) }}
                         </div>
                     </div>
-                    <div class="cws_divider mt-5"><img src="{{ context.theme }}images/icons/divider_11.png" alt=""></div>
+                    {% if addDividerImageId %}
+                    <div class="cws_divider mt-5"><img src="{{ context.theme }}images/icons/divider_{{ addDividerImageId }}.png" alt=""></div>
+                    {% endif %}
                 </div>
             </section>
         {% endfor %}

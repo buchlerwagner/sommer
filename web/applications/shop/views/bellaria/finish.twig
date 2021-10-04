@@ -1,25 +1,26 @@
 {% import "tools.twig" as tools %}
 <section class="page-title" style="background-image:url({{ theme }}images/backgrounds/34.jpg)">
     <div class="auto-container">
-        <h1>{{ _('LBL_YOUR_ORDER') }}</h1>
+        <h1>{{ _('LBL_ORDERED_ITEMS') }}</h1>
     </div>
 </section>
 
-{{ tools.pageSections(sections, _context) }}
+{{ tools.pageSections(sections, false, _context) }}
 
 <section class="cart-section{% if sections %} pt-0{% else %} pt-3{% endif %}">
     <div class="auto-container">
 
         <div class="sec-title text-center margin-top-50">
             <div class="divider"><img src="{{ theme }}images/icons/divider_1.png" alt=""></div>
-            <h2>{{ _('LBL_ORDERED_ITEMS') }}</h2>
         </div>
 
         {% if cart.items %}
             <div class="mb-3">
-                {{ _('LBL_ORDER_DATE') }}: <b>{{ _date(cart.orderDate, 1) }}</b>
+                {{ _('LBL_ORDER_NUMBER') }}: <b class="text-info">{{ cart.orderNumber }}</b>
                 <br>
-                {{ _('LBL_ORDER_STATUS') }}: <b>{{ cart.orderStatus }}</b>
+                {{ _('LBL_ORDER_DATE') }}: <b class="text-info">{{ _date(cart.orderDate, 1) }}</b>
+                <br>
+                {{ _('LBL_ORDER_STATUS') }}: <b class="text-info">{{ _('LBL_ORDER_STATUS_' ~ cart.orderStatus) }}</b>
             </div>
 
             <div class="cart-outer on-cart mb-4">
@@ -62,7 +63,7 @@
 
         <div class="row mb-4">
             <div class="col-12 col-lg-6 pr-lg-3 mb-3 mb-lg-0 border-right border-gray-500">
-                <h5>{{ _('LBL_SELECTED_SHIPPING_MODE') }}</h5>
+                <h4 class="mb-3"><b>{{ _('LBL_SELECTED_SHIPPING_MODE') }}</b></h4>
                 <p>
                     <b>{{ cart.getSelectedShippingMode.name }}</b>
                     <br>
@@ -70,11 +71,11 @@
                 </p>
             </div>
             <div class="col-12 col-lg-6 pl-lg-3">
-                <h5>{{ _('LBL_SELECTED_PAYMENT_MODE') }}</h5>
+                <h4 class="mb-3"><b>{{ _('LBL_SELECTED_PAYMENT_MODE') }}</b></h4>
                 <p>
                     <b>{{ cart.getSelectedPaymentMode.name }}</b>
                     <br>
-                    {{ cart.getSelectedPaymentMode.text }}
+                    {{ cart.getSelectedPaymentMode.text|nl2br }}
                 </p>
             </div>
         </div>

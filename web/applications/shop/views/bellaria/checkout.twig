@@ -65,7 +65,7 @@
 
                 <h3 class="mb-4">{{ _('LBL_CONTACT_DATA') }}</h3>
 
-                <form action="." method="post" id="frmOrder" class="parsley-form--">
+                <form action="." method="post" id="frmOrder" class="parsley-form">
                     <input type="hidden" name="order[key]" value="{{ cart.key }}">
 
                     <div class="form-row">
@@ -237,6 +237,15 @@
 
                     <div class="cws_divider mt-4 mb-4"><img src="{{ theme }}images/icons/divider_12.png" alt=""></div>
 
+                    <h3 class="mb-4">{{ _('LBL_REMARKS') }}</h3>
+                    <div class="form-row mb-4">
+                        <div class="col form-group col-md-12">
+                            <div class="checkbox checkbox-primary">
+                                <textarea cols="5" rows="4" id="remarks" class="form-control" name="order[remarks]" data-parsley-excluded="true">{{ forms.order.values.remarks }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-row">
                         <div class="col form-group col-md-12">
                             <div class="checkbox checkbox-primary{% if forms.order.hasError('agree_terms') %} has-error{% endif %}">
@@ -245,6 +254,7 @@
                             </div>
                         </div>
                     </div>
+
 
                     <div class="form-row">
                         <div class="col form-group col-12">

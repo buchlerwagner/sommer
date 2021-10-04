@@ -47,6 +47,8 @@ class orderForm extends formBuilder {
 
             (new inputHidden('key')),
 
+            (new inputTextarea('remarks', 'LBL_REMARKS')),
+
             (new inputCheckbox('agree_terms', 'LBL_I_AGREE_TERMS_AND_CONDITIONS', 0))
                 ->setRequired()
         );
@@ -110,6 +112,20 @@ class orderForm extends formBuilder {
     }
 
     public function saveValues() {
+        $key = $this->values['key'];
+        $this->owner->cart->init($key, false);
+        $this->owner->cart->setPaymentMode((int)$this->values['payment']);
+        $this->owner->cart->setShippingMode((int)$this->values['shipping']);
+
+        $userId = $this->registerUser();
+        $this->owner->cart->makeOrder($userId, $this->values['invoice_type'], $this->values['remarks']);
+
+        $this->owner->pageRedirect($this->owner->getPageName('finish') . $key . '/');
+    }
+
+    private function registerUser(){
+        $userData = [];
+
         $sendRegisterNotification = false;
         $this->values['last_order'] = 'NOW()';
 
@@ -129,44 +145,20 @@ class orderForm extends formBuilder {
             $this->values['group'] = USER_GROUP_CUSTOMERS;
             $this->values['hash'] = uuid::v4();
             $this->values['password'] = password_hash(generateRandomString(32), PASSWORD_DEFAULT);
-            $this->values['timezone'] = $this->owner->hostConfig['host_timezone'];
+            $this->values['timezone'] = $this->owner->hostConfig['timeZoneID'];
             $this->values['registered'] = 'NOW()';
+        }else{
+            unset($this->values['email']);
         }
 
-        $key = $this->values['key'];
-        $this->owner->cart->init($key, false);
-        $this->owner->cart->setPaymentMode($this->values['payment']);
-        $this->owner->cart->setShippingMode($this->values['shipping']);
-
-        unset(
-            $this->values['key'],
-            $this->values['payment'],
-            $this->values['shipping'],
-            $this->values['invoiceaddress'],
-            $this->values['createaccount'],
-            $this->values['agree_terms']
-        );
-
-        $userId = $this->registerUser();
-        if($sendRegisterNotification && $userId){
-
-        }
-
-        $this->owner->cart->makeOrder($userId);
-
-        $this->owner->pageRedirect($this->owner->getPageName('finish') . $key . '/');
-    }
-
-    private function registerUser(){
-        $userData = [];
+        $this->clearPostData();
 
         foreach($this->values AS $key => $value){
             $userData['us_' . $key] = $value;
         }
 
         if($this->owner->user->isLoggedIn()){
-            unset($userData['us_email']);
-            $userId = $this->owner->user->getUser();
+            $userId = $this->owner->user->getUser()['id'];
 
             $this->owner->db->sqlQuery(
                 $this->owner->db->genSQLUpdate(
@@ -188,8 +180,31 @@ class orderForm extends formBuilder {
             );
 
             $userId = $this->owner->db->getInsertRecordId();
+
+            if($sendRegisterNotification && $userId){
+                $this->owner->email->prepareEmail(
+                    'register',
+                    $userId,
+                    [
+                        'id' => $userId,
+                        'email' => $this->values['email'],
+                        'link' => $this->owner->user->setId($userId)->getPasswordChangeLink('REGISTER'),
+                    ]
+                );
+            }
         }
 
         return $userId;
+    }
+
+    private function clearPostData(){
+        unset(
+            $this->values['key'],
+            $this->values['payment'],
+            $this->values['shipping'],
+            $this->values['invoiceaddress'],
+            $this->values['createaccount'],
+            $this->values['agree_terms']
+        );
     }
 }

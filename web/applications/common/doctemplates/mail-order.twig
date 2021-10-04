@@ -1,21 +1,61 @@
+<table border="0" cellpadding="10" cellspacing="0" style="" width="100%">
+    <tr>
+        <td>
+            <h4 style="margin: 10px 0;">{{ _('LBL_ORDER_NUMBER') }}: {{ orderNumber }}</h4>
+        </td>
+    </tr>
+    <tr>
+        <td style="border-bottom:1px solid #EDECEC;">
+            <h3 style="margin: 10px 0;">{{ _('LBL_CONTACT_DATA') }}</h3>
+            <b>{{ contactData.name }}</b>
+            <br>
+            {{ _('LBL_EMAIL') }}: {{ contactData.email }}
+            <br>
+            {{ _('LBL_PHONE') }}: {{ contactData.phone }}
+        </td>
+    </tr>
+    <tr>
+        <td style="border-bottom:1px solid #EDECEC;">
+            <h3 style="margin: 10px 0;">{{ _('LBL_SHIPPING_DATA') }}</h3>
+            {{ shippingAddress.name }}
+            <br>
+            {{ shippingAddress.zip }} {{ shippingAddress.city }}, {{ shippingAddress.address }}
+        </td>
+    </tr>
+    <tr>
+        <td style="border-bottom:1px solid #EDECEC;">
+            <h3 style="margin: 10px 0;">{{ _('LBL_INVOICE_DATA') }}</h3>
+            {{ invoiceAddress.name }}
+            <br>
+            {{ invoiceAddress.zip }} {{ invoiceAddress.city }}, {{ invoiceAddress.address }}
+            {% if invoiceAddress.vatNumber %}
+                <br>
+                {{ _('LBL_VAT_NUMBER') }}: {{ invoiceAddress.vatNumber }}
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+
 {% if items %}
+    <h3 style="padding: 0 10px;margin: 10px 0;">{{ _('LBL_ORDERED_ITEMS') }}</h3>
     <table border="0" cellpadding="10" cellspacing="0" style="" width="100%">
         <thead>
         <tr>
-            <th align="left" colspan="2" style="border-bottom:2px solid #CCCCCC;">{{ _('LBL_PRODUCT') }}</th>
-            <th align="center" style="border-bottom:2px solid #CCCCCC;">{{ _('LBL_QUANTITY') }}</th>
-            <th align="right" style="border-bottom:2px solid #CCCCCC;">{{ _('LBL_PRICE') }}</th>
+            <th align="left" colspan="2" style="border-bottom:2px solid #EDECEC;">{{ _('LBL_PRODUCT') }}</th>
+            <th align="center" style="border-bottom:2px solid #EDECEC;">{{ _('LBL_QUANTITY') }}</th>
+            <th align="right" style="border-bottom:2px solid #EDECEC;">{{ _('LBL_PRICE') }}</th>
         </tr>
         </thead>
         <tbody>
         {% for cid, item in items %}
             <tr>
-                <td width="2%" style="border-bottom:1px solid #CCCCCC;">
+                <td width="2%" style="border-bottom:1px solid #EDECEC;">
                     <a href="{{ domain }}{{ item.url }}"><img src="{{ domain }}{{ item.image }}" width="50" alt="{{ item.name }}"></a>
                 </td>
-                <td width="73%" style="border-bottom:1px solid #CCCCCC;">
-                    <b>{{ item.name }}</b>
-                    <p style="color:#cccccc; font-size: 12px;">
+                <td width="73%" style="border-bottom:1px solid #EDECEC;">
+                    <a href="{{ domain }}{{ item.url }}" style="color:#000000;text-decoration:none;"><b>{{ item.name }}</b></a>
+                    <p style="color:#EDECEC; font-size: 12px;">
                         {% if item.brand %}
                             {{ _('LBL_BRAND') }}: {{ item.brand }}
                         {% endif %}
@@ -24,10 +64,10 @@
                         {% endif %}
                     </p>
                 </td>
-                <td width="10%" align="center" style="border-bottom:1px solid #CCCCCC;">
+                <td width="10%" align="center" style="border-bottom:1px solid #EDECEC;">
                     {{ item.quantity.amount }} {{ item.quantity.unit }}
                 </td>
-                <td width="15%" align="right" style="border-bottom:1px solid #CCCCCC;white-space: nowrap;">
+                <td width="15%" align="right" style="border-bottom:1px solid #EDECEC;white-space: nowrap;">
                     {{ _price(item.price.total, currency) }}
                 </td>
             </tr>
@@ -35,10 +75,10 @@
         </tbody>
     </table>
 
-    <table border="0" cellpadding="10" cellspacing="0" style="" width="100%">
+    <table border="0" cellpadding="10" cellspacing="0" width="100%">
         <tr>
-            <td>
-                <h5>{{ _('LBL_SELECTED_SHIPPING_MODE') }}</h5>
+            <td style="border-bottom:1px solid #EDECEC;">
+                <h3 style="margin: 10px 0;">{{ _('LBL_SELECTED_SHIPPING_MODE') }}</h3>
                 <p>
                     <b>{{ shippingMode.name }}</b>
                     <br>
@@ -47,20 +87,30 @@
             </td>
         </tr>
         <tr>
-            <td>
-                <h5>{{ _('LBL_SELECTED_PAYMENT_MODE') }}</h5>
+            <td style="border-bottom:1px solid #EDECEC;">
+                <h3 style="margin: 10px 0;">{{ _('LBL_SELECTED_PAYMENT_MODE') }}</h3>
                 <p>
                     <b>{{ paymentMode.name }}</b>
                     <br>
-                    {{ paymentMode.emailText }}
+                    {{ paymentMode.emailText|nl2br }}
                 </p>
             </td>
         </tr>
+        {% if remarks %}
+            <tr>
+                <td style="border-bottom:1px solid #EDECEC;">
+                    <h3 style="margin: 10px 0;">{{ _('LBL_REMARKS') }}</h3>
+                    <p>
+                        {{ remarks|nl2br }}
+                    </p>
+                </td>
+            </tr>
+        {% endif %}
     </table>
 
 
     <br>
-    <table border="0" cellpadding="10" cellspacing="0">
+    <table border="0" cellpadding="10" cellspacing="0" width="50%">
         <tr>
             <td>{{ _('LBL_TOTAL') }}:</td>
             <td align="right" style="white-space: nowrap;">{{ _price(subtotal, currency) }}</td>
@@ -74,7 +124,7 @@
         <tr>
             <td>{{ _('LBL_SHIPPING_FEE') }}:</td>
             <td align="right" style="white-space: nowrap;">
-                {% if paymentFee %}
+                {% if shippingFee %}
                     {{ _price(shippingFee, currency) }}
                 {% else %}
                     {{ _('LBL_FREE') }}
@@ -88,8 +138,8 @@
             </tr>
         {% endif %}
         <tr>
-            <td style="border-top:1px solid #CCCCCC;"><b>{{ _('LBL_GRAND_TOTAL') }}:</b></td>
-            <td align="right" style="border-top:1px solid #CCCCCC;white-space: nowrap;"><b>{{ _price(total, currency) }}</b></td>
+            <td style="border-top:1px solid #EDECEC;"><b>{{ _('LBL_GRAND_TOTAL') }}:</b></td>
+            <td align="right" style="border-top:1px solid #EDECEC;white-space: nowrap;"><b>{{ _price(total, currency) }}</b></td>
         </tr>
     </table>
 {% endif %}

@@ -8,18 +8,20 @@
     <tbody>
     <tr>
         <td style="padding-right:10px;padding-left:10px;" id="bodyCell" valign="top" align="center">
-            <!--[if (gte mso 9)|(IE)]><table align="center" border="0" cellspacing="0" cellpadding="0" style="width:600px;" width="600"><tr><td align="center" valign="top"><![endif]-->
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellspacing="0" cellpadding="0" style="width:600px;" width="600"><tr><td align="center" valign="top">
+            <![endif]-->
 
-            <table style="max-width:600px;" class="wrapperWebview" width="100%" cellspacing="0" cellpadding="0" border="0">
+            <table style="max-width:800px;" class="wrapperWebview" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tbody>
                 <tr>
                     <td valign="top" align="center">
                         <table width="100%" cellspacing="0" cellpadding="0" border="0">
                             <tbody>
                             <tr>
-                                <td style="padding-top: 40px; padding-bottom: 40px;" class="emailLogo" valign="middle" align="center">
-                                    <a href="https://careline.hu" target="_blank" style="text-decoration:none;" class="">
-                                        LOGO
+                                <td style="padding-top: 20px; padding-bottom: 20px;" class="emailLogo" valign="middle" align="center">
+                                    <a href="{{ domain }}" target="_blank" style="text-decoration:none;" class="">
+                                        <img src="{{ domain }}uploads/{{ shopId }}/logo-mail.png" title="{{ settings.shopName }}" alt="{{ settings.shopName }}">
                                     </a>
                                 </td>
                             </tr>
@@ -30,15 +32,14 @@
                 </tbody>
             </table>
 
-            <table style="max-width:600px;" class="wrapperBody" width="100%" cellspacing="0" cellpadding="0" border="0">
+            <table style="max-width:800px;" class="wrapperBody" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tbody>
                 <tr>
                     <td valign="top" align="center">
-                        <table style="background-color: rgb(255, 255, 255); box-shadow: rgb(216, 216, 216) 0px 0px 10px;" class="tableCard" width="100%" cellspacing="0" cellpadding="0" border="0">
-
+                        <table style="border-top: 3px solid #7E422D; background-color: rgb(255, 255, 255); box-shadow: rgb(216, 216, 216) 0px 0px 10px; border-top-left-radius: 3px;border-top-right-radius: 3px;" class="tableCard" width="100%" cellspacing="0" cellpadding="0" border="0">
                             <tbody>
                             <tr>
-                                <td style="padding-left:20px;padding-right:20px;" valign="top" align="center">
+                                <td style="padding-left:20px;padding-right:20px;" valign="top">
 
                                     <table width="100%" cellspacing="0" cellpadding="0" border="0">
                                         <tbody>
@@ -78,21 +79,61 @@
                 </tbody>
             </table>
 
-            <table style="max-width:600px;" class="wrapperFooter" width="100%" cellspacing="0" cellpadding="0" border="0">
+            <table style="max-width:800px;" class="wrapperFooter" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tbody>
                 <tr>
                     <td valign="top" align="center">
                         <table class="footer" width="100%" cellspacing="0" cellpadding="0" border="0">
                             <tbody>
-
+                            {% if settings.facebook or settings.twitter or settings.instagram or settings.pinterest or settings.youtube %}
+                            <tr>
+                                <td style="padding-top:10px;padding-bottom:10px;padding-left:10px;padding-right:10px;" class="socialLinks" valign="top" align="center">
+                                    {% if settings.facebook %}
+                                    <a href="{{ settings.facebook }}" target="_blank" style="display: inline-block;" class="facebook">
+                                        <img src="{{ domain }}{{ images }}facebook.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                    </a>
+                                    {% endif %}
+                                    {% if settings.twitter %}
+                                    <a href="{{ settings.twitter }}" target="_blank" style="display: inline-block;" class="twitter">
+                                        <img src="{{ domain }}{{ images }}twitter.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                    </a>
+                                    {% endif %}
+                                    {% if settings.instagram %}
+                                    <a href="{{ settings.instagram }}" target="_blank" style="display: inline-block;" class="instagram">
+                                        <img src="{{ domain }}{{ images }}instagram.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                    </a>
+                                    {% endif %}
+                                    {% if settings.pinterest %}
+                                    <a href="{{ settings.pinterest }}" target="_blank" style="display: inline-block;" class="pinterest">
+                                        <img src="{{ domain }}{{ images }}pinterest.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                    </a>
+                                    {% endif %}
+                                    {% if settings.youtube %}
+                                        <a href="{{ settings.youtube }}" target="_blank" style="display: inline-block;" class="youtube">
+                                            <img src="{{ domain }}{{ images }}youtube.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
                             <tr>
                                 <td style="padding: 10px 10px 5px;" class="brandInfo" valign="top" align="center">
-                                    <!-- Brand Information // -->
                                     <p class="text" style="color:#777777; font-family:'Open Sans', Helvetica, Arial, sans-serif; font-size:12px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:20px; text-transform:none; text-align:center; padding:0; margin:0;">
-
+                                        &copy; {{ "now"|date("Y") }} {{ settings.shopName }} {{ _('LBL_ALL_RIGHTS_RESERVED') }}
                                     </p>
                                 </td>
                             </tr>
+
+                            <tr>
+                                <td style="padding: 0px 10px 20px;" class="footerLinks" valign="top" align="center">
+                                    <p class="text" style="color:#777777; font-family:'Open Sans', Helvetica, Arial, sans-serif; font-size:12px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:20px; text-transform:none; text-align:center; padding:0; margin:0;">
+                                        <a href="{{ domain }}" style="color:#777777;text-decoration:underline;" target="_blank">ÁSZF</a>
+                                        |
+                                        <a href="{{ domain }}" style="color:#777777;text-decoration:underline;" target="_blank">Adatvédelem</a>
+                                    </p>
+                                </td>
+                            </tr>
+
                             <tr>
                                 <td style="font-size:1px;line-height:1px;" height="30">&nbsp;</td>
                             </tr>
@@ -105,7 +146,9 @@
                 </tr>
                 </tbody>
             </table>
-            <!--[if (gte mso 9)|(IE)]></td></tr></table><![endif]-->
+            <!--[if (gte mso 9)|(IE)]>
+            </td></tr></table>
+            <![endif]-->
         </td>
     </tr>
     </tbody>

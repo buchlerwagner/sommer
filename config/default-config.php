@@ -24,10 +24,6 @@ const MEMCACHE_COMPRESS     = false;
 
 // server related
 const SERVER_ID             = 'production';
-const SET_AUTH              = false;
-const AUTH_USER             = '';
-const AUTH_PWD              = '';
-
 const DEBUG_ON              = false;
 const TWIG_CACHE_ENABLED    = false;
 const IMG_CACHE_ENABLED     = false;
@@ -35,11 +31,6 @@ const IMG_CACHE_ENABLED     = false;
 const EMAIL_SENDER_NAME     = 'sommer-cukraszda.hu';
 const EMAIL_SENDER_EMAIL    = 'no-reply@sommer-cukraszda.hu';
 const EMAIL_INSTANT_SEND    = true;
-const EMAIL_USE_GMAIL_SMTP  = true;
-const EMAIL_USERNAME        = 'wzs.dev@gmail.com';
-const EMAIL_PASSWORD        = 'wZs975DevMail2021';
-const EMAIL_SMTP_PORT       = 587;
-const EMAIL_SMTP_HOST       = 'smtp.gmail.com';
 
 // default environment values
 const DEFAULT_HOST          = 'sommer-cukraszda.hu';
@@ -48,6 +39,7 @@ const DEFAULT_THEME         = 'mimity';
 const DEFAULT_COUNTRY       = 'HU';
 const DEFAULT_LANGUAGE      = 'hu';
 const DEFAULT_CURRENCY      = 'HUF';
-const SESSION_ON_SUBDOMAINS = true;
 
 const IPAPI_KEY             = '20966a71b200633664995f6b35b7e081';
+
+const SMTP_HASH_KEY         = 'syL$$CXAjzMR&j9$zhcN8**H+m+!Y_+58#5xZpRvR$ab_qV67TfHSGnQR4PNTWL!@-WN2!ZVNPLVKew+UUPv9Jw7xw&rc_cvr!XQ3X&Kw2g!hf747kDuw??CKv#b5A+t';

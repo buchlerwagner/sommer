@@ -9,13 +9,31 @@ class orderFiltersForm extends filterForm {
         $this->customRights = ACCESS_RIGHT_WRITE;
         $this->parentTable = 'orders';
 
-        /*
         $this->addControls(
-            (new groupRow('row'))->addElements(
-                (new inputText('userName', 'LBL_NAME'))->setColSize('col-12 col-sm-6'),
-                (new inputText('us_email', 'LBL_EMAIL'))->setColSize('col-12 col-sm-6')
+            (new groupRow('row1'))->addElements(
+                (new inputSelect('cart_order_status', 'LBL_STATUS'))
+                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getOrderStatuses())
+                    ->setColSize('col-12 col-lg-2'),
+                (new inputText('freeText', 'LBL_FREE_TEXT'))
+                    ->setColSize('col-12 col-lg-3'),
+                (new inputText('userName', 'LBL_CUSTOMER_NAME'))
+                    ->setColSize('col-12 col-lg-3'),
+                (new inputText('us_email', 'LBL_CUSTOMER_EMAIL'))
+                    ->setColSize('col-12 col-lg-3')
+            ),
+            (new groupRow('row2'))->addElements(
+                (new inputDate('cart_ordered_min', 'LBL_ORDER_DATE'))
+                    ->setIcon('fa fa-calendar')
+                    ->setAppend('tól')
+                    ->setMaxDate(date('Y-m-d'))
+                    ->setColSize('col-6 col-lg-2'),
+                (new inputDate('cart_ordered_max', ''))
+                    ->setIcon('fa fa-calendar')
+                    ->setColSize('col-6 col-lg-2')
+                    ->setMaxDate(date('Y-m-d'))
+                    ->addEmptyLabel()
+                    ->setAppend('ig')
             )
         );
-        */
     }
 }

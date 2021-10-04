@@ -102,7 +102,7 @@ class router extends model {
 
         $this->setHost($_SERVER['HTTP_HOST']);
 
-        if(SESSION_ON_SUBDOMAINS) {
+        if($this->hostConfig['shareSession']) {
             if(substr_count($this->host, '.') > 1) {
                 $mainDomain = substr($this->host, strpos($this->host, '.'), 100);
             }else{
@@ -111,6 +111,10 @@ class router extends model {
 
             session_set_cookie_params(0, '/', $mainDomain);
             ini_set('session.cookie_domain', $mainDomain);
+        }
+
+        if($this->hostConfig['auth']) {
+            $this->setBasicAuth();
         }
 
 		define('APP_ROOT', DOC_ROOT . 'web/applications/' . $this->application . '/');
@@ -165,6 +169,7 @@ class router extends model {
                     'shopId' => (int) $h['host_shop_id'],
                     'host' => $h['host_host'],
                     'name' => $h['host_name'],
+                    'isMaintenance' => ($h['host_maintenance']),
                     'forceSSL' => ($h['host_force_ssl']),
                     'defaultLanguage' => $h['host_default_language'],
                     'languages' => explode('|', trim($h['host_languages'], '|')),
@@ -177,7 +182,31 @@ class router extends model {
                     'publicSite' => rtrim($h['host_public_site'], '/') . '/',
                     'defaultEmail' => $h['host_default_email'],
                     'production' => ($h['host_production']),
+                    'shareSession' => ($h['host_share_session']),
+                    'smtp' => false,
+                    'auth' => false,
                 ];
+
+                if(!Empty($h['host_smtp_host'])){
+                    $pwd = unserialize($h['host_smtp_pwd']);
+                    $config['smtp'] = [
+                        'host'  => $h['host_smtp_host'],
+                        'port'  => $h['host_smtp_port'],
+                        'ssl'  => $h['host_smtp_ssl'],
+                        'user'  => $h['host_smtp_user'],
+                        'password'  => deCryptString(SMTP_HASH_KEY, $pwd),
+                    ];
+                }
+
+                if(!Empty($h['host_protect'])){
+                    $pwd = unserialize($h['host_auth_password']);
+                    $config['auth'] = [
+                        'user'  => $h['host_auth_user'],
+                        'password'  => deCryptString(SMTP_HASH_KEY, $pwd),
+                        'realm'  => $h['host_auth_realm'],
+                        'errorMessage'  => $h['host_auth_error'],
+                    ];
+                }
 
                 $this->mem->set(HOST_SETTINGS . $host, $config);
             }
@@ -213,29 +242,41 @@ class router extends model {
         $this->setLanguage();
 		$this->translate = $this->addByClassName('translate');
 		$this->translate->init($this->context);
-		$this->parseUrl();
 
-		if ($this->output == OUTPUT_HTML) {
-			$this->view = $this->addByClassName('view');
-		}
+        if ($this->output == OUTPUT_HTML) {
+            $this->view = $this->addByClassName('view');
+        }
 
-        if($this->application == 'shop'){
+        if($this->hostConfig['isMaintenance']){
+            $this->page = 'maintenance';
+        }else {
             /**
              * @var $cart cart
              */
             $this->cart = $this->addByClassName('cart');
             $this->cart->init(false, false);
-            //$fbLogin = $this->user->getFBLoginUrl();
-        }
 
-        /*
-        if($this->user->getUser() && $this->user->getUser()['force_pwchange'] && $this->page != 'logout'){
-			if (!empty($this->user->getUser()['force_pwchange'])) {
-				$this->addMessage('warning', 'LBL_PASSWORD_CHANGE_NEEDED', 'LBL_PASSWORD_CHANGE_NEEDED');
-			}
-			$this->page = 'change-pwd';
-		}
-        */
+            $this->parseUrl();
+
+            if ($this->application == 'admin') {
+
+
+
+                $this->menu['orders']['badge']['color'] = 'danger text-white';
+                $this->menu['orders']['badge']['value'] = $this->cart->getNumberOfNewOrders();
+            }elseif($this->application == 'shop'){
+                //$fbLogin = $this->user->getFBLoginUrl();
+            }
+
+            /*
+            if($this->user->getUser() && $this->user->getUser()['force_pwchange'] && $this->page != 'logout'){
+                if (!empty($this->user->getUser()['force_pwchange'])) {
+                    $this->addMessage('warning', 'LBL_PASSWORD_CHANGE_NEEDED', 'LBL_PASSWORD_CHANGE_NEEDED');
+                }
+                $this->page = 'change-pwd';
+            }
+            */
+        }
 
 		$this->view->init();
 		if ($this->page == 'ajax') {
@@ -579,5 +620,23 @@ class router extends model {
         }
 
         return '/' . $name . '/';
+    }
+
+    private function setBasicAuth(){
+        if($this->hostConfig['auth']) {
+
+            if (empty($this->getSession(SESSION_HTACCESS)) && isset($_SERVER['PHP_AUTH_USER'])) {
+                if ($_SERVER['PHP_AUTH_PW'] == $this->hostConfig['auth']['password'] && $_SERVER['PHP_AUTH_USER'] == $this->hostConfig['auth']['user']) {
+                    $this->setSession(SESSION_HTACCESS, true);
+                }
+            }
+
+            if (empty($this->getSession(SESSION_HTACCESS))) {
+                header('WWW-Authenticate: Basic realm="' . $this->hostConfig['auth']['realm'] . '"');
+                header('HTTP/1.0 401 Unauthorized');
+
+                die($this->hostConfig['auth']['errorMessage']);
+            }
+        }
     }
 }

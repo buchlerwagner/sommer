@@ -63,6 +63,15 @@ class lists extends ancestor {
         return $this->getList();
     }
 
+    public function getOrderStatuses(){
+        $this->list = [];
+        foreach($GLOBALS['ORDER_STATUSES'] AS $key => $status){
+            $this->list[$key] = $status;
+        }
+
+        return $this->getList();
+    }
+
     public function getCountries(){
         $validLanguages = ['en', 'de', 'hu', 'sk', 'bg'];
 

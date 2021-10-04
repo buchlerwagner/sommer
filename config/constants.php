@@ -4,9 +4,10 @@ const SERVER_TIME_ZONE      = 'UTC';
 const DEFAULT_TIMEZONE_ID   = 29;            // (UTC+01:00) Belgrade, Bratislava, Budapest, Ljublj
 
 // session keys
-const SESSION_USER          = 'sc-userdata';
-const SESSION_LOCALE        = 'sc-locale';
-const SESSION_MESSAGES      = 'sc-messages';
+const SESSION_USER          = 'ws-userdata';
+const SESSION_LOCALE        = 'ws-locale';
+const SESSION_MESSAGES      = 'ws-messages';
+const SESSION_HTACCESS      = 'ws-htaccess';
 
 const HOST_SETTINGS         = APPLICATION_NAME . '-hosts-';
 const LABELS_KEY            = APPLICATION_NAME . '-labels-';
@@ -186,6 +187,35 @@ $GLOBALS['IMAGE_SIZES'] = [
     ],
 ];
 
+const ORDER_STATUS_NEW = 'NEW';
+const ORDER_STATUS_PROCESSING = 'PROCESSING';
+const ORDER_STATUS_DELIVERING = 'DELIVERING';
+const ORDER_STATUS_FINISHED = 'FINISHED';
+const ORDER_STATUS_CLOSED = 'CLOSED';
+
+$GLOBALS['ORDER_STATUSES'] = [
+    ORDER_STATUS_NEW => [
+        'name' => 'LBL_ORDER_STATUS_NEW',
+        'class' => 'bg-danger text-white',
+    ],
+    ORDER_STATUS_PROCESSING => [
+        'name' => 'LBL_ORDER_STATUS_PROCESSING',
+        'class' => 'bg-warning text-white',
+    ],
+    ORDER_STATUS_DELIVERING => [
+        'name' => 'LBL_ORDER_STATUS_DELIVERING',
+        'class' => 'bg-success text-white',
+    ],
+    ORDER_STATUS_FINISHED => [
+        'name' => 'LBL_ORDER_STATUS_FINISHED',
+        'class' => 'bg-primary text-white',
+    ],
+    ORDER_STATUS_CLOSED => [
+        'name' => 'LBL_ORDER_STATUS_CLOSED',
+        'class' => 'bg-secondary text-white',
+    ],
+];
+
 $GLOBALS['PAGE_NAMES'] = [
     'hu' => [
         'register'  => [
@@ -212,7 +242,7 @@ $GLOBALS['PAGE_NAMES'] = [
             'display' => 0,
         ],
         'finish'    => [
-            'name' => 'sikeres-megrendeles',
+            'name' => 'rendeles',
             'display' => 0,
         ],
         'set-new-password' => [

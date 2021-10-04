@@ -1,0 +1,213 @@
+<div class="row">
+    <div class="col-12 col-lg-4">
+        <div class="card" style="min-height: 180px;">
+            <div class="card-header">
+                <h5 class="text-primary">{{ _('LBL_CUSTOMER_DATA') }}</h5>
+            </div>
+            <div class="card-body">
+                <div>
+                    <span class="text-secondary">{{ _('LBL_NAME') }}:</span>
+                    <a href="/ajax/forms/editCustomer/{{ form.cart.userData.contactData.id }}/customers/" data-size="lg" data-toggle="modal" data-target="#ajax-modal"><b>{{ form.cart.userData.contactData.name }}</b></a>
+                </div>
+                <div>
+                    <span class="text-secondary">{{ _('LBL_EMAIL') }}:</span>
+                    <a href="mailto:{{ form.cart.userData.contactData.email }}"><b>{{ form.cart.userData.contactData.email }}</b></a>
+                </div>
+                <div>
+                    <span class="text-secondary">{{ _('LBL_PHONE') }}:</span>
+                    <b>{{ form.cart.userData.contactData.phone }}</b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card" style="min-height: 180px;">
+            <div class="card-header">
+                <h5 class="text-primary">{{ _('LBL_SHIPPING_DATA') }}</h5>
+            </div>
+            <div class="card-body">
+                <div>
+                    <span class="text-secondary">{{ _('LBL_NAME') }}:</span>
+                    <b>{{ form.cart.userData.shippingAddress.name }}</b>
+                </div>
+                <div>
+                    <span class="text-secondary">{{ _('LBL_ADDRESS') }}:</span>
+                    <b>
+                        {{ form.cart.userData.shippingAddress.zip }}
+                        {{ form.cart.userData.shippingAddress.city }},
+                        {{ form.cart.userData.shippingAddress.address }}
+                    </b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card" style="min-height: 180px;">
+            <div class="card-header">
+                <h5 class="text-primary">{{ _('LBL_INVOICE_DATA') }}</h5>
+            </div>
+            <div class="card-body">
+                <div>
+                    <span class="text-secondary">{{ _('LBL_NAME') }}:</span>
+                    <b>{{ form.cart.userData.invoiceAddress.name }}</b>
+                </div>
+                <div>
+                    <span class="text-secondary">{{ _('LBL_ADDRESS') }}:</span>
+                    <b>
+                        {{ form.cart.userData.invoiceAddress.zip }}
+                        {{ form.cart.userData.invoiceAddress.city }},
+                        {{ form.cart.userData.invoiceAddress.address }}
+                    </b>
+                </div>
+                {% if form.cart.userData.invoiceAddress.vatNumber %}
+                    <div>
+                        <span class="text-secondary">{{ _('LBL_VAT_NUMBER') }}:</span>
+                        <b>{{ form.cart.userData.invoiceAddress.vatNumber }}</b>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="text-primary">{{ _('LBL_ORDER_DETAILS') }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 border-right">
+                        <div>
+                            <span class="text-secondary">{{ _('LBL_ORDER_NUMBER') }}:</span>
+                            <b>{{ form.cart.orderNumber }}</b>
+                        </div>
+                        <div>
+                            <span class="text-secondary">{{ _('LBL_ORDER_DATE') }}:</span>
+                            <b>{{ _date(form.cart.orderDate, 5) }}</b>
+                        </div>
+                        <div>
+                            <span class="text-secondary">{{ _('LBL_ORDER_STATUS') }}:</span>
+                            <b>{{ orderState(form.cart.orderStatus)|raw }}</b>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div>
+                            <span class="text-secondary">{{ _('LBL_SELECTED_SHIPPING_MODE') }}:</span>
+                            <b>{{ form.cart.getSelectedShippingMode.name }}</b>
+                        </div>
+
+                        <div>
+                            <span class="text-secondary">{{ _('LBL_SELECTED_PAYMENT_MODE') }}:</span>
+                            <b>{{ form.cart.getSelectedPaymentMode.name }}</b>
+                        </div>
+                    </div>
+                </div>
+
+                {% if form.cart.remarks %}
+                <div class="row">
+                    <div class="col-12">
+                        <hr>
+                        <b class="text-secondary">{{ _('LBL_REMARKS') }}</b>
+                        <br>
+                        <p>
+                            {{ form.cart.remarks|nl2br }}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if form.cart.items %}
+<div class="row">
+    <div class="col-12 mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="text-primary">{{ _('LBL_ORDERED_ITEMS') }}</h5>
+            </div>
+
+            <div class="card-body table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">{{ _('LBL_PRODUCT') }}</th>
+                            <th class="text-right">{{ _('LBL_PRICE') }}</th>
+                            <th class="text-center">{{ _('LBL_QUANTITY') }}</th>
+                            <th class="text-right">{{ _('LBL_TOTAL') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in form.cart.items %}
+                        <tr>
+                            <td class="col-1 text-center"><a href="/webshop/products/edit|products/{{ item.productId }}/" target="_blank"><img src="{{ item.image }}" width="60" alt="{{ item.name }}"></a></td>
+                            <td class="col-5">
+                                <a href="/webshop/products/edit|products/{{ item.productId }}/" target="_blank">
+                                    {{ item.name }}
+                                    {% if item.variant %}
+                                        <div class="text-muted">({{ item.variant }})</div>
+                                    {% endif %}
+                                </a>
+                            </td>
+                            <td class="col-2 text-right">
+                                {{ _price(item.price.finalPrice, cart.currency) }} / {{ item.quantity.unit }}
+                            </td>
+                            <td class="col-2 text-center">
+                                {{ item.quantity.amount }} {{ item.quantity.unit }}
+                            </td>
+                            <td class="col-2 text-right">
+                                {{ _price(item.price.total, form.cart.currency) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr class="bg-gray-100">
+                        <td colspan="4">
+                            {{ _('LBL_TOTAL') }}
+                        </td>
+                        <td class="text-right">
+                            {{ _price(form.cart.subtotal, form.cart.currency) }}
+                        </td>
+                    </tr>
+                    <tr class="bg-gray-100">
+                        <td colspan="4">
+                            {{ _('LBL_SHIPPING_FEE') }}
+                        </td>
+                        <td class="text-right">
+                            {% if form.cart.shippingFee %}
+                                {{ _price(form.cart.shippingFee, form.cart.currency) }}
+                            {% else %}
+                                {{ _('LBL_FREE') }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if form.cart.paymentFee %}
+                    <tr class="bg-gray-100">
+                        <td colspan="4">
+                            {{ _('LBL_PAYMENT_FEE') }}
+                        </td>
+                        <td class="text-right">
+                            {{ _price(form.cart.paymentFee, form.cart.currency) }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr class="bg-gray-200">
+                        <td colspan="4">
+                            <b>{{ _('LBL_GRAND_TOTAL') }}</b>
+                        </td>
+                        <td class="text-right">
+                            <b>{{ _price(form.cart.total, form.cart.currency) }}</b>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

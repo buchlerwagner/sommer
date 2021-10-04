@@ -154,17 +154,16 @@ class email extends ancestor {
 
 			$mail = new PHPMailer(true);
 			try {
-                if(EMAIL_USE_GMAIL_SMTP){
+                if(!Empty($this->owner->hostConfig['smtp'])){
                     $mail->IsSMTP();
-
                     $mail->SMTPDebug  = 0;
                     $mail->SMTPAuth   = true;
                     $mail->SMTPAutoTLS = false;
-                    $mail->SMTPSecure = 'tls'; //tls or ssl
-                    $mail->Port       = EMAIL_SMTP_PORT;
-                    $mail->Host       = EMAIL_SMTP_HOST;
-                    $mail->Username   = EMAIL_USERNAME;
-                    $mail->Password   = EMAIL_PASSWORD;
+                    $mail->SMTPSecure = strtolower($this->owner->hostConfig['smtp']['ssl']);
+                    $mail->Port       = $this->owner->hostConfig['smtp']['port'];
+                    $mail->Host       = $this->owner->hostConfig['smtp']['host'];
+                    $mail->Username   = $this->owner->hostConfig['smtp']['user'];
+                    $mail->Password   = $this->owner->hostConfig['smtp']['password'];
                 }
 
                 $mail->IsHTML(true);
@@ -285,9 +284,15 @@ class email extends ancestor {
 					$bcc[] = $tmp;
 				}
 
-				foreach ($bcc AS $userId) {
-					$user = $this->owner->user->getUserProfile($userId);
-					$this->bcc[$user['name']] = $user['email'];
+				foreach ($bcc AS $email) {
+                    if(is_numeric($email)) {
+                        $user = $this->owner->user->getUserProfile($email);
+                        if($user){
+                            $this->bcc[$user['name']] = $user['email'];
+                        }
+                    }else {
+                        $this->bcc = $email;
+                    }
 				}
 			}
 
@@ -321,6 +326,7 @@ class email extends ancestor {
         $this->body = $this->owner->lib->replaceValues($this->body, $data);
 
 		$this->body = $this->owner->view->renderContent('mail', ['contentstring' => $this->body, 'domain' => $this->host, 'heroImg' => $data['heroImg']], false);
+        //print $this->body; exit();
 	}
 
 	private function getEmailSender(){

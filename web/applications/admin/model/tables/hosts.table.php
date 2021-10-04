@@ -8,7 +8,13 @@ class hostsTable extends table {
 
 		$this->formName = 'editHost';
 		$this->header = true;
-		$this->copy = false;
+		$this->copy = true;
+        $this->copyChangeFields = [
+            'add' => [
+                'host_name' => ' (copy)',
+                'host_host' => '.' . generateRandomString(3),
+            ],
+        ];
 		$this->subTable = true;
         $this->modalSize = 'lg';
 

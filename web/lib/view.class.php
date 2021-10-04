@@ -53,6 +53,7 @@ class view extends ancestor {
 			'production'  	=> (SERVER_ID == 'development' ? false : true),
 			//'sitedata'  	=> $GLOBALS['HOSTS'][$this->owner->host]['sitedata'],
 			'settings'  	=> $this->owner->settings,
+			'shopId'  	    => $this->owner->shopId,
 			'cart'  	    => $this->owner->cart,
 		];
 	}
