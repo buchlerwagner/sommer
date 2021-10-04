@@ -113,12 +113,14 @@ class orderForm extends formBuilder {
 
     public function saveValues() {
         $key = $this->values['key'];
+        $remarks = $this->values['remarks'];
+
         $this->owner->cart->init($key, false);
         $this->owner->cart->setPaymentMode((int)$this->values['payment']);
         $this->owner->cart->setShippingMode((int)$this->values['shipping']);
 
         $userId = $this->registerUser();
-        $this->owner->cart->makeOrder($userId, $this->values['invoice_type'], $this->values['remarks']);
+        $this->owner->cart->makeOrder($userId, $this->values['invoice_type'], $remarks);
 
         $this->owner->pageRedirect($this->owner->getPageName('finish') . $key . '/');
     }
@@ -200,6 +202,7 @@ class orderForm extends formBuilder {
     private function clearPostData(){
         unset(
             $this->values['key'],
+            $this->values['remarks'],
             $this->values['payment'],
             $this->values['shipping'],
             $this->values['invoiceaddress'],
