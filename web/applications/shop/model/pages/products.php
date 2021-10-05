@@ -2,14 +2,10 @@
 /**
  * @var $this router
  * @var $shop webShop
- * @var $cart cart
  */
 
 $shop = $this->addByClassName('webShop');
 $shop->init($this->shopId);
-
-$cart = $this->addByClassName('cart');
-//$cart->init($this->shopId);
 
 $params = $this->getSession('params');
 if(!$params || $_REQUEST['clear']) {

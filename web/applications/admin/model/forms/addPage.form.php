@@ -22,7 +22,7 @@ class addPageForm extends formBuilder {
             (new groupRow('row1'))->addElements(
                 (new inputSelect('c_widget', 'LBL_SPECIAL_PAGE_CONTENT', 'null'))
                     ->setColSize('col-12')
-                    ->changeState('null', enumChangeAction::Show(), '#c_show_in_header-formgroup, #c_show_in_footer-formgroup')
+                    ->changeState(0, enumChangeAction::Show(), '#c_show_in_header-formgroup, #c_show_in_footer-formgroup')
                     ->changeDefaultState(enumChangeAction::Hide(), '#c_show_in_header-formgroup, #c_show_in_footer-formgroup')
                     ->setOptions($this->owner->lists->reset()->getContentPageWidgets()),
                 (new inputSwitch('c_show_in_header', 'LBL_SHOW_IN_HEADER', 1))
@@ -77,8 +77,8 @@ class addPageForm extends formBuilder {
 
         if(Empty($this->values['c_show_in_header'])) $this->values['c_show_in_header'] = 0;
         if(Empty($this->values['c_show_in_footer'])) $this->values['c_show_in_footer'] = 0;
-        if($this->values['c_widget'] == 'null' || Empty($this->values['c_widget'])) {
-            $this->values['c_widget'] = null;
+        if(Empty($this->values['c_widget'])) {
+            $this->values['c_widget'] = '';
         }else{
             $this->values['c_order'] = -1;
         }

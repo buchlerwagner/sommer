@@ -64,7 +64,8 @@ class pagesTable extends table {
                 ],
                 [
                     'c_shop_id' => $this->owner->shopId,
-                    'c_parent_id' => (int)$parentId
+                    'c_parent_id' => (int)$parentId,
+                    $this->deleteField => 0
                 ],
                 [],
                 false,
@@ -83,6 +84,7 @@ class pagesTable extends table {
 
     public function onBeforeDelete($keyFields, $real = true) {
         $this->owner->mem->delete(CACHE_PAGES . $this->owner->shopId . $this->owner->language . $this->getPageWidget($keyFields['c_id']));
+        return true;
     }
 
     public function onCheck($keyValues, $field, $value) {

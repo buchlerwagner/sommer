@@ -145,7 +145,7 @@ class lists extends ancestor {
 
     public function getContentPageWidgets(){
         $this->setList([
-            'null' => 'LBL_NONE',
+            0 => 'LBL_NONE',
             'home' => 'LBL_PAGE_HOME',
             'contact' => 'LBL_PAGE_CONTACT',
             'cart' => 'LBL_PAGE_CART',

@@ -1,1 +1,13 @@
-<div>Hello!</div>
+<section class="page-title" style="background-image:url({% if content.image %}{{ content.image }}{% else %}{{ theme }}images/backgrounds/34.jpg{% endif %})">
+    <div class="auto-container">
+        <h1>{{ content.title }}</h1>
+    </div>
+</section>
+
+<section class="mt-4 mb-4">
+    <div class="auto-container">
+        <div class="content-box">
+            {{ content.content|raw }}
+        </div>
+    </div>
+</section>

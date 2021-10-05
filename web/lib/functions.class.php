@@ -769,9 +769,7 @@ class functions extends ancestor {
                         'c_shop_id' => $this->owner->shopId,
                         'c_deleted' => 0,
                         'c_published' => 1,
-                        'c_widget' => [
-                            'is' => NULL
-                        ],
+                        'c_widget' => '',
                         'c_language' => $this->owner->language,
                     ],
                     [],

@@ -27,12 +27,12 @@
                             {{ menu_elements.menuitem(mkey, mvalue, rootdir, level, loggedin) }}
                         </li>
                     {% endif %}
-                {% endif %}
                 {% if counter == settings.menuBreakPoint %}
         </ul>
             <ul class="navigation menu-right clearfix">
                 {% endif %}
                 {% set counter = counter + 1 %}
+                {% endif %}
             {% endfor %}
 
 
