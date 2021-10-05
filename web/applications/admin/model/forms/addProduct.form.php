@@ -31,6 +31,7 @@ class addProductForm extends formBuilder {
         $this->values['prod_visible'] = 0;
         $this->values['prod_available'] = 0;
         $this->values['prod_key'] = uuid::v4();
+        $this->values['prod_code'] = '';
         $this->values['prod_created'] = 'NOW()';
 
         if(Empty($this->values['prod_url'])) {
