@@ -165,6 +165,7 @@ class lists extends ancestor {
             4 => 'dkg',
             5 => 'kg',
             6 => 'csomag',
+            7 => 'torta',
         ]);
 
         return $this->getList();
