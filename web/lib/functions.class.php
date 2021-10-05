@@ -806,7 +806,7 @@ class functions extends ancestor {
 
                     if(!isset($GLOBALS['MENU'][$url]['items'])) $GLOBALS['MENU'][$url]['items'] = [];
                     $GLOBALS['MENU'][$url]['items'][$row['c_page_url']] = [
-                        'display' => $display,
+                        'display' => 1,
                         'header' => false,
                         'footer' => false,
                         'pagemodel' => 'content',
