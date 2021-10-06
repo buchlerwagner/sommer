@@ -63,6 +63,19 @@ class product extends ancestor {
         return $this->getVariant($variantId)['stock'];
     }
 
+    public function getPackaging($variantId = 0){
+        $variant = $this->getVariant($variantId);
+
+        if($variant['packaging']['packagingFee']){
+            return [
+                'name' => $variant['packaging']['packagingName'],
+                'fee' => $variant['packaging']['packagingFee']
+            ];
+        }
+
+        return false;
+    }
+
     public function getVariant($variantId = 0){
         if($this->data['variants']){
             foreach($this->data['variants'] AS $var){
@@ -241,6 +254,7 @@ class product extends ancestor {
 		if($result) {
             $packageUnits = $this->owner->lists->getUnits();
             $weightUnits = $this->owner->lists->getWeights();
+            $packaging = $this->getPackagings();
 
 			foreach ($result AS $row) {
                 $variants[] = [
@@ -259,9 +273,12 @@ class product extends ancestor {
                         'quantity' => $row['pv_pack_quantity'],
                         'packageUnit' => $row['pv_pack_unit'],
                         'packageUnitName' => $packageUnits[$row['pv_pack_unit']],
+                        'packagePcsUnitName' => $packageUnits[$row['pv_pack_pcs_unit']],
                         'weight' => $row['pv_weight'],
                         'weightUnit' => $packageUnits[$row['pv_weight_unit']],
                         'weightUnitName' => $weightUnits[$row['pv_weight_unit']],
+                        'packagingName' => $packaging[$row['pv_pkg_id']]['name'],
+                        'packagingFee' => $packaging[$row['pv_pkg_id']]['price'],
                     ],
                 ];
 			}
@@ -349,6 +366,8 @@ class product extends ancestor {
             $weightUnits = $this->owner->lists->getWeights();
         }
 
+        $packaging = $this->getPackagings();
+
         $url = '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $row['cat_url'] . '/' . $row['prod_id'] . '-' . $row['prod_url'] . '/';
         $path = $this->getImagePath(false, $row['prod_cat_id']);
 
@@ -367,9 +386,12 @@ class product extends ancestor {
                 'quantity' => $row['prod_pack_quantity'],
                 'packageUnit' => $row['prod_pack_unit'],
                 'packageUnitName' => $packageUnits[$row['prod_pack_unit']],
+                'packagePcsUnitName' => $packageUnits[$row['prod_pack_pcs_unit']],
                 'weight' => $row['prod_weight'],
                 'weightUnit' => $packageUnits[$row['prod_weight_unit']],
                 'weightUnitName' => $weightUnits[$row['prod_weight_unit']],
+                'packagingName' => $packaging[$row['prod_pkg_id']]['name'],
+                'packagingFee' => $packaging[$row['prod_pkg_id']]['price'],
             ],
         ];
 
@@ -377,6 +399,7 @@ class product extends ancestor {
             'id' => $row['prod_id'],
             'key' => $row['prod_key'],
             'name' => $row['prod_name'],
+            'code' => $row['prod_code'],
             'brand' => $row['prod_brand_name'],
             'intro' => $row['prod_intro'],
             'description' => $row['prod_description'],
@@ -417,5 +440,39 @@ class product extends ancestor {
         ];
 
         return $data;
+    }
+
+    private function getPackagings(){
+        static $out = [];
+
+        if(!$out) {
+            $result = $this->owner->db->getRows(
+                $this->owner->db->genSQLSelect(
+                    'packagings',
+                    [
+                        'pkg_id AS id',
+                        'pkg_name AS name',
+                        'pkg_price AS price',
+                    ],
+                    [
+                        'pkg_shop_id' => $this->owner->shopId
+                    ]
+                )
+            );
+            if($result){
+
+                $out[0] = [
+                    'id' => 0,
+                    'name' => '',
+                    'price' => 0,
+                ];
+
+                foreach($result AS $row){
+                    $out[$row['id']] = $row;
+                }
+            }
+        }
+
+        return $out;
     }
 }

@@ -110,7 +110,7 @@ class mysql extends db {
      * @param bool $limit number of fetched rows
      * @return string
      */
-    public function genSQLSelect($tableName, array $fields = [], array $where = [], array $joins = [], $groupBy = false, $orderBy = false, $limit = false) {
+    public function genSQLSelect($tableName, array $fields = [], $where = [], array $joins = [], $groupBy = false, $orderBy = false, $limit = false) {
         if(Empty($fields)){
             $fields = "*";
         }else{

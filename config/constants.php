@@ -21,6 +21,8 @@ const CACHE_POPULARS        = APPLICATION_NAME . '-popular-';
 const CACHE_TAGGED          = APPLICATION_NAME . '-tagged-';
 const CACHE_SETTINGS        = APPLICATION_NAME . '-settings-';
 
+const CACHE_USER_PROFILE    = APPLICATION_NAME . '-userprofile-';
+
 // cookie keys
 const COOKIE_MACHINEID      = 'sc-mid';
 

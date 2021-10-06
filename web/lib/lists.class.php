@@ -157,6 +157,7 @@ class lists extends ancestor {
     }
 
     public function getUnits(){
+        /*
         $this->setList([
             0 => '-',
             1 => 'db',
@@ -167,6 +168,23 @@ class lists extends ancestor {
             6 => 'csomag',
             7 => 'torta',
         ]);
+        */
+
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'units',
+                [
+                    'un_id AS list_key',
+                    'un_name AS list_value',
+                ],
+                'un_shop_id = 0 OR un_shop_id = ' . $this->owner->shopId,
+                [],
+                [],
+                [
+                    'list_key'
+                ]
+            )
+        );
 
         return $this->getList();
     }
@@ -227,6 +245,28 @@ class lists extends ancestor {
                 ],
                 [
                     'prop_shop_id' => $this->owner->shopId
+                ],
+                [],
+                [],
+                [
+                    'list_value'
+                ]
+            )
+        );
+
+        return $this->getList();
+    }
+
+    public function getPackagingOptions($addPrice = true){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'packagings',
+                [
+                    'pkg_id AS list_key',
+                    ($addPrice ? 'CONCAT(pkg_name, " (", pkg_price, " ' . $this->owner->currencySign . ' / ' . $this->owner->translate->getTranslation('LBL_PCS') . ')")' : 'pkg_name') . ' AS list_value'
+                ],
+                [
+                    'pkg_shop_id' => $this->owner->shopId
                 ],
                 [],
                 [],

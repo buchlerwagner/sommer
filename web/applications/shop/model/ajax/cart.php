@@ -75,6 +75,14 @@ switch($action) {
             $this->data['.item-total-' . $id]['html'] = $this->lib->formatPrice($this->cart->getItem($id)['price']['total'], $this->cart->currency);
             $this->data['.cart-total']['html'] = $this->lib->formatPrice($this->cart->subtotal, $this->cart->currency);
 
+            if($this->cart->packagingFee > 0){
+                $this->data['.cart-item-packaging']['show'] = true;
+                $this->data['.cart-packaging-fee']['html'] = $this->lib->formatPrice($this->cart->packagingFee, $this->cart->currency);
+            }else{
+                $this->data['.cart-item-packaging']['show'] = false;
+                $this->data['.cart-packaging-fee']['html'] = 0;
+            }
+
             if($num){
                 $this->data['.on-cart']['show'] = true;
                 $this->data['.on-empty-cart']['show'] = false;

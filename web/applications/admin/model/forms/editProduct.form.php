@@ -27,10 +27,34 @@ class editProductForm extends formBuilder {
             (new inputText('prod_name', 'LBL_PRODUCT_TITLE'))
                 ->setRequired(),
             (new inputText('prod_brand_name', 'LBL_PRODUCT_BRAND_NAME')),
+            (new groupRow('row7'))->addElements(
+                (new inputText('prod_code', 'LBL_PRODUCT_ARTICLE_NUMBER'))
+                    ->setColSize('col-6 col-lg-4')
+            ),
             (new link('preview', 'LBL_PREVIEW_PRODUCT', $url ))
                 ->setGroupClass('mb-0')
                 ->setTarget('_blank')
                 ->setIcon('fas fa-eye')
+        );
+
+        $variations = (new groupFieldset('variations', ''))->addElements(
+            (new groupRow('row6'))->addElements(
+                (new inputSwitch('prod_variants', 'LBL_PRODUCT_HAS_VARIANTS', 0))
+                    ->changeState(1, enumChangeAction::Hide(), '#pricing')
+                    ->changeState(1, enumChangeAction::Show(), '#product-variants')
+                    ->changeState(0, enumChangeAction::Show(), '#pricing')
+                    ->changeState(0, enumChangeAction::Hide(), '#product-variants')
+                    ->changeDefaultState(enumChangeAction::Show(), '#pricing')
+                    ->setColSize('col-12')
+            ),
+            (new groupRow('product-variants'))
+                ->addClass('d-none')
+                ->addElements(
+                    (new subTable('variants'))
+                        ->addClass('table-responsive')
+                        ->add($this->loadSubTable('productVariants')
+                        )
+                )
         );
 
         $pricing = (new groupFieldset('pricing', ''))->addElements(
@@ -47,25 +71,33 @@ class editProductForm extends formBuilder {
                     ->setAppend($this->owner->currencySign)
             ),
             (new groupRow('row3'))->addElements(
+                (new inputText('prod_pack_quantity', 'LBL_PACKAGE_QUANTITY', 1))
+                    ->setColSize('col-6 col-lg-2')
+                    ->setGroupClass('pr-0')
+                    ->onlyNumbers()
+                    ->addClass('text-right'),
+                (new inputSelect('prod_pack_pcs_unit'))
+                    ->addEmptyLabel()
+                    ->setGroupClass('pl-0')
+                    ->setColSize('col-6 col-lg-2')
+                    ->setOptions($this->owner->lists->reset()->getUnits()),
+
+                (new groupHtml('txt', '<div class="mt-4 pt-2 d-none d-lg-block">/</div>')),
+
                 (new inputSelect('prod_pack_unit', 'LBL_PACKAGE_UNIT'))
                     ->addClass('change-label')
-                    ->setColSize('col-12 col-lg-3')
-                    ->setOptions($this->owner->lists->reset()->getUnits()),
-                (new inputText('prod_pack_quantity', 'LBL_PACKAGE_QUANTITY', 1))
-                    ->setColSize('col-12 col-lg-3')
-                    ->onlyNumbers()
-                    ->addClass('text-right')
-                    ->setAppend('LBL_PACKAGE_QUANTITY_UNIT')
+                    ->setColSize('col-12 col-lg-2')
+                    ->setOptions($this->owner->lists->reset()->getUnits())
             ),
             (new groupRow('row4'))->addElements(
                 (new inputText('prod_stock', 'LBL_PRODUCT_STOCK', 0))
-                    ->setColSize('col-4 col-lg-3')
+                    ->setColSize('col-4 col-lg-2')
                     ->setHelpText('LBL_STOCK_HELP_TEXT')
                     ->onlyNumbers()
                     ->addClass('text-right')
                     ->setAppend('LBL_PCS'),
                 (new inputText('prod_weight', 'LBL_PRODUCT_WEIGHT', 0))
-                    ->setColSize('col-4 col-lg-1')
+                    ->setColSize('col-4 col-lg-2')
                     ->onlyNumbers()
                     ->addClass('text-right'),
                 (new inputSelect('prod_weight_unit', false))
@@ -88,28 +120,14 @@ class editProductForm extends formBuilder {
                     ->setAppend('LBL_PCS')
                     ->addClass('has-label')
                     ->addClass('text-right')
+            ),
+            (new groupRow('row8'))->addElements(
+                (new inputSelect('prod_pkg_id', 'LBL_PACKAGE_FEE', 0))
+                    ->setColSize('col-12 col-lg-6')
+                    ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_NONE')->getPackagingOptions())
             )
         );
 
-        $variations = (new groupFieldset('variations', ''))->addElements(
-            (new groupRow('row4'))->addElements(
-                (new inputSwitch('prod_variants', 'LBL_PRODUCT_HAS_VARIANTS', 0))
-                    ->changeState(1, enumChangeAction::Hide(), '#pricing')
-                    ->changeState(1, enumChangeAction::Show(), '#product-variants')
-                    ->changeState(0, enumChangeAction::Show(), '#pricing')
-                    ->changeState(0, enumChangeAction::Hide(), '#product-variants')
-                    ->changeDefaultState(enumChangeAction::Show(), '#pricing')
-                    ->setColSize('col-12')
-            ),
-            (new groupRow('product-variants'))
-                ->addClass('d-none')
-                ->addElements(
-                    (new subTable('variants'))
-                        ->addClass('table-responsive')
-                        ->add($this->loadSubTable('productVariants')
-                    )
-                )
-        );
 
         $tabGeneral = (new sectionBox('general', 'LBL_PRODUCT_DETAILS', 'far fa-birthday-cake'))
             ->addClass('col-12 col-lg-8')
@@ -117,7 +135,7 @@ class editProductForm extends formBuilder {
 
         $tabPricing = (new sectionBox('pricing', 'LBL_PRODUCT_PRICING', 'far fa-money-bill-alt'))
             ->addClass('col-12 col-lg-8')
-            ->addElements($pricing, $variations);
+            ->addElements($variations, $pricing);
 
 
         $tabDescription = (new sectionBox('description', 'LBL_DESCRIPTIONS', 'far fa-book-open'))

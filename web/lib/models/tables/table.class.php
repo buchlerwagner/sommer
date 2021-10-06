@@ -487,6 +487,7 @@ class table extends model {
                         $this->rows[$key] = $dbRow;
                         $this->rows[$key]['__id'] = $rowId;
                         $this->rows[$key]['options']['delete'] = true;
+                        $this->rows[$key]['options']['edit'] = true;
 
                         if($this->deleteField) {
                             $this->rows[$key]['options']['isDeleted'] = $dbRow[$this->deleteField];
@@ -510,6 +511,7 @@ class table extends model {
                             $this->rows[$i][-2] = $groups;
                         }
                         $this->rows[$i][-1]['delete'] = true;
+                        $this->rows[$i][-1]['edit'] = true;
                     }
 					$i++;
 				}

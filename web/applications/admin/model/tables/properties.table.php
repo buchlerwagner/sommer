@@ -25,4 +25,15 @@ class propertiesTable extends table {
             true
         );
 	}
+
+    public function onAfterDelete($keyFields, $real = true) {
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLDelete(
+                'product_properties',
+                [
+                    'pp_prop_id' => $keyFields['prop_id']
+                ]
+            )
+        );
+    }
 }

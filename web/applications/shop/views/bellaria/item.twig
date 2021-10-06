@@ -56,7 +56,11 @@
                                             {% endif %}
 
                                             {% if variant.packaging.quantity > 1 %}
-                                                <div class="item-packaging small text-muted">({{ variant.packaging.quantity }} {{ _('LBL_PCS') }}/{{ variant.packaging.packageUnitName }})</div>
+                                                <div class="item-packaging text-muted">({{ variant.packaging.quantity }} {{ variant.packaging.packagePcsUnitName }}/{{ variant.packaging.packageUnitName }})</div>
+                                            {% endif %}
+
+                                            {% if variant.packaging.packagingFee > 0 %}
+                                                <div class="item-packaging text-muted">{{ variant.packaging.packagingName }} +{{ _price(variant.packaging.packagingFee, variant.price.currency) }}/{{ variant.packaging.packageUnitName }}</div>
                                             {% endif %}
                                         </div>
                                         {% endfor %}

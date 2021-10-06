@@ -30,15 +30,25 @@ class editVariantForm extends formBuilder {
                     ->setAppend($this->owner->currencySign)
             ),
             (new groupRow('row2'))->addElements(
+                (new inputText('pv_pack_quantity', 'LBL_PACKAGE_QUANTITY', 1))
+                    ->setColSize('col-6 col-lg-4')
+                    ->setGroupClass('pr-0')
+                    ->onlyNumbers()
+                    ->addClass('text-right'),
+
+                (new inputSelect('pv_pack_pcs_unit'))
+                    ->addEmptyLabel()
+                    ->setGroupClass('pl-0')
+                    ->setColSize('col-6 col-lg-3')
+                    ->setOptions($this->owner->lists->reset()->getUnits()),
+
+                (new groupHtml('txt', '<div class="mt-4 pt-2 d-none d-lg-block">/</div>')),
+
                 (new inputSelect('pv_pack_unit', 'LBL_PACKAGE_UNIT'))
                     ->addClass('change-label')
-                    ->setColSize('col-6')
-                    ->setOptions($this->owner->lists->reset()->getUnits()),
-                (new inputText('pv_pack_quantity', 'LBL_PACKAGE_QUANTITY', 1))
-                    ->setColSize('col-6')
-                    ->onlyNumbers()
-                    ->addClass('text-right')
-                    ->setAppend('LBL_PACKAGE_QUANTITY_UNIT')
+                    ->setColSize('col-6 col-lg-4')
+                    ->setOptions($this->owner->lists->reset()->getUnits())
+
             ),
             (new groupRow('row3'))->addElements(
                 (new inputText('pv_stock', 'LBL_PRODUCT_STOCK', 0))
@@ -70,6 +80,11 @@ class editVariantForm extends formBuilder {
                     ->setAppend('LBL_PCS')
                     ->addClass('has-label')
                     ->addClass('text-right')
+            ),
+            (new groupRow('row5'))->addElements(
+                (new inputSelect('pv_pkg_id', 'LBL_PACKAGE_FEE', 0))
+                    ->setColSize('col-12 col-lg-6')
+                    ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_NONE')->getPackagingOptions())
             )
         );
 

@@ -92,6 +92,12 @@
             <div class="column col-lg-4 offset-lg-8 col-md-6 col-sm-12">
                 <ul class="totals-table">
                     <li><h3>{{ _('LBL_CART_TOTAL') }}</h3></li>
+                    <li class="clearfix cart-item-packaging{% if not cart.packagingFee %} d-none{% endif %}">
+                        <span class="col">
+                            {{ _('LBL_PACKAGING_FEE') }}
+                        </span>
+                        <span class="col total-price cart-packaging-fee">{{ _price(cart.packagingFee, cart.currency) }}</span>
+                    </li>
                     <li class="clearfix">
                         <span class="col">
                             {{ _('LBL_TOTAL') }}
@@ -107,4 +113,3 @@
         </div>
     </div>
 </section>
-

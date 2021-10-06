@@ -28,10 +28,11 @@ class cart extends ancestor {
     private $shippingId = false;
 	public $paymentFee = 0;
     private $paymentId = false;
+    public $packagingFee = 0;
 
     private $userId;
-    public $userData = [];
 
+    public $userData = [];
 	public $items = [];
 	public $remarks;
 
@@ -102,7 +103,6 @@ class cart extends ancestor {
 	public function changeProductQuantity($key, $quantity = 0){
 		if($this->status == self::CART_STATUS_NEW) {
 			$key = (int)$key;
-
 			if ($this->items[$key]) {
                 $productId = $this->items[$key]['productId'];
                 $variantId = $this->items[$key]['variantId'];
@@ -227,6 +227,7 @@ class cart extends ancestor {
                 'currency' => $this->currency,
                 'subtotal' => $this->subtotal,
                 'discount' => $this->discount,
+                'packagingFee' => $this->packagingFee,
                 'shippingFee' => $this->shippingFee,
                 'paymentFee' => $this->paymentFee,
                 'total' => $this->total,
@@ -287,7 +288,8 @@ class cart extends ancestor {
                 $this->orderNumber = $cart['cart_order_number'];
                 $this->orderDate = $cart['cart_ordered'];
                 $this->total = $cart['cart_total'];
-                $this->subtotal = $cart['cart_subtotal'];
+                $this->packagingFee = $cart['cart_packaging_fee'];
+                $this->subtotal = $cart['cart_subtotal'] + $this->packagingFee;
                 $this->currency = $cart['cart_currency'];
                 $this->shippingFee = $cart['cart_shipping_fee'];
                 $this->shippingId = $cart['cart_sm_id'];
@@ -344,9 +346,11 @@ class cart extends ancestor {
                     $this->product = $this->owner->addByClassName('product');
 
                     foreach ($result as $row) {
+                        $this->product->init($row['citem_prod_id'])->getProduct();
+
                         $price = (!empty($row['citem_discount']) && $row['citem_discount'] < $row['citem_price'] ? $row['citem_discount'] : $row['citem_price']);
 
-                        $this->product->init($row['citem_prod_id'])->getProduct();
+                        $packaging = $this->product->getPackaging($row['citem_pv_id']);
 
                         $this->items[$row['citem_id']] = [
                             'id' => $row['citem_id'],
@@ -367,6 +371,7 @@ class cart extends ancestor {
                                 'finalPrice' => $price,
                                 'total' => ($price * $row['citem_quantity']),
                             ],
+                            'packaging' => $packaging,
                             'quantity' => [
                                 'amount' => $row['citem_quantity'],
                                 'unit' => $row['citem_pack_unit'],
@@ -481,16 +486,24 @@ class cart extends ancestor {
 	private function summarize(){
 		$this->total = 0;
 		$this->subtotal = 0;
+		$this->packagingFee = 0;
 
 		if($this->items){
 			foreach($this->items AS $item){
+                $fee = 0;
+
+                if($item['packaging']['fee'] > 0){
+                    $fee = ($item['packaging']['fee'] * $item['quantity']['amount']);
+                }
+
 				$this->subtotal += $item['price']['total'];
+                $this->packagingFee += $fee;
 			}
 		}
 
         $this->checkShippingFee();
 
-        $this->total = $this->subtotal + $this->shippingFee + $this->paymentFee - $this->discount;
+        $this->total = $this->subtotal + $this->packagingFee + $this->shippingFee + $this->paymentFee - $this->discount;
 
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLUpdate(
@@ -498,11 +511,12 @@ class cart extends ancestor {
 				[
 					'cart_us_id' => (int) $this->owner->user->getUser()['id'],
 					'cart_subtotal' => $this->subtotal,
-					'cart_total' => $this->total,
+                    'cart_packaging_fee' => $this->packagingFee,
 					'cart_shipping_fee' => $this->shippingFee,
-					//'cart_payment_fee' => $this->paymentFee,
-					'cart_discount' => $this->discount,
-				],
+                    //'cart_payment_fee' => $this->paymentFee,
+                    'cart_discount' => $this->discount,
+                    'cart_total' => $this->total,
+                ],
 				[
 					'cart_id' => $this->id,
                     'cart_shop_id' => $this->owner->shopId,
@@ -511,7 +525,9 @@ class cart extends ancestor {
 			)
 		);
 
-		return $this;
+        $this->subtotal += $this->packagingFee;
+
+        return $this;
 	}
 
 	private function getKey($key = false, $create = true){
@@ -628,7 +644,8 @@ class cart extends ancestor {
             if ($quantity < $this->product->getMinSale($variantId)) {
                 $quantity = $this->product->getMinSale($variantId);
             }
-            if ($quantity > $this->product->getMaxSale($variantId)) {
+            $maxSale = $this->product->getMaxSale($variantId);
+            if ($quantity > $maxSale && $maxSale > 0) {
                 $quantity = $this->product->getMaxSale($variantId);
             }
         }

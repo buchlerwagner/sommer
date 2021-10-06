@@ -1,10 +1,22 @@
+ALTER TABLE `products` ADD COLUMN `prod_pkg_id` INT(11) NULL DEFAULT 0 AFTER `prod_pack_unit`;
+ALTER TABLE `product_variants` ADD COLUMN `pv_pkg_id` INT(11) NULL DEFAULT 0 AFTER `pv_pack_quantity`;
+ALTER TABLE `cart` ADD COLUMN `cart_packaging_fee` DOUBLE NULL DEFAULT 0 AFTER `cart_subtotal`;
+ALTER TABLE `products` ADD COLUMN `prod_pack_pcs_unit` INT(11) NULL DEFAULT 0 AFTER `prod_pack_quantity`;
+ALTER TABLE `product_variants` ADD COLUMN `pv_pack_pcs_unit` INT(11) NULL DEFAULT 0 AFTER `pv_pack_unit`;
+
+
+
+
+
+
+
+
+
+
 ALTER TABLE `cart` ADD COLUMN `cart_order_number` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_key`;
 ALTER TABLE `hosts` ADD COLUMN `host_maintenance` TINYINT(1) NULL DEFAULT 0 AFTER `host_auth_error`;
-
 ALTER TABLE `cart` ADD COLUMN `cart_invoice_type` INT(11) NULL DEFAULT 0 AFTER `cart_deleted`;
 ALTER TABLE `cart` ADD COLUMN `cart_remarks` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL AFTER `cart_invoice_type`;
-
-
 
 
 ALTER TABLE `hosts` ADD COLUMN `host_share_session` TINYINT(1) NULL DEFAULT 0 AFTER `host_smtp_pwd`;

@@ -121,6 +121,12 @@
             <td align="right" style="white-space: nowrap;">{{ _price(discount, currency) }}</td>
         </tr>
         {% endif %}
+        {% if packagingFee %}
+            <tr>
+                <td>{{ _('LBL_PACKAGING_FEE') }}:</td>
+                <td align="right" style="white-space: nowrap;">{{ _price(packagingFee, currency) }}</td>
+            </tr>
+        {% endif %}
         <tr>
             <td>{{ _('LBL_SHIPPING_FEE') }}:</td>
             <td align="right" style="white-space: nowrap;">

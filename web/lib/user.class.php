@@ -1,7 +1,5 @@
 <?php
 class user extends ancestor {
-    const MEMCACHE_KEY = 'ws-user-profile-';
-
 	public $id = 0;
 	public $group = false;
 	public $role = false;
@@ -54,14 +52,14 @@ class user extends ancestor {
 	}
 
     public function clearUserDataCache($userId){
-        $this->owner->mem->delete(self::MEMCACHE_KEY . (int) $userId);
+        $this->owner->mem->delete(CACHE_USER_PROFILE . (int) $userId);
     }
 
     public function getUserProfile($userId){
         $user = false;
 
         if($userId) {
-            $user = $this->owner->mem->get(self::MEMCACHE_KEY . (int) $userId);
+            $user = $this->owner->mem->get(CACHE_USER_PROFILE . (int) $userId);
             if (!$user) {
                 $row = $this->owner->db->getFirstRow(
                     "SELECT * 
@@ -100,7 +98,7 @@ class user extends ancestor {
                     $user['img'] = $this->setProfilePicture($user);
                 }
 
-                $this->owner->mem->set(self::MEMCACHE_KEY . $user['id'], $user);
+                $this->owner->mem->set(CACHE_USER_PROFILE . $user['id'], $user);
             }
         }
 

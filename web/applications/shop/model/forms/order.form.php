@@ -173,6 +173,7 @@ class orderForm extends formBuilder {
                 )
             );
 
+            $this->owner->user->clearUserDataCache($userId);
         }else{
             $this->owner->db->sqlQuery(
                 $this->owner->db->genSQLInsert(

@@ -6,7 +6,9 @@ class groupHtml extends formContainer {
     public function __construct($id, $html = '', $class = ''){
         $this->id = $id;
         $this->html = $html;
-        $this->class = $class;
+        if($class) {
+            $this->addClass($class);
+        }
         $this->isContainer = true;
     }
 
