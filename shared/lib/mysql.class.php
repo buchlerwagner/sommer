@@ -244,6 +244,9 @@ class mysql extends db {
                         if(isset($val['less'])){
                             $where[] = $key . '<' . $this->prepareValue($val['less']);
                         }
+                        if(isset($val['like'])){
+                            $where[] = $key . ' LIKE ' . $this->prepareValue($val['like']);
+                        }
                     }else {
                         $where[] = $key . '=' . $val;
                     }

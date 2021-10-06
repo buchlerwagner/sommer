@@ -125,9 +125,7 @@ class editCategoryForm extends formBuilder {
 
     public function onAfterInit() {
         $this->setSubtitle($this->values['cat_title']);
-    }
 
-    public function onAfterLoadValues() {
         if(Empty($this->values['cat_page_img'])){
             $this->removeControl('removeImg');
         }

@@ -278,6 +278,7 @@ class router extends model {
             */
         }
 
+
 		$this->view->init();
 		if ($this->page == 'ajax') {
             if($this->application == 'admin' && !$this->user->isLoggedIn()){

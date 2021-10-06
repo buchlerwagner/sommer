@@ -188,6 +188,45 @@ class lists extends ancestor {
         return $this->getList();
     }
 
+    public function getDocumentTypes(){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'document_types',
+                [
+                    'dt_id AS list_key',
+                    'dt_name AS list_value',
+                ],
+                'dt_shop_id = 0 OR dt_shop_id = ' . $this->owner->shopId,
+                [],
+                [],
+                'list_value'
+
+            )
+        );
+
+        return $this->getList();
+    }
+
+    public function getTemplateTypes(){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'templates',
+                [
+                    'mt_key AS list_key',
+                    'CONCAT("LBL_TEMPLATE_", mt_key) AS list_value',
+                ],
+                [
+                    'mt_shop_id' => $this->owner->shopId
+                ],
+                [],
+                'list_value'
+
+            )
+        );
+
+        return $this->getList();
+    }
+
     public function getWeights(){
         $this->setList([
             'g'  => 'g',

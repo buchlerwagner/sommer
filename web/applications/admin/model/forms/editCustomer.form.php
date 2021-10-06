@@ -99,6 +99,8 @@ class editCustomerForm extends formBuilder {
 	public function onAfterInit() {
         $this->setSubtitle($this->values['us_lastname'] . ' ' . $this->values['us_firstname']);
         $this->owner->setPageTitle($this->values['us_lastname'] . ' ' . $this->values['us_firstname']);
+
+
 	}
 
 	public function onValidate() {
@@ -122,9 +124,6 @@ class editCustomerForm extends formBuilder {
     public function onAfterLoadValues() {
         if(!$this->values['us_birth_date']) $this->values['us_birth_date'] = '';
 
-        /**
-         * @todo fix this
-         */
         if($this->values['us_role'] == USER_ROLE_NONE){
             $this->removeControl('us_email');
         }else{

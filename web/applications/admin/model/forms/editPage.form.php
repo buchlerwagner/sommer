@@ -138,9 +138,7 @@ class editPageForm extends formBuilder {
     public function onAfterInit() {
         $this->getParent();
         $this->setSubtitle(($this->parentTitle ? $this->parentTitle . ' / ' : '') . $this->values['c_title']);
-    }
 
-    public function onAfterLoadValues() {
         if(Empty($this->values['c_page_img'])){
             $this->removeControl('removeImg');
         }

@@ -246,6 +246,19 @@
                         </div>
                     </div>
 
+                    {% if forms.order.options %}
+                        {% for id, option in forms.order.options %}
+                            <div class="form-row">
+                                <div class="col form-group col-md-12">
+                                    <div class="checkbox checkbox-primary">
+                                        <input id="option-{{ id }}" type="checkbox" name="order[options][]" value="{{ id }}"{% if id in forms.order.options %} checked{% endif %} data-parsley-excluded="true">
+                                        <label for="option-{{ id }}">{{ option }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
                     <div class="form-row">
                         <div class="col form-group col-md-12">
                             <div class="checkbox checkbox-primary{% if forms.order.hasError('agree_terms') %} has-error{% endif %}">
@@ -254,7 +267,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     <div class="form-row">
                         <div class="col form-group col-12">

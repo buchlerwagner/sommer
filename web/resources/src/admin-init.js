@@ -1059,6 +1059,27 @@ var app = {
     },
 
     initModals: function(){
+        $('#preview-modal').on('show.bs.modal', function (e) {
+            var url = '';
+            var modal = $(this);
+            if(e.relatedTarget) {
+                var button = $(e.relatedTarget);
+                if (button.data('size')) {
+                    $('#preview-modal .modal-dialog').addClass('modal-' + button.data('size'));
+                }
+
+                if (button.attr('href') != '#' && button.attr('href') != '') {
+                    url = button.attr('href');
+                } else if (button.data('href')) {
+                    url = button.data('href');
+                }
+            }
+
+            if (url != '') {
+                modal.find('.modal-content').load(url);
+            }
+        });
+
         $('#ajax-modal').on('show.bs.modal', function (e) {
             var url = '';
             var modal = $(this);

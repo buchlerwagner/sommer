@@ -117,6 +117,8 @@ class email extends ancestor {
 			if (!empty($res)) {
 				foreach($res as $key => $val) {
 					$property = substr($key, 3);
+                    if($property === 'mailid') $property = 'mailId';
+
 					if (property_exists($this, $property)) {
 						if (!is_numeric($val)
 							&& substr($val, 0, 2) == 'a:'
@@ -151,7 +153,6 @@ class email extends ancestor {
 		if ($check = $this->checkMail()) {
 			$status = $check;
 		} else {
-
 			$mail = new PHPMailer(true);
 			try {
                 if(!Empty($this->owner->hostConfig['smtp'])){
@@ -186,6 +187,7 @@ class email extends ancestor {
 					$status = 2;
 				} else {
 					$status = 1;
+                    $this->removeAttachments();
 				}
 
 			} catch (Exception $e) {
@@ -326,7 +328,6 @@ class email extends ancestor {
         $this->body = $this->owner->lib->replaceValues($this->body, $data);
 
 		$this->body = $this->owner->view->renderContent('mail', ['contentstring' => $this->body, 'domain' => $this->host, 'heroImg' => $data['heroImg']], false);
-        //print $this->body; exit();
 	}
 
 	private function getEmailSender(){
@@ -338,10 +339,24 @@ class email extends ancestor {
 
 	private function getAttachment($file){
         $filePath = DIR_CACHE . 'emails/' . $this->mailId . '/' . $file;
+
         if(file_exists($filePath)){
             return file_get_contents($filePath);
         }else{
             return false;
+        }
+    }
+
+    private function removeAttachments(){
+        if($this->attachments){
+            $filePath = DIR_CACHE . 'emails/' . $this->mailId . '/';
+            foreach($this->attachments AS $file => $fileName){
+                if(file_exists($filePath . $file)) {
+                    @unlink($filePath . $file);
+                }
+            }
+
+            @rmdir($filePath);
         }
     }
 }

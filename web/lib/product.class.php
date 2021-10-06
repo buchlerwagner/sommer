@@ -171,7 +171,7 @@ class product extends ancestor {
 	public function getImages(){
 		$img = [];
 
-		$sql = "SELECT * FROM " . DB_NAME_WEB . ".product_images WHERE pimg_prod_id='" . $this->productId . "' ORDER BY pimg_order LIMIT 8";
+		$sql = "SELECT * FROM " . DB_NAME_WEB . ".product_images WHERE pimg_prod_id='" . $this->productId . "' ORDER BY pimg_order LIMIT " . FILEUPLOAD_MAX_FILES;
 		$result = $this->owner->db->getRows($sql);
 		if($result){
 			$i = 0;

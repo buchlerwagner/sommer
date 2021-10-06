@@ -1,6 +1,8 @@
 <?php
 class orderForm extends formBuilder {
 
+    public $options = [];
+
     public function setupKeyFields() {
 
     }
@@ -47,8 +49,12 @@ class orderForm extends formBuilder {
 
             (new inputHidden('key')),
 
-            (new inputTextarea('remarks', 'LBL_REMARKS')),
+            (new inputTextarea('remarks', 'LBL_REMARKS'))
+        );
 
+        $this->getFileOptions();
+
+        $this->addControls(
             (new inputCheckbox('agree_terms', 'LBL_I_AGREE_TERMS_AND_CONDITIONS', 0))
                 ->setRequired()
         );
@@ -59,14 +65,15 @@ class orderForm extends formBuilder {
     }
 
     public function onAfterInit() {
-        if($this->owner->user->isLoggedIn() && !isset($_REQUEST[$this->name])) {
-            if($user = $this->owner->user->getUser()){
+        if ($this->owner->user->isLoggedIn() && !isset($_REQUEST[$this->name])) {
+            if ($user = $this->owner->user->getUser()) {
                 $this->values['lastname'] = $user['lastname'];
                 $this->values['firstname'] = $user['firstname'];
                 $this->values['email'] = $user['email'];
                 $this->values['phone'] = $user['phone'];
                 $this->values['zip'] = $user['zip'];
                 $this->values['city'] = $user['city'];
+                $this->values['address'] = $user['address'];
 
                 $this->values['invoice_type'] = $user['invoice_type'];
                 $this->values['invoice_name'] = $user['invoice_name'];
@@ -79,33 +86,33 @@ class orderForm extends formBuilder {
     }
 
     public function onValidate() {
-        if(!Empty($this->values['invoiceaddress'])){
-            if(Empty($this->values['invoice_name'])){
+        if (!empty($this->values['invoiceaddress'])) {
+            if (empty($this->values['invoice_name'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['invoice_name']);
             }
-            if($this->values['invoice_type'] == 2 && Empty($this->values['vat'])){
+            if ($this->values['invoice_type'] == 2 && empty($this->values['vat'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['vat']);
             }
-            if(Empty($this->values['invoice_zip'])){
+            if (empty($this->values['invoice_zip'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['invoice_zip']);
             }
-            if(Empty($this->values['invoice_city'])){
+            if (empty($this->values['invoice_city'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['invoice_city']);
             }
-            if(Empty($this->values['invoice_address'])){
+            if (empty($this->values['invoice_address'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['invoice_address']);
             }
-        }else{
+        } else {
             $this->values['invoice_type'] = 0;
         }
 
-        if(Empty($this->values['agree_terms'])){
+        if (empty($this->values['agree_terms'])) {
             $this->addError('ERR_2001', self::FORM_ERROR, ['agree_terms']);
         }
-        if(Empty($this->values['shipping'])){
+        if (empty($this->values['shipping'])) {
             $this->addError('ERR_2002', self::FORM_ERROR, ['shipping']);
         }
-        if(Empty($this->values['payment'])){
+        if (empty($this->values['payment'])) {
             $this->addError('ERR_2003', self::FORM_ERROR, ['payment']);
         }
 
@@ -119,24 +126,28 @@ class orderForm extends formBuilder {
         $this->owner->cart->setPaymentMode((int)$this->values['payment']);
         $this->owner->cart->setShippingMode((int)$this->values['shipping']);
 
+        if(!Empty($this->values['options'])) {
+            $this->owner->cart->setOption('documents', $this->values['options']);
+        }
+
         $userId = $this->registerUser();
         $this->owner->cart->makeOrder($userId, $this->values['invoice_type'], $remarks);
 
         $this->owner->pageRedirect($this->owner->getPageName('finish') . $key . '/');
     }
 
-    private function registerUser(){
+    private function registerUser() {
         $userData = [];
 
         $sendRegisterNotification = false;
         $this->values['last_order'] = 'NOW()';
 
-        if(!$this->owner->user->isLoggedIn()) {
-            if(!empty($this->values['createaccount'])){
+        if (!$this->owner->user->isLoggedIn()) {
+            if (!empty($this->values['createaccount'])) {
                 $sendRegisterNotification = true;
                 $this->values['role'] = USER_ROLE_USER;
                 $this->values['enabled'] = 1;
-            }else{
+            } else {
                 $this->values['role'] = USER_ROLE_NONE;
                 $this->values['enabled'] = 0;
                 $this->values['email2'] = $this->values['email'];
@@ -149,17 +160,17 @@ class orderForm extends formBuilder {
             $this->values['password'] = password_hash(generateRandomString(32), PASSWORD_DEFAULT);
             $this->values['timezone'] = $this->owner->hostConfig['timeZoneID'];
             $this->values['registered'] = 'NOW()';
-        }else{
+        } else {
             unset($this->values['email']);
         }
 
         $this->clearPostData();
 
-        foreach($this->values AS $key => $value){
+        foreach ($this->values as $key => $value) {
             $userData['us_' . $key] = $value;
         }
 
-        if($this->owner->user->isLoggedIn()){
+        if ($this->owner->user->isLoggedIn()) {
             $userId = $this->owner->user->getUser()['id'];
 
             $this->owner->db->sqlQuery(
@@ -174,7 +185,7 @@ class orderForm extends formBuilder {
             );
 
             $this->owner->user->clearUserDataCache($userId);
-        }else{
+        } else {
             $this->owner->db->sqlQuery(
                 $this->owner->db->genSQLInsert(
                     'users',
@@ -184,7 +195,7 @@ class orderForm extends formBuilder {
 
             $userId = $this->owner->db->getInsertRecordId();
 
-            if($sendRegisterNotification && $userId){
+            if ($sendRegisterNotification && $userId) {
                 $this->owner->email->prepareEmail(
                     'register',
                     $userId,
@@ -200,7 +211,7 @@ class orderForm extends formBuilder {
         return $userId;
     }
 
-    private function clearPostData(){
+    private function clearPostData() {
         unset(
             $this->values['key'],
             $this->values['remarks'],
@@ -208,7 +219,37 @@ class orderForm extends formBuilder {
             $this->values['shipping'],
             $this->values['invoiceaddress'],
             $this->values['createaccount'],
-            $this->values['agree_terms']
+            $this->values['agree_terms'],
+            $this->values['options']
         );
+    }
+
+    private function getFileOptions(){
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'documents',
+                [
+                    'doc_id AS id',
+                    'doc_select_text AS text'
+                ],
+                [
+                    'doc_optional' => 1,
+                    'doc_mail_types' => [
+                        'like' => '%|new-order|%'
+                    ],
+                    'doc_shop_id' => $this->owner->shopId,
+                ]
+            )
+        );
+        if($result){
+            foreach($result AS $row){
+                $this->options[$row['id']] = $row['text'];
+
+                $this->addControls(
+                    (new inputCheckbox('options', $row['text']))
+                        ->setStateValues($row['id'])
+                );
+            }
+        }
     }
 }

@@ -70,6 +70,7 @@
 }
 .fileuploader-theme-thumbnails .fileuploader-items .fileuploader-item {
 	border-bottom: 0;
+    margin-bottom: 15px;
 }
 .fileuploader-theme-thumbnails .fileuploader-items .fileuploader-item:last-child {
     margin-bottom: 0;

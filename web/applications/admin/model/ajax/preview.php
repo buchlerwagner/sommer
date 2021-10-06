@@ -10,9 +10,10 @@ $hash = $_REQUEST['hash'];
 $type = $_REQUEST['type'];
 $id = (int) $_REQUEST['id'];
 
-$fileName = '/file.php?m=inline&type=' . $type . '&id=' . $id . '&hash=' . $hash;
+//$fileName = '/file.php?m=inline&type=' . $type . '&id=' . $id . '&hash=' . $hash;
+$fileName = FOLDER_UPLOAD . $this->shopId . '/documents/' . $hash;
 $fileDownload = '/file.php?m=download&type=' . $type . '&id=' . $id . '&hash=' . $hash;
-$fileType = pathinfo($hash, PATHINFO_EXTENSION);
+$fileType = strtolower(pathinfo($hash, PATHINFO_EXTENSION));
 
 $data = [
     'title'   => false,

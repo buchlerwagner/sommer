@@ -20,6 +20,7 @@ class inputFileUploader extends formElement {
     private $actionDelete = false;
     private $actionSort = false;
     private $actionDownload = false;
+    private $limit = FILEUPLOAD_MAX_FILES;
 
     protected function init() {
         $this->addCss('fileuploader', 'fileuploader/jquery.fileuploader.min.css');
@@ -48,7 +49,8 @@ class inputFileUploader extends formElement {
     }
 
     public function setLimit($limit){
-        $this->addData('fileuploader-limit', $limit);
+        $this->limit = (int) $limit;
+        $this->addData('fileuploader-limit', $this->limit);
         return $this;
     }
 
@@ -116,8 +118,8 @@ class inputFileUploader extends formElement {
     public function setInlineJs() {
         $data = [
             'theme' =>  $this->theme,
-            'captions' =>  $this->labels,
-            //'limit' =>  $this->limit,
+            'captions' =>  'en',
+            'limit' =>  $this->limit,
             //'maxSize' =>  $this->maxSize,
             //'fileMaxSize' =>  $this->fileMaxSize,
             'extensions' =>  $this->allowedExtensions,

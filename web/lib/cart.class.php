@@ -36,6 +36,8 @@ class cart extends ancestor {
 	public $items = [];
 	public $remarks;
 
+	private $options = [];
+
     public function init($key = false, $create = true) {
 		$this->currency = $this->owner->currency;
 
@@ -261,8 +263,34 @@ class cart extends ancestor {
             $data,
             false,  // from
             false,  // cc
-            ($this->owner->settings['incomingEmail'] ?: false) // bcc
+            ($this->owner->settings['incomingEmail'] ?: false), // bcc
+            $this->getMailAttachments()
         );
+    }
+
+    private function getMailAttachments(){
+        $files = [];
+        $savePath = DIR_UPLOAD . $this->owner->shopId . '/documents/';
+
+        $where = '(doc_optional = 0' . ($this->options['documents'] ? ' OR doc_id IN (' . implode(',', $this->options['documents']) . ')' : '') . ') AND doc_mail_types LIKE "%|new-order|%" AND doc_shop_id = ' . $this->owner->shopId;
+
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'documents',
+                [
+                    'doc_filename AS filename',
+                    'doc_hash AS hash'
+                ],
+                $where
+            )
+        );
+        if($result){
+            foreach($result AS $row){
+                $files[$row['filename']] = $savePath . $row['hash'];
+            }
+        }
+
+        return $files;
     }
 
 	private function loadCart(){
@@ -553,6 +581,16 @@ class cart extends ancestor {
 
 		return $this;
 	}
+
+    public function setOption($key, $value){
+        if(!isset($this->options[$key])){
+            $this->options[$key] = [];
+        }
+
+        $this->options[$key] = $value;
+
+        return $this;
+    }
 
 	private function setKey($key = false, $storeKey = true){
         if($key){

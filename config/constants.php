@@ -168,8 +168,8 @@ const CHUNK_SIZE            = 1024 * 1024;
 
 const PROFILE_IMG_SIZE      = 200;
 
-const FILEUPLOAD_MAX_FILES  = 100;
-const FILEUPLOAD_MAX_FILESIZE = 10; // Mb
+const FILEUPLOAD_MAX_FILES  = 9;
+const FILEUPLOAD_MAX_FILESIZE = 20; // Mb
 
 $GLOBALS['IMAGE_SIZES'] = [
     'default' => [
