@@ -11,7 +11,7 @@ class unitsTable extends table {
 		$this->header = true;
 
 		$this->settings['display']    = 50;
-		$this->settings['orderfield'] = 'un_shop_id DESC, un_name';
+		$this->settings['orderfield'] = 'un_shop_id, un_id';
 		$this->settings['orderdir']   = 'asc';
 
         $this->addColumns(

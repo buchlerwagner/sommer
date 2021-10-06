@@ -180,9 +180,8 @@ class lists extends ancestor {
                 'un_shop_id = 0 OR un_shop_id = ' . $this->owner->shopId,
                 [],
                 [],
-                [
-                    'list_key'
-                ]
+                'un_id'
+
             )
         );
 

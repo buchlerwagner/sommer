@@ -115,6 +115,8 @@ class editCategoryForm extends formBuilder {
         }else {
             $this->uploadFile();
         }
+
+        unset($this->values['removeImg']);
     }
 
     public function onAfterSave($statement) {
