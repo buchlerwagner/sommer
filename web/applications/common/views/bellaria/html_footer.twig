@@ -14,5 +14,18 @@
     </script>
     {% endif %}
 {% endif %}
+{% if settings.cookieBar %}
+    <script>
+        $(document).ready(function(){
+            $.cookieBar({
+                fixed: true,
+                bottom: true,
+                message: '{{ settings.cookieBarText }}',
+                acceptText: '{{ settings.cookieBarAcceptButton }}',
+                zindex: 1000
+            });
+        });
+    </script>
+{% endif %}
 	</body>
 </html>

@@ -111,7 +111,21 @@ class shopSettingsForm extends formBuilder {
                     ->setName('settings/youtube')
             );
 
-        $this->addSections($mainOptions, $contact, $menu, $openingHours, $analytics, $social);
+        $cookieBar = (new sectionBox('cookiebar', 'LBL_GDPR', 'far fa-cookie'))
+            ->addElements(
+                (new inputSwitch('cookieBar', 'LBL_COOKIE_COMPLIANCE', 0))
+                    ->changeState(0, enumChangeAction::Readonly(), '#cookieBarText, #cookieBarAcceptButton')
+                    ->changeState(1, enumChangeAction::Editable(), '#cookieBarText, #cookieBarAcceptButton')
+                    ->setName('settings/cookieBar'),
+
+                (new inputText('cookieBarText', 'LBL_COOKIE_COMPLIANCE_TEXT'))
+                    ->setName('settings/cookieBarText'),
+                (new inputText('cookieBarAcceptButton', 'LBL_ACCEPT_BUTTON_TEXT'))
+                    ->setName('settings/cookieBarAcceptButton')
+            );
+
+
+        $this->addSections($mainOptions, $contact, $menu, $openingHours, $analytics, $cookieBar, $social);
 
         $this->hideSidebar();
 
@@ -121,8 +135,26 @@ class shopSettingsForm extends formBuilder {
         );
 	}
 
+    public function onValidate() {
+        if(!Empty($this->values['settings']['stopSale'])) {
+            if(Empty($this->values['settings']['stopSaleText'])){
+                $this->addError('ERR_1000', self::FORM_ERROR, ['stopSaleText']);
+            }
+        }
+
+        if(!Empty($this->values['settings']['cookieBar'])) {
+            if(Empty($this->values['settings']['cookieBarText'])){
+                $this->addError('ERR_1000', self::FORM_ERROR, ['cookieBarText']);
+            }
+            if(Empty($this->values['settings']['cookieBarAcceptButton'])){
+                $this->addError('ERR_1000', self::FORM_ERROR, ['cookieBarAcceptButton']);
+            }
+        }
+    }
+
     public function saveValues() {
         if(Empty($this->values['settings']['stopSale'])) $this->values['settings']['stopSale'] = 0;
+        if(Empty($this->values['settings']['cookieBar'])) $this->values['settings']['cookieBar'] = 0;
 
         $this->owner->db->sqlQuery(
             $this->owner->db->genSQLInsert(

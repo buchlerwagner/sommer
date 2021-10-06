@@ -33619,6 +33619,67 @@ iframe#gmap_canvas {
   width: 100%;
 }
 
+#cookie-bar {
+  background: #7E422D;
+  height: auto;
+  line-height: 24px;
+  color: #ffffff !important;
+  text-align: center;
+  padding: 5px 0;
+  z-index: 1000;
+}
+
+#cookie-bar.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+#cookie-bar.fixed.bottom {
+  bottom: 0;
+  top: auto;
+}
+
+#cookie-bar p {
+  margin: 0;
+  padding: 0;
+  color: #ffffff !important;
+}
+
+#cookie-bar a {
+  color: #ffffff;
+  display: inline-block;
+  border-radius: 3px;
+  text-decoration: none;
+  padding: 0 6px;
+  margin-left: 8px;
+}
+
+#cookie-bar .cb-enable {
+  background: #46cf93;
+}
+
+#cookie-bar .cb-enable:hover {
+  background: #ff91a4;
+}
+
+#cookie-bar .cb-disable {
+  background: #ff5555;
+}
+
+#cookie-bar .cb-disable:hover {
+  background: #ff5555;
+}
+
+#cookie-bar .cb-policy {
+  background: #0033bb;
+}
+
+#cookie-bar .cb-policy:hover {
+  background: #0055dd;
+}
+
 .has-error input {
   border-color: #ff5555 !important;
 }

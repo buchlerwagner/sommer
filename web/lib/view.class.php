@@ -163,7 +163,7 @@ class view extends ancestor {
 		echo $content->render($this->common + $this->owner->data);
 
 		if($this->owner->page != 'ajax'){
-			echo $twig->render('html_footer' . TWIG_FILE_EXTENSION, ['js' => $this->js, 'jsVersion' => VERSION_JS]);
+			echo $twig->render('html_footer' . TWIG_FILE_EXTENSION, ['js' => $this->js, 'jsVersion' => VERSION_JS, 'settings' => $this->owner->settings]);
 		}
 	}
 

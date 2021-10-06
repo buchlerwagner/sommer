@@ -62,6 +62,7 @@ module.exports = function(grunt) {
                     //'web/public/vendor/revolution/js/extensions/revolution.extension.video.js',
 
                     'web/public/vendor/select2/js/select2.js',
+                    'web/public/vendor/cookiebar/jquery.cookiebar.js',
 
                     'web/resources/src/bellaria/main-slider-script.js',
                     'web/resources/src/bellaria/jquery.fancybox.js',
