@@ -120,7 +120,8 @@ class contactForm extends formBuilder {
             $this->values['email']
         );
 
-        $this->values['prod_id'] = $this->values['itemId'];
+        $this->values['prod_id'] = (int) $this->values['itemId'];
+        if(!$this->values['prod_id']) $this->values['prod_id'] = 0;
         unset($this->values['token'], $this->values['agree_terms'], $this->values['itemId']);
 
         if($user = $this->owner->user->isLoggedIn()) {
