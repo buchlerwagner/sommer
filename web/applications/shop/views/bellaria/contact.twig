@@ -43,18 +43,20 @@
 
                     <ul class="contact-info">
                         {% if settings.address %}
-                        <li><i class="far fa-map-marker-alt"></i> {{ settings.address|replace({',': ',<br>'})|raw }}</li>
+                            <li><i class="far fa-map-marker-alt"></i> {{ settings.address|replace({',': ',<br>'})|raw }}</li>
                         {% endif %}
                         {% if settings.addressAlt %}
-                        <li><i class="far fa-map-marker-alt"></i> {{ settings.addressAlt|replace({',': ',<br>'})|raw }}</li>
+                            <li><i class="far fa-map-marker-alt"></i> {{ settings.addressAlt|replace({',': ',<br>'})|raw }}</li>
                         {% endif %}
                         {% if settings.phone %}
-                        <li><i class="far fa-phone-alt"></i> <a href="tel:{{ settings.phone }}">{{ settings.phone }}</a></li>
+                            <li><i class="far fa-phone-alt"></i> <a href="tel:{{ settings.phone }}">{{ settings.phone }}</a></li>
                         {% endif %}
                         {% if settings.phoneAlt %}
                             <li><i class="far fa-phone-alt"></i> <a href="tel:{{ settings.phoneAlt }}">{{ settings.phoneAlt }}</a></li>
                         {% endif %}
-                        <li><i class="far fa-envelope"></i> <a href="mailto:{{ settings.incomingEmail }}">{{ settings.incomingEmail }}</a></li>
+                        {% if settings.incomingEmail %}
+                            <li><i class="far fa-envelope"></i> <a href="mailto:{{ settings.incomingEmail }}">{{ settings.incomingEmail }}</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
