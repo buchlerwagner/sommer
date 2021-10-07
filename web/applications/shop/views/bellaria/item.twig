@@ -112,9 +112,9 @@
                                                     </div>
                                                 </div>
                                             {% else %}
-                                                <button type="button" class="theme-btn btn-pink request-offer">
+                                                <a href="{{ getPageName('contact') }}?item={{ item.id }}" class="theme-btn btn-pink request-offer">
                                                     <span class="btn-title">{{ _('LBL_REQUEST_OFFER') }}</span>
-                                                </button>
+                                                </a>
                                             {% endif %}
                                         {% else %}
                                             <div class="alert alert-danger">

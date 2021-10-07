@@ -8,6 +8,7 @@ abstract class formBuilder extends model {
     const FORM_SUCCESS  = 0;
 
     public $type = 'formBuilder';
+    public $formWidth = 'col-12';
 	public $title = '';
 	public $subTitle = '';
 	public $boxed = true;
@@ -37,7 +38,6 @@ abstract class formBuilder extends model {
     public $customRights = false;
 	public $customActions = [];
 	public $displayErrors = true;
-	public $reCaptcha = []; // sitekey, secret, action
 	public $locale;
 
 	public $includeBefore = false;
@@ -46,7 +46,8 @@ abstract class formBuilder extends model {
 	public $viewTemplate = false;
 	public $toolsTemplate = false;
 
-	private $reCaptchaTokenName = 'recaptcha-token';
+    private $reCaptcha = [];
+	private $reCaptchaTokenName = 'token';
 	private $reCaptchaActionName = 'homepage';
 
     public $sections = [];
@@ -107,15 +108,6 @@ abstract class formBuilder extends model {
 		}
 
         $this->onBeforeLoadValues();
-
-		if(!Empty($this->reCaptcha) && $this->reCaptcha['sitekey']){
-		    $this->addControl(
-                (new inputRecaptcha(
-                    ($this->reCaptcha['token'] ?: $this->reCaptchaTokenName),
-                    ($this->reCaptcha['token'] ?: $this->reCaptchaTokenName)
-                ))->setReadonly(true)
-            );
-		}
 
 		if (empty($_REQUEST[$this->name])) {
 			if ($this->useSession) {
@@ -545,9 +537,9 @@ abstract class formBuilder extends model {
 			$response = file_get_contents(
 				"https://www.google.com/recaptcha/api/siteverify?secret=" . $this->reCaptcha['secret'] . "&response=" . $this->values[$tokenName] . "&remoteip=" . $_SERVER['REMOTE_ADDR']
 			);
-			$response = json_decode($response, true);
+            $this->reCaptcha['response'] = json_decode($response, true);
 
-			if($response['success'] && $response['action'] == $actionName){
+			if($this->reCaptcha['response']['success'] && $this->reCaptcha['response']['action'] == $actionName){
 				$out = true;
 			}else{
 				$this->addError('ERR_RECAPTCHA', 2, []);
@@ -556,6 +548,29 @@ abstract class formBuilder extends model {
 
 		return $out;
 	}
+
+    protected function setRecaptcha($siteKey, $secret, $token = false, $action = false){
+        $this->reCaptcha = [
+            'sitekey' => $siteKey,
+            'secret' => $secret,
+            'token' => ($token ?: $this->reCaptchaTokenName),
+            'action' => ($action ?: $this->reCaptchaActionName)
+        ];
+
+        $this->addControl(
+            (new inputRecaptcha(
+                ($this->reCaptcha['token'] ?: $this->reCaptchaTokenName),
+                $this->reCaptcha['sitekey'],
+                ($this->reCaptcha['action'] ?: $this->reCaptchaActionName)
+            ))
+        );
+
+        return $this;
+    }
+
+    protected function getRecaptchaResponse(){
+        return $this->reCaptcha['response'];
+    }
 
     protected function addButtons(formButton ...$buttons){
         foreach ($buttons as $button) {

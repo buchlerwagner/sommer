@@ -3,14 +3,16 @@
 <div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}">
     {% set inputName = formName ~ '[' ~ element.getName ~ ']' %}
     <input type="hidden" name="{{ inputName }}" value="{{ value }}">
+    {% if element.hasPreview %}
+    <a href="{{ element.getPreviewUrl }}{{ element.getPath }}{{ value }}" data-target="#preview-modal" data-toggle="modal" data-size="xl" class="{{ element.getClass }}"{{ self.attributes(element.getAttributes) }}>
+    {% endif %}
     {% if element.isResponsive %}
-        <img class="img-thumbnail" src="{{ element.getPath }}{{ value }}" alt="">
+        <img class="img-thumbnail" src="{{ element.getPath }}{{ value }}"{% if element.getSize.width %} width="{{ element.getSize.width }}"{% endif %}{% if element.getSize.height %} height="{{ element.getSize.height }}"{% endif %} alt="">
     {% else %}
         <img class="img-thumbnail" src="/i.php?src={{ element.getPath }}{{ value }}&w={{ element.getSize.width }}&h={{ element.getSize.height }}&m={{ element.getCropMode }}" alt="">
     {% endif %}
-    {#
-    <a href="{{ element.getPreviewUrl }}" data-target="#ajax-modal" data-toggle="modal" data-size="xl" class="{{ element.getClass }}"{{ self.attributes(element.getAttributes) }}>
+    {% if element.hasPreview %}
     </a>
-    #}
+    {% endif %}
 </div>
 {% endif %}

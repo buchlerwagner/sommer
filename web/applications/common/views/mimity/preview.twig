@@ -1,7 +1,7 @@
 <div class="row-fluid align-center">
     {% if fileType == 'pdf' %}
         <embed class="embed-responsive" style="float:none;display:inline;height:800px;width:100%;" src="{{ fileName }}"/>
-    {% elseif fileType == 'jpg' or fileType == 'jpeg' or fileType == 'png' %}
+    {% elseif fileType == 'jpg' or fileType == 'jpeg' or fileType == 'png' or fileType == 'svg' %}
         <div class="img-zoom">
             <img src="{{ fileName }}" class="img-fluid" alt=""/>
         </div>

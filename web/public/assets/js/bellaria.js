@@ -32223,6 +32223,7 @@ var revapi2,
 	}
 
 	//Header Search
+	/*
 	if($('.search-btn').length) {
 		$('.search-btn').on('click', function() {
 			$('.main-header').addClass('search-active');
@@ -32231,7 +32232,7 @@ var revapi2,
 			$('.main-header').removeClass('search-active');
 		});
 	}
-
+	*/
 
 	//Services Carousel
 	if ($('.services-carousel').length) {
@@ -32263,6 +32264,7 @@ var revapi2,
 	}
 
 	//Recipes Carousel
+	/*
 	if ($('.recipes-carousel').length) {
 		$('.recipes-carousel').owlCarousel({
 			loop:true,
@@ -32385,6 +32387,7 @@ var revapi2,
 			}
 		});    		
 	}
+	*/
 
 	//Single Item Carousel
 	if ($('.single-item-carousel').length) {
@@ -32451,28 +32454,7 @@ var revapi2,
     	$('.sortby-select').select2();
 	}
 
-	// cooked single ingredient
-	if ($('.cooked-single-ingredient').length) {
-    	$('.cooked-single-ingredient .cooked-ingredient-checkbox').on('click', function() {
-			$(this).parent('.cooked-single-ingredient').toggleClass('checked');
-		});
-	}
-
-	// Open modal in AJAX callback
-	$('#call-btn').on('click', function(event) {
-	  event.preventDefault();
-	  this.blur();
-	  $.get(this.href, function(html) {
-	    $(html).appendTo('body').modal({
-			clickClose: false,
-			closeClass: 'cooked-close-fsm',
-			closeExisting: true,
-			fadeDuration: 300,
-			fadeDelay: 0.15
-	    });
-	  });
-	});
-
+	/*
 	//Default Masonary
 	function defaultMasonry() {
 		if($('.masonry-items-container').length){
@@ -32627,80 +32609,6 @@ var revapi2,
 			}
 		});
 	}
-	
-	//Contact Form Validation
-	if($('#email-form').length){
-		$('#submit').click(function(){
-			
-            var o = new Object();
-            var form = '#email-form';
-			
-			var username = $('#email-form .username').val();
-			var email = $('#email-form .email').val();
-			
-			if(username == '' || email == '')
-			{
-				$('#email-form .response').html('<div class="failed">Please fill the required fields.</div>');
-				return false;
-			}
-            
-            $.ajax({
-                url:"sendemail.php",
-                method:"POST",
-                data: $(form).serialize(),
-                beforeSend:function(){
-                    $('#email-form .response').html('<div class="text-info"><img src="images/icons/preloader.gif"> Loading...</div>');
-                },
-                success:function(data){
-                    $('form').trigger("reset");
-                    $('#email-form .response').fadeIn().html(data);
-                    setTimeout(function(){
-                        $('#email-form .response').fadeOut("slow");
-                    }, 5000);
-                },
-                error:function(){
-                    $('#email-form .response').fadeIn().html(data);
-                }
-            });
-        });
-	}
-
-	//Subscribe Form
-	/*
-	if($('#subscribe-form').length){
-		$('#subscribe-newslatters').click(function(){
-			
-            var o = new Object();
-            var form = '#subscribe-form';
-			var email = $('#subscribe-form .email').val();
-			
-			if(email == '')
-			{
-				$('#subscribe-form .response').html('<div class="failed">Please enter your Email Address.</div>');
-				return false;
-			}
-            
-            $.ajax({
-                url:"sendnewslatters.php",
-                method:"POST",
-                data: $(form).serialize(),
-                beforeSend:function(){
-                    $('#subscribe-form .response').html('<div class="text-info"><img src="images/icons/preloader.gif"> Loading...</div>');
-                },
-                success:function(data){
-                    $('form').trigger("reset");
-                    $('#subscribe-form .response').fadeIn().html(data);
-                    setTimeout(function(){
-                        $('#subscribe-form .response').fadeOut("slow");
-                    }, 5000);
-                },
-                error:function(){
-                    $('#subscribe-form .response').fadeIn().html(data);
-                }
-            });
-        });
-	}
-	*/
 
 	// Scroll to a Specific Div
 	if($('.scroll-to-target').length){
@@ -32743,7 +32651,7 @@ var revapi2,
 	
 	$(window).on('load', function() {
 		handlePreloader();
-		defaultMasonry();
+		//defaultMasonry();
 	});	
 
 })(window.jQuery);

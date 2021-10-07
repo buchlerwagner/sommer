@@ -239,10 +239,9 @@
 
                     <h3 class="mb-4">{{ _('LBL_REMARKS') }}</h3>
                     <div class="form-row mb-4">
-                        <div class="col form-group col-md-12">
-                            <div class="checkbox checkbox-primary">
-                                <textarea cols="5" rows="4" id="remarks" class="form-control" name="order[remarks]" data-parsley-excluded="true">{{ forms.order.values.remarks }}</textarea>
-                            </div>
+                        <div class="col form-group floating-label col-md-12">
+                            <textarea cols="5" rows="4" id="remarks" class="form-control" name="order[remarks]" placeholder=" " data-parsley-excluded="true">{{ forms.order.values.remarks }}</textarea>
+                            <label class="control-label" for="remarks">{{ _('LBL_MESSAGE') }}</label>
                         </div>
                     </div>
 

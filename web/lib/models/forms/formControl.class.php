@@ -37,7 +37,7 @@ abstract class formControl {
     }
 
     final public function getId():string{
-        return $this->id;
+        return str_replace('/', '-', $this->id);
     }
 
     public function setName($name){

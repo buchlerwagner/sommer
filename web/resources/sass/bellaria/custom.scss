@@ -96,6 +96,7 @@
   height: 50px;
 }
 
+.floating-label > textarea,
 .floating-label > input,
 .floating-label > label {
   padding: $spacer * .9 $spacer * .75;
@@ -122,33 +123,42 @@
   user-select: none;
 }
 
+.floating-label textarea::-webkit-input-placeholder,
 .floating-label input::-webkit-input-placeholder {
   color: transparent;
 }
 
+.floating-label textarea:-ms-input-placeholder,
 .floating-label input:-ms-input-placeholder {
   color: transparent;
 }
 
+.floating-label textarea::-ms-input-placeholder,
 .floating-label input::-ms-input-placeholder {
   color: transparent;
 }
 
+.floating-label textarea::-moz-placeholder,
 .floating-label input::-moz-placeholder {
   color: transparent;
 }
 
+.floating-label textarea::placeholder,
 .floating-label input::placeholder {
   color: transparent;
 }
 
+.floating-label textarea:focus,
 .floating-label input:focus,
+.floating-label textarea:not(:placeholder-shown),
 .floating-label input:not(:placeholder-shown) {
   padding-top: calc(#{$spacer} + #{$spacer} * (2 / 3));
   padding-bottom: calc(#{$spacer} / 3);
 }
 
+.floating-label textarea:focus ~ label,
 .floating-label input:focus ~ label,
+.floating-label textarea:not(:placeholder-shown) ~ label,
 .floating-label input:not(:placeholder-shown) ~ label {
   padding-top: calc(#{$spacer} / 3);
   padding-bottom: calc(#{$spacer} / 3);

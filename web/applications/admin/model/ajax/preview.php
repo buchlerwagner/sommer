@@ -6,14 +6,20 @@
 $this->output = OUTPUT_RAW;
 
 $this->data = [];
-$hash = $_REQUEST['hash'];
-$type = $_REQUEST['type'];
-$id = (int) $_REQUEST['id'];
+if($_REQUEST['src']){
+    $src = $_REQUEST['src'];
+    $fileName = $src;
+    $fileDownload = $src;
+    $fileType = strtolower(pathinfo($src, PATHINFO_EXTENSION));
+}else {
+    $hash = $_REQUEST['hash'];
+    $type = $_REQUEST['type'];
+    $id = (int)$_REQUEST['id'];
 
-//$fileName = '/file.php?m=inline&type=' . $type . '&id=' . $id . '&hash=' . $hash;
-$fileName = FOLDER_UPLOAD . $this->shopId . '/documents/' . $hash;
-$fileDownload = '/file.php?m=download&type=' . $type . '&id=' . $id . '&hash=' . $hash;
-$fileType = strtolower(pathinfo($hash, PATHINFO_EXTENSION));
+    $fileName = FOLDER_UPLOAD . $this->shopId . '/documents/' . $hash;
+    $fileDownload = '/file.php?m=download&type=' . $type . '&id=' . $id . '&hash=' . $hash;
+    $fileType = strtolower(pathinfo($hash, PATHINFO_EXTENSION));
+}
 
 $data = [
     'title'   => false,

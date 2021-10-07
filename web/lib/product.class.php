@@ -418,9 +418,7 @@ class product extends ancestor {
             ],
 
             'thumbnail' => ($row['prod_img'] ? $path . str_replace('.', '_thumbnail.', $row['prod_img']) : false),
-            'images' => [
-                0 => $path . $row['prod_img']
-            ],
+            'images' => false,
 
             'stats' => [
                 'views' => $row['prod_views'],
@@ -438,6 +436,10 @@ class product extends ancestor {
             ],
             'url' => $url
         ];
+
+        if($row['prod_img']){
+            $data['images'][] = $path . $row['prod_img'];
+        }
 
         return $data;
     }

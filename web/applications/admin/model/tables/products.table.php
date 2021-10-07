@@ -6,6 +6,7 @@ class productsTable extends table {
         $this->join  = 'LEFT JOIN product_categories ON (cat_id = prod_cat_id)';
         $this->where = 'prod_shop_id = ' . $this->owner->shopId;
 
+        $this->returnAfterSave = false;
         $this->buttonsPosition = 'top';
         $this->keyFields = ['prod_id'];
 		$this->formName = 'editProduct';

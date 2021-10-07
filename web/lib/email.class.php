@@ -241,7 +241,7 @@ class email extends ancestor {
 		}
 	}
 
-	public function prepareEmail($template, $to, $data = [], $from = false, $cc = [], $bcc = [], $attachments = []){
+	public function prepareEmail($template, $to, $data = [], $from = false, $cc = [], $bcc = [], $attachments = [], $replyTo = false){
 		$sent = false;
 
 		$this->init();
@@ -252,7 +252,9 @@ class email extends ancestor {
 		}
 		$this->from = [$from['name'] => $from['email']];
 
-    	$to = $this->owner->user->getUserProfile($to);
+        if(is_numeric($to) && !is_array($to)){
+            $to = $this->owner->user->getUserProfile($to);
+        }
 
 		if($to['email']) {
 			if ($to['firstname']) $data['firstName'] = $to['firstname'];
@@ -297,6 +299,10 @@ class email extends ancestor {
                     }
 				}
 			}
+
+            if($replyTo){
+                $this->replyto = $replyTo;
+            }
 
             if($attachments){
                 foreach($attachments AS $filename => $file){

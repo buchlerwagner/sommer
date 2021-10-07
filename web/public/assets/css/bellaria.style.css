@@ -21943,7 +21943,7 @@ ul, li {
 
 ***/
 .theme-btn {
-  font-family: "Charm", cursive;
+  font-family: "ABeeZee", cursive;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -ms-transition: all 0.5s ease;
@@ -29439,6 +29439,7 @@ blockquote:after {
 .contact-section {
   position: relative;
   padding: 80px 0 30px;
+  font-size: 17px;
 }
 
 .contact-section .sec-title {
@@ -29469,6 +29470,7 @@ blockquote:after {
 
 .contact-section .title h4 {
   font-size: 28px;
+  margin-top: 10px;
 }
 
 .contact-section .contact-info {
@@ -29497,56 +29499,6 @@ blockquote:after {
   color: #5fcac7;
 }
 
-.contact-section .contact-form {
-  margin-top: 46px;
-}
-
-.contact-form .form-group {
-  position: relative;
-  margin-bottom: 17px;
-}
-
-.contact-form .form-group:last-child {
-  margin-bottom: 0;
-}
-
-.contact-form .form-group input[type=text],
-.contact-form .form-group input[type=email],
-.contact-form .form-group input[type=url],
-.contact-form .form-group textarea,
-.contact-form .form-group select {
-  position: relative;
-  display: block;
-  width: 100%;
-  font-size: 16px;
-  color: #4b4342;
-  line-height: 20px;
-  padding: 10px 10px;
-  border: 1px solid #edecec;
-  background-color: #ffffff;
-  font-weight: 400;
-  height: 42px;
-  border-radius: 5px;
-  -webkit-transition: all 300ms ease;
-  -ms-transition: all 300ms ease;
-  -o-transition: all 300ms ease;
-  -moz-transition: all 300ms ease;
-  transition: all 300ms ease;
-}
-
-.contact-form .form-group input:focus,
-.contact-form .form-group select:focus,
-.contact-form .form-group textarea:focus {
-  border-color: #edecec;
-}
-
-.contact-form .form-group textarea {
-  height: 130px;
-  resize: none;
-}
-
-.contact-form .form-group input[type=submit],
-.contact-form .form-group button,
 .btn-simple {
   position: relative;
   display: inline-block;
@@ -29576,48 +29528,8 @@ blockquote:after {
 
 .contact-form .form-group input[type=submit]:hover,
 .contact-form .form-group button:hover {
-  color: #ffffff;
+  color: #ffffff !important;
   background-color: #4b4342;
-}
-
-.contact-form input.error:focus,
-.contact-form select.error:focus,
-.contact-form textarea.error:focus {
-  border-color: #ff0000;
-}
-
-.contact-form label.error {
-  display: block;
-  font-weight: 500;
-  font-size: 13px;
-  text-transform: capitalize;
-  line-height: 24px;
-  color: #ff0000;
-  text-align: left;
-  margin-bottom: 0;
-}
-
-#email-form .response {
-  position: relative;
-  text-align: center;
-}
-
-#email-form .response .success {
-  background: #5fcac7;
-  color: #ffffff;
-  padding: 0 10px;
-}
-
-#email-form .response .failed {
-  background-color: #ff91a4;
-  color: #ffffff;
-  padding: 0 10px;
-}
-
-#email-form .response .text-info {
-  background-color: #ffcd66;
-  color: #222222 !important;
-  padding: 0 10px;
 }
 
 .contact-section .contact-column {
@@ -33781,6 +33693,7 @@ iframe#gmap_canvas {
   height: 50px;
 }
 
+.floating-label > textarea,
 .floating-label > input,
 .floating-label > label {
   padding: 0.9rem 0.75rem;
@@ -33807,33 +33720,42 @@ iframe#gmap_canvas {
   user-select: none;
 }
 
+.floating-label textarea::-webkit-input-placeholder,
 .floating-label input::-webkit-input-placeholder {
   color: transparent;
 }
 
+.floating-label textarea:-ms-input-placeholder,
 .floating-label input:-ms-input-placeholder {
   color: transparent;
 }
 
+.floating-label textarea::-ms-input-placeholder,
 .floating-label input::-ms-input-placeholder {
   color: transparent;
 }
 
+.floating-label textarea::-moz-placeholder,
 .floating-label input::-moz-placeholder {
   color: transparent;
 }
 
+.floating-label textarea::placeholder,
 .floating-label input::placeholder {
   color: transparent;
 }
 
+.floating-label textarea:focus,
 .floating-label input:focus,
+.floating-label textarea:not(:placeholder-shown),
 .floating-label input:not(:placeholder-shown) {
   padding-top: calc(1rem + 1rem * (2 / 3));
   padding-bottom: calc(1rem / 3);
 }
 
+.floating-label textarea:focus ~ label,
 .floating-label input:focus ~ label,
+.floating-label textarea:not(:placeholder-shown) ~ label,
 .floating-label input:not(:placeholder-shown) ~ label {
   padding-top: calc(1rem / 3);
   padding-bottom: calc(1rem / 3);

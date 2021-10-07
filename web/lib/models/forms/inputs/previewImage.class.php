@@ -1,6 +1,8 @@
 <?php
 class previewImage extends formElement {
     const Type = 'previewImage';
+    const PreviewUrl = '/ajax/preview/?';
+
     private $path;
     private $src = false;
     private $preview = true;
@@ -81,7 +83,7 @@ class previewImage extends formElement {
     }
 
     public function getPreviewUrl(){
-
+        return self::PreviewUrl . 'src=';
     }
 
 }

@@ -16,6 +16,7 @@ class editProductForm extends formBuilder {
     public function setup() {
         $this->title = 'LBL_EDIT_PRODUCT';
 		$this->dbTable = 'products';
+		$this->formWidth = 'col-12 col-lg-8';
 
         $url = $this->owner->hostConfig['publicSite'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-';
 

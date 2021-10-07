@@ -1,10 +1,19 @@
 <?php
 class shopSettingsForm extends formBuilder {
+    const LOGO_TYPES = [
+        'main'      => 'logo-main.svg',
+        'alt'       => 'logo-alt.svg',
+        'white'     => 'logo-white.svg',
+        'mail'      => 'logo-mail.png',
+        'favicon'   => 'favicon.png',
+    ];
 
     public function setupKeyFields() {
     }
 
     public function setup() {
+        $this->upload = true;
+
         $mainOptions = (new sectionBox('main', 'LBL_WEBSHOP_GENERAL_SETTINGS', 'far fa-cogs'))
             ->addElements(
                 (new inputText('shopName', 'LBL_SHOP_NAME'))
@@ -43,7 +52,19 @@ class shopSettingsForm extends formBuilder {
                 (new inputText('incomingEmail', 'LBL_INCOMING_EMAIL_ADDRESS'))
                     ->setPlaceholder('orders@company.com')
                     ->setIcon('far fa-inbox-in')
-                    ->setName('settings/incomingEmail')
+                    ->setName('settings/incomingEmail'),
+                (new inputText('address', 'LBL_ADDRESS'))
+                    ->setIcon('far fa-map-marker-alt')
+                    ->setName('settings/address'),
+                (new inputText('addressAlt', 'LBL_ADDRESS_ALT'))
+                    ->setIcon('far fa-map-marker-alt')
+                    ->setName('settings/addressAlt'),
+                (new inputText('phone', 'LBL_PHONE'))
+                    ->setIcon('far fa-phone-alt')
+                    ->setName('settings/phone'),
+                (new inputText('phoneAlt', 'LBL_PHONE'))
+                    ->setIcon('far fa-phone-alt')
+                    ->setName('settings/phoneAlt')
             );
 
         $openingHours = new sectionBox('opening-hours', 'LBL_OPENING_HOURS', 'far fa-clock');
@@ -71,7 +92,6 @@ class shopSettingsForm extends formBuilder {
             );
         }
 
-
         $openingHours->addElements(
             (new inputTextarea('opening-hours-info', 'LBL_OPENING_HOURS_INFO'))
                 ->setRows(2)
@@ -87,6 +107,14 @@ class shopSettingsForm extends formBuilder {
                 (new inputText('googleMapsAPI', 'LBL_GOOGLE_MAPS_API_KEY'))
                     ->setIcon('far fa-map-marker-alt')
                     ->setName('settings/googleMapsAPI'),
+
+                (new inputText('googleSiteKey', 'LBL_GOOGLE_SITE_KEY'))
+                    ->setIcon('far fa-key')
+                    ->setName('settings/googleSiteKey'),
+                (new inputText('googleSecret', 'LBL_GOOGLE_SECRET'))
+                    ->setIcon('far fa-key')
+                    ->setName('settings/googleSecret'),
+
                 (new inputText('facebookAppId', 'LBL_FACEBOOK_APP_ID'))
                     ->setIcon('fab fa-facebook')
                     ->setName('settings/facebookAppId')
@@ -124,8 +152,37 @@ class shopSettingsForm extends formBuilder {
                     ->setName('settings/cookieBarAcceptButton')
             );
 
+        $logo = new sectionBox('logo', 'LBL_LOGO', 'far fa-sign');
 
-        $this->addSections($mainOptions, $contact, $menu, $openingHours, $analytics, $cookieBar, $social);
+        $i = 0;
+        foreach(self::LOGO_TYPES AS $type => $fileName){
+            $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+
+            $logo->addElements(
+                (new inputFile('logo/' . $type, 'LBL_LOGO_' . strtoupper($type)))
+                    ->setHelpText($this->owner->translate->getTranslation('LBL_ALLOWED_FILETYPES', $ext))
+                    ->addData('max-file-size', 10240)
+                    ->addData('theme', 'fas')
+                    ->addData('show-upload', 'false')
+                    ->addData('show-caption', 'true')
+                    ->addData('show-remove', 'false')
+                    ->addData('show-cancel', 'false')
+                    ->addData('show-close', 'false')
+                    ->addData('allowed-file-extensions', '["' . $ext . '"]')
+                    ->addData('show-preview', 'false')
+                    ->notDBField(),
+                (new previewImage('img_logo_' . $type))
+                    ->setGroupClass(($type == 'white' ? 'bg-dark' : ''))
+                    ->setSize(200)
+                    ->setResponsive(true)
+                    ->setPath(FOLDER_UPLOAD . $this->owner->shopId . '/'),
+                (new inputCheckbox('remove_' . $type, 'LBL_REMOVE_IMAGE', 0))
+                    ->notDBField(),
+                new groupHtml('div-' . $i++, '<hr>')
+            );
+        }
+
+        $this->addSections($mainOptions, $contact, $menu, $openingHours, $analytics, $cookieBar, $logo, $social);
 
         $this->hideSidebar();
 
@@ -153,6 +210,8 @@ class shopSettingsForm extends formBuilder {
     }
 
     public function saveValues() {
+        $this->uploadFiles();
+
         if(Empty($this->values['settings']['stopSale'])) $this->values['settings']['stopSale'] = 0;
         if(Empty($this->values['settings']['cookieBar'])) $this->values['settings']['cookieBar'] = 0;
 
@@ -190,5 +249,34 @@ class shopSettingsForm extends formBuilder {
         if($row){
             $this->values['settings'] = json_decode($row['ws_settings'], true);
         }
+
+        $path = DIR_UPLOAD . $this->owner->shopId . '/';
+        foreach(self::LOGO_TYPES AS $type => $fileName){
+            if(file_exists($path . $fileName)){
+                $this->values['img_logo_' . $type] = $fileName;
+            }
+        }
    }
+
+    private function uploadFiles(){
+        $savePath = DIR_UPLOAD . $this->owner->shopId . '/';
+        if(!is_dir($savePath)){
+            @mkdir($savePath, 0777, true);
+            @chmod($savePath, 0777);
+        }
+
+        foreach(self::LOGO_TYPES AS $type => $fileName){
+            if(!Empty($this->values['remove_' . $type])) {
+                if (file_exists($savePath . $fileName)) {
+                    @unlink($savePath . $fileName);
+                }
+            }
+            unset($this->values['remove_' . $type]);
+            unset($this->values['img_logo_' . $type]);
+
+            if (!empty($_FILES[$this->name]['name']['logo'][$type]) && empty($_FILES[$this->name]['error']['logo'][[$type]])) {
+                move_uploaded_file($_FILES[$this->name]['tmp_name']['logo'][$type], $savePath . $fileName);
+            }
+        }
+    }
 }

@@ -1,1 +1,174 @@
-contact
+{% import "tools.twig" as tools %}
+<section class="page-title" style="background-image:url({% if content.image %}{{ content.image }}{% else %}{{ theme }}images/backgrounds/34.jpg{% endif %})">
+    <div class="auto-container">
+        <h1>{{ _('MENU_CONTACT') }}</h1>
+    </div>
+</section>
+
+{{ tools.pageSections(sections, _context) }}
+
+<section class="contact-section{% if sections %} pt-0{% endif %}">
+    <div class="auto-container">
+        <div class="row clearfix">
+            <div class="column col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="inner-column">
+                    <div class="title">
+                        <div class="icon"><img src="{{ theme }}images/icons/icon-devider-gray.png" alt=""></div>
+                        <h4>{{ _('LBL_OPENING_HOURS') }}</h4>
+                    </div>
+
+                    <div>
+                    {% for i in 1..7 %}
+                        <div class="row">
+                            <div class="col-6 text-right">{{ _('LBL_DAY_' ~ i) }}</div>
+                            <div class="col-6 text-left pl-0">{{ settings['oo-day' ~ i ~ '-from'] }}{% if settings['oo-day' ~ i ~ '-to'] %} - {{ settings['oo-day' ~ i ~ '-to'] }}{% endif %}</div>
+                        </div>
+                    {% endfor %}
+
+                    {% if settings['opening-hours-info'] %}
+                        <div class="text-white text-center mt-2">
+                            {{ settings['opening-hours-info']|raw|nl2br }}
+                        </div>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="column col-xl-3 col-lg-6 col-md-6 col-sm-12 order-3">
+                <div class="inner-column">
+                    <div class="title">
+                        <div class="icon"><img src="{{ theme }}images/icons/icon-devider-gray.png" alt=""></div>
+                        <h4>{{ _('LBL_OUR_SHOPS') }}</h4>
+                    </div>
+
+                    <ul class="contact-info">
+                        {% if settings.address %}
+                        <li><i class="far fa-map-marker-alt"></i> {{ settings.address|replace({',': ',<br>'})|raw }}</li>
+                        {% endif %}
+                        {% if settings.addressAlt %}
+                        <li><i class="far fa-map-marker-alt"></i> {{ settings.addressAlt|replace({',': ',<br>'})|raw }}</li>
+                        {% endif %}
+                        {% if settings.phone %}
+                        <li><i class="far fa-phone-alt"></i> <a href="tel:{{ settings.phone }}">{{ settings.phone }}</a></li>
+                        {% endif %}
+                        {% if settings.phoneAlt %}
+                            <li><i class="far fa-phone-alt"></i> <a href="tel:{{ settings.phoneAlt }}">{{ settings.phoneAlt }}</a></li>
+                        {% endif %}
+                        <li><i class="far fa-envelope"></i> <a href="mailto:{{ settings.incomingEmail }}">{{ settings.incomingEmail }}</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                <div class="inner-column">
+                    <div class="title">
+                        <div class="icon"><img src="{{ theme }}images/icons/icon-devider-gray.png" alt=""></div>
+                        {% if forms.contact.item %}
+                            <h4>{{ _('LBL_REQUEST_OFFER') }}</h4>
+                        {% else %}
+                            <h4>{{ _('LBL_SEND_MESSAGE') }}</h4>
+                        {% endif %}
+                    </div>
+                    <div class="contact-form">
+                        {% if isSuccess %}
+
+                            <div class="message-box with-icon success">
+                                <div class="icon-box">
+                                    <span class="icon fa fa-check"></span>
+                                </div>
+                                <h4>{{ _('LBL_SUCCESS') }}</h4>
+                                <p>{{ _('LBL_MESSAGE_RECEIVED') }}</p>
+                            </div>
+
+                        {% else %}
+
+                            {% if forms['contact'].errors|length > 0 %}
+                                <div class="message-box with-icon error">
+                                    <div class="icon-box">
+                                        <span class="icon fa fa-exclamation"></span>
+                                    </div>
+                                    <h4>{{ _('ERR_WARNING') }}</h4>
+                                    {% for error in forms['contact'].errors %}
+                                        <p>{{ _(error.message) }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <form action="." method="post" id="frmContact" class="parsley-form">
+                                <input type="hidden" name="contact[itemId]" value="{{ forms.contact.values.itemId }}">
+                                <input type="hidden" id="token" name="contact[token]" value="">
+
+                                {% if forms.contact.item %}
+                                    <div class="form-row p-1">
+                                        <table class="table table-bordered">
+                                            <tr>
+                                                <td class="col-lg-3 col-2">
+                                                    <a href="{{ forms.contact.item.url }}" target="_blank">
+                                                        <img src="{{ forms.contact.item.thumbnail }}" class="img-fluid" alt="{{ forms.contact.item.name }}" title="">
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ forms.contact.item.url }}" target="_blank">
+                                                        {{ forms.contact.item.name }}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                {% endif %}
+
+                                <div class="form-row">
+                                    <div class="col form-group floating-label{% if forms.contact.hasError('name') %} has-error{% endif %}">
+                                        <input type="text" id="name" name="contact[name]" class="form-control" value="{{ forms.contact.values.name }}" placeholder=" " data-parsley-required="1">
+                                        <label class="control-label" for="name">{{ _('LBL_NAME') }}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="col form-group floating-label{% if forms.contact.hasError('email') %} has-error{% endif %}">
+                                        <input type="text" id="email" name="contact[email]" class="form-control" value="{{ forms.contact.values.email }}" placeholder=" " data-parsley-required="1">
+                                        <label class="control-label" for="email">{{ _('LBL_EMAIL') }}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="col form-group floating-label{% if forms.contact.hasError('phone') %} has-error{% endif %}">
+                                        <input type="text" id="phone" name="contact[phone]" class="form-control" value="{{ forms.contact.values.phone }}" placeholder=" " data-parsley-required="1">
+                                        <label class="control-label" for="phone">{{ _('LBL_PHONE') }}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-row mb-4">
+                                    <div class="col form-group floating-label col-md-12{% if forms.contact.hasError('message') %} has-error{% endif %}">
+                                        <textarea cols="5" rows="4" id="message" class="form-control" name="contact[message]" placeholder=" " data-parsley-required="1">{{ forms.contact.values.message }}</textarea>
+                                        <label class="control-label" for="message">{{ _('LBL_MESSAGE') }}</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="col form-group col-md-12">
+                                        <div class="checkbox checkbox-primary{% if forms.contact.hasError('agree_terms') %} has-error{% endif %}">
+                                            <input id="agree_terms" type="checkbox" name="contact[agree_terms]" value="1"{% if forms.contact.values.agree_terms %} checked{% endif %} data-parsley-required="1" data-parsley-mincheck="1" data-parsley-errors-messages-disabled="1">
+                                            <label for="agree_terms">{{ _('LBL_I_AGREE_TERMS_AND_CONDITIONS', '/ajax/content/terms-and-conditions/')|raw }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group text-center">
+                                    <button class="btn-simple" type="submit" id="save" name="contact[save]">{{ _('LBL_SEND') }}</button>
+                                </div>
+                            </form>
+
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if settings.address %}
+<section class="map-section">
+    <iframe id="gmap_canvas" src="https://maps.google.com/maps?q={{ settings.address }}&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+</section>
+{% endif %}
