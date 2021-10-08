@@ -25,7 +25,14 @@ class shopSettingsForm extends formBuilder {
                     ->changeState(1, enumChangeAction::Editable(), '#stopSaleText')
                     ->setName('settings/stopSale'),
                 (new inputText('stopSaleText', 'LBL_STOP_SALE_TEXT'))
-                    ->setName('settings/stopSaleText')
+                    ->setName('settings/stopSaleText'),
+
+                (new groupRow('row0'))->addElements(
+                    (new inputSelect('itemsOnPage', 'LBL_ITEMS_PON_PAGE', 12))
+                        ->setColSize('col-4 col-lg-4')
+                        ->setName('settings/itemsOnPage')
+                        ->setOptions($this->owner->lists->reset()->numberRange(1, 100))
+                )
             );
 
         $menu = (new sectionBox('menu', 'LBL_MENU_SETTINGS', 'far fa-bars'))

@@ -19,6 +19,7 @@ if(!$params || $_REQUEST['clear']) {
     ];
 }
 
+$params['pager']['limit'] = $this->settings['itemsOnPage'];
 $params['filters']['categories'] = [];
 $categoryData = [];
 

@@ -11,6 +11,12 @@ class lists extends ancestor {
         return $this->setList($list)->getList();
     }
 
+    public function numberRange($start, $end){
+        $list = array_combine(range($start,$end), range($start, $end));
+
+        return $this->setList($list)->getList();
+    }
+
     public function getLanguages(){
         $this->list = [];
         if($this->owner->hostConfig['languages']){
