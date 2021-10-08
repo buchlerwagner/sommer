@@ -131,6 +131,7 @@ if ($_action == 'preload') {
 				'data' => array(
 					'readerForce' => true,
 					'url' => $row['g_file'],
+                    'thumbnail' => str_replace('.', '_thumbnail.', $row['g_file']),
 					'date' => $row['g_date'],
 					'isMain' => $row['g_main'],
 					'listProps' => array(
