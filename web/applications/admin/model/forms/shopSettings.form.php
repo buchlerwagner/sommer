@@ -28,7 +28,7 @@ class shopSettingsForm extends formBuilder {
                     ->setName('settings/stopSaleText'),
 
                 (new groupRow('row0'))->addElements(
-                    (new inputSelect('itemsOnPage', 'LBL_ITEMS_PON_PAGE', 12))
+                    (new inputSelect('itemsOnPage', 'LBL_ITEMS_ON_PAGE', 12))
                         ->setColSize('col-4 col-lg-4')
                         ->setName('settings/itemsOnPage')
                         ->setOptions($this->owner->lists->reset()->numberRange(1, 100))
