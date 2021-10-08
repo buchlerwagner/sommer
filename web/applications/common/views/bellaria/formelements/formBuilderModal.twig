@@ -1,0 +1,56 @@
+{% import "tools.twig" as tools %}
+{% import "formBuilderMacros.twig" as formBuilder %}
+{% if form.errors|length > 0 %}
+<div class="alert alert-danger" role="alert">
+    <h5 class="mb-1 alert-heading text-danger">
+        <i class="fas fa-exclamation-triangle mr-1 mb-1"></i>
+        {{ _('ERR_GENERIC') }}
+    </h5>
+    {% for error in form.errors %}
+        <div>{{ _(error.message)|raw }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if form.view %}
+    {{ tools.view(form) }}
+{% else %}
+    <form action="{{ form.action }}" method="post" id="{{ form.name }}-form"{% if form.upload is not empty %} enctype="multipart/form-data"{% endif %} class="form-horizontal" data-modal="true" onsubmit="postModalForm(this);return false;">
+        {% if form.sections %}
+            {% if form.sections.type == 'tab' %}
+                <section>
+                    <ul class="nav nav-tabs nav-gap-x-1" role="tablist">
+                        {% for section in form.sections.items %}
+                            <li class="nav-item">
+                                <a href="#{{ section.id }}" data-toggle="tab" class="nav-link has-icon{% if section.active %} active{% endif %}">
+                                    {% if section.icon %}
+                                        <i class="fa {{section.icon  }} mr-2"></i>
+                                    {% elseif section.featherIcon %}
+                                        <i data-feather="{{ section.featherIcon }}" class="mr-2"></i>
+                                    {% endif %}
+                                    {{ _(section.title) }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="tab-content">
+                        {% for section in form.sections.items %}
+                            <div class="tab-pane{% if section.active %} active{% endif %}" id="{{ section.id }}">
+                                {{ formBuilder.renderElements(form.controls[section.id], form.values, form.name, form.errors) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% else %}
+                {% for section in form.sections.items %}
+                    <section>
+                        {{ formBuilder.renderElements(form.controls[section.id], form.values, form.name, form.errors) }}
+                    </section>
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            {{ formBuilder.renderElements(form.controls, form.values, form.name, form.errors) }}
+        {% endif %}
+    </form>
+{% endif %}
+

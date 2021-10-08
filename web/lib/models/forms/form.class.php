@@ -725,6 +725,10 @@ class form extends model {
 		return $out;
 	}
 
+    public function hasCaptcha(){
+        return (!Empty($this->reCaptcha['sitekey']));
+    }
+
 	public function getControlById($id, $controls = []) {
 		$result = false;
 		if (empty($controls)) $controls = $this->controls;

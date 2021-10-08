@@ -43,6 +43,7 @@ module.exports = function(grunt) {
             shop: {
                 src: [
                     'web/resources/src/shop-init.js',
+                    'web/resources/src/shop-tables.js'
                 ],
                 dest: 'web/public/assets/js/shop.js'
             },
@@ -63,9 +64,9 @@ module.exports = function(grunt) {
 
                     'web/public/vendor/select2/js/select2.js',
                     'web/public/vendor/cookiebar/jquery.cookiebar.js',
+                    'web/public/vendor/fancybox/jquery.fancybox.js',
 
                     'web/resources/src/bellaria/main-slider-script.js',
-                    'web/resources/src/bellaria/jquery.fancybox.js',
                     'web/resources/src/bellaria/owl.js',
                     'web/resources/src/bellaria/wow.js',
                     'web/resources/src/bellaria/appear.js',

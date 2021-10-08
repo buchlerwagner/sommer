@@ -199,3 +199,184 @@
         {% endfor %}
     {% endif %}
 {% endmacro %}
+
+{% macro form(form, context) %}
+    <form action="{{ form.action }}" method="post" id="{{ form.name }}-form" autocomplete="off" class="parsley-form"{% if form.upload is not empty %} enctype="multipart/form-data"{% endif %} data-modal="false">
+        {% include "formBuilder.twig" %}
+    </form>
+{% endmacro %}
+
+{% macro table(table, filterFormName) %}
+    {% import _self as tools %}
+    {% if table.form is not empty %}
+        {% if table.formTemplate %}
+            {% include table.formTemplate ~ constant('TWIG_FILE_EXTENSION') %}
+        {% else %}
+            {% if table.form.view is not empty %}
+                {{ tools.view(table.form) }}
+            {% else %}
+                {{ tools.form(table.form) }}
+            {% endif %}
+        {% endif %}
+    {% else %}
+        {% if table.boxed %}
+            {% include "table-boxed.twig" %}
+        {% else %}
+            {% include "table.twig" %}
+        {% endif %}
+
+        {% if table.inlineForm is not empty %}
+            {{ tools.form(table.inlineForm) }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro view(form) %}
+    {% import "formBuilderMacros.twig" as formBuilder %}
+    {% if form.title or form.toolsTemplate %}
+        <div class="border-0 mb-3">
+            {% if form.title %}
+                <div class="float-left">
+                    <h1 class="page-title text-secondary-d3 text-140 d-block">
+                        {{ _(form.title) }}
+                    </h1>
+                    {% if form.subTitle %}
+                        <h6 class="text-grey-l2 font-light">{{ form.subTitle }}</h6>
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if form.toolsTemplate %}
+                <div class="float-right">
+                    {% include form.toolsTemplate ~ ".twig" %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="clearfix"></div>
+    {% endif %}
+
+    {% include form.view ~ '.twig' %}
+
+    {% if form.buttons|length > 0 %}
+        <div class="d-flex">
+            <div class="justify-content-end ml-auto">
+                {% for button in form.buttons %}
+                    {% if button.showInViewer and not button.isHidden %}
+                        {{ formBuilder.button(button) }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro form_header(table) %}
+    {% import _self as tools %}
+
+    {% if table.form %}
+        <div class="text-muted mb-2">
+            <i class="fas fa-angle-left"></i> <a href="{{ table.form.buttons.cancel.link }}" class="text-muted">{{ _(table.form.header.parent) }}</a>
+        </div>
+
+        {% if table.form.header.selectionText %}
+            <h3>{{ table.form.header.selectionText|raw }}</h3>
+        {% else %}
+            <H3>
+                {% if table.form.header.raw %}
+                    {{ table.form.header.title|raw }}
+                {% else %}
+                    {{ _(table.form.header.title) }}
+                {% endif %}
+            </H3>
+        {% endif %}
+
+        {% if table.form.header.subtitle != '' %}
+            <div class="subtitle">
+                {% if table.form.header.raw %}{{ table.form.header.subtitle|raw }}{% else %}{{ _(table.form.header.subtitle) }}{% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <h3>{{ _(table.header) }}</h3>
+    {% endif %}
+
+{% endmacro %}
+
+{% macro table_cell(table_name, keyvalue, column, val, row, readonly = false, table = false) %}
+    {% if column.type == 'number' %}<div{% if val > 0 %} class="text-success"{% elseif val < 0 %} class="text-danger"{% endif %}>{% endif %}
+    {% if column.templatestring is not empty %}
+        {{ include(template_from_string( column.templatestring )) }}
+    {% elseif column.type == 'options' %}
+        {% if column.options[val] is iterable %}
+            {% if column.options[val].class is not empty %}<div class="btn btn-block btn-sm {{ column.options[val].class }}">{% endif %}
+            {{ _(column.options[val].name) }}
+            {% if column.options[val].class is not empty %}</div>{% endif %}
+        {% elseif column.options[val] is not empty %}
+            {{ _(column.options[val]) }}
+        {% else %}
+            {%  for opt in column.options %}
+                {% if opt is iterable and opt[val] is not empty %}
+                    {{ _(opt[val]) }}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% elseif column.type == 'checkgroup' %}
+        {% set val = val|split('|') %}
+        {% for opt in val %}{% if opt is not empty %}{{ column.options[opt] }}, {% endif %}{% endfor %}
+    {% elseif column.type == 'icon' %}
+        <i class="fa fa-{{ column.icons[ val ] }}{% if column.colors %} text-{{ column.colors[val] }}{% endif %}"></i>
+    {% else %}
+        {{ val|raw }}{% if column.unit is not empty %} {{ column.unit|raw }}{% endif %}
+    {% endif %}
+    {% if column.type == 'number' %}</div>{% endif %}
+{% endmacro %}
+
+{% macro table_options(keyvalue, table, row) %}
+    <div class="table-options">
+        {% if table.optionTemplate is not empty %}
+            {% include table.optionTemplate ~ constant('TWIG_FILE_EXTENSION') %}
+        {% else %}
+            {% if table.subTable %}
+                {% if table.readonly %}
+                    {% if table.view %}<a data-toggle="modal" data-target="#ajax-modal"{% if table.modalSize or table.viewModalSize %} data-size="{% if table.viewModalSize %}{{ table.viewModalSize }}{% else %}{{ table.modalSize }}{% endif %}"{% endif %} href="/ajax/forms/{% if table.viewForm %}{{ table.viewForm }}{% else %}{{ table.formName }}{% endif %}/{{ keyvalue }}/?view=1" class="btn btn-light btn-h-info" data-backdrop="static" data-keyboard="false"><i class="far fa-eye text-muted"></i></a>{% endif %}
+                {% else %}
+                    {% if table.view %}<a data-toggle="modal" data-target="#ajax-modal"{% if table.modalSize or table.viewModalSize %} data-size="{% if table.viewModalSize %}{{ table.viewModalSize }}{% else %}{{ table.modalSize }}{% endif %}"{% endif %} href="/ajax/forms/{% if table.viewForm %}{{ table.viewForm }}{% else %}{{ table.formName }}{% endif %}/{{ keyvalue }}/?view=1" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
+                    {% if table.edit and ((row['options'].edit is defined and row['options'].edit != false) or row['options'].edit is not defined) %}<a data-toggle="modal" data-target="#ajax-modal"{% if table.modalSize %} data-size="{{ table.modalSize }}"{% endif %} href="/ajax/forms/{{ table.formName }}/{{ keyvalue }}/{{ table.name }}/" class="btn btn-light h-info" data-backdrop="static" data-keyboard="false"><i class="far fa-edit"></i></a>{% endif %}
+                {% endif %}
+            {% else %}
+                {% if table.readonly %}
+                    {% if table.view %}<a href="{% if table.customUrl %}{{ table.customUrl|replace({'%keyvalue%': keyvalue, '%id%': row.__id }) }}{% else %}view|{{ table.name }}/{{ keyvalue }}/{% endif %}" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
+                {% else %}
+                    {% if table.view %}<a href="view|{{ table.name }}/{{ keyvalue }}/" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
+                    {% if table.edit and ((row['options'].edit is defined and row['options'].edit != false) or row['options'].edit is not defined) %}<a href="edit|{{ table.name }}/{{ keyvalue }}/" class="btn btn-light h-info"><i class="far fa-edit"></i></a>{% endif %}
+                {% endif %}
+            {% endif %}
+
+            {% if not table.readonly %}
+                {% if table.copy %}<a data-confirm-action="tables.copy('{{ table.name }}', '{{ keyvalue }}')" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-button="{{ _('BTN_COPY') }}" data-confirm-question="{{ _('CONFIRM_COPY_TABLE_RECORD')|e }}" data-title="{{ _('LBL_COPY_TABLE_RECORD_TITLE')|e }}" data-color="warning" class="btn btn-light h-warning"><i class="far fa-clone"></i></a>{% endif %}
+
+                {% if table.delete and row['options'].delete != false %}
+                    {% if table.deleteField %}
+                        {% if row['options'].isDeleted %}
+                            {% if table.undelete %}
+                                <a data-confirm-action="tables.unDelete('{{ table.name }}', '{{ keyvalue }}')" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-button="{{ _('BTN_UNARCHIVE') }}" data-confirm-question="{{ _('CONFIRM_UNARCHIVE_TABLE_RECORD')|e }}" class="btn btn-light h-danger"><i class="fa fa-undo"></i> </a>
+                            {% endif %}
+                        {% else %}
+                            <a data-confirm-action="tables.delete('{{ table.name }}', '{{ keyvalue }}')" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-button="{{ _('BTN_ARCHIVE') }}" data-confirm-question="{{ _('CONFIRM_ARCHIVE_TABLE_RECORD')|e }}" class="btn btn-light h-danger"><i class="fa fa-archive"></i> </a>
+                        {% endif %}
+                    {% else %}
+                        <a data-confirm-action="tables.delete('{{ table.name }}', '{{ keyvalue }}')" href="#" data-toggle="modal" data-target="#confirm-delete" data-confirm-question="{{ _('CONFIRM_DELETE_TABLE_RECORD')|e }}" class="btn btn-light h-danger"><i class="far fa-trash-alt"></i></a>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+        {% if table.additionalOptionsTemplate is not empty %}
+            {% include table.additionalOptionsTemplate ~ constant('TWIG_FILE_EXTENSION') %}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro infinite_scroll(id, container, current, pagenum, url, callback) %}
+    <div id="{{ id }}" class="infinite_scroll text-center{% if current == pagenum %} hidden{% endif %}" data-container="{{ container }}" data-current="{{ current }}" data-pagenum="{{ pagenum }}"{% if url != '' %} data-url="{{ url }}"{% endif %}{% if callback != '' %} data-callback="{{ callback }}"{% endif %}>
+        <i class="fas fa-circle-notch fa-spin text-muted"></i>
+    </div>
+{% endmacro %}

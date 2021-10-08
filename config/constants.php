@@ -16,6 +16,7 @@ const LABELS_KEY            = APPLICATION_NAME . '-labels-';
 const CACHE_PAGES           = APPLICATION_NAME . '-pages-';
 const CACHE_CATEGORIES      = APPLICATION_NAME . '-categories-';
 const CACHE_SLIDERS         = APPLICATION_NAME . '-sliders-';
+const CACHE_GALLERY         = APPLICATION_NAME . '-gallery-';
 const CACHE_HIGHLIGHTS      = APPLICATION_NAME . '-highlights-';
 const CACHE_POPULARS        = APPLICATION_NAME . '-popular-';
 const CACHE_TAGGED          = APPLICATION_NAME . '-tagged-';
@@ -227,6 +228,12 @@ $GLOBALS['PAGE_NAMES'] = [
         'account'   => [
             'name' => 'fiokom',
             'display' => 0,
+            'access' => true,
+        ],
+        'orders'   => [
+            'name' => 'rendeleseim',
+            'display' => 0,
+            'access' => true,
         ],
         'products'  => [
             'name' => 'termekek',
@@ -267,6 +274,12 @@ $GLOBALS['PAGE_NAMES'] = [
         'account'   => [
             'name' => 'account',
             'display' => 0,
+            'access' => true,
+        ],
+        'orders'   => [
+            'name' => 'orders',
+            'display' => 0,
+            'access' => true,
         ],
         'products'  => [
             'name' => 'products',

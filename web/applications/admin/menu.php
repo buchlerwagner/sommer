@@ -166,6 +166,11 @@ $GLOBALS['MENU'] = [
                         'access'  => true,
                         'userGroups' => [USER_GROUP_ADMINISTRATORS]
                     ],
+                    'gallery' => [
+                        'display' => 1,
+                        'access'  => true,
+                        'userGroups' => [USER_GROUP_ADMINISTRATORS]
+                    ],
 				]
 			],
 		]

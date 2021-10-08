@@ -24,7 +24,7 @@ function getRealFile($file) {
 // upload
 if ($_action == 'upload') {
 	$id = false;
-	$title = 'auto';
+	$title = 'name';
 
 	// if after editing
 	if (isset($_POST['id']) && isset($_POST['name']) && isset($_POST['_editor'])) {
@@ -64,7 +64,8 @@ if ($_action == 'upload') {
 
 	if (count($upload['files']) == 1) {
 		$item = $upload['files'][0];
-		$title = $this->db->escapeString($item['name']);
+		//$title = $this->db->escapeString($item['name']);
+		$title = '';
 		$type = $this->db->escapeString($item['type']);
 		$size = $this->db->escapeString($item['size']);
 		$file = $this->db->escapeString($uploadDir . $item['name']);
@@ -77,13 +78,30 @@ if ($_action == 'upload') {
         }
 
 		if ($id) {
+            $parts = pathinfo($realUploadDir . $item['name']);
+            $newFileName = $parts['filename'];
+
+            if($GLOBALS['IMAGE_SIZES']){
+                foreach($GLOBALS['IMAGE_SIZES'] AS $postfix => $size){
+                    FileUploader::resize(
+                        $realUploadDir . $item['name'],
+                        $size['width'],
+                        $size['height'],
+                        $realUploadDir . $newFileName . ($postfix != 'default' ? '_' . $postfix : '') . '.' . $parts['extension'],
+                        ($size['crop'] ?: false),
+                        ($size['quality'] ?: 97),
+                        ($size['rotation'] ?: 0)
+                    );
+                }
+            }
+
 			$upload['files'][0] = array(
 				'title' => $item['title'],
 				'name' => $item['name'],
 				'size' => $item['size'],
 				'size2' => $item['size2'],
 				'url' => $file,
-				'id' => $id ? $id : $this->db->getInsertRecordId()
+				'id' => $id ?: $this->db->getInsertRecordId()
 			);
 		} else {
 			if (is_file($item['file']))
@@ -106,7 +124,7 @@ if ($_action == 'preload') {
 	if ($result) {
 		foreach($result AS $row) {
 			$preloadedFiles[] = array(
-				'name' => $row['g_title'],
+				'name' => ($row['g_title'] ?: basename($row['g_file'])),
 				'type' => $row['g_type'],
 				'size' => $row['g_size'],
 				'file' => $row['g_file'],
@@ -163,7 +181,9 @@ if ($_action == 'sort') {
 			$this->db->sqlQuery("UPDATE " . DB_NAME_WEB . ".gallery SET `g_index` = '$index' WHERE g_id = '$id' AND g_shop_id='" . $this->shopId . "'");
 			$index++;
 		}
-	}
+
+        $this->mem->delete(CACHE_GALLERY . $this->shopId);
+    }
 	exit;
 }
 
@@ -171,6 +191,16 @@ if ($_action == 'sort') {
 if ($_action == 'rename') {
 	if (isset($_POST['id']) && isset($_POST['name']) && isset($_POST['title'])) {
 		$id = $this->db->escapeString($_POST['id']);
+        $this->db->sqlQuery("UPDATE " . DB_NAME_WEB . ".gallery SET `g_title` = '" . $this->db->escapeString($_POST['title']) . "' WHERE g_id = '$id' AND g_shop_id='" . $this->shopId . "'");
+
+        $this->mem->delete(CACHE_GALLERY . $this->shopId);
+
+        echo json_encode([
+            'title' => $_POST['title'],
+            'file' => $_POST['title'],
+        ]);
+
+        /*
 		$title = substr(FileUploader::filterFilename($_POST['title']), 0, 200);
 
 		$row = $this->db->getFirstRow("SELECT g_file FROM " . DB_NAME_WEB . ".gallery WHERE g_id = '$id' AND g_shop_id='" . $this->shopId . "'");
@@ -194,8 +224,9 @@ if ($_action == 'rename') {
 					]);
 				}
 			}
-
 		}
+
+        */
 	}
 	exit;
 }
@@ -205,8 +236,18 @@ if ($_action == 'asmain') {
 	if (isset($_POST['id']) && isset($_POST['name'])) {
 		$id = $this->db->escapeString($_POST['id']);
 
-		$this->db->sqlQuery("UPDATE " . DB_NAME_WEB . ".gallery SET g_main = 0 AND g_shop_id='" . $this->shopId . "'");
-		$this->db->sqlQuery("UPDATE " . DB_NAME_WEB . ".gallery SET g_main = 1 WHERE g_id = '$id' AND g_shop_id='" . $this->shopId . "'");
+		//$this->db->sqlQuery("UPDATE " . DB_NAME_WEB . ".gallery SET g_main = 0 AND g_shop_id='" . $this->shopId . "'");
+		$this->db->sqlQuery("UPDATE " . DB_NAME_WEB . ".gallery SET g_main = NOT g_main WHERE g_id = '$id' AND g_shop_id='" . $this->shopId . "'");
+        $row = $this->db->getFirstRow("SELECT g_main FROM " . DB_NAME_WEB . ".gallery WHERE g_id = '$id' AND g_shop_id='" . $this->shopId . "'");
+        if($row) {
+            $out['selected'] = (int)$row['g_main'];
+        }else{
+            $out['selected'] = 0;
+        }
+
+        $this->mem->delete(CACHE_GALLERY . $this->shopId);
+
+        echo json_encode($out);
 	}
 	exit;
 }
@@ -218,7 +259,9 @@ if ($_action == 'remove') {
 		$row = $this->db->getFirstRow("SELECT g_file FROM " . DB_NAME_WEB . ".gallery WHERE g_id = '$id' AND g_shop_id='" . $this->shopId . "'");
 
 		if ($row) {
-			$file = str_replace($uploadDir, $realUploadDir, $row['g_file']);
+            $this->mem->delete(CACHE_GALLERY . $this->shopId);
+
+            $file = str_replace($uploadDir, $realUploadDir, $row['g_file']);
 
 			$this->db->sqlQuery("DELETE FROM " . DB_NAME_WEB . ".gallery WHERE g_id = '${id}' AND g_shop_id='" . $this->shopId . "'");
 			if (is_file($file))

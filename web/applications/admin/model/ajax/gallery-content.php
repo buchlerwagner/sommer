@@ -7,4 +7,4 @@ include_once WEB_ROOT . '../lib/fileuploader.class.php';
 
 $this->output = OUTPUT_RAW;
 
-$this->data = $this->view->renderContent('gallery', []);
+$this->data = $this->view->renderContent('cms-gallery', []);

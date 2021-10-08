@@ -866,6 +866,10 @@ class functions extends ancestor {
                     $content[$row['id']] = $row;
                     if($row['image']) {
                         $content[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/pages/' . $row['image'];
+                        
+                        if(!$this->owner->data['content']['image']){
+                            $this->owner->data['content']['image'] = $content[$row['id']]['image'];
+                        }
                     }
                 }
 
@@ -1002,6 +1006,42 @@ class functions extends ancestor {
         }
 
         return $sliders;
+    }
+
+    public function getGallery(){
+        $gallery = $this->owner->mem->get(CACHE_GALLERY . $this->owner->shopId);
+        if(!$gallery) {
+            $gallery = [];
+
+            $result = $this->owner->db->getRows(
+                $this->owner->db->genSQLSelect(
+                    'gallery',
+                    [
+                        'g_id AS id',
+                        'g_title AS title',
+                        'g_file AS image',
+                    ],
+                    [
+                        'g_shop_id' => $this->owner->shopId,
+                        'g_main' => 1
+                    ],
+                    [],
+                    false,
+                    'g_index',
+                    8
+                )
+            );
+            if($result){
+                foreach($result AS $row){
+                    $gallery[$row['id']] = $row;
+                    $gallery[$row['id']]['thumbnail'] = str_replace('.', '_thumbnail.', $row['image']);
+                }
+            }
+
+            $this->owner->mem->set(CACHE_GALLERY . $this->owner->shopId, $gallery);
+        }
+
+        return $gallery;
     }
 
     /*

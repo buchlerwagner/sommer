@@ -116,6 +116,74 @@ var shoppingCart = {
             }
         });
 
+        $(document).on('change', '.change-state', function () {
+            var $this = $(this);
+            var options = $this.data('stateOptions');
+            var value, found = false;
+
+            if(options) {
+                if (this.type && this.type === 'checkbox') {
+                    value = ($this.is(':checked') ? 1 : 0);
+                } else if (this.type && this.type === 'radio') {
+                    value = ($this.is(':checked') ? $this.val() : 0);
+                } else {
+                    value = $this.val();
+                }
+
+                /*
+                if(typeof options !== 'object'){
+                    options = JSON.parse(options);
+                }
+                */
+
+                $.each(options, function (val, opt) {
+                    if (val == value) {
+                        found = true;
+                        $.each(opt, function (action, elements) {
+                            if (action === 'show') {
+                                $(elements).removeClass('d-none').show();
+                            } else if (action === 'hide') {
+                                $(elements).hide();
+                            } else if (action === 'disable') {
+                                $(elements).attr('disabled', 'disabled');
+                            } else if (action === 'enable') {
+                                $(elements).removeAttr('disabled');
+                            } else if (action === 'readonly') {
+                                $(elements).attr('readonly', 'readonly');
+                            } else if (action === 'editable') {
+                                $(elements).removeAttr('readonly');
+                            } else if (action === 'value') {
+                                $(elements.el).val(elements.val).trigger('change');
+                            }
+                        });
+                    }
+                });
+
+                if (!found) {
+                    var def = $this.data('stateDefault');
+                    if (def) {
+                        $.each(def, function (action, elements) {
+                            if (action === 'show') {
+                                $(elements).removeClass('d-none').show();
+                            } else if (action === 'hide') {
+                                $(elements).hide();
+                            } else if (action === 'disable') {
+                                $(elements).attr('disabled', 'disabled');
+                            } else if (action === 'enable') {
+                                $(elements).removeAttr('disabled');
+                            } else if (action === 'readonly') {
+                                $(elements).attr('readonly', 'readonly');
+                            } else if (action === 'editable') {
+                                $(elements).removeAttr('readonly');
+                            } else if (action === 'value') {
+                                $(elements.el).val(elements.val);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
         $('.quantity-select').on('click', function () {
             var $this = $(this);
             var min = parseInt($this.parents('.input-group').find('input').attr('data-min') || 1);

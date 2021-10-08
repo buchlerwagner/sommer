@@ -1,0 +1,12 @@
+{% import "tools.twig" as tools %}
+<section class="page-title" style="background-image:url({% if content.image %}{{ content.image }}{% else %}{{ theme }}images/backgrounds/34.jpg{% endif %})">
+    <div class="auto-container">
+        <h1>{{ _('MENU_ORDERS') }}</h1>
+    </div>
+</section>
+
+<section class="login-section">
+    <div class="auto-container">
+        {{ tools.table(table) }}
+    </div>
+</section>

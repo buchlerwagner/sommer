@@ -1,0 +1,5 @@
+{% import "formBuilderMacros.twig" as self %}
+<button {% if button.id is not empty %}id="{{ button.getId }}"{% endif %} value="{{ button.value }}" class="{{ button.getClass }}" type="{{ button.getType }}" name="{{ button.getForm }}[{{ button.getName }}]"{% if button.isDisabled %} disabled="disabled" {% endif %}{{ self.attributes(button.getAttributes) }}>
+    {{ self.icon(button) }}
+    {{ _(button.getCaption) }}
+</button>

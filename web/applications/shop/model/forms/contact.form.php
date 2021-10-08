@@ -22,14 +22,7 @@ class contactForm extends formBuilder {
             (new inputHidden('itemId'))
         );
 
-        if($this->owner->settings['googleSiteKey'] && $this->owner->settings['googleSecret']) {
-            $this->setRecaptcha(
-                $this->owner->settings['googleSiteKey'],
-                $this->owner->settings['googleSecret'],
-                false,
-                'contact'
-            );
-        }
+        $this->useCaptcha('contact');
 
         $this->addButtons(
             new buttonSave()

@@ -108,6 +108,12 @@ class shopSettingsForm extends formBuilder {
                     ->setIcon('far fa-map-marker-alt')
                     ->setName('settings/googleMapsAPI'),
 
+                (new inputSwitch('captcha', 'LBL_GOOGLE_CAPTCHA', 0))
+                    ->setColor(enumColors::Warning())
+                    ->setGroupClass('mb-0')
+                    ->changeState(0, enumChangeAction::Readonly(), '#googleSiteKey, #googleSecret')
+                    ->changeState(1, enumChangeAction::Editable(), '#googleSiteKey, #googleSecret')
+                    ->setName('settings/captcha'),
                 (new inputText('googleSiteKey', 'LBL_GOOGLE_SITE_KEY'))
                     ->setIcon('far fa-key')
                     ->setName('settings/googleSiteKey'),
@@ -214,6 +220,7 @@ class shopSettingsForm extends formBuilder {
 
         if(Empty($this->values['settings']['stopSale'])) $this->values['settings']['stopSale'] = 0;
         if(Empty($this->values['settings']['cookieBar'])) $this->values['settings']['cookieBar'] = 0;
+        if(Empty($this->values['settings']['captcha'])) $this->values['settings']['captcha'] = 0;
 
         $this->owner->db->sqlQuery(
             $this->owner->db->genSQLInsert(

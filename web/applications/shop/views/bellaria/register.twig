@@ -1,1 +1,26 @@
-register
+{% import "tools.twig" as tools %}
+<section class="page-title" style="background-image:url({% if content.image %}{{ content.image }}{% else %}{{ theme }}images/backgrounds/34.jpg{% endif %})">
+    <div class="auto-container">
+        <h1>{{ _('MENU_REGISTER') }}</h1>
+    </div>
+</section>
+
+{{ tools.pageSections(sections, _context) }}
+
+<section class="login-section">
+    <div class="auto-container">
+        {% if isSuccess %}
+            <div class="message-box with-icon success">
+                <div class="icon-box">
+                    <span class="icon fa fa-check"></span>
+                </div>
+                <h4>{{ _('LBL_REGISTRATION_SUCCESS') }}</h4>
+                <p>{{ _('LBL_REGISTRATION_INFO_SENT') }}</p>
+            </div>
+        {% else %}
+            <div class="login-form">
+                {{ tools.form(forms.register) }}
+            </div>
+        {% endif %}
+    </div>
+</section>

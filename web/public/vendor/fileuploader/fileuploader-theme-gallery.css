@@ -196,6 +196,14 @@
 	color: rgba(255, 255, 255, 0.8);
 }
 
+.file-main-0 i.fa-main-selector:before {
+	content: "\f0c8";
+}
+
+.file-main-1 i.fa-main-selector:before {
+	content: "\f14a";
+}
+
 
 /* uploading */
 .fileuploader-theme-gallery .fileuploader-items .fileuploader-item.upload-failed .thumbnail-holder {

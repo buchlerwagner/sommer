@@ -1,0 +1,51 @@
+{% import "formBuilderMacros.twig" as self %}
+<div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}{% if element.hasError %} has-error{% endif %}">
+    {{ self.label(element) }}
+    {% if element.isReadonly %}
+        <span class="form-control form-control-static">
+			{% for opt_key, opt_val in element.getOptions %}
+                {% set label = false %}
+                {% set color = '' %}
+                {% set val = opt_val %}
+                {% set selected = (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) %}
+
+                {% if opt_val is iterable %}
+                    {% set val = opt_val.name %}
+                    {% if opt_val.class %}
+                        {% set label = true %}
+                        {% set color = opt_val.class %}
+                    {% endif %}
+                {% endif %}
+
+                {% if selected %}
+                    {% if label %}<span class="badge badge{{ color|replace({"alert": ""}) }} text-white">{% endif %}
+                    {{ val|raw }}
+                    {% if label %}</span>{% endif %}
+                {% endif %}
+            {% endfor %}
+            <input type="hidden"{% if element.getClass %} class="{{ element.getClass }}"{% endif %} id="{{ element.getId }}-hidden" name="{{ element.getName }}" value="{{ value|e }}"{{ self.attributes(element.getAttributes) }}/>
+        </span>
+    {% else %}
+        <select id="{{ element.getId }}" name="{{ formName }}[{{ element.getName }}]{% if element.isMultiple %}[]{% endif %}"{% if element.isMultiple %} multiple{% endif %} class="{{ element.getClass }}{% if element.getInputSize %} custom-select-{{ element.getInputSize }}{% endif %}"{% if element.isDisabled %} disabled{% endif %}{{ self.attributes(element.getAttributes) }}>
+            {% for opt_key, opt_val in element.getOptions %}
+                {% if opt_val is iterable %}
+                    {% if opt_val.name is not empty %}
+                        <option value="{{ opt_key }}" {% if (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) or (opt_key2 in value) %} selected="selected" {% endif %}{{ self.attributes(opt_val.data) }}{% if opt_val.class is not empty %} class="{{ opt_val.class }}"{% endif %}>{{ _(opt_val.name) }}</option>
+                    {% else %}
+                        <optgroup label="{{ _(opt_key) }}">
+                            {% for opt_key2, opt_val2 in opt_val %}
+                                {% if opt_val2.name is not empty %}
+                                    <option value="{{ opt_key2 }}" {% if (value == 0 and opt_key2 is same as(value)) or (value != 0 and opt_key2 == value) or (opt_key2 in value) %} selected="selected"{% endif %}{{ self.attributes(opt_val2.data) }}>{{ _(opt_val2.name)|raw }}</option>
+                                {% else %}
+                                <option value="{{ opt_key2 }}" {% if (value == 0 and opt_key2 is same as(value)) or (value != 0 and opt_key2 == value) %} selected="selected" {% endif %}>{{ _(opt_val2)|raw }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                    {% endif %}
+                {% else %}
+                    <option value="{{ opt_key }}"{% if (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) or (opt_key2 in value) %} selected="selected" {% endif %}>{{ _(opt_val) }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    {% endif %}
+</div>

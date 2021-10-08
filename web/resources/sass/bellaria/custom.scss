@@ -45,6 +45,10 @@
   color: $success;
 }
 
+.cursor-pointer,
+.tr-clickable {
+  cursor: pointer;
+}
 
 .footer-links a {
   color: $white !important;;

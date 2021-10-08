@@ -7,7 +7,7 @@ class ordersTable extends table {
         $this->join .= ' LEFT JOIN shipping_modes ON (sm_id = cart_sm_id)';
         $this->join .= ' LEFT JOIN payment_modes ON (pm_id = cart_pm_id)';
 
-        $this->where = 'cart_status = "ORDERED" AND sm_shop_id = ' . $this->owner->shopId;
+        $this->where = 'cart_status = "ORDERED" AND cart_shop_id = ' . $this->owner->shopId;
 
 		$this->keyFields = ['cart_id'];
 

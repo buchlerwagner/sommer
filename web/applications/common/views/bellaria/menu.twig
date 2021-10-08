@@ -43,11 +43,12 @@
                         <li class="mb-3" style="white-space:normal;">
                             {{ _('LBL_USER_WELCOME', user.firstname) }}
                         </li>
-                        <li><a href="/{{ menu.profile.name }}/">{{ _('MENU_PROFILE') }}</a></li>
+                        <li><a href="{{ getPageName('account') }}">{{ _('MENU_PROFILE') }}</a></li>
+                        <li><a href="{{ getPageName('orders') }}">{{ _('MENU_ORDERS') }}</a></li>
                         <li><a href="/logout/">{{ _('MENU_LOGOUT') }}</a></li>
                     {% else %}
                         <li><a href="/login/">{{ _('MENU_LOGIN') }}</a></li>
-                        <li><a href="/{{ menu.register.name }}/">{{ _('MENU_REGISTER') }}</a></li>
+                        <li><a href="{{ getPageName('register') }}">{{ _('MENU_REGISTER') }}</a></li>
                     {% endif %}
                 </ul>
             </li>

@@ -13,5 +13,6 @@ $this->data['highlightedItems'] = $shop->getHighlightedProducts(false, [], 12);
 //$this->data['popularItems'] = $shop->getPopularItems();
 
 $this->data['sections'] = $this->lib->getWidgetContents('home');
+$this->data['gallery'] = $this->lib->getGallery();
 
-//dd($this->data['sliders']);
+//dd($this->data['gallery']);

@@ -1,0 +1,10 @@
+{% import "formBuilderMacros.twig" as self %}
+<div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}{% if element.hasError %} has-error{% endif %}">
+    {{ self.label(element) }}
+    {% for id, option in element.getOptions %}
+    <div class="custom-control custom-radio{% if element.getColor %} custom-checkbox-{{ element.getColor }}{% endif %}">
+        <input id="{{ element.getId }}-{{ id }}" name="{{ formName }}[{{ element.getName }}]" type="radio" value="{{ id }}"{% if element.isDisabled %} disabled="disabled"{% endif %}{% if id == value %} checked="checked"{% endif %} class="custom-control-input{{ element.getClass }}"{{ self.attributes(element.getAttributes) }} />
+        <label for="{{ element.getId }}-{{ id }}" class="custom-control-label">{% if option %}{{ _(option) }}{% endif %}</label>
+    </div>
+    {% endfor %}
+</div>

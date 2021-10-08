@@ -312,8 +312,10 @@ var app = {
             var value, found = false;
 
             if(options) {
-                if (this.type && (this.type === 'checkbox' || this.type === 'radio')) {
+                if (this.type && this.type === 'checkbox') {
                     value = ($this.is(':checked') ? 1 : 0);
+                } else if (this.type && this.type === 'radio') {
+                    value = ($this.is(':checked') ? $this.val() : 0);
                 } else {
                     value = $this.val();
                 }

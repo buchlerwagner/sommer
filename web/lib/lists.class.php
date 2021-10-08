@@ -151,6 +151,7 @@ class lists extends ancestor {
             'cart' => 'LBL_PAGE_CART',
             'checkout' => 'LBL_PAGE_CHECKOUT',
             'finish' => 'LBL_PAGE_FINISH',
+            'register' => 'LBL_PAGE_REGISTER',
         ]);
 
         return $this->getList();

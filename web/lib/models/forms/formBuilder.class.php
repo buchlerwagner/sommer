@@ -549,7 +549,22 @@ abstract class formBuilder extends model {
 		return $out;
 	}
 
-    protected function setRecaptcha($siteKey, $secret, $token = false, $action = false){
+    protected function useCaptcha($action = false){
+        $this->reCaptcha = [];
+
+        if($this->owner->settings['captcha'] && $this->owner->settings['googleSiteKey'] && $this->owner->settings['googleSecret']) {
+            $this->setRecaptchaCredentials(
+                $this->owner->settings['googleSiteKey'],
+                $this->owner->settings['googleSecret'],
+                false,
+                $action
+            );
+        }
+
+        return $this;
+    }
+
+    protected function setRecaptchaCredentials($siteKey, $secret, $token = false, $action = false){
         $this->reCaptcha = [
             'sitekey' => $siteKey,
             'secret' => $secret,
@@ -570,6 +585,10 @@ abstract class formBuilder extends model {
 
     protected function getRecaptchaResponse(){
         return $this->reCaptcha['response'];
+    }
+
+    public function hasCaptcha(){
+        return (!Empty($this->reCaptcha['sitekey']));
     }
 
     protected function addButtons(formButton ...$buttons){
