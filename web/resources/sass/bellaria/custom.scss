@@ -182,3 +182,7 @@
 .dropdown-menu {
   z-index: 1025 !important;
 }
+
+.form-control:focus-visible {
+  text-shadow: none !important;
+}
