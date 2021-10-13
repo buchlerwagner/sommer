@@ -1,0 +1,296 @@
+
+
+/***
+
+====================================================================
+		Testimonial Section
+====================================================================
+
+***/
+
+.testimonial-section{
+  position: relative;
+  padding: 100px 0 140px;
+  background-color: transparent;
+  margin-top: -65px;
+}
+
+.testimonial-section .shape_wrapper .overlay{
+  background-color: $pink;
+}
+
+.testimonial-carousel{
+  position: relative;
+}
+
+.testimonial-block{
+  position: relative;
+}
+
+.testimonial-block .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.testimonial-block .testimonial_img{
+  position: relative;
+}
+
+.testimonial-block .testimonial_img .thumb-box{
+  position: relative;
+  display: inline-block;
+  border-radius: 50%;
+  border: 4px solid $white;
+}
+
+.testimonial-block .testimonial_img .thumb-box img{
+  border-radius: 50%;
+  vertical-align: top;
+}
+
+.testimonial-block .testimonial_img .div_left,
+.testimonial-block .testimonial_img .div_right{
+  display: inline-block;
+  width: 65px;
+  height: 21px;
+  margin-top: 30px;
+  vertical-align: top;
+}
+
+.testimonial-block .testimonial_img .div_left{
+  margin-right: 10px;
+}
+
+.testimonial-block .testimonial_img .div_right{
+  margin-left: 10px;
+}
+
+.testimonial-block .text{
+  position: relative;
+  color: $white;
+  max-width: 750px;
+  margin: 0 auto 25px;
+}
+
+.testimonial-block .name{
+  position: relative;
+  display: block;
+  font-size: 24px;
+  color: $white;
+  font-family: $header-font-family, cursive;
+  margin-bottom: 5px;
+}
+
+.testimonial-block .designation{
+  position: relative;
+  display: block;
+  font-size: 17px;
+  color: $white;
+}
+
+.testimonial-carousel .owl-nav{
+  display: none;
+}
+
+.testimonial-carousel .owl-dots{
+  position: relative;
+  margin-top: 25px;
+  width: 100%;
+  text-align: center;
+}
+
+.testimonial-carousel .owl-dot{
+  position: relative;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: $white;
+  opacity: 0.6;
+}
+
+.testimonial-carousel .owl-dot:hover,
+.testimonial-carousel .owl-dot.active{
+  opacity: 1;
+}
+
+.testimonial-section.style-two{
+  padding: 230px 0;
+  margin-bottom: -100px;
+  z-index: 1;
+}
+
+.testimonial-section.style-two .overlay{
+  background-color: rgba(0,0,0,0.3);
+}
+
+/***
+
+====================================================================
+		Testimonial Section Two
+====================================================================
+
+***/
+
+.testimonial-section-two{
+  position: relative;
+  padding: 100px 0 90px;
+}
+
+.testimonial-section-two .sec-title{
+  margin-bottom: 25px;
+}
+
+.testimonial-section-two .content-box{
+  position: relative;
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 30px;
+}
+
+.testimonial-section-two .content-box p{
+  color: $white;
+}
+
+.testimonial-section-two .content-box h4{
+  position: relative;
+  font-size: 28px;
+  line-height: 1.2em;
+  color: $white;
+  margin-bottom: 15px;
+}
+
+/***
+
+====================================================================
+		Testimonial Section Three
+====================================================================
+
+***/
+
+.testimonial-section-three{
+  padding: 30px 0 90px;
+  margin-top: -40px;
+}
+
+.testimonial-section-three .overlay{
+  display: none;
+}
+
+.testimonial-section-three .testimonial-block .testimonial_img .thumb-box{
+  border-color: #d1f16a;
+}
+
+.testimonial-section-three .testimonial-block .testimonial_img .div_left,
+.testimonial-section-three .testimonial-block .testimonial_img .div_right{
+  fill: #d1f16a;
+}
+
+.testimonial-section-three .testimonial-block .inner-box{
+  padding: 0 15px;
+}
+
+.testimonial-section-three .testimonial-block .name,
+.testimonial-section-three .testimonial-block .text{
+  color: #4b4342;
+}
+
+.testimonial-section-three .owl-nav{
+  display: none;
+}
+
+.testimonial-section-three .owl-dots{
+  position: relative;
+  margin-top: 25px;
+  width: 100%;
+  text-align: center;
+}
+
+.testimonial-section-three .owl-dot{
+  position: relative;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: $light-green;
+  opacity: 0.6;
+}
+
+.testimonial-section-three .owl-dot:hover,
+.testimonial-section-three .owl-dot.active{
+  opacity: 1;
+}
+
+/*=============================
+	Testimonial Block Two
+==============================*/
+
+.testimonial-block-two{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.testimonial-block-two .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.testimonial-block-two .testimonial_img{
+  position: relative;
+}
+
+.testimonial-block-two .testimonial_img .thumb-box{
+  position: relative;
+  display: inline-block;
+  border-radius: 50%;
+  border: 4px solid $light-blue;
+}
+
+.testimonial-block-two .testimonial_img .thumb-box img{
+  border-radius: 50%;
+  vertical-align: top;
+}
+
+.testimonial-block-two .testimonial_img .div_left,
+.testimonial-block-two .testimonial_img .div_right{
+  display: inline-block;
+  width: 65px;
+  height: 21px;
+  margin-top: 30px;
+  vertical-align: top;
+  fill: $light-blue;
+}
+
+.testimonial-block-two .testimonial_img .div_left{
+  margin-right: 10px;
+}
+
+.testimonial-block-two .testimonial_img .div_right{
+  margin-left: 10px;
+}
+
+.testimonial-block-two .text{
+  position: relative;
+  margin: 0 0 25px;
+}
+
+.testimonial-block-two .name{
+  position: relative;
+  display: block;
+  font-size: 24px;
+  color: #4b4342;
+  font-family: $header-font-family, cursive;
+}
+
+.testimonial-block-two.style-two .testimonial_img .div_left,
+.testimonial-block-two.style-two .testimonial_img .div_right{
+  fill: $pink;
+}
+
+.testimonial-block-two.style-two .testimonial_img .thumb-box{
+  border-color: $pink;
+}

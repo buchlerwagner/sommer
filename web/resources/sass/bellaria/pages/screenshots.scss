@@ -1,0 +1,53 @@
+
+/***
+
+====================================================================
+		Screenshots Section
+====================================================================
+
+***/
+
+.screenshots-section{
+  position: relative;
+  padding: 110px 0 50px;
+}
+
+.screenshots-section .demo-block{
+  padding: 0 15px;
+  margin-bottom: 55px;
+}
+
+.screenshots-section .title-column{
+  position: relative;
+}
+
+.screenshots-section .title-column .inner-column{
+  position: relative;
+  text-align: center;
+  margin-top: -10px;
+}
+
+.screenshots-section .title-column h3{
+  position: relative;
+  color: #4b4342;
+  font-size: 42px;
+  line-height: 1.2em;
+  margin-bottom: 30px;
+}
+
+.screenshots-section .title-column h3 span{
+  position: relative;
+  display: block;
+  color: $light-blue;
+}
+
+.screenshots-section .divider{
+  margin-bottom: 20px;
+}
+
+.screenshots-section .divider img{
+  position: relative;
+  display: block;
+  height: 40px;
+  margin: 0 auto;
+}

@@ -182,11 +182,41 @@
                                 {% for item in cart.getShippingModes %}
                                 <ul>
                                     <li>
-                                        <div class="radio-option">
+                                        <div class="radio-option options">
                                             <input type="radio" name="order[shipping]" id="shipping-{{ item.id }}" class="set-shipping-mode" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getShippingId == item.id %} checked{% endif %}>
                                             <label for="shipping-{{ item.id }}">
                                                 <strong>{{ item.name }}</strong>
-                                                <span class="small-text">{{ item.text|nl2br }}</span>
+                                                <span class="small-text">
+                                                    <div>{{ item.text|nl2br }}</div>
+                                                    {% if item.hasIntervals %}
+                                                        <div class="form-row mt-3 shipping-intervals">
+                                                            <div class="form-group col-6">
+                                                                <label class="control-label pl-0 text-white mb-1" for="shipping-interval-{{ item.id }}">
+                                                                    {{ _('LBL_SELECT_SHIPPING_INTERVAL') }}
+                                                                </label>
+                                                                <select name="order[interval]" class="form-control set-shipping-interval" id="shipping-interval-{{ item.id }}"{% if cart.getShippingId != item.id %} disabled{% endif %}>
+                                                                    {% for interval in item.intervals %}
+                                                                        <option value="{{ interval.id }}"{% if forms.order.values.interval == interval.id %} selected{% endif %}>{{ _date(item.shippingDate, 41) }}, {{ _date(interval.timeStart, 6, false) }} - {{ _date(interval.timeEnd, 6, false) }}</option>
+                                                                    {% endfor %}
+                                                                    {% if item.hasCustomInterval %}
+                                                                        <option value="-1"{% if forms.order.values.interval == -1 %} selected{% endif %}>{{ _('LBL_CUSTOM_INTERVAL') }}</option>
+                                                                    {% endif %}
+                                                                </select>
+                                                            </div>
+                                                            {% if item.hasCustomInterval %}
+                                                            <div class="custom-interval form-group col-12{% if forms.order.values.interval != -1 %} d-none{% endif %}{% if forms.order.hasError('custom_interval') %} has-error{% endif %}">
+                                                                <input type="text" id="shipping-custom-interval-{{ item.id }}" name="order[custom_interval]" class="form-control" value="{% if forms.order.values.interval == -1 %}{{ forms.order.values.custom_interval }}{% endif %}" placeholder="{{ _('LBL_CUSTOM_INTERVAL_INPUT') }}"{% if cart.getShippingId != item.id %} disabled{% endif %}>
+
+                                                                {% if item.customIntervalText %}
+                                                                    <div class="mt-2">
+                                                                        <b>{{ item.customIntervalText }}</b>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                </span>
                                                 <div class="item-fee">
                                                     <span class="text-muted">
                                                         {% if item.price > 0 %}

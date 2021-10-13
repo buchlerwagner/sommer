@@ -20,6 +20,11 @@
 .has-error.checkbox-inline label {
   color: $danger;
 }
+
+.has-error input::placeholder {
+  color: $danger;
+}
+
 .has-warning .help-block,
 .has-warning .control-label,
 .has-warning .radio,

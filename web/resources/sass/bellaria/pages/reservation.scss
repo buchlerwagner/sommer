@@ -1,0 +1,182 @@
+
+/***
+
+====================================================================
+		Reservation Section
+====================================================================
+
+***/
+
+.reservation-section{
+  position: relative;
+  padding: 90px 0;
+}
+
+.reservation-section .overlay{
+  background-color: rgba(242,164,173,0.65);
+}
+
+.reservation-section .sec-title{
+  margin-bottom: 40px;
+}
+
+.reservation-section .sec-title h2{
+  font-size: 51px;
+}
+
+.reservation-section .form-outer{
+  position: relative;
+  max-width: 570px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.reservation-section .text{
+  color: $white;
+  margin-bottom: 55px;
+}
+
+/*=== Footer Form ===*/
+
+.reservation-form{
+  position: relative;
+}
+
+.reservation-form .form-group{
+  position:relative;
+  margin-bottom:18px;
+}
+
+.reservation-form .form-group:last-child{
+  margin-bottom: 0;
+}
+
+.reservation-form .form-group input[type="text"],
+.reservation-form .form-group input[type="email"],
+.reservation-form .form-group input[type="url"],
+.reservation-form .form-group textarea,
+.reservation-form .form-group select{
+  position: relative;
+  width: 100%;
+  display: block;
+  color: #222222;
+  font-size: 15px;
+  line-height: 20px;
+  padding: 10px 15px;
+  border: 1px solid #edecec;
+  border-radius: 5px;
+  height: 42px;
+  background-color: rgba(255,255,255,1);
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.reservation-form .form-group input:focus,
+.reservation-form .form-group select:focus,
+.reservation-form .form-group textarea:focus{
+  border-color:$white;
+}
+
+.reservation-form .form-group textarea{
+  height: 125px;
+  resize: none;
+}
+
+.reservation-form .form-group input[type="submit"],
+.reservation-form .form-group button{
+  position: relative;
+  display: inline-block;
+  text-transform: capitalize;
+  font-weight: 500;
+  color: #4b4342;
+  font-size: 16px;
+  background-color: $white;
+  padding: 10px 15px;
+  line-height: 20px;
+  border: 1px solid #edecec;
+  border-radius: 4px;
+  width: 160px;
+  text-align: center;
+  transition: all 300ms ease;
+  margin-top: 8px;
+}
+
+.reservation-form .form-group input[type="submit"]:hover,
+.reservation-form .form-group button:hover{
+  background-color: #4b4342;
+  color: $white;
+  border: 1px solid #4b4342;
+}
+
+.reservation-form input.error:focus,
+.reservation-form select.error:focus,
+.reservation-form textarea.error:focus{
+  border-color:#ff0000;
+}
+
+.reservation-form label.error{
+  display:block;
+  font-weight:500;
+  font-size:13px;
+  text-transform:capitalize;
+  line-height:24px;
+  color:#ff0000;
+  margin-bottom: 0;
+}
+
+/***
+
+====================================================================
+		Reservation Section Two
+====================================================================
+
+***/
+
+.reservation-section-two{
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 100px 0 135px;
+  margin-bottom: -60px;
+}
+
+.reservation-section-two .overlay{
+  background-color: rgba(242,164,173,0.65);
+}
+
+.reservation-section-two .sec-title{
+  margin-bottom: 20px;
+}
+
+.reservation-section-two .sec-title h2{
+  font-size: 51px;
+}
+
+.reservation-section-two .reservation-form p{
+  margin-bottom: 20px;
+}
+
+.reservation-section-two .reservation-form .divider{
+  margin-bottom: 50px;
+}
+
+.reservation-section-two .reservation-form .divider img{
+  height: 39px;
+  width: auto;
+}
+
+.reservation-section-two .form-outer{
+  position: relative;
+  max-width: 370px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.reservation-section-two .text{
+  color: $white;
+  margin-bottom: 55px;
+}

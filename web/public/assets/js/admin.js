@@ -2853,4 +2853,47 @@ function resetInfiniteScroll(id, pagenum) {
 
 $(function() {
     tables.init();
+
+    $(document).on('click', '#btnAddInterval', function(e){
+        var $this = $(this);
+
+        var params = {
+            smid: parseInt($this.data('smid')),
+            start: $('#si_time_start').val(),
+            end: $('#si_time_end').val(),
+        };
+
+        if(params.smid && params.start && params.end) {
+            addInterval(params);
+        }
+    });
 });
+
+function addInterval(params) {
+    $.ajax(
+        '/ajax/intervals/add/',
+        {
+            data: params
+        }
+    ).done(function (res) {
+        if(res) {
+            tables.reload('shippingIntervals', params.smid, false);
+        }
+        $('#si_time_start').val('');
+        $('#si_time_end').val('');
+    });
+}
+
+function removeInterval(id, smid) {
+    $.ajax({
+        method: "GET",
+        url: "/ajax/intervals/remove/",
+        data: {
+            smid: smid,
+            id: id
+        }
+    }).done(function (res) {
+        $('#confirm-delete').modal('hide');
+        tables.reload('shippingIntervals', smid, false);
+    });
+}

@@ -107,6 +107,20 @@ var shoppingCart = {
             }
         });
 
+        $(document).on('change', '.set-shipping-mode', function () {
+            $('.set-shipping-mode').each(function(i, obj) {
+                var $parent = $(obj).parents('.options');
+
+                if($(obj).is(':checked')){
+                    $parent.find('select').removeAttr('disabled');
+                    $parent.find('input[type=text]').removeAttr('disabled');
+                }else{
+                    $parent.find('select').attr('disabled', 'disabled');
+                    $parent.find('input[type=text]').attr('disabled', 'disabled');
+                }
+            });
+        });
+
         $(document).on('click', '.set-payment-mode', function () {
             var id = parseInt($(this).data('id'));
             if(id) {
@@ -311,6 +325,17 @@ var shoppingCart = {
         if($('.set-invoice-type').length){
             $('.set-invoice-type').trigger('change');
         }
+
+        $('.set-shipping-interval').on('change', function (){
+            var $this = $(this);
+            var $parent = $this.parents('.shipping-intervals');
+            if(parseInt($this.val()) === -1){
+                $parent.find('.custom-interval').removeClass('d-none').show();
+            }else{
+                $parent.find('.custom-interval').hide();
+            }
+        });
+
 
         $(document).on('keyup', '.numbersonly', function(){
             var chars = $(this).data('chars');

@@ -1,0 +1,539 @@
+
+/***
+
+====================================================================
+	Servoces Section
+====================================================================
+
+***/
+
+.services-section{
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 100px 0 167px;
+}
+
+.services-section:before{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(255,255,255,0.8);
+  content: '';
+}
+
+.services-carousel{
+  position: relative;
+}
+
+.service-block{
+  position: relative;
+}
+
+.service-block .inner-box{
+  position: relative;
+  padding: 0 15px;
+  text-align: center;
+}
+
+.service-block .image-box{
+  position: relative;
+  height: 180px;
+  width: 180px;
+  margin: 0 auto 20px;
+}
+
+.service-block .services_frame svg{
+  position: relative;
+  stroke-width:12px;
+  fill:transparent;
+  stroke:$light-blue;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.service-block .inner-box:hover .services_frame svg{
+  fill:$light-blue;
+}
+
+.service-block .image{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 27px;
+  height: 126px;
+  width: 126px;
+  margin: 0 auto;
+}
+
+.service-block .image img{
+  display: block;
+  width: 100%;
+}
+
+.service-block h3{
+  position: relative;
+  display: block;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: #4b4342;
+  margin-bottom:15px;
+}
+
+.service-block p{
+  position: relative;
+}
+
+.services-carousel .owl-nav{
+  display: none;
+}
+
+.services-carousel .owl-dots{
+  position: relative;
+  margin-top: 30px;
+  width: 100%;
+  text-align: center;
+}
+
+.services-carousel .owl-dot{
+  position: relative;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: $pink;
+  opacity: 0.6;
+}
+
+.services-carousel .owl-dot:hover,
+.services-carousel .owl-dot.active{
+  opacity: 1;
+}
+
+/***
+
+====================================================================
+	Servoces Section Two
+====================================================================
+
+***/
+
+.services-section-two{
+  position: relative;
+  padding: 60px 0 85px;
+}
+
+.services-section-two .auto-container{
+  max-width: 1320px;
+}
+
+.services-section-two .sec-title{
+  margin-bottom: 95px;
+}
+
+.service-block-two{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.service-block-two .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.service-block-two .image-box{
+  position: relative;
+  height: 300px;
+  width: 300px;
+  margin: 0 auto 45px;
+}
+
+.service-block-two .service-frame svg{
+  position: relative;
+  fill:#e4e3e3;
+}
+
+.service-block-two .image{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 210px;
+  width: 210px;
+  margin: -105px auto 0;
+}
+
+.service-block-two .image img{
+  display: block;
+  width: 100%;
+}
+
+.service-block-two h3{
+  position: relative;
+  display: block;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: #4b4342;
+  margin-bottom:10px;
+}
+
+.service-block-two p{
+  position: relative;
+}
+
+/***
+
+====================================================================
+	Servoces Section Three
+====================================================================
+
+***/
+
+.services-section-three{
+  position: relative;
+  padding:110px 0 0;
+  margin-top: -35px;
+  z-index: 3;
+  background-color: transparent;
+}
+
+.services-section-three .outer-box{
+  position: relative;
+  padding: 0 15px;
+}
+
+.services-section-three .overlay{
+  background-color: rgba(123,181,206,0.8);
+}
+
+.services-section-three .sec-title{
+  margin-bottom: 30px;
+}
+
+.service-block-three{
+  position: relative;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.service-block-three .inner-box{
+  position: relative;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.service-block-three .image-box{
+  position: relative;
+}
+
+.service-block-three .image{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.service-block-three .image img{
+  display: inline-block;
+  max-width: 100%;
+}
+
+.service-block-three h3{
+  position: relative;
+  display: block;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: $white;
+  margin-bottom:10px;
+}
+
+/***
+
+====================================================================
+	Servoces Section Four
+====================================================================
+
+***/
+
+.services-section-four{
+  position: relative;
+}
+
+.service-block-four{
+  position: relative;
+}
+
+.service-block-four .inner-box{
+  position: relative;
+  padding: 20% 15px;
+  text-align: center;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.service-block-four .icon{
+  position: relative;
+  display: inline-block;
+  font-size: 80px;
+  color: $white;
+  line-height: 90px;
+  margin-bottom: 20px;
+}
+
+.service-block-four h3{
+  position: relative;
+  display: block;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: $white;
+  margin-bottom: 10px;
+}
+
+/***
+
+====================================================================
+	Servoces Section Five
+====================================================================
+
+***/
+
+.services-section-five{
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 110px 0 80px;
+}
+
+.service-block-five{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.service-block-five .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.service-block-five .image-box{
+  position: relative;
+}
+
+.service-block-five .image{
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.service-block-five .image img{
+  display: inline-block;
+  max-width: 100%;
+}
+
+.service-block-five h3{
+  position: relative;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: #4b4342;
+  margin-bottom: 15px;
+}
+
+.service-block-five p{
+  position: relative;
+}
+
+/***
+
+====================================================================
+	Servoces Section Six
+====================================================================
+
+***/
+
+.services-section-six{
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 60px 0 50px;
+}
+
+.services-section-six .sec-title{
+  margin-bottom: 45px;
+}
+
+.service-block-six{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.service-block-six .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.service-block-six .image-box{
+  position: relative;
+}
+
+.service-block-six .image{
+  position: relative;
+  z-index: 1;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  margin-bottom: 20px;
+  height: 300px;
+  width: 300px;
+}
+
+.service-block-six .image img{
+  display: inline-block;
+  max-width: 100%;
+}
+
+.service-block-six h3{
+  position: relative;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: #4b4342;
+  margin-bottom: 10px;
+}
+
+.service-block-six p{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+/***
+
+====================================================================
+	Servoces Section Seven
+====================================================================
+
+***/
+
+.services-section-seven{
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 60px 0 210px;
+  z-index: 2;
+}
+
+.services-section-seven .overlay{
+  background-color: rgba(0,0,0,0.3);
+}
+
+.service-block-seven{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.service-block-seven .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.service-block-seven .icon-box{
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.service-block-seven .icon-box .icon{
+  position: relative;
+  display: inline-block;
+  font-size: 80px;
+  line-height: 1em;
+  color: $white;
+}
+
+.service-block-seven h3{
+  position: relative;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: $white;
+  margin-bottom: 10px;
+}
+
+.service-block-seven p{
+  position: relative;
+  margin-bottom: 30px;
+  color: $white;
+}
+
+/***
+
+====================================================================
+	Servoces Section Eight
+====================================================================
+
+***/
+
+.services-section-eight{
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 80px 0 115px;
+}
+
+.service-block-eight{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.service-block-eight .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.service-block-eight .image-box{
+  position: relative;
+}
+
+.service-block-eight .image{
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.service-block-eight .image img{
+  display: inline-block;
+  max-width: 100%;
+}
+
+.service-block-eight .divider{
+  margin-bottom: 5px;
+}
+
+.service-block-eight .divider img{
+  height: 15px;
+  display: block;
+  margin: 0 auto;
+}
+
+.service-block-eight h3{
+  position: relative;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: #4b4342;
+  margin-bottom: 10px;
+}
+
+.service-block-eight p{
+  position: relative;
+}

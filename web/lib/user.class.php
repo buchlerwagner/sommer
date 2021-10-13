@@ -296,6 +296,8 @@ class user extends ancestor {
         $needAuthentication = $this->checkLoginHistory();
 
         if (!empty($this->data)) {
+            $this->loggedIn = true;
+
             $db->sqlQuery(
                 $db->genSQLUpdate(
                     "users",

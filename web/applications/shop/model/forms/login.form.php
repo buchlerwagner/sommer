@@ -66,6 +66,8 @@ class loginForm extends form {
 					$redirect = $this->owner->root;
 				}
 
+                $this->owner->cart->claimCart();
+
 				//$this->reset();
 				$this->owner->pageRedirect($redirect);
 

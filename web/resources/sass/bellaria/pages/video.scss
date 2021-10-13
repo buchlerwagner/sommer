@@ -1,0 +1,45 @@
+
+/***
+
+====================================================================
+	Video Section
+====================================================================
+
+***/
+
+.video-section{
+  position: relative;
+  min-height: 585px;
+  overflow: hidden;
+  margin-top: -100px;
+  margin-bottom: -70px;
+  z-index: 3;
+}
+
+.video-section .shape_wrapper{
+  position: absolute !important;
+}
+
+.video-section .overlay{
+  background-color: rgba(40,151,179,0.5);
+}
+
+.video-section .content-box{
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.video-section .content-box h2{
+  font-size: 48px;
+  line-height: 1.2em;
+  color: $white;
+  font-weight: 500;
+}

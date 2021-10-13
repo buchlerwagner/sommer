@@ -1,0 +1,61 @@
+
+/***
+
+====================================================================
+		Our Standards
+====================================================================
+
+***/
+
+.our-standards{
+  position: relative;
+  padding: 135px 0 210px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  margin-bottom: -100px;
+}
+
+.our-standards .content-column{
+  position: relative;
+  text-align: center;
+}
+
+.our-standards .sec-title{
+  margin-bottom: 0;
+}
+
+.our-standards .sec-title .divider{
+  margin-bottom: 0;
+}
+
+.our-standards h4{
+  font-size: 28px;
+  line-height: 1.4em;
+  color: $pink;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.our-standards .divider{
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.our-standards .divider img{
+  height: 41px;
+  display: inline-block;
+}
+
+.our-standards p{
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.our-standards .content .icon{
+  position: relative;
+  display: block;
+  color: $pink;
+  font-size: 16px;
+  margin-bottom: 2px;
+}

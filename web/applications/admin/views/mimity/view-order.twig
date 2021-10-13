@@ -99,7 +99,20 @@
                             <span class="text-secondary">{{ _('LBL_SELECTED_SHIPPING_MODE') }}:</span>
                             <b>{{ form.cart.getSelectedShippingMode.name }}</b>
                         </div>
-
+                        {% if form.cart.getSelectedShippingInterval.id != 0 %}
+                        <div class="mb-3">
+                            {% if form.cart.getSelectedShippingInterval.id > 0 %}
+                                <span class="text-secondary">{{ _('LBL_SHIPPING_TIME') }}:</span>
+                                <b>{{ _date(form.cart.getSelectedShippingMode.shippingDate, 41) }}, {{ _date(form.cart.getSelectedShippingInterval.timeStart, 6, false) }} - {{ _date(form.cart.getSelectedShippingInterval.timeEnd, 6, false) }}</b>
+                            {% elseif form.cart.getSelectedShippingInterval.id == -1 %}
+                                <span class="text-secondary">{{ _('LBL_CUSTOM_SHIPPING_TIME') }}:</span>
+                                <b>{{ form.cart.getSelectedShippingInterval.customText }}</b>
+                                {% if form.cart.getSelectedShippingMode.customIntervalText %}
+                                    <div class="text-danger">{{ form.cart.getSelectedShippingMode.customIntervalText }}</div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
                         <div>
                             <span class="text-secondary">{{ _('LBL_SELECTED_PAYMENT_MODE') }}:</span>
                             <b>{{ form.cart.getSelectedPaymentMode.name }}</b>

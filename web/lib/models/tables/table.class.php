@@ -740,7 +740,7 @@ class table extends model {
 			$params['keyvalues'][] = (isset($tmp[$i])) ? $tmp[$i] : 0;
 		}
 
-		$this->inlineForm = $this->owner->loadForm($form, $params, $form . '_form');
+		$this->inlineForm = $this->owner->loadForm($form, $params, $form . 'Form');
 	}
 
 	public function addButton($caption, $isModal = false, $params = [], $index = false){

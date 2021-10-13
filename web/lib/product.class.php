@@ -477,4 +477,44 @@ class product extends ancestor {
 
         return $out;
     }
+
+    public function updateViewCounter(){
+        if(!$this->owner->getSession('pw-' . $this->productId) && !$this->isAdmin && $this->productId){
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'products',
+                    [
+                        'prod_views' => 'INCREMENT',
+                    ],
+                    [
+                        'prod_id' => $this->productId,
+                        'prod_shop_id' => $this->shopId,
+                    ]
+                )
+            );
+
+            $this->owner->setSession('pw-' . $this->productId, true);
+        }
+
+        return $this;
+    }
+
+    public function updateOrderCounter(){
+        if($this->productId) {
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'products',
+                    [
+                        'prod_orders' => 'INCREMENT',
+                    ],
+                    [
+                        'prod_id' => $this->productId,
+                        'prod_shop_id' => $this->shopId,
+                    ]
+                )
+            );
+        }
+
+        return $this;
+    }
 }

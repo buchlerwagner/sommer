@@ -1,0 +1,165 @@
+
+/*=== Newslatter Widget ===*/
+
+.newslatter-widget{
+  position: relative;
+}
+
+.newslatter-form .form-group{
+  position: relative;
+  padding-right: 70px;
+}
+
+.newslatter-form .form-group input[type="text"],
+.newslatter-form .form-group input[type="tel"],
+.newslatter-form .form-group input[type="email"],
+.newslatter-form .form-group textarea{
+  position: relative;
+  font-size: 16px;
+  padding: 0 10px;
+  border: 1px solid #edecec;
+  width: 100%;
+  margin: auto;
+  line-height: 40px;
+  min-height: 42px;
+  border-radius: 6px;
+}
+
+.newslatter-form .form-group input[type="submit"],
+.newslatter-form .form-group button{
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: $white;
+  font-size: 40px;
+  line-height: 40px;
+  text-align: center;
+  border: 1px solid #edecec;
+  background-color: #aba4a2;
+  border-radius: 4px;
+  width: 60px;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.newslatter-form .form-group input[type="submit"]:hover,
+.newslatter-form .form-group button:hover{
+  background-color: $light-blue;
+}
+
+.newslatter-form .response{
+  position: relative;
+  padding: 0 10px;
+}
+
+.newslatter-form .response .success{
+  background: $light-blue;
+  color: $white;
+}
+
+.newslatter-form .response .failed{
+  background-color: $pink;
+  color: $white;
+}
+
+.newslatter-form .response .text-info{
+  background-color: #ffcd66;
+  color: #222222 !important;
+}
+
+
+/*=== Footer Form ===*/
+
+.footer-form{
+  position: relative;
+}
+
+.footer-form .form-group{
+  position:relative;
+  margin-bottom:1em;
+  text-align: left;
+}
+
+.footer-form .form-group:last-child{
+  margin-bottom: 0;
+}
+
+.footer-form .form-group input[type="text"],
+.footer-form .form-group input[type="email"],
+.footer-form .form-group input[type="url"],
+.footer-form .form-group textarea,
+.footer-form .form-group select{
+  position: relative;
+  width: 100%;
+  display: block;
+  color: $white;
+  font-size: 15px;
+  line-height: 20px;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  height: 42px;
+  background-color: rgba(255,255,255,0.5);
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.footer-form .form-group input:focus,
+.footer-form .form-group select:focus,
+.footer-form .form-group textarea:focus{
+  border-color:#eeeeee;
+}
+
+.footer-form ::-webkit-input-placeholder{color: #222222;}
+.footer-form ::-moz-input-placeholder{color: #222222;}
+.footer-form ::-ms-input-placeholder{color: #222222;}
+
+.footer-form .form-group textarea{
+  height: 125px;
+  resize: none;
+}
+
+.footer-form .form-group input[type="submit"],
+.footer-form .form-group button{
+  position: relative;
+  display: inline-block;
+  text-transform: capitalize;
+  font-weight: 500;
+  color: #4b4342;
+  font-size: 16px;
+  background-color: $white;
+  padding: 10px 15px;
+  line-height: 22px;
+  border-radius: 4px;
+  width: 160px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.footer-form input.error:focus,
+.footer-form select.error:focus,
+.footer-form textarea.error:focus{
+  border-color:#ff0000;
+}
+
+.footer-form label.error{
+  display:block;
+  font-weight:500;
+  font-size:13px;
+  text-transform:capitalize;
+  line-height:24px;
+  color:#ff0000;
+  margin-bottom: 0;
+}
+
+.footer-form .form-group input[type="submit"]:hover,
+.footer-form .form-group button:hover{
+  background-color: #4b4342;
+  color: $white;
+}

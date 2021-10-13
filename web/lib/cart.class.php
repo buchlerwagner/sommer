@@ -26,6 +26,7 @@ class cart extends ancestor {
 	private $discount = 0;
 	public $shippingFee = 0;
     private $shippingId = false;
+    private $intervalId = false;
 	public $paymentFee = 0;
     private $paymentId = false;
     public $packagingFee = 0;
@@ -35,6 +36,7 @@ class cart extends ancestor {
     public $userData = [];
 	public $items = [];
 	public $remarks;
+	public $customInterval;
 
 	private $options = [];
 
@@ -212,6 +214,12 @@ class cart extends ancestor {
 			)
 		);
 
+        if($this->items){
+            foreach($this->items AS $item){
+                $this->product->init($item['productId'])->updateOrderCounter();
+            }
+        }
+
         $this->sendConfirmationEmail();
 
 		$this->destroyKey();
@@ -234,6 +242,8 @@ class cart extends ancestor {
                 'paymentFee' => $this->paymentFee,
                 'total' => $this->total,
                 'shippingMode' => $this->getSelectedShippingMode(),
+                'shippingInterval' => $this->getSelectedShippingInterval(),
+                'customInterval' => $this->customInterval,
                 'paymentMode' => $this->getSelectedPaymentMode(),
                 'orderNumber' => $this->orderNumber,
                 'orderStatus' => $this->orderStatus,
@@ -321,9 +331,11 @@ class cart extends ancestor {
                 $this->currency = $cart['cart_currency'];
                 $this->shippingFee = $cart['cart_shipping_fee'];
                 $this->shippingId = $cart['cart_sm_id'];
+                $this->intervalId = $cart['cart_si_id'];
                 $this->paymentFee = $cart['cart_payment_fee'];
                 $this->paymentId = $cart['cart_pm_id'];
                 $this->remarks = $cart['cart_remarks'];
+                $this->customInterval = $cart['cart_custom_interval'];
 
                 if($this->userId){
                     $user = $this->owner->user->getUserProfile($this->userId);
@@ -562,8 +574,8 @@ class cart extends ancestor {
         if(!Empty($key)) {
             $cart = $this->checkCartKey($key);
 
-            if($cart['carKey']){
-                $this->setKey($cart['carKey'], ($cart['cartStatus'] != self::CART_STATUS_ORDERED));
+            if($cart['cartKey']){
+                $this->setKey($cart['cartKey'], ($cart['cartStatus'] != self::CART_STATUS_ORDERED));
             }
         }else{
             if (!$this->key = $this->owner->getSession(self::CART_SESSION_KEY)) {
@@ -619,10 +631,11 @@ class cart extends ancestor {
         return $out;
     }
 
-	private function destroyKey(){
+	public function destroyKey(){
 		$this->owner->delSession(self::CART_SESSION_KEY);
 		setcookie(self::CART_SESSION_KEY, '', time() - 3600, '/');
 		$this->key = false;
+		$this->id = false;
 	}
 
 	private function checkCartKey($key){
@@ -634,7 +647,7 @@ class cart extends ancestor {
             $this->owner->db->genSQLSelect(
                 'cart',
                 [
-                    'cart_key AS carKey',
+                    'cart_key AS cartKey',
                     'cart_status AS cartStatus'
                 ],
                 [
@@ -800,6 +813,10 @@ class cart extends ancestor {
                     'sm_price AS price',
                     'sm_default AS def',
                     'sm_text AS text',
+                    'sm_day_diff AS dayDiff',
+                    'sm_intervals AS hasIntervals',
+                    'sm_custom_interval AS hasCustomInterval',
+                    'sm_custom_text AS customIntervalText',
                 ],
                 [
                     'sm_shop_id' => $this->owner->shopId,
@@ -813,9 +830,36 @@ class cart extends ancestor {
         if ($result) {
             foreach($result AS $row){
                 $out[$row['id']] = $row;
+                $out[$row['id']]['shippingDate'] = ($row['dayDiff'] ? dateAddDays('now', $row['dayDiff']) : date('Y-m-d'));
+                $out[$row['id']]['intervals'] = [];
 
                 if($this->subtotal >= $row['freeLimit'] && !Empty($row['freeLimit'])){
                     $out[$row['id']]['price'] = 0;
+                }
+
+                if($row['hasIntervals']){
+                    $res = $this->owner->db->getRows(
+                        $this->owner->db->genSQLSelect(
+                            'shipping_intervals',
+                            [
+                                'si_id AS id',
+                                'si_time_start AS timeStart',
+                                'si_time_end AS timeEnd',
+                            ],
+                            [
+                                'si_shop_id' => $this->owner->shopId,
+                                'si_sm_id' => $row['id'],
+                            ],
+                            [],
+                            false,
+                            'si_time_start'
+                        )
+                    );
+                    if($res){
+                        foreach($res AS $r){
+                            $out[$row['id']]['intervals'][$r['id']] = $r;
+                        }
+                    }
                 }
             }
         }
@@ -835,6 +879,8 @@ class cart extends ancestor {
                         'sm_name AS name',
                         'sm_text AS text',
                         'sm_email_text AS emailText',
+                        'sm_day_diff AS dayDiff',
+                        'sm_custom_text AS customIntervalText',
                     ],
                     [
                         'sm_shop_id' => $this->owner->shopId,
@@ -842,6 +888,39 @@ class cart extends ancestor {
                     ]
                 )
             );
+            if($out){
+                $out['shippingDate'] = ($out['dayDiff'] ? dateAddDays($this->orderDate, $out['dayDiff']) : date('Y-m-d'));
+            }
+        }
+
+        return $out;
+    }
+
+    public function getSelectedShippingInterval(){
+        static $out = [];
+
+        if(Empty($out)) {
+            $out['id'] = $this->intervalId;
+
+            if ($this->intervalId > 0) {
+                $out = $this->owner->db->getFirstRow(
+                    $this->owner->db->genSQLSelect(
+                        'shipping_intervals',
+                        [
+                            'si_id AS id',
+                            'si_time_start AS timeStart',
+                            'si_time_end AS timeEnd',
+                        ],
+                        [
+                            'si_shop_id' => $this->owner->shopId,
+                            'si_sm_id' => $this->shippingId,
+                            'si_id' => $this->intervalId,
+                        ]
+                    )
+                );
+            } elseif ($this->intervalId == -1) {
+                $out['customText'] = $this->customInterval;
+            }
         }
 
         return $out;
@@ -872,18 +951,24 @@ class cart extends ancestor {
         }
     }
 
-    public function setShippingMode($id){
+    public function setShippingMode($id, $intervalId = 0, $customInterval = ''){
         $shippingModes = $this->getShippingModes();
         if($shippingModes[$id]){
             $this->shippingId = $id;
             $this->shippingFee = $shippingModes[$id]['price'];
+
+            if($intervalId > 0) {
+                $customInterval = '';
+            }
 
             $this->owner->db->sqlQuery(
                 $this->owner->db->genSQLUpdate(
                     'cart',
                     [
                         'cart_sm_id' => (int) $id,
+                        'cart_si_id' => (int) $intervalId,
                         'cart_shipping_fee' => $this->shippingFee,
+                        'cart_custom_interval' => $customInterval,
                     ],
                     [
                         'cart_id' => $this->id,
@@ -897,5 +982,85 @@ class cart extends ancestor {
         }
     }
 
+    public function claimCart(){
+        if($this->owner->user->isLoggedIn()) {
+            if ($key = $this->getUserSavedCart()) {
+                if ($this->key && !$this->userId) {
+                    $this->deleteCart();
+                }
 
+                $this->setKey($key);
+            } else {
+                if ($this->key && !$this->userId) {
+                    $this->owner->db->sqlQuery(
+                        $this->owner->db->genSQLUpdate(
+                            'cart',
+                            [
+                                'cart_us_id' => $this->owner->user->id,
+                            ],
+                            [
+                                'cart_id' => $this->id,
+                                'cart_shop_id' => $this->owner->shopId,
+                                'cart_key' => $this->key
+                            ]
+                        )
+                    );
+                }
+            }
+        }
+    }
+
+    private function getUserSavedCart(){
+        $key = false;
+
+        if($this->owner->user->isLoggedIn()) {
+            $row = $this->owner->db->getFirstRow(
+                $this->owner->db->genSQLSelect(
+                    'cart',
+                    [
+                        'cart_id AS id',
+                        'cart_key AS cartKey'
+                    ],
+                    [
+                        'cart_us_id' => $this->owner->user->id,
+                        'cart_shop_id' => $this->owner->shopId,
+                        'cart_status' => [
+                            'in' => ["'" . self::CART_STATUS_NEW . "'", "'" . self::CART_STATUS_ABANDONED . "'"]
+                        ]
+                    ]
+                )
+            );
+            if($row){
+                $key = $row['cartKey'];
+            }
+        }
+
+        return $key;
+    }
+
+    private function deleteCart(){
+        if($this->key && $this->id) {
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLDelete(
+                    'cart',
+                    [
+                        'cart_id' => $this->id,
+                        'cart_shop_id' => $this->owner->shopId,
+                        'cart_key' => $this->key
+                    ]
+                )
+            );
+
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLDelete(
+                    'cart_items',
+                    [
+                        'citem_cart_id' => $this->id,
+                    ]
+                )
+            );
+
+            $this->destroyKey();
+        }
+    }
 }

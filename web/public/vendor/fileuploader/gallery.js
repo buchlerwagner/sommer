@@ -107,7 +107,8 @@ $(document).ready(function() {
             container: '.fileuploader-theme-gallery .fileuploader-input'
         },
         upload: {
-            url: '/ajax/gallery/?type=upload',
+            //url: '/ajax/gallery/?type=upload',
+            url: '/ajax/uploader/gallery/0/upload/',
             data: null,
             type: 'POST',
             enctype: 'multipart/form-data',
@@ -131,10 +132,14 @@ $(document).ready(function() {
             onSuccess: function(result, item) {
                 var data = {};
 
-                try {
-                    data = JSON.parse(result);
-                } catch (e) {
-                    data.hasWarnings = true;
+                if(typeof result == 'object') {
+                    data = result;
+                }else{
+                    try {
+                        data = JSON.parse(result);
+                    } catch (e) {
+                        data.hasWarnings = true;
+                    }
                 }
 
                 // if success update the information
@@ -218,7 +223,8 @@ $(document).ready(function() {
                     item.image.addClass('fileuploader-loading').find('img, canvas').hide();
                     item.html.find('.fileuploader-action-popup').hide();
 
-                    $.post('/ajax/gallery/?type=resize', {name: item.name, id: item.data.listProps.id, _editor: JSON.stringify(item.editor)}, function() {
+                    //$.post('/ajax/gallery/?type=resize', {name: item.name, id: item.data.listProps.id, _editor: JSON.stringify(item.editor)}, function() {
+                    $.post('/ajax/uploader/gallery/0/edit/', {name: item.name, id: item.data.listProps.id, _editor: JSON.stringify(item.editor)}, function() {
                         // update the image
                         item.reader.read(function() {
                             delete item.imU;
@@ -249,7 +255,8 @@ $(document).ready(function() {
                 });
 
                 // send request
-                $.post('/ajax/gallery/?type=sort', {
+                //$.post('/ajax/gallery/?type=sort', {
+                $.post('/ajax/uploader/gallery/0/sort/', {
                     list: JSON.stringify(list)
                 });
             }
@@ -283,30 +290,32 @@ $(document).ready(function() {
                     var x = prompt(api.getOptions().captions.rename, item.title);
 
                     if (x && item.data.listProps) {
-                        $.post('/ajax/gallery/?type=rename', {name: item.name, id: item.data.listProps.id, title: x}, function(result) {
-                            try {
-                                var j = JSON.parse(result);
-
-                                // update the file name and url
-                                if (j.title) {
-                                    item.title = j.title;
-                                    item.name = item.title + (item.extension.length ? '.' + item.extension : '');
-                                    $item.find('.content-holder h5').attr('title', item.name).html(item.name);
-                                    $item.find('.gallery-item-dropdown [download]').attr('href', item.data.url);
-
-                                    if (item.popup.html)
-                                        item.popup.html.find('h5:eq(0)').text(item.name);
-
-                                    if (j.url)
-                                        item.data.url = j.url;
-                                    if (item.appended && j.file)
-                                        item.file = j.file;
-
-                                    api.updateFileList();
+                        //$.post('/ajax/gallery/?type=rename', {name: item.name, id: item.data.listProps.id, title: x}, function(result) {
+                        $.post('/ajax/uploader/gallery/0/rename/', {name: item.name, id: item.data.listProps.id, title: x}, function(result) {
+                            if(typeof result != 'object') {
+                                try {
+                                    result = JSON.parse(result);
+                                } catch (e) {
+                                    alert(api.getOptions().captions.renameError);
                                 }
+                            }
 
-                            } catch(e) {
-                                alert(api.getOptions().captions.renameError);
+                            // update the file name and url
+                            if (result.title) {
+                                item.title = result.title;
+                                item.name = item.title + (item.extension.length ? '.' + item.extension : '');
+                                $item.find('.content-holder h5').attr('title', item.name).html(item.name);
+                                $item.find('.gallery-item-dropdown [download]').attr('href', item.data.url);
+
+                                if (item.popup.html)
+                                    item.popup.html.find('h5:eq(0)').text(item.name);
+
+                                if (result.url)
+                                    item.data.url = result.url;
+                                if (item.appended && result.file)
+                                    item.file = result.file;
+
+                                api.updateFileList();
                             }
                         });
                     }
@@ -314,9 +323,16 @@ $(document).ready(function() {
 
                 // set main
                 if ($target.is('.gallery-action-asmain') && item.data.listProps) {
-                    $.post('/ajax/gallery/?type=asmain', {name: item.name, id: item.data.listProps.id}, function(result) {
-                        var res = JSON.parse(result);
-                        if(res.selected){
+                    //$.post('/ajax/gallery/?type=asmain', {name: item.name, id: item.data.listProps.id}, function(result) {
+                    $.post('/ajax/uploader/gallery/0/mark/', {name: item.name, id: item.data.listProps.id}, function(result) {
+                        if(typeof result != 'object') {
+                            try {
+                                result = JSON.parse(result);
+                            } catch (e) {
+                            }
+                        }
+
+                        if(result.selected){
                             item.html.removeClass('file-main-0').addClass('file-main-1');
                             item.data.isMain = true;
                         }else{
@@ -332,7 +348,8 @@ $(document).ready(function() {
         onRemove: function(item) {
             // send request
             if (item.data.listProps)
-                $.post('/ajax/gallery/?type=remove', {
+                //$.post('/ajax/gallery/?type=remove', {
+                $.post('/ajax/uploader/gallery/0/delete/', {
                     name: item.name,
                     id: item.data.listProps.id
                 });
@@ -351,15 +368,23 @@ $(document).ready(function() {
     });
 
     // preload the files
-    $.post('/ajax/gallery/?type=preload', null, function(result) {
+    //$.post('/ajax/gallery/?type=preload', null, function(result) {
+    $.post('/ajax/uploader/gallery/0/load/', null, function(result) {
         var api = $.fileuploader.getInstance($fileuploader),
             preload = [];
 
         try {
-            // preload the files
-            preload = JSON.parse(result);
+            if(typeof result == 'object') {
+                preload = result;
+            }else{
+                try {
+                    preload = JSON.parse(result);
+                } catch (e) {
+                }
+            }
 
             api.append(preload);
-        } catch(e) {}
+        } catch(e) {
+        }
     });
 });

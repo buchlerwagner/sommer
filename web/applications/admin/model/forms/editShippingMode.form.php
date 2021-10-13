@@ -9,7 +9,7 @@ class editShippingModeForm extends formBuilder {
         $this->title = 'LBL_EDIT_SHIPPING_MODE';
 		$this->dbTable = 'shipping_modes';
 
-        $group = (new groupFieldset('general'))->addElements(
+        $group = (new groupFieldset('general-1'))->addElements(
             (new groupRow('row1'))->addElements(
                 (new inputText('sm_name', 'LBL_TITLE'))
                     ->setColSize('col-12')
@@ -45,7 +45,45 @@ class editShippingModeForm extends formBuilder {
             //(new inputSwitch('sm_default', 'LBL_DEFAULT_SHIPPING_MODE', 0))
         );
 
-        $this->addControls($group);
+        $this->addTabs(
+            (new sectionTab('general', 'LBL_GENERAL', 'fal fa-dolly', true))
+                ->addElements($group)
+        );
+
+        if($this->keyFields['sm_id']){
+            $this->addTabs(
+                (new sectionTab('intervals', 'LBL_INTERVALS', 'fal fa-shipping-timed'))
+                    ->addElements(
+                        (new groupRow('row5'))->addElements(
+                            (new inputText('sm_day_diff', 'LBL_DAY_DIFF'))
+                                ->setPrepend('LBL_FROM_ACTUAL_DAY')
+                                ->onlyNumbers()
+                                ->setColSize('col-6')
+                                ->addClass('text-right')
+                                ->setAppend('LBL_DAYS')
+                        ),
+
+                        (new inputSwitch('sm_intervals', 'LBL_SHIPPING_INTERVALS', 0))
+                         ->changeState(1, enumChangeAction::Show(), '#interval-items')
+                        ->changeDefaultState(enumChangeAction::Hide(), '#interval-items'),
+
+                        (new groupFieldset('interval-items'))->addElements(
+                            (new subTable('interval-table'))
+                                ->addClass('table-responsive')
+                                ->add($this->loadSubTable('shippingIntervals')),
+
+                            (new inputSwitch('sm_custom_interval', 'LBL_ENABLE_CUSTOM_INTERVAL', 0))
+                                ->setGroupClass('mb-0 mt-4')
+                                ->changeState(1, enumChangeAction::Editable(), '#sm_custom_text')
+                                ->changeDefaultState(enumChangeAction::Readonly(), '#sm_custom_text'),
+
+                            (new inputText('sm_custom_text', 'LBL_CUSTOM_INTERVAL_INFO'))
+
+                        )
+                    )
+            );
+
+        }
 
         $this->addButtons(
             new buttonSave(),
@@ -55,6 +93,13 @@ class editShippingModeForm extends formBuilder {
 
     public function onBeforeSave() {
         $this->values['sm_shop_id'] = $this->owner->shopId;
+        if(Empty($this->values['sm_intervals'])) $this->values['sm_intervals'] = 0;
+        if(Empty($this->values['sm_custom_interval'])) $this->values['sm_custom_interval'] = 0;
+        if(Empty($this->values['sm_day_diff'])) $this->values['sm_day_diff'] = 0;
+        if(Empty($this->values['sm_price'])) $this->values['sm_price'] = 0;
+        if(Empty($this->values['sm_free_limit'])) $this->values['sm_free_limit'] = 0;
+        if(Empty($this->values['sm_order'])) $this->values['sm_order'] = $this->getMaxOrder();
+
         /*
         if(Empty($this->values['sm_default'])) {
             $this->values['sm_default'] = 0;

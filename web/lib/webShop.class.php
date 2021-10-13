@@ -478,8 +478,7 @@ class webShop extends ancestor {
 
 	public function getProductDetails($productId){
 		if($this->isProductAvailable($productId)) {
-			$this->updateViewCounter($productId);
-			return $this->product->init($productId)->getProduct();
+			return $this->product->init($productId)->updateViewCounter()->getProduct();
 		}else{
 			return false;
 		}
@@ -592,24 +591,6 @@ class webShop extends ancestor {
 		}
 
 		return ($orderby ? ' ORDER BY ' .implode(', ', $orderby) : '' ) . ($limit ? ' LIMIT ' . $from . ', ' . $pager['limit'] : '');
-	}
-
-	private function updateViewCounter($productId){
-		if(!$this->owner->getSession('pw-' . $productId) && !$this->isAdmin){
-			$this->owner->db->sqlQuery(
-				$this->owner->db->genSQLUpdate(
-					'products',
-					[
-						'prod_views' => 'INCREMENT',
-					],
-					[
-						'prod_id' => $productId
-					]
-				)
-			);
-
-			$this->owner->setSession('pw-' . $productId, true);
-		}
 	}
 
     private function getProductsByTags(array $tags):array{

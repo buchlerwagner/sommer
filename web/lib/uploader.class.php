@@ -4,15 +4,28 @@ abstract class uploader extends ancestor {
 
     abstract protected function init();
 
-    abstract protected function doUpload(array $uploadData): array;
+    abstract protected function doUpload(array $uploadData, $fileId = false): array;
 
     abstract protected function doDelete(int $fileId): void;
 
     abstract protected function doSort(array $list): void;
 
-    abstract protected function setDefault(int $fileId): void;
+    abstract protected function setDefault(int $fileId): array;
 
-    public function upload(int $id, string $uploaderFormName): array{
+    abstract protected function loadFiles(): array;
+
+    abstract protected function doRename(int $fileId, string $title): array;
+
+    abstract protected function doEdit(int $fileId, array $options): void;
+
+    public function load($id): array{
+        $this->id = $id;
+
+        $this->init();
+        return $this->loadFiles();
+    }
+
+    public function upload(int $id, string $uploaderFormName, $fileId = false): array{
         $this->id = $id;
 
         $this->init();
@@ -31,6 +44,24 @@ abstract class uploader extends ancestor {
         $this->id = $id;
 
         $this->init()->doSort($list);
+    }
+
+    public function mark(int $id, int $fileId){
+        $this->id = $id;
+
+        return $this->init()->setDefault($fileId);
+    }
+
+    public function rename(int $id, int $fileId, string $title){
+        $this->id = $id;
+
+        return $this->init()->doRename($fileId, $title);
+    }
+
+    public function edit(int $id, int $fileId, array $options){
+        $this->id = $id;
+
+        $this->init()->doEdit($fileId, $options);
     }
 
     protected function getSetup():array {

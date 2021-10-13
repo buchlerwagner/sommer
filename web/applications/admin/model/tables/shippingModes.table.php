@@ -35,4 +35,45 @@ class shippingModesTable extends table {
             true
         );
 	}
+
+    public function onAfterDelete($keyFields, $real = true) {
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLDelete(
+                'shipping_intervals',
+                [
+                    'si_sm_id' => $keyFields['sm_id'],
+                    'si_shop_id' => $this->owner->shopId
+                ]
+            )
+        );
+    }
+
+    public function onAfterCopy($keyFields, $newId) {
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'shipping_intervals',
+                [
+                    'si_shop_id',
+                    'si_time_start',
+                    'si_time_end',
+                ],
+                [
+                    'si_sm_id' => $keyFields['sm_id'],
+                    'si_shop_id' => $this->owner->shopId
+                ]
+            )
+        );
+        if($result){
+            foreach($result AS $row){
+                $row['si_sm_id'] = $newId;
+
+                $this->owner->db->sqlQuery(
+                    $this->owner->db->genSQLInsert(
+                        'shipping_intervals',
+                        $row
+                    )
+                );
+            }
+        }
+    }
 }

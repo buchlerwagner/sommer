@@ -1,0 +1,223 @@
+
+/***
+
+====================================================================
+		Comment Area
+====================================================================
+
+ ***/
+
+.group-title{
+  position: relative;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.group-title h3{
+  position: relative;
+  display: inline-block;
+  font-size: 36px;
+  line-height: 1.2em;
+  color: #4b4342;
+  font-weight: 500;
+}
+
+.comments-area{
+  position:relative;
+  margin-bottom: 50px;
+}
+
+.comments-area .comment-box{
+  position: relative;
+}
+
+.comments-area .comment-box.reply-comment{
+  margin-left: 100px;
+}
+
+.comments-area .comment{
+  position:relative;
+  min-height: 60px;
+  padding-left: 70px;
+  margin-bottom: 20px;
+}
+
+.comments-area .comment-box .author-thumb{
+  position:absolute;
+  left:0px;
+  top:0px;
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.comments-area .comment-box .author-thumb img{
+  width:100%;
+  display:block;
+}
+
+.comments-area .comment-info{
+  position: relative;
+  display: block;
+  padding-top: 5px;
+}
+
+.comments-area .comment-box .name{
+  position: relative;
+  display: inline-block;
+  font-size:17px;
+  line-height:1.2em;
+  font-weight:700;
+  color:$light-blue;
+}
+
+.comments-area .comment-box .date{
+  position: relative;
+  display: inline-block;
+  font-size: 17px;
+  line-height: 25px;
+  color: #333e4f;
+}
+
+.comments-area .comment-box .text{
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.comments-area .comment-box .rating{
+  float: right;
+  font-size: 10px;
+  line-height: 18px;
+  color: #ebba44;
+  margin-top: -20px;
+}
+
+.comments-area .comment-box .reply-btn{
+  position: absolute;
+  right: 0;
+  top: 0px;
+  font-size: 14px;
+  line-height: 15px;
+  color: $white;
+  padding: 5px 10px;
+  font-weight: 400;
+  background-color: #156f89;
+  border-radius: 5px;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.comments-area .comment-box .reply-btn:hover{
+  box-shadow: 0 10px 10px rgba(0,0,0,0.10);
+}
+
+/***
+
+====================================================================
+		Comment Form
+====================================================================
+
+ ***/
+
+.comment-form{
+  position: relative;
+}
+
+.comment-form .sub-title{
+  font-size: 18px;
+}
+
+.comment-form .form-outer{
+  position: relative;
+  border-radius: 20px;
+  border:4px solid #f8f8f8;
+  padding: 20px 30px 0px;
+  background: #f8f8f8;
+}
+
+.comment-form .form-outer p{
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.comment-form .row{
+  margin: 0 -5px;
+}
+
+.comment-form .form-group{
+  position:relative;
+  padding: 0 5px;
+  margin-bottom: 30px;
+}
+
+.comment-form .form-group .field-label{
+  font-size: 17px;
+  line-height: 29px;
+  color: #4b4342;
+}
+
+.comment-form .form-group input[type="text"],
+.comment-form .form-group input[type="email"],
+.comment-form .form-group input[type="url"],
+.comment-form .form-group textarea,
+.comment-form .form-group select{
+  position: relative;
+  display: block;
+  height: 42px;
+  width: 100%;
+  font-size: 15px;
+  color: #4b4342;
+  line-height: 20px;
+  font-weight: 400;
+  padding: 10px 20px;
+  background-color: $white;
+  border: 1px solid #edecec;
+  -webkit-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.comment-form .form-group input:focus,
+.comment-form .form-group select:focus,
+.comment-form .form-group textarea:focus{
+  border-color:#156f89;
+}
+
+.comment-form .form-group textarea{
+  height: 250px;
+  resize: none;
+}
+
+.comment-form .form-group input[type="submit"],
+.comment-form .form-group button{
+  position: relative;
+  display: inline-block;
+  background-color: $white;
+  color: $pink;
+  font-size: 17px;
+  padding: 4px 20px;
+  line-height: 30px;
+  font-family: $header-font-family;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 160px;
+  border-radius: 5px;
+  border: 1px solid $pink;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.comment-form .form-group input[type="submit"]:hover,
+.comment-form .form-group button:hover{
+  color: $white;
+  background-color: $pink;
+}

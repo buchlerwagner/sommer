@@ -1,15 +1,28 @@
+ALTER TABLE `shipping_modes` ADD COLUMN `sm_day_diff` INT(11) NULL DEFAULT 0 AFTER `sm_order`;
+ALTER TABLE `shipping_modes` ADD COLUMN `sm_intervals` TINYINT(1) NULL DEFAULT 0 AFTER `sm_day_diff`;
+ALTER TABLE `shipping_modes` ADD COLUMN `sm_custom_interval` TINYINT(1) NULL DEFAULT 0 AFTER `sm_intervals`;
+ALTER TABLE `shipping_modes` ADD COLUMN `sm_custom_text` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `sm_custom_interval`;
+ALTER TABLE `cart` ADD COLUMN `cart_si_id` INT(11) NULL DEFAULT NULL AFTER `cart_sm_id`;
+ALTER TABLE `cart` ADD COLUMN `cart_custom_interval` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_remarks`;
+
+CREATE TABLE `shipping_intervals` (
+  `si_id` int(11) NOT NULL AUTO_INCREMENT,
+  `si_sm_id` int(11) DEFAULT NULL,
+  `si_shop_id` int(11) DEFAULT NULL,
+  `si_time_start` time DEFAULT NULL,
+  `si_time_end` time DEFAULT NULL,
+  PRIMARY KEY (`si_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+
+
+
+
+
 ALTER TABLE `products` ADD COLUMN `prod_pkg_id` INT(11) NULL DEFAULT 0 AFTER `prod_pack_unit`;
 ALTER TABLE `product_variants` ADD COLUMN `pv_pkg_id` INT(11) NULL DEFAULT 0 AFTER `pv_pack_quantity`;
 ALTER TABLE `cart` ADD COLUMN `cart_packaging_fee` DOUBLE NULL DEFAULT 0 AFTER `cart_subtotal`;
 ALTER TABLE `products` ADD COLUMN `prod_pack_pcs_unit` INT(11) NULL DEFAULT 0 AFTER `prod_pack_quantity`;
 ALTER TABLE `product_variants` ADD COLUMN `pv_pack_pcs_unit` INT(11) NULL DEFAULT 0 AFTER `pv_pack_unit`;
-
-
-
-
-
-
-
 
 
 

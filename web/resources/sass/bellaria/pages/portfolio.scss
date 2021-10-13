@@ -1,0 +1,991 @@
+
+
+/***
+
+====================================================================
+		Portfolio Section
+====================================================================
+
+***/
+
+.portfolio-section{
+  position: relative;
+  padding: 30px 0 85px;
+}
+
+.portfolio-section .auto-container{
+  max-width: 1230px;
+}
+
+.portfolio-section .sec-title{
+  margin-bottom: 40px;
+}
+
+.portfolio-section .row{
+  margin: 0 -10px;
+}
+
+.portfolio-section .row.masonry-items-container{
+  margin: 0;
+}
+
+.portfolio-block{
+  padding: 0 10px;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.portfolio-block .inner-box{
+  position: relative;
+}
+
+.portfolio-block .image-box{
+  position: relative;
+}
+
+.portfolio-block .image{
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.portfolio-block .image img{
+  display: block;
+  width: 100%;
+}
+
+.portfolio-block .link,
+.portfolio-block .hover-effect,
+.portfolio-block .portfolio-hover{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.portfolio-block .portfolio-hover{
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block .inner-box:hover .portfolio-hover{
+  opacity: 1;
+  visibility: visible;
+}
+
+.portfolio-block .hover-effect svg{
+  fill:rgba(255,255,255,0.7);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+
+.portfolio-block .portfolio-hover h3{
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  font-size: 24px;
+  font-weight: 500;
+  color: #4b4342;
+  padding: 0 15%;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block .inner-box:hover .portfolio-hover h3{
+  -webkit-transition-delay: 100ms;
+  -moz-transition-delay: 100ms;
+  -ms-transition-delay: 100ms;
+  -o-transition-delay: 100ms;
+  transition-delay: 100ms;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  visibility: visible;
+  opacity: 1;
+}
+
+.portfolio-block .portfolio-hover h3 a{
+  color: #4b4342;
+  display: inline-block;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block .portfolio-hover h3 a:hover{
+  opacity: 0.7;
+}
+
+.portfolio-section.pull-up{
+  margin-top: -40px;
+}
+
+.portfolio-section.alternate{
+  margin-top: -60px;
+  padding: 110px 0 90px;
+}
+
+.portfolio-section.alternate2{
+  padding: 90px 0 40px;
+}
+
+/***
+
+====================================================================
+		Portfolio Section Two
+====================================================================
+
+***/
+
+.portfolio-section-two{
+  position: relative;
+  padding: 65px 0 80px;
+}
+
+.portfolio-section-two .sec-title{
+  margin-bottom: 40px;
+}
+
+.portfolio-tabs{
+  position: relative;
+  padding: 0 15px;
+}
+
+.portfolio-tabs .btns-box{
+  position: relative;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.portfolio-tabs .tab-buttons{
+  position: relative;
+  display: inline-block;
+  border: 3px solid #edecec;
+  border-radius: 30px;
+  padding: 5px 30px;
+}
+
+.portfolio-tabs .tab-buttons:before,
+.portfolio-tabs .tab-buttons:after{
+  position: absolute;
+  left: calc(100% + 13px);
+  top: 50%;
+  margin-top: -1.5px;
+  width: 107px;
+  background-color: #edecec;
+  height: 3px;
+  content: "";
+}
+
+.portfolio-tabs .tab-buttons:after{
+  left: auto;
+  right: calc(100% + 13px);
+}
+
+.portfolio-tabs .tab-btn{
+  position: relative;
+  display: inline-block;
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 8px 9px;
+  z-index: 3;
+  font-family: $header-font-family;
+  color: #4b4342;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.portfolio-tabs .tab-btn:hover,
+.portfolio-tabs .tab-btn.active-btn{
+  color: $pink;
+}
+
+.portfolio-tabs .tabs-content{
+  position: relative;
+}
+
+.portfolio-tabs .tabs-content .tab{
+  position: relative;
+}
+
+.portfolio-block-two{
+  padding: 0 10px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.portfolio-block-two .inner-box{
+  position: relative;
+}
+
+.portfolio-block-two .image-box{
+  position: relative;
+  -webkit-transform: scale(.7);
+  -moz-transform: scale(.7);
+  -ms-transform: scale(.7);
+  -o-transform: scale(.7);
+  transform: scale(.7);
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.portfolio-tabs .active-tab .portfolio-block-two .image-box{
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -ms-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+}
+
+.portfolio-block-two .image{
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.portfolio-block-two .image img{
+  display: block;
+  width: 100%;
+}
+
+.portfolio-block-two .link,
+.portfolio-block-two .hover-effect,
+.portfolio-block-two .portfolio-hover{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+.portfolio-block-two .portfolio-hover{
+  opacity: 0;
+  visibility: hidden;
+  border-radius: 10px;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block-two .inner-box:hover .portfolio-hover{
+  opacity: 1;
+  visibility: visible;
+}
+
+.portfolio-block-two .hover-effect svg{
+  fill:rgba(255,255,255,0.7);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+
+.portfolio-block-two .portfolio-hover h3{
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  font-size: 24px;
+  font-weight: 500;
+  color: #4b4342;
+  padding: 0 20%;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block-two .inner-box:hover .portfolio-hover h3{
+  -webkit-transition-delay: 100ms;
+  -moz-transition-delay: 100ms;
+  -ms-transition-delay: 100ms;
+  -o-transition-delay: 100ms;
+  transition-delay: 100ms;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  visibility: visible;
+  opacity: 1;
+}
+
+.portfolio-block-two .portfolio-hover h3 a{
+  color: #4b4342;
+  display: inline-block;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block-two .portfolio-hover h3 a:hover{
+  opacity: 0.7;
+}
+
+/***
+
+====================================================================
+		Portfolio Section Three
+====================================================================
+
+***/
+
+.portfolio-section-three{
+  position: relative;
+  padding: 80px 0 50px;
+}
+
+.portfolio-section-three .outer-box{
+  position: relative;
+  margin: 0 -15px;
+}
+
+.portfolio-carousel{
+  position: relative;
+}
+
+.portfolio-block-thre{
+  position: relative;
+  padding: 0 15px;
+}
+
+.portfolio-block-thre .image-box{
+  position: relative;
+}
+
+.portfolio-block-thre .image{
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.portfolio-block-thre .image img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.portfolio-carousel .owl-dots{
+  position: relative;
+  margin-top: 50px;
+  width: 100%;
+  text-align: center;
+}
+
+.portfolio-carousel .owl-dot{
+  position: relative;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: $pink;
+  opacity: 0.6;
+}
+
+.portfolio-carousel .owl-dot:hover,
+.portfolio-carousel .owl-dot.active{
+  opacity: 1;
+}
+
+/***
+
+====================================================================
+		Portfolio Page Sections
+====================================================================
+
+***/
+
+.portfolio-masonry .portfolio-block .hover-effect svg{
+  fill: rgba(247,173,180,0.7);
+}
+
+.portfolio-masonry .portfolio-block .portfolio-hover h3 a{
+  color: $white;
+}
+
+.portfolio-masonry-wide .portfolio-block .hover-effect svg{
+  fill: rgba(146,205,219,0.7);
+}
+
+.portfolio-masonry-wide .portfolio-block .portfolio-hover h3 a{
+  color: $white;
+}
+
+.portfolio-with-filter .portfolio-block-four .hover-effect svg{
+  fill: rgba(131,234,115,0.6);
+}
+
+.portfolio-two-column .portfolio-block-four .hover-effect svg{
+  fill: rgba(255,255,255,0.7);
+}
+
+.portfolio-with-sidebar .portfolio-block-four{
+  padding: 0;
+}
+
+.portfolio-with-sidebar .portfolio-block-four .lower-content{
+  text-align: left;
+}
+
+.portfolio-with-sidebar .portfolio-block-four .hover-effect svg{
+  fill: rgba(255,255,255,0.7);
+}
+
+.portfolio-square .portfolio-block-four{
+  margin-bottom: 20px;
+}
+
+.portfolio-wide .row{
+  margin: 0;
+}
+
+.portfolio-section .portfolio-block-four.mix{
+  display: none;
+}
+
+.mixitup-gallery .filters{
+  position: relative;
+  margin-top: -10px;
+  margin-bottom: 35px;
+  text-align: center;
+}
+
+.mixitup-gallery .filter{
+  position: relative;
+  display: inline-block;
+  font-size: 24px;
+  color: #4b4342;
+  cursor: pointer;
+  padding: 0 51px;
+  font-family: $header-font-family;
+  font-weight: 500;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.mixitup-gallery .filter:before{
+  position: absolute;
+  right: -12px;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  background-image: url(../../themes/bellaria/images/icons/filter_before.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  content: "";
+}
+
+.mixitup-gallery .filter:last-child:before{
+  display: none;
+}
+
+.mixitup-gallery .filter .filter_shape{
+  position: relative;
+  width: 47px;
+  margin: 0 auto;
+  display: block;
+  fill: $pink;
+  bottom: 2px;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.mixitup-gallery .filter.active{
+  color: $pink;
+}
+
+.mixitup-gallery .filter.active .filter_shape{
+  opacity: 1;
+  visibility: visible;
+}
+
+/*=== Portfolio Block Four ===*/
+
+.portfolio-block-four{
+  position: relative;
+  padding: 0 10px;
+  margin-bottom: 40px;
+}
+
+.portfolio-block-four .inner-box{
+  position: relative;
+}
+
+.portfolio-block-four .image-box{
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.portfolio-block-four .image-box .image{
+  position: relative;
+  margin-bottom: 0;
+}
+
+.portfolio-block-four .image img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.portfolio-block-four .link,
+.portfolio-block-four .hover-effect{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block-four .inner-box:hover .link,
+.portfolio-block-four .inner-box:hover .hover-effect{
+  opacity: 1;
+  visibility: visible;
+}
+
+.portfolio-block-four .hover-effect svg{
+  fill:rgba(244,149,193,0.7);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+
+.portfolio-block-four .lower-content{
+  position: relative;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.portfolio-block-four .title-box{
+  position: relative;
+}
+
+.portfolio-block-four .title-box h3{
+  position: relative;
+  font-size: 24px;
+  line-height: 1.2em;
+  color: #4b4342;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+.portfolio-block-four .title-box h3 svg{
+  position: relative;
+  display: inline-block;
+  width: 39px;
+  height: 13px;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block-four .title-box h3 a{
+  color: #4b4342;
+  display: inline-block;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.portfolio-block-four .title-box h3 a:hover svg{
+  fill: $pink;
+}
+
+.portfolio-block-four .title-box h3 a:hover{
+  color: $pink;
+}
+
+.portfolio-block-four .title-box h3 .div_left{
+  margin-right: 10px;
+}
+
+.portfolio-block-four .title-box h3 .div_right{
+  margin-left: 10px;
+}
+
+/***
+
+====================================================================
+		Portfolio Single
+====================================================================
+
+***/
+
+.portfolio-single{
+  position: relative;
+  padding: 80px 0 30px;
+}
+
+.portfolio-single .content-box{
+  position: relative;
+}
+
+.portfolio-single .image-box{
+  position: relative;
+}
+
+.portfolio-single .image{
+  position: relative;
+  margin-bottom: 0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.portfolio-single .image img{
+  display: block;
+  width: 100%;
+}
+
+.portfolio-single .lower-content{
+  position: relative;
+  padding-top: 30px;
+  margin-bottom: 40px;
+}
+
+.portfolio-single .two-column{
+  position: relative;
+}
+
+.portfolio-single .title-box{
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.portfolio-single h3{
+  position: relative;
+  font-size: 36px;
+  line-height: 1.2em;
+  font-weight: 600;
+  color: #4b4342;
+  margin-bottom: 7px;
+}
+
+.portfolio-single h4{
+  font-size: 28px;
+  line-height: 39px;
+  color: #4b4342;
+  margin-bottom: 20px;
+}
+
+.portfolio-single .term{
+  color: $light-blue;
+  font-size: 15px;
+}
+
+.portfolio-single p{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+blockquote{
+  display: block;
+  position: relative;
+  text-align: center;
+  color: #4b4342;
+  border: 4px solid #edecec;
+  padding: 25px 10%;
+  border-radius: 30px;
+  font-size: 26px;
+  line-height: 40px;
+  margin-top: 20px;
+  margin-bottom: 1em;
+  font-family: $header-font-family;
+}
+
+blockquote:before,
+blockquote:after{
+  content: '“';
+  color: $pink;
+  font-size: 60px;
+  position: absolute;
+  left: 50%;
+  top: -13px;
+  margin-left: -22px;
+  line-height: 0.9;
+  height: 20px;
+  width: 44px;
+  background: #fff;
+}
+
+blockquote:after {
+  content: '”';
+  bottom: -13px;
+  top: initial;
+}
+
+/* Post control Option */
+
+.post-control-option{
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.post-control-option li{
+  overflow: hidden;
+}
+
+.post-control-option li.prev a,
+.post-control-option li.next a{
+  position: relative;
+  display: block;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  line-height: 24px;
+  font-size: 17px;
+  color: #4b4342;
+  font-weight: 600;
+  min-width: 50px;
+  z-index: 2;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.post-control-option li.next .fa,
+.post-control-option li.prev .fa{
+  position: absolute;
+  left: 0;
+  top: 1px;
+  height: 38px;
+  line-height: 38px;
+  width: 36px;
+  text-align: center;
+  background-color: $white;
+  z-index: 1;
+}
+
+.post-control-option li.next .fa{
+  right: 0;
+  left: auto;
+}
+
+.post-control-option li .wrap{
+  position: relative;
+  display: inline-block;
+  margin-left: -60px;
+  opacity: 0;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.post-control-option li.next .wrap{
+  margin-left: 0;
+  margin-right: -60px;
+}
+
+.post-control-option li.next a{
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.post-control-option li.prev a:hover{
+  border: 1px solid #cccccc;
+  padding-left: 36px;
+}
+
+.post-control-option li.next a:hover{
+  border: 1px solid #cccccc;
+  padding-right: 36px;
+}
+
+.post-control-option li a:hover .wrap{
+  opacity: 1;
+  margin: 0;
+}
+
+.post-control-option .load-more{
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  overflow: auto;
+}
+
+.post-control-option .load-more a{
+  width: 22px;
+  height: 22px;
+  margin-top: 6px;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.post-control-option .load-more .back_link span{
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border: 1px solid #cfd0d0;
+  transition: all 0.2s cubic-bezier(0.000, 0.000, 0.580, 1.000);
+}
+
+.post-control-option .load-more .back_link span:nth-child(1){
+  top: 0;
+  left: 0;
+}
+
+.post-control-option .load-more .back_link span:nth-child(2){
+  top: 0;
+  left: 8px;
+}
+
+.post-control-option .load-more .back_link span:nth-child(3){
+  top: 0;
+  left: 16px;
+}
+
+.post-control-option .load-more .back_link span:nth-child(4){
+  top: 8px;
+  left: 0;
+}
+
+.post-control-option .load-more .back_link span:nth-child(5){
+  top: 8px;
+  left: 8px;
+}
+
+.post-control-option .load-more .back_link span:nth-child(6){
+  top: 8px;
+  left: 16px;
+}
+
+.post-control-option .load-more .back_link span:nth-child(7){
+  top: 16px;
+  left: 0;
+}
+
+.post-control-option .load-more .back_link span:nth-child(8){
+  top: 16px;
+  left: 8px;
+}
+
+.post-control-option .load-more .back_link span:nth-child(9){
+  top: 16px;
+  left: 16px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(1){
+  top: -2px;
+  left: -2px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(2){
+  top: -2px;
+  left: 8px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(3){
+  top: -2px;
+  left: 18px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(4){
+  top: 8px;
+  left: -2px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(5){
+  top: 8px;
+  left: 8px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(6){
+  top: 8px;
+  left: 18px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(7){
+  top: 18px;
+  left: -2px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(8){
+  top: 18px;
+  left: 8px;
+}
+
+.post-control-option .load-more .back_link:hover span:nth-child(9){
+  top: 18px;
+  left: 18px;
+}

@@ -1,0 +1,125 @@
+
+/***
+
+====================================================================
+	About Section
+====================================================================
+
+***/
+
+.about-section{
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 100px 0 100px;
+}
+
+.devider_icon_one{
+  display: inline-block;
+  height: 39px;
+  width: 82px;
+  background-image: url(../../themes/bellaria/images/icons/icon-devider.png);
+  background-size: 100%;
+}
+
+.about-section .sec-title{
+  margin-bottom: 13px;
+}
+
+.about-section .content-box{
+  position: relative;
+  text-align: center;
+}
+
+.about-section .content-box h1{
+  position: relative;
+  font-size: 120px;
+  line-height: 1em;
+  color: $pink;
+  font-weight: 500;
+  margin-bottom: 40px;
+}
+
+.about-section .devider_icon_one{
+  margin-bottom: 10px;
+}
+
+.about-section .content-box p{
+  position: relative;
+  margin-bottom: 35px;
+}
+
+.about-section .feature-list{
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto 40px;
+}
+
+.about-section .feature-list li{
+  position: relative;
+  float: left;
+  width: 25%;
+  font-size: 30px;
+  color: #4b4342;
+  margin-bottom: 20px;
+  font-family: $header-font-family;
+}
+
+/***
+
+====================================================================
+	About Section Two
+====================================================================
+
+***/
+
+.about-section-two{
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 100px 0 120px;
+}
+
+.about-section-two .sec-title{
+  margin-bottom: 20px;
+}
+
+.about-section-two .content-box{
+  position: relative;
+  max-width: 570px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about-section-two .content-box p{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.about-section-two .designation{
+  font-size: 18px;
+  color: #4b4342;
+  font-weight: 500;
+}
+
+.about-section-two .devider_icon_one{
+  margin-bottom: 20px;
+}
+
+.about-section-two.alternate{
+  padding: 110px 0 40px;
+}
+
+.about-section-two.alternate .sec-title{
+  margin-bottom: 10px;
+}
+
+.about-section-two.alternate .sec-title .divider{
+  margin-bottom: 0;
+}
+
+.about-section-two.alternate .devider_icon_one{
+  margin-bottom: 0px;
+}

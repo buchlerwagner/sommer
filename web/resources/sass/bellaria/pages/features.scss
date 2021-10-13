@@ -1,0 +1,325 @@
+
+/***
+
+====================================================================
+		Features Section
+====================================================================
+
+***/
+
+.features-section{
+  position: relative;
+  overflow: hidden;
+  padding: 110px 0 150px;
+  z-index: 2;
+}
+
+.feature-block{
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.feature-block .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.feature-block h3{
+  position: relative;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: $white;
+  margin-bottom: 10px;
+}
+
+.feature-block p{
+  position: relative;
+  color: $white;
+}
+
+.feature-block .icon-box{
+  position: relative;
+  display: inline-block;
+  height: 125px;
+  width: 125px;
+  margin-bottom: 25px;
+}
+
+.feature-block .icon-box svg{
+  stroke-width:12px;
+  fill:transparent;
+  stroke:$white;
+}
+
+.feature-block .icon{
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  text-align: center;
+  z-index: 1;
+  color: $white;
+  font-size: 62px;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.features-section .btn-box{
+  position: relative;
+  text-align: center;
+}
+
+.features-section.style-two{
+  padding: 130px 0 95px;
+  margin-bottom: -100px;
+}
+
+.features-section.style-two .overlay{
+  background-color: rgba(249,129,147,0.8);
+}
+
+.features-section.style-two .sec-title{
+  margin-bottom: 70px;
+}
+
+/***
+
+====================================================================
+		Features Section Two
+====================================================================
+
+***/
+
+.features-section-two{
+  position: relative;
+  overflow: hidden;
+  padding: 120px 0 90px;
+  z-index: 2;
+}
+
+.features-section-two .overlay{
+  background-color: rgba(94,94,94,0.5);
+}
+
+.feature-block-two{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.feature-block-two .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.feature-block-two h3{
+  position: relative;
+  font-size: 30px;
+  line-height: 1.2em;
+  color: $white;
+  margin-bottom: 10px;
+}
+
+.feature-block-two p{
+  position: relative;
+  color: $white;
+  margin-bottom: 30px;
+}
+
+.feature-block-two .icon-box{
+  position: relative;
+  display: inline-block;
+  height: 120px;
+  width: 120px;
+  margin-bottom: 20px;
+}
+
+.feature-block-two .icon-box svg{
+  fill:$white;
+  stroke:$white;
+}
+
+.feature-block-two .icon{
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  text-align: center;
+  z-index: 1;
+  color: $white;
+  font-size: 70px;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.features-section-two .btn-box{
+  position: relative;
+  text-align: center;
+}
+
+.features-section-two .btn-box a:hover span:before,
+.features-section-two .btn-box a:hover{
+  background-color: $white;
+  color: #4b4342;
+}
+
+/***
+
+====================================================================
+		Features Section Three
+====================================================================
+
+***/
+
+.features-section-three{
+  position: relative;
+  padding: 75px 0 90px;
+  background-color: #f8f5f1;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+}
+
+.features-section-three .image-column{
+  position: relative;
+}
+
+.feature-block-three{
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.feature-block-three .inner-box{
+  position: relative;
+  padding-right: 100px;
+  text-align: right;
+}
+
+.feature-block-three .icon-box{
+  position: absolute;
+  right: 0;
+  top: 0;
+  text-align: center;
+}
+
+.feature-block-three .icon-box .icon{
+  position: relative;
+  display: block;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  font-size: 50px;
+  line-height: 74px;
+  color: #4b4342;
+  border: 3px solid #4b4342;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.feature-block-three .inner-box:hover .icon-box .icon{
+  background-color: #4b4342;
+  color: $white;
+}
+
+.feature-block-three h3{
+  position: relative;
+  font-size: 30px;
+  color: #4b4342;
+  margin-bottom: 10px;
+}
+
+.feature-block-three p{
+  position: relative;
+}
+
+.features-section-three .left-column{
+  position: relative;
+}
+
+.features-section-three .right-column{
+  position: relative;
+  order: 12;
+}
+
+.features-section-three .right-column .feature-block-three .inner-box{
+  text-align: left;
+  padding-left: 100px;
+  padding-right: 0;
+}
+
+.features-section-three .right-column .feature-block-three .icon-box{
+  left: 0;
+  right: auto;
+}
+
+/***
+
+====================================================================
+		Features Section Four
+====================================================================
+
+***/
+
+.features-section-four{
+  position: relative;
+  padding: 100px 0 105px;
+  margin-top: -55px;
+}
+
+.features-section-four .overlay{
+  background-color: $pink !important;
+}
+
+.feature-block-four{
+  position: relative;
+  margin-bottom: 70px;
+}
+
+.feature-block-four .inner-box{
+  position: relative;
+  text-align: center;
+}
+
+.feature-block-four .icon{
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  font-size: 56px;
+  color: $white;
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+  margin-bottom: 35px;
+}
+
+.feature-block-four h4{
+  position: relative;
+  font-size: 28px;
+  color: $white;
+  margin-bottom: 20px;
+}
+
+.feature-block-four p{
+  position: relative;
+  color: $white;
+}

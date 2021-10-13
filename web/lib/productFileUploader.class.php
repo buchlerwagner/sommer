@@ -20,7 +20,7 @@ class productFileUploader extends uploader {
         ];
     }
 
-    protected function doUpload(array $uploadData): array {
+    protected function doUpload(array $uploadData, $fileId = false): array {
         $data = [];
 
         if ($uploadData['isSuccess']) {
@@ -100,11 +100,13 @@ class productFileUploader extends uploader {
         $this->product->reorderImages($list)->setDefaultImg();
     }
 
-    protected function setDefault(int $fileId): void {
+    protected function setDefault(int $fileId): array {
         $img = $this->product->getImage($fileId);
         if($img) {
             $this->product->setDefaultImg($img['pimg_filename'] . ' ' . $img['pimg_extension']);
         }
+
+        return [];
     }
 
     protected function init(){
@@ -144,5 +146,16 @@ class productFileUploader extends uploader {
         }
 
         return $newFileName;
+    }
+
+    protected function loadFiles(): array {
+        return [];
+    }
+
+    protected function doRename(int $fileId, string $title): array {
+        return [];
+    }
+
+    protected function doEdit(int $fileId, array $options): void {
     }
 }

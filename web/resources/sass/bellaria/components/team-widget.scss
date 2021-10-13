@@ -1,0 +1,130 @@
+
+/*Team Widget*/
+
+.team-widget{
+  position: relative;
+}
+
+.team-widget .single-item-carousel{
+  position: relative;
+}
+
+.team-widget .single-item-carousel .owl-nav{
+  display: none;
+}
+
+.team-widget .owl-dots{
+  position: relative;
+  margin-top: 15px;
+  width: 100%;
+  text-align: center;
+}
+
+.team-widget .owl-dot{
+  position: relative;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: $pink;
+  opacity: 0.6;
+}
+
+.team-widget .owl-dot:hover,
+.team-widget .owl-dot.active{
+  opacity: 1;
+}
+
+.team-block-two{
+  position: relative;
+}
+
+.team-block-two .inner-box{
+  position: relative;
+  padding: 15px 10px;
+  padding-left: 75px;
+  border-radius: 10px;
+}
+
+.team-block-two .thumb{
+  position: absolute;
+  left: 10px;
+  top: 15px;
+  width: 60px;
+}
+
+.team-block-two .thumb img{
+  width: 100%;
+  display: block;
+}
+
+.team-block-two h4{
+  position: relative;
+  font-size: 16px;
+  line-height: 1.2em;
+  color: #4b4342;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.team-block-two .text{
+  font-size: 16px;
+  line-height: 25px;
+  color: $pink;
+}
+
+.team-block-two .text a{
+  color: $pink;
+}
+
+.team-block-two.active .inner-box{
+  background-color: #f8f8f8;
+}
+
+.category-widget{
+  position: relative;
+}
+
+.categories-list{
+  position: relative;
+}
+
+.categories-list li{
+  position: relative;
+  color: #363636;
+  font-weight: 500;
+  font-size: 16px;
+  padding-left: 35px;
+  padding-right: 20px;
+  background:#f8f8f8;
+  border-radius: 30px;
+  line-height: 40px;
+}
+
+.categories-list li:nth-child(even){
+  background-color: $white;
+}
+
+.categories-list li:before{
+  position: absolute;
+  top: 0;
+  left: 10px;
+  font-family: flaticon;
+  content: "\f111";
+  color: $light-blue;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.categories-list li a{
+  color: #363636;
+  font-weight: 500;
+  display: inline-block;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
