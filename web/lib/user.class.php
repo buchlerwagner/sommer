@@ -59,8 +59,10 @@ class user extends ancestor {
         $user = false;
 
         if($userId) {
+            /*
             $user = $this->owner->mem->get(CACHE_USER_PROFILE . (int) $userId);
             if (!$user) {
+            */
                 $row = $this->owner->db->getFirstRow(
                     "SELECT * 
 					    FROM " . DB_NAME_WEB . ".users
@@ -98,8 +100,10 @@ class user extends ancestor {
                     $user['img'] = $this->setProfilePicture($user);
                 }
 
+            /*
                 $this->owner->mem->set(CACHE_USER_PROFILE . $user['id'], $user);
             }
+            */
         }
 
         return $user;

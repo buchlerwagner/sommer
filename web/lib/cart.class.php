@@ -344,7 +344,7 @@ class cart extends ancestor {
                         'firstName' => $user['firstname'],
                         'lastName' => $user['lastname'],
                         'name' => $user['name'],
-                        'email' => ($user['role'] == USER_ROLE_NONE ? $user['email2'] : $user['email']),
+                        'email' => $user['email'],
                         'phone' => $user['phone'],
                     ];
 
