@@ -162,9 +162,8 @@ abstract class formBuilder extends model {
 				}
 
 				foreach($validActions as $action) {
-					if (isset($_REQUEST[$this->name][$action['name']])) {
+                    if (isset($_REQUEST[$this->name][$action['name']])) {
                         if ($this->validate($action['skipValidation'])) {
-
 							$this->state = FORM_STATE_VALIDATED;
 							if (strtolower($action['name']) == 'save' && !$this->readonly) {
 								$this->state = FORM_STATE_SAVED;

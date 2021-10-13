@@ -93,6 +93,11 @@
                             <span class="text-secondary">{{ _('LBL_ORDER_STATUS') }}:</span>
                             <b>{{ orderState(form.cart.orderStatus)|raw }}</b>
                         </div>
+                        {% if form.cart.orderStatus != 'CLOSED' and form.cart.orderStatus != 'RATED' %}
+                        <div class="text-center mt-3">
+                            <a href="/ajax/forms/setOrderStatus/{{ form.cart.id }}/" data-toggle="modal" data-target="#ajax-modal" class="btn btn-primary">{{ _('BTN_SET_STATUS') }}</a>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="col-6">
                         <div>

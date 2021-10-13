@@ -1,3 +1,11 @@
+UPDATE `templates` SET `mt_key` = 'order-new' WHERE `mt_id` = 172;
+ALTER TABLE `shipping_modes` ADD COLUMN `sm_type` INT(11) NULL DEFAULT 0 AFTER `sm_shop_id`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_order_status` `cart_order_status` ENUM('NEW','PROCESSING','RECEIVABLE','DELIVERING','FINISHED','RATED','CLOSED') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'NEW'  COMMENT '' AFTER `cart_status`;
+
+
+
+
+
 ALTER TABLE `shipping_modes` ADD COLUMN `sm_day_diff` INT(11) NULL DEFAULT 0 AFTER `sm_order`;
 ALTER TABLE `shipping_modes` ADD COLUMN `sm_intervals` TINYINT(1) NULL DEFAULT 0 AFTER `sm_day_diff`;
 ALTER TABLE `shipping_modes` ADD COLUMN `sm_custom_interval` TINYINT(1) NULL DEFAULT 0 AFTER `sm_intervals`;

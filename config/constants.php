@@ -193,6 +193,7 @@ $GLOBALS['IMAGE_SIZES'] = [
 const ORDER_STATUS_NEW = 'NEW';
 const ORDER_STATUS_PROCESSING = 'PROCESSING';
 const ORDER_STATUS_DELIVERING = 'DELIVERING';
+const ORDER_STATUS_RECEIVABLE = 'RECEIVABLE';
 const ORDER_STATUS_FINISHED = 'FINISHED';
 const ORDER_STATUS_CLOSED = 'CLOSED';
 
@@ -207,6 +208,10 @@ $GLOBALS['ORDER_STATUSES'] = [
     ],
     ORDER_STATUS_DELIVERING => [
         'name' => 'LBL_ORDER_STATUS_DELIVERING',
+        'class' => 'bg-success text-white',
+    ],
+    ORDER_STATUS_RECEIVABLE => [
+        'name' => 'LBL_ORDER_STATUS_RECEIVABLE',
         'class' => 'bg-success text-white',
     ],
     ORDER_STATUS_FINISHED => [

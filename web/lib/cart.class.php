@@ -23,7 +23,7 @@ class cart extends ancestor {
 	public $orderNumber;
 	public $total = 0;
 	public $subtotal = 0;
-	private $discount = 0;
+	public $discount = 0;
 	public $shippingFee = 0;
     private $shippingId = false;
     private $intervalId = false;
@@ -268,7 +268,7 @@ class cart extends ancestor {
         ];
 
         $this->owner->email->prepareEmail(
-            'new-order',
+            'order-new',
             $this->userId,
             $data,
             false,  // from
@@ -786,6 +786,7 @@ class cart extends ancestor {
                     [
                         'pm_id AS id',
                         'pm_name AS name',
+                        'pm_type AS type',
                         'pm_text AS text',
                         'pm_email_text AS emailText',
                     ],
@@ -813,6 +814,7 @@ class cart extends ancestor {
                     'sm_price AS price',
                     'sm_default AS def',
                     'sm_text AS text',
+                    'sm_type AS type',
                     'sm_day_diff AS dayDiff',
                     'sm_intervals AS hasIntervals',
                     'sm_custom_interval AS hasCustomInterval',
@@ -878,6 +880,7 @@ class cart extends ancestor {
                         'sm_id AS id',
                         'sm_name AS name',
                         'sm_text AS text',
+                        'sm_type AS type',
                         'sm_email_text AS emailText',
                         'sm_day_diff AS dayDiff',
                         'sm_custom_text AS customIntervalText',
@@ -1061,6 +1064,24 @@ class cart extends ancestor {
             );
 
             $this->destroyKey();
+        }
+    }
+
+    public function setOrderStatus($status){
+        if(isset($GLOBALS['ORDER_STATUSES'][$status])){
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'cart',
+                    [
+                        'cart_order_status' => $status,
+                    ],
+                    [
+                        'cart_id' => $this->id,
+                        'cart_shop_id' => $this->owner->shopId,
+                        'cart_key' => $this->key
+                    ]
+                )
+            );
         }
     }
 }

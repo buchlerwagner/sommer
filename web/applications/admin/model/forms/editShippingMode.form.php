@@ -16,13 +16,17 @@ class editShippingModeForm extends formBuilder {
                     ->setRequired()
             ),
             (new groupRow('row2'))->addElements(
+                (new inputSelect('sm_type', 'LBL_TYPE', 1))
+                    ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_SELECT')->getShippingTypes())
+                    ->setRequired()
+                    ->setColSize('col-4 col-lg-4'),
                 (new inputText('sm_price', 'LBL_FEE', 0))
-                    ->setColSize('col-6 col-lg-3')
+                    ->setColSize('col-4 col-lg-3')
                     ->addClass('text-right')
                     ->onlyNumbers()
                     ->setAppend($this->owner->currencySign),
                 (new inputText('sm_free_limit', 'LBL_FREE_LIMIT', 0))
-                    ->setColSize('col-6 col-lg-4')
+                    ->setColSize('col-4 col-lg-4')
                     ->addClass('text-right')
                     ->setHelpText('LBL_HELP_SHIPPING_FREE_LIMIT')
                     ->onlyNumbers()

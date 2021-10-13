@@ -69,6 +69,16 @@ class lists extends ancestor {
         return $this->getList();
     }
 
+    public function getShippingTypes(){
+        $this->setList([
+            1 => 'LBL_SHIPPING_TYPE_PERSONAL',
+            2 => 'LBL_SHIPPING_TYPE_DELIVERY',
+            //3 => 'LBL_SHIPPING_TYPE_POST',
+        ]);
+
+        return $this->getList();
+    }
+
     public function getOrderStatuses(){
         $this->list = [];
         foreach($GLOBALS['ORDER_STATUSES'] AS $key => $status){

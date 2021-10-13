@@ -20,19 +20,6 @@
             {{ shippingAddress.name }}
             <br>
             {{ shippingAddress.zip }} {{ shippingAddress.city }}, {{ shippingAddress.address }}
-
-            {% if cart.getSelectedShippingInterval.id != 0 %}
-                <div style="margin-top: 15px;">
-                    {% if cart.getSelectedShippingInterval.id == -1 %}
-                        {{ _('LBL_CUSTOM_SHIPPING_TIME') }}: <b>{{ cart.getSelectedShippingInterval.customText }}</b>
-                        {% if cart.getSelectedShippingMode.customIntervalText %}
-                            <div style="color: #dc3545;">{{ cart.getSelectedShippingMode.customIntervalText }}</div>
-                        {% endif %}
-                    {% else %}
-                        {{ _('LBL_SHIPPING_TIME') }}: <b>{{ _date(cart.getSelectedShippingMode.shippingDate, 41) }}, {{ _date(cart.getSelectedShippingInterval.timeStart, 6, false) }} - {{ _date(cart.getSelectedShippingInterval.timeEnd, 6, false) }}</b>
-                    {% endif %}
-                </div>
-            {% endif %}
         </td>
     </tr>
     <tr>
@@ -96,6 +83,18 @@
                     <br>
                     {{ shippingMode.emailText|nl2br }}
                 </p>
+                {% if cart.getSelectedShippingInterval.id != 0 %}
+                    <div style="margin-top: 15px;">
+                        {% if cart.getSelectedShippingInterval.id == -1 %}
+                            {{ _('LBL_CUSTOM_SHIPPING_TIME') }}: <b>{{ cart.getSelectedShippingInterval.customText }}</b>
+                            {% if cart.getSelectedShippingMode.customIntervalText %}
+                                <div style="color: #dc3545;">{{ cart.getSelectedShippingMode.customIntervalText }}</div>
+                            {% endif %}
+                        {% else %}
+                            {{ _('LBL_SHIPPING_TIME') }}: <b>{{ _date(cart.getSelectedShippingMode.shippingDate, 41) }}, {{ _date(cart.getSelectedShippingInterval.timeStart, 6, false) }} - {{ _date(cart.getSelectedShippingInterval.timeEnd, 6, false) }}</b>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </td>
         </tr>
         <tr>
