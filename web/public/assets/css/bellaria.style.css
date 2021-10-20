@@ -25211,6 +25211,7 @@ iframe#gmap_canvas {
 
 ***/
 .main-footer {
+  margin-top: -40px;
   position: relative;
 }
 
