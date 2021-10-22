@@ -33,6 +33,7 @@ class syncDictionary extends apiClient {
         $this->setServiceUrl('dictionary/cleanup/' . $this->language)->callService(self::CALL_METHOD_GET);
 
         // Local clean up
+        $this->owner->translate->deleteUnusedLabels();
         $this->owner->translate->removeUnusedContextItems();
         $this->owner->translate->clearTranslationCache($this->language);
 

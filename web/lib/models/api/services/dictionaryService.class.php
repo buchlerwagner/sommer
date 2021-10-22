@@ -64,6 +64,7 @@ class dictionaryService extends requester {
             $languages = explode(',', trim($id[0], ','));
         }
 
+        $this->dictionary->deleteUnusedLabels();
         $this->dictionary->removeUnusedContextItems();
 
         // clear memcache
