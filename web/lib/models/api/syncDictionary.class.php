@@ -30,7 +30,7 @@ class syncDictionary extends apiClient {
         $out['dev'] = $this->uploadLabels();
 
         // Remote clean up
-        $this->setServiceUrl('dictionary/cleanup/' . $this->language)->callService(self::CALL_METHOD_GET);
+        $this->setServiceUrl('dictionary/cleanup/' . $this->language . '/')->callService(self::CALL_METHOD_GET);
 
         // Local clean up
         $this->owner->translate->deleteUnusedLabels();
@@ -46,7 +46,7 @@ class syncDictionary extends apiClient {
             'deleted' => 0,
         ];
 
-        $result = $this->setServiceUrl('dictionary/get-labels/' . $this->language)->callService(self::CALL_METHOD_GET);
+        $result = $this->setServiceUrl('dictionary/get-labels/' . $this->language . '/')->callService(self::CALL_METHOD_GET);
 
         if($result['new']){
             $this->owner->translate->updateLabelSet($result['new']);
@@ -55,14 +55,13 @@ class syncDictionary extends apiClient {
                 $out['new'] += count($labels);
             }
 
-            $this->setServiceUrl('dictionary/mark-synced/' . $this->shopId)->setPayload($result['new'])->callService(self::CALL_METHOD_POST);
+            $this->setServiceUrl('dictionary/mark-synced/' . $this->shopId . '/')->setPayload($result['new'])->callService(self::CALL_METHOD_POST);
         }
 
         if($result['delete']) {
             $this->owner->translate->deleteLabels($result['delete']);
             $out['deleted'] = count($result['delete']);
         }
-
 
         return $out;
     }
@@ -78,7 +77,7 @@ class syncDictionary extends apiClient {
         $labelSet['delete'] = $this->owner->translate->listDeletedLabels($this->shopId);
 
         if(!Empty($labelSet['new']) || !Empty($labelSet['delete'])) {
-            $ret = $this->setServiceUrl('dictionary/set-labels/' . $this->shopId)->setPayload($labelSet)->callService(self::CALL_METHOD_POST);
+            $ret = $this->setServiceUrl('dictionary/set-labels/' . $this->shopId . '/')->setPayload($labelSet)->callService(self::CALL_METHOD_POST);
 
             if($labelSet['new']) {
                 foreach($labelSet['new'] AS $labels) {
