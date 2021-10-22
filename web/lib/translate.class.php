@@ -37,7 +37,7 @@ class translate extends ancestor {
 		}
 	}
 
-    private function initMemCache(){
+    public function initMemCache(){
         if($this->owner->mem) {
             $this->mem = $this->owner->mem;
         }else{
@@ -585,7 +585,7 @@ class translate extends ancestor {
 
 		$sql  = "SELECT di_label, di_value, di_language, dc_context FROM " . DB_NAME_WEB . ".dictionary ";
 		$sql .= "LEFT JOIN " . DB_NAME_WEB . ".dictionary_context ON (di_label=dc_label) ";
-		$sql .= "WHERE di_companyid='" . $shopId . "' AND di_language IN (" . implode(',', $lang) . ") AND di_new != 0 AND di_deleted='0'";
+		$sql .= "WHERE di_companyid='" . $shopId . "' AND di_language IN (" . implode(',', $lang) . ") AND di_new = 2 AND di_deleted='0'";
 
 		$result = $this->owner->db->getRows($sql);
 		if($result){

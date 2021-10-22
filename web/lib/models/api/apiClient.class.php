@@ -21,6 +21,7 @@ class apiClient extends ancestor {
 
     private $payload = [];
     private $response = null;
+    private $error = [];
 
     public function setEndPoint(string $url){
         $this->endPoint = rtrim($url, '/') . '/';
@@ -125,7 +126,9 @@ class apiClient extends ancestor {
     }
 
     private function processResponse($result){
-        $this->response = json_decode($result, true);
+        $result = json_decode($result, true);
+        $this->response = $result['data'];
+        $this->error = $result['error'];
     }
 
     private function saveLog($data, $action, $method = self::LOG_REQUEST){

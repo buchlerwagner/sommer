@@ -68,6 +68,7 @@ class dictionaryService extends requester {
         $this->dictionary->removeUnusedContextItems();
 
         // clear memcache
+        $this->dictionary->initMemCache();
         $this->dictionary->clearTranslationCache($languages);
 
         return [];
