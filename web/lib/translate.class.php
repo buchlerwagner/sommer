@@ -735,6 +735,8 @@ class translate extends ancestor {
                 foreach($shopIds AS $shopId) {
                     foreach($languages AS $language) {
                         $key = $this->memcacheKey . $shopId . '-' . $row['context'] . '-' . $language;
+
+                        print $key . "\n";
                         $this->mem->delete($key);
                     }
                 }
