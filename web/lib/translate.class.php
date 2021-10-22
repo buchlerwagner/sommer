@@ -24,11 +24,10 @@ class translate extends ancestor {
 
 		$this->setContext($context);
 
-		$this->memcacheKey = LABELS_KEY;
 		//$this->shopId = $this->owner->shopId;
 		$this->shopId = 0;
 
-		if(!$forceReload AND self::USE_CACHE) {
+		if(!$forceReload && self::USE_CACHE) {
 			$this->labels[$this->owner->language] = $this->mem->get($this->getMemcacheKey());
 		}
 
@@ -38,6 +37,8 @@ class translate extends ancestor {
 	}
 
     public function initMemCache(){
+        $this->memcacheKey = LABELS_KEY;
+
         if($this->owner->mem) {
             $this->mem = $this->owner->mem;
         }else{
@@ -735,8 +736,6 @@ class translate extends ancestor {
                 foreach($shopIds AS $shopId) {
                     foreach($languages AS $language) {
                         $key = $this->memcacheKey . $shopId . '-' . $row['context'] . '-' . $language;
-
-                        print $key . "\n";
                         $this->mem->delete($key);
                     }
                 }
