@@ -42,4 +42,7 @@ const DEFAULT_CURRENCY      = 'HUF';
 
 const IPAPI_KEY             = '20966a71b200633664995f6b35b7e081';
 
+const API_ENABLED           = true;
+const API_HOST_NAME         = '';
+
 const SMTP_HASH_KEY         = 'syL$$CXAjzMR&j9$zhcN8**H+m+!Y_+58#5xZpRvR$ab_qV67TfHSGnQR4PNTWL!@-WN2!ZVNPLVKew+UUPv9Jw7xw&rc_cvr!XQ3X&Kw2g!hf747kDuw??CKv#b5A+t';

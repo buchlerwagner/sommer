@@ -104,7 +104,7 @@
                                             <label id="label-info-orig">{{ _('LBL_ORIGINAL_LABELS', labels.stats.orig.translated, labels.stats.total) }}</label>
                                             {{ form_elements.progressbar('progress-orig', labels.stats.orig.status, 0, 100, labels.stats.orig.status ~ '%', 'success') }}
                                         </div>
-                                        {% if constant('SERVER_ID') != 'bw-production' %}
+                                        {% if constant('SERVER_ID') == 'development' %}
                                         <div class="col-12 mt-3">
                                             <a href="/ajax/dictionary/sync/" class="btn btn-block btn-primary" data-toggle="modal" data-target="#ajax-modal">
                                                 <i class="fas fa-sync-alt"></i>
