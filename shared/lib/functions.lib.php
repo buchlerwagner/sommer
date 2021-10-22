@@ -1,5 +1,26 @@
 <?php
 /**
+ * Bootstrap http request
+ * @return bool
+ */
+function isApiRequest():bool{
+    if(API_ENABLED) {
+        if (defined('API_HOST_NAME') && $_SERVER['HTTP_HOST'] === API_HOST_NAME) {
+            return true;
+        }
+
+        if (!empty($_REQUEST['path'])) {
+            list($service,) = explode('/', trim($_REQUEST['path'], '/'));
+            if (strtolower($service) === 'api') {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
  * Convert date to standard date format: YYYY-MM-DD
  *
  * @param string $date
@@ -617,7 +638,7 @@ function removeCyrillicLetters($str){
 }
 
 /**
- * Remove any special chars from strings, only alpha(numeric) + sapce
+ * Remove any special chars from strings, only alpha(numeric) + space
  * (accents, dash, underscores)
  *
  * @param string $str

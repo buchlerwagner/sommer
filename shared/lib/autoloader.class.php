@@ -26,6 +26,7 @@ class autoloader {
      * @param string $className
      */
     public static function loader($className){
+        $added = [];
         $directory = new RecursiveDirectoryIterator(static::$pathTop, RecursiveDirectoryIterator::SKIP_DOTS);
 
         if (is_null(static::$fileIterator)) {
@@ -38,17 +39,13 @@ class autoloader {
 
         foreach (static::$fileIterator as $file) {
 
-            if (strtolower($file->getFilename()) === strtolower($filename)) {
-
+            if (strtolower($file->getFilename()) === strtolower($filename) && !in_array($file->getFilename(), $added)) {
                 if ($file->isReadable()) {
-
                     include_once $file->getPathname();
-
+                    $added[] = $filename;
                 }
                 break;
-
             }
-
         }
 
     }

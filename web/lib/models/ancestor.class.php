@@ -2,7 +2,7 @@
 class ancestor {
 
 	/**
-	 * @var $owner router
+	 * @var $owner router|api
 	 */
 	public $owner;
 

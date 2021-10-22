@@ -1,7 +1,7 @@
 {% import "formBuilderMacros.twig" as formBuilder %}
 {% if title %}
 <div class="modal-header bg-dark d-block text-white">
-    <h3 class="modal-title" id="customModalLabel">{{ _(title) }}</h3>
+    <h3 class="modal-title" id="customModalLabel">{{ _(title)|raw }}</h3>
     {% if subtitle %}
         <h6 class="text-warning">{{ _(subtitle) }}</h6>
     {% endif %}

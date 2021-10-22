@@ -231,11 +231,11 @@ $(function() {
 
             if (msg) {
                 syncinprogress = true;
-                $this.attr('disabled', 'disabled');
+                $this.attr('disabled', 'disabled').addClass('disabled');
                 $('#sync-progress').removeClass('d-none').show();
 
                 $.ajax({
-                    url: "/ajax/dictionary/do-sync/"
+                    url: "/ajax/dictionary/do-sync/?lang=" + $('#langto').val()
                 }).done(function (data) {
                     if(typeof data !== 'object'){
                         data = JSON.parse(data);
@@ -244,7 +244,7 @@ $(function() {
                         $(selector).html(data[selector]);
                     }
 
-                    $this.removeAttr('disabled');
+                    $this.removeAttr('disabled').removeClass('disabled');
                     $('#sync-progress').hide();
                     syncinprogress = false;
                 });

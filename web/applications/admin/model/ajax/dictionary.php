@@ -122,45 +122,39 @@ if($this->user->hasPageAccess('dictionary')) {
 			*/
 
 			break;
-		/*
+
 		case 'sync':
-			$data = [];
+            if(SERVER_ID == 'development') {
+                $data = [
+                    'title' => 'Sync labels <i id="sync-progress" class="fa fa-spinner fa-spin d-none"></i>',
+                    'content' => 'sync-labels',
+                    'buttons' => [
+                        0 => (new buttonHref('btn-startsync', 'BTN_SYNC', 'btn btn-primary'))
+                            ->setUrl('javascript:;')
+                            ->setIcon('fa fa-sync-alt'),
+                        1 => new buttonModalClose('btn-close', 'BTN_CLOSE')
+                    ],
+                ];
 
-			$common = [
-				'rawtitle' => 'Sync labels <i id="sync-progress" class="fa fa-spinner fa-spin hidden"></i>',
-				'content' => 'sync_labels',
-				'buttons' => [
-					0 => [
-						'id' => 'btn-startsync',
-						'class' => 'primary',
-						'caption' => 'BTN_SYNC',
-						'href' => 'javascript:;',
-					],
-					1 => [
-						'class' => 'default',
-						'caption' => 'BTN_CLOSE',
-						'close' => true
-					]
-				]
-			];
-
-			$this->output = OUTPUT_RAW;
-			$this->data = $this->view->renderContent('modal', array_merge($common, $data));
-
+                $this->output = OUTPUT_RAW;
+                $this->data = $this->view->renderContent('modal', $data);
+            }
 			break;
 
 		case 'do-sync':
-			include_once(WEB_ROOT . 'lib/dictionary.sync.php');
-			$sync = $this->addByClassName('dictionarysync');
+            if(SERVER_ID == 'development') {
+                /**
+                 * @var $sync syncDictionary
+                 */
+                $sync = $this->addByClassName('syncDictionary');
+                $data = $sync->syncLabels($_REQUEST['lang']);
 
-			$data = $sync->syncLables();
-
-			$this->data['#master-new'] = $data['master']['new'];
-			$this->data['#master-del'] = $data['master']['deleted'];
-			$this->data['#dev-new'] = $data['dev']['new'];
-			$this->data['#dev-del'] = $data['dev']['deleted'];
+                $this->data['#master-new'] = $data['master']['new'];
+                $this->data['#master-del'] = $data['master']['deleted'];
+                $this->data['#dev-new'] = $data['dev']['new'];
+                $this->data['#dev-del'] = $data['dev']['deleted'];
+            }
 
 			break;
-		*/
 	}
 }

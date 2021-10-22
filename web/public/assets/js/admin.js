@@ -2280,10 +2280,6 @@ const lime   = '#cddc39'
 
         $('#confirm-delete').on('show.bs.modal', function(e) {
             e.stopPropagation();
-            
-            setTimeout(function(){
-                $('.modal-backdrop').addClass('modal-backdrop--custom');
-            });
 
             var $confirm_button = $(this).find('.danger');
             var color = $(e.relatedTarget).data('color');
