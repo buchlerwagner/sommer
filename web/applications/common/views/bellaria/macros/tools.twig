@@ -61,11 +61,11 @@
         <div class="styled-pagination text-center">
             <ul>
                 {% if data.page > 1 %}
-                    <li><a class="prev" href="{{ data.dir }}?page={{ data.page - 1 }}{{ data.urlParams }}" data-page="{{ data.page - 1 }}"><i class="fa fa-chevron-left"></i></a></li>
+                    <li><a class="prev pager" href="javascript:;" data-page="{{ data.page - 1 }}"><i class="fa fa-chevron-left"></i></a></li>
                 {% else %}
                     <li><a class="disabled" href="javascript:;"><i class="fa fa-chevron-left"></i></a></li>
                 {% endif %}
-                <li class="{% if data.page == 1 %}current{% endif %}"><a href="{{ data.dir }}?page=1{{ data.urlParams }}" data-page="1">1</a></li>
+                <li class="{% if data.page == 1 %}current{% endif %}"><a href="javascript:;" class="pager" data-page="1">1</a></li>
 
                 {% if totalPages > 2 %}
 
@@ -115,7 +115,7 @@
                     {% endif %}
 
                     {% for page in pStart..pEnd %}
-                        <li class="{% if page == data.page %}current{% endif %}"><a href="{{ data.dir }}?page={{ page }}{{ data.urlParams }}" data-page="{{ page }}">{{ page }}</a></li>
+                        <li class="{% if page == data.page %}current{% endif %}"><a href="javascript:;" class="pager" data-page="{{ page }}">{{ page }}</a></li>
                     {% endfor %}
 
                     {% if ellipsisRight == 1 %}
@@ -123,12 +123,12 @@
                     {% endif %}
 
                 {% endif %}
-                <li class="{% if totalPages == data.page %}current{% endif %}"><a href="{{ data.dir }}?page={{ totalPages }}{{ data.urlParams }}" data-page="{{ totalPages }}">{{ totalPages }}</a></li>
+                <li class="{% if totalPages == data.page %}current{% endif %}"><a href="javascript:;" class="pager" data-page="{{ totalPages }}">{{ totalPages }}</a></li>
 
                 {% if data.page < totalPages %}
-                    <li class=""><a class="next" href="{{ data.dir }}?page={{ data.page + 1 }}{{ data.urlParams }}" data-page="{{ data.page + 1 }}"><i class="fa fa-chevron-right"></i></a></li>
+                    <li class=""><a class="next pager" href="javascript:;" data-page="{{ data.page + 1 }}"><i class="fa fa-chevron-right"></i></a></li>
                 {% else %}
-                    <li class=""><a class="disabled" href="javasript:;"><i class="fa fa-chevron-right"></i></a></li>
+                    <li class=""><a class="disabled" href="javascript:;"><i class="fa fa-chevron-right"></i></a></li>
                 {% endif %}
             </ul>
         </div>

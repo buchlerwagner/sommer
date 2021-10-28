@@ -3,7 +3,6 @@
  * @var $this router
  * @var $shop webShop
  */
-
 $shop = $this->addByClassName('webShop');
 $shop->init($this->shopId);
 
@@ -61,6 +60,18 @@ if($this->params[0]){
     }
     if(isset($_REQUEST['search'])){
         $params['filters']['query'] = trim($_REQUEST['search']);
+    }else{
+        $params['filters']['query'] = false;
+    }
+    if(isset($_REQUEST['tags'])){
+        $params['filters']['tags'] = $_REQUEST['tags'];
+    }else{
+        $params['filters']['tags'] = false;
+    }
+    if(isset($_REQUEST['sort'])){
+        $params['sorter'] = $_REQUEST['sort'];
+    }else{
+        $params['sorter'] = 'price';
     }
 
     $this->setSession('params', $params);

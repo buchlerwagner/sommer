@@ -21593,6 +21593,7 @@ body.compensate-for-scrollbar {
       <div>Font made from <a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>is licensed by CC BY 3.0</div>
       OR
       <a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>
+      https://www.onlinewebfonts.com/icon/packs_1118
 */
 @font-face {
   font-family: "foodfonts";
@@ -25460,7 +25461,7 @@ iframe#gmap_canvas {
   margin-bottom: 10px;
 }
 
-.tag-list li a {
+.tag-list li label {
   position: relative;
   display: block;
   z-index: 1;
@@ -25475,13 +25476,18 @@ iframe#gmap_canvas {
   -ms-transition: all 300ms ease;
   -o-transition: all 300ms ease;
   transition: all 300ms ease;
+  cursor: pointer;
 }
 
-.tag-list li a.active,
-.tag-list li a:hover {
+.tag-list li label.active,
+.tag-list li label:hover {
   color: #ffffff;
   background-color: #5fcac7;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tag-list li label input[type=checkbox] {
+  display: none !important;
 }
 
 /***
@@ -25687,6 +25693,74 @@ iframe#gmap_canvas {
   color: #d5d7d4;
   font-weight: 100;
   margin-right: 5px;
+}
+
+.styled-pagination ul {
+  position: relative;
+  display: inline-block;
+  border: 3px solid #edecec;
+  border-radius: 30px;
+  padding: 5px 10px;
+}
+
+.styled-pagination ul:before,
+.styled-pagination ul:after {
+  position: absolute;
+  left: calc(100% + 13px);
+  top: 50%;
+  margin-top: -1.5px;
+  width: 107px;
+  background-color: #edecec;
+  height: 3px;
+  content: "";
+}
+
+.styled-pagination ul:after {
+  left: auto;
+  right: calc(100% + 13px);
+}
+
+.styled-pagination li {
+  position: relative;
+  display: inline-block;
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 8px 6px;
+  z-index: 3;
+  color: #4b4342;
+  font-family: "ABeeZee";
+}
+
+.styled-pagination li .next,
+.styled-pagination li .prev {
+  font-size: 13px;
+}
+
+.styled-pagination li a {
+  color: #4b4342;
+  display: inline-block;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.styled-pagination li a:hover {
+  color: #ff91a4;
+}
+
+.styled-pagination .current a {
+  color: #ff91a4;
+  font-weight: bold;
+}
+
+.styled-pagination a.disabled:hover,
+.styled-pagination a.disabled {
+  font-size: 13px;
+  color: #edecec;
 }
 
 /*** 

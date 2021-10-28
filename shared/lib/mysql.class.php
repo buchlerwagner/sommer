@@ -247,6 +247,8 @@ class mysql extends db {
                         if(isset($val['like'])){
                             $where[] = $key . ' LIKE ' . $this->prepareValue($val['like']);
                         }
+                    }elseif($key == 'custom') {
+                        $where[] = $val;
                     }else {
                         $where[] = $key . '=' . $val;
                     }
@@ -316,7 +318,9 @@ class mysql extends db {
                 } else if ($val == 'DECREMENT') {
                     $val = $key . " - 1";
                 } else {
-                    $val = "'" . $this->escapeString($val) . "'";
+                    if($key != 'custom') {
+                        $val = "'" . $this->escapeString($val) . "'";
+                    }
                 }
             }
             $values[$key] = $val;

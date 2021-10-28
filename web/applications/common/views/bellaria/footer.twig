@@ -87,10 +87,12 @@
 
     <div class="footer-column">
         <div class="auto-container text-white text-center footer-links">
-            |
+            {% set first = true %}
             {% for mkey, mvalue in menu %}
                 {% if mvalue.footer %}
-                    {{ menu_elements.menuitem(mkey, mvalue, rootdir, level, loggedin) }} |
+                    {% if not first %} | {% endif %}
+                    {{ menu_elements.menuitem(mkey, mvalue, rootdir, level, loggedin) }}
+                    {% set first = false %}
                 {% endif %}
             {% endfor %}
         </div>

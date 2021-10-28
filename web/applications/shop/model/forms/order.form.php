@@ -58,6 +58,8 @@ class orderForm extends formBuilder {
 
         $this->addControls(
             (new inputCheckbox('agree_terms', 'LBL_I_AGREE_TERMS_AND_CONDITIONS', 0))
+                ->setRequired(),
+            (new inputCheckbox('agree_privacy', 'LBL_I_AGREE_PRIVACY_POLICY', 0))
                 ->setRequired()
         );
 
@@ -110,6 +112,9 @@ class orderForm extends formBuilder {
 
         if (empty($this->values['agree_terms'])) {
             $this->addError('ERR_2001', self::FORM_ERROR, ['agree_terms']);
+        }
+        if (empty($this->values['agree_privacy'])) {
+            $this->addError('ERR_2004', self::FORM_ERROR, ['agree_privacy']);
         }
         if (empty($this->values['shipping'])) {
             $this->addError('ERR_2002', self::FORM_ERROR, ['shipping']);

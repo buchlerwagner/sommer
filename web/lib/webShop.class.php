@@ -133,7 +133,7 @@ class webShop extends ancestor {
 		return $out;
 	}
 
-    public function getActiveTags($categories = false){
+    public function getActiveTags($params = false){
         $out = [];
 
         $where = [
@@ -141,17 +141,34 @@ class webShop extends ancestor {
             'prop_shop_id' => $this->shopId
         ];
 
-        if($categories){
-            if(!is_array($categories)) $categories = [$categories];
+        if($params['categories']){
+            if(!is_array($params['categories'])) $categories = [$params['categories']];
 
             $where['prod_cat_id'] = [
-                'in' => $categories
+                'in' => $params['categories']
             ];
         }
 
         if(!$this->isAdmin){
             $where['cat_visible'] = 1;
             $where['prod_visible'] = 1;
+        }
+
+        if($params['query']) {
+            $query = preg_replace("/[^a-zA-Z0-9]+/", "", $params['query']);
+            $query = $this->owner->db->escapeString($query);
+            $query = explode(' ', $query);
+            if($query){
+                $tmp = [];
+                foreach($query AS $text){
+                    $tmp[] = '(
+						prod_name LIKE "%' . $text . '%" OR 
+						prod_brand_name LIKE "%' . $text . '%" OR 
+						prod_description LIKE "%' . $text . '%" 
+					)';
+                }
+                $where['custom'] = '(' . implode(' OR ', $tmp) . ')';
+            }
         }
 
         $result = $this->owner->db->getRows(
@@ -191,7 +208,7 @@ class webShop extends ancestor {
             }
         }
 
-        if($categories){
+        if($params['categories']){
             $result = $this->owner->db->getRows(
                 $this->owner->db->genSQLSelect(
                     'product_categories',
@@ -200,7 +217,7 @@ class webShop extends ancestor {
                     ],
                     [
                         'cat_id' => [
-                            'in' => $categories
+                            'in' => $params['categories']
                         ],
                         'cat_smart' => 1,
                         'cat_visible' => 1,
@@ -408,6 +425,7 @@ class webShop extends ancestor {
     public function getProducts($params) {
 		$out = [
 			'filters' => $this->getFilters($params['filters']),
+			'sorter' => $params['sorter'],
 			'items' => [],
 			'pager' => [],
 		];
@@ -458,7 +476,7 @@ class webShop extends ancestor {
 			$sql = "SELECT " . implode(', ', $fields) . " FROM " . DB_NAME_WEB . ".products 
 					LEFT JOIN " . DB_NAME_WEB . ".product_categories ON (prod_cat_id = cat_id) 
 						" . $this->buildFilterQuery($params['filters']) . "
-							" . $this->buildSorterQuery($params['sorters'], $params['pager']);
+							" . $this->buildSorterQuery($params['sorter'], $params['pager']);
 			$result = $this->owner->db->getRows($sql);
 			if ($result) {
 				foreach ($result AS $row) {
@@ -485,6 +503,12 @@ class webShop extends ancestor {
 	}
 
 	public function getFilters($params){
+        $isFiltered = false;
+
+        if(!Empty($params['query']) || !Empty($params['tags'])){
+            $isFiltered = true;
+        }
+
 		return [
 			'search' => [
 				'query' => $params['query']
@@ -494,9 +518,10 @@ class webShop extends ancestor {
 				'selected' => $params['categories']
 			],
             'tags' => [
-                'available' => $this->getActiveTags($params['categories']),
+                'available' => $this->getActiveTags($params),
                 'selected' => $params['tags']
-            ]
+            ],
+            'filtered' => $isFiltered
 		];
 	}
 
@@ -530,6 +555,7 @@ class webShop extends ancestor {
             $where[] = 'prod_visible = 1';
         }
 
+		//$where[] = '(prod_price > 0 OR prod_price_discount > 0)';
 		$where[] = 'prod_archived = 0';
 		$where[] = 'prod_shop_id = ' . $this->shopId;
 
@@ -574,23 +600,33 @@ class webShop extends ancestor {
 		return ' WHERE ' . implode(' AND ', $where);
 	}
 
-	private function buildSorterQuery($sorters = [], $pager = []){
-		$orderby = [];
+	private function buildSorterQuery($sorter = false, $pager = []){
+		$orderBy = [];
 		$limit = false;
 		$from = 0;
 
-		if($sorters){
-			foreach($sorters AS $key => $type){
-				$orderby[] = $key . ' ' . (strtolower($type) == 'DESC' ? 'DESC' : 'ASC');
-			}
-		}
+        if(!$sorter) $sorter = 'price';
+
+        switch ($sorter){
+            case 'price-desc':
+                $field = 'IF(prod_price_discount > 0, prod_price_discount, prod_price)';
+                $type = 'DESC';
+                break;
+            case 'price':
+            default:
+                $field = 'IF(prod_price_discount > 0, prod_price_discount, prod_price)';
+                $type = 'ASC';
+                break;
+        }
+
+        $orderBy[] = $field . ' ' . $type;
 
 		if($pager['limit']){
 			$limit = true;
 			$from = (abs($pager['page']) - 1) * $pager['limit'];
 		}
 
-		return ($orderby ? ' ORDER BY ' .implode(', ', $orderby) : '' ) . ($limit ? ' LIMIT ' . $from . ', ' . $pager['limit'] : '');
+		return ($orderBy ? ' ORDER BY ' .implode(', ', $orderBy) : '' ) . ($limit ? ' LIMIT ' . (int) $from . ', ' . $pager['limit'] : '');
 	}
 
     private function getProductsByTags(array $tags):array{

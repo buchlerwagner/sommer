@@ -45,7 +45,7 @@
     {% import _self as self %}
     {% if element.getLabel %}
     {% if addLabelTag %}<label for="{{ element.getId }}">{% endif %}
-            {{ _(element.getLabel) }}{% if element.isRequired %} <span class="text-danger">*</span>{% endif %}
+            {{ _(element.getLabel)|raw }}{% if element.isRequired %} <span class="text-danger">*</span>{% endif %}
             {% if element.getHelpText.icon %}
                 <i class="text-primary{% if element.getHelpText.icon is same as (true) %} fa fa-info-circle{% else %} {{ element.getHelpText.icon }}{% endif %}" data-toggle="tooltip" title="{{ _(element.getHelpText.text) }}"></i>
             {% endif %}

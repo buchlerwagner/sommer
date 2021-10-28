@@ -2,8 +2,8 @@
     <div class="sticky-sidebar">
         <div class="sidebar-widget search-widget">
             <div class="form-group">
-                <input type="search" name="search" value="{{ products.filters.search.query }}" placeholder="{{ _('LBL_SEARCH_PRODUCT') }}" required>
-                <button type="submit"><span class="icon fa fa-search"></span></button>
+                <input type="search" class="filter-search" name="search" value="{{ products.filters.search.query }}" placeholder="{{ _('LBL_SEARCH_PRODUCT') }}" required>
+                <button type="button" class="do-filter"><span class="icon fa fa-search"></span></button>
             </div>
         </div>
 
@@ -18,19 +18,28 @@
         #}
 
         {% if products.filters.tags.available %}
-        <div class="sidebar-widget tags-widget">
+        <div class="sidebar-widget tags-widget mb-4">
             <h3 class="widget-title">{{ _('LBL_TAGS') }}</h3>
             <ul class="tag-list clearfix">
                 {% for tag in products.filters.tags.available %}
-                    <li>
-                        <a href="#"{% if tag.id in products.filters.tags.selected %} class="active"{% endif %} data-id="{{ tag.id }}">
-                            {% if tag.icon %}<i class="{{ tag.icon }} mr-1"></i>{% endif %}
+                    <li class="d-block">
+                        <label for="tag-{{ tag.id }}" class="filter-tags{% if tag.id in products.filters.tags.selected %} active{% endif %}" data-id="{{ tag.id }}">
+                            <input id="tag-{{ tag.id }}" name="tags[]" class="do-filter" type="checkbox" value="{{ tag.id }}"{% if tag.id in products.filters.tags.selected %} checked{% endif %}>
+                            {% if tag.icon %}<i class="{{ tag.icon }} mr-2" style="font-size: 18px;"></i>{% endif %}
                             {{ tag.name }}
-                        </a>
+                        </label>
                     </li>
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
+
+        {% if products.filters.filtered %}
+            <div class="form-group text-center">
+                <a href=".">{{ _('BTN_RESET_FILTERS') }}</a>
+            </div>
+        {% endif %}
+
     </div>
 </aside>
+

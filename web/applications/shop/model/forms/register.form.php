@@ -20,7 +20,7 @@ class registerForm extends formBuilder {
                 ->setRequired(),
             (new inputFloatingLabelText('us_phone', 'LBL_PHONE'))
                 ->onlyNumbers('+'),
-            (new inputCheckbox('agree_terms', 'LBL_I_AGREE_TERMS_AND_CONDITIONS', 0))
+            (new inputCheckbox('agree_privacy', 'LBL_I_AGREE_PRIVACY_POLICY', 0))
                 ->setRequired()
         );
 
@@ -39,8 +39,8 @@ class registerForm extends formBuilder {
             }
         }
 
-        if (empty($this->values['agree_terms'])) {
-            $this->addError('ERR_2001', self::FORM_ERROR, ['agree_terms']);
+        if (empty($this->values['agree_privacy'])) {
+            $this->addError('ERR_2004', self::FORM_ERROR, ['agree_privacy']);
         }
     }
 

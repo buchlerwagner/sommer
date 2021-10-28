@@ -262,9 +262,9 @@ class editProductForm extends formBuilder {
         unset($this->values['prod_properties']);
 
         if($this->values['prod_variants']) {
-            $this->values['prod_price'] = 0;
+            $this->getLowestVariantPrice();
+
             $this->values['prod_stock'] = 0;
-            $this->values['prod_price_discount'] = 0;
             $this->values['prod_weight'] = 0;
         }else{
             $this->values['prod_variants'] = 0;
@@ -281,6 +281,44 @@ class editProductForm extends formBuilder {
 
         if(Empty($this->values['prod_page_title'])){
             $this->values['prod_page_title'] = $this->values['prod_name'];
+        }
+    }
+
+    private function getLowestVariantPrice(){
+        $this->values['prod_price'] = 0;
+        $this->values['prod_price_discount'] = 0;
+
+        $row = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'product_variants',
+                [
+                    'MIN(pv_price) AS price'
+                ],
+                [
+                    'pv_prod_id' => $this->keyFields['prod_id']
+                ]
+            )
+        );
+        if($row){
+            $this->values['prod_price'] = $row['price'];
+        }
+
+        $row = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'product_variants',
+                [
+                    'MIN(pv_price_discount) AS price'
+                ],
+                [
+                    'pv_prod_id' => $this->keyFields['prod_id'],
+                    'pv_price_discount' => [
+                        'greater' => 0
+                    ],
+                ]
+            )
+        );
+        if($row){
+            $this->values['prod_price_discount'] = $row['price'];
         }
     }
 }

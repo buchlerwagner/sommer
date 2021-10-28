@@ -7,7 +7,7 @@
 
 {{ tools.pageSections(sections, _context) }}
 
-<section class="checkout-page cart-section{% if sections %} pt-0{% endif %}">
+<section class="checkout-page cart-section{% if sections %} pt-0{% endif %} mb-5">
     <div class="auto-container">
         <div class="row clearfix">
             <div class="content-side col-lg-8 col-md-12 col-sm-12 order-last order-lg-first">
@@ -289,10 +289,16 @@
                     {% endif %}
 
                     <div class="form-row">
-                        <div class="col form-group col-md-12">
+                        <div class="col form-group col-md-12 mb-1">
                             <div class="checkbox checkbox-primary{% if forms.order.hasError('agree_terms') %} has-error{% endif %}">
                                 <input id="agree_terms" type="checkbox" name="order[agree_terms]" value="1"{% if forms.order.values.agree_terms %} checked{% endif %} data-parsley-required="1" data-parsley-mincheck="1" data-parsley-errors-messages-disabled="1">
-                                <label for="agree_terms">{{ _('LBL_I_AGREE_TERMS_AND_CONDITIONS', '/ajax/content/terms-and-conditions/')|raw }}</label>
+                                <label for="agree_terms">{{ _('LBL_I_AGREE_TERMS_AND_CONDITIONS')|raw }}</label>
+                            </div>
+                        </div>
+                        <div class="col form-group col-md-12">
+                            <div class="checkbox checkbox-primary{% if forms.order.hasError('agree_privacy') %} has-error{% endif %}">
+                                <input id="agree_privacy" type="checkbox" name="order[agree_privacy]" value="1"{% if forms.order.values.agree_privacy %} checked{% endif %} data-parsley-required="1" data-parsley-mincheck="1" data-parsley-errors-messages-disabled="1">
+                                <label for="agree_privacy">{{ _('LBL_I_AGREE_PRIVACY_POLICY')|raw }}</label>
                             </div>
                         </div>
                     </div>
