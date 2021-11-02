@@ -303,6 +303,7 @@ var shoppingCart = {
             $item.removeClass('d-none').show();
             $('#quantity').attr('data-min', $item.data('min')).attr('data-max', $item.data('max')).val($item.data('min'));
             $('#weight').html($item.data('weight'));
+            $('#quantity-unit').html($item.data('unit'));
 
             if($item.data('img')){
                 var img = document.getElementById("img-" + $item.data('img'));
