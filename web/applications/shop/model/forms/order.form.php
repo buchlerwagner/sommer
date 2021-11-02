@@ -232,6 +232,7 @@ class orderForm extends formBuilder {
             $this->values['invoiceaddress'],
             $this->values['createaccount'],
             $this->values['agree_terms'],
+            $this->values['agree_privacy'],
             $this->values['options']
         );
     }
