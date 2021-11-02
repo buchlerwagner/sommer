@@ -555,7 +555,7 @@ class webShop extends ancestor {
             $where[] = 'prod_visible = 1';
         }
 
-		//$where[] = '(prod_price > 0 OR prod_price_discount > 0)';
+		$where[] = '(prod_price > 0 OR prod_price_discount > 0)';
 		$where[] = 'prod_archived = 0';
 		$where[] = 'prod_shop_id = ' . $this->shopId;
 

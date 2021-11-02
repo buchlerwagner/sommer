@@ -282,6 +282,12 @@ class editProductForm extends formBuilder {
         if(Empty($this->values['prod_page_title'])){
             $this->values['prod_page_title'] = $this->values['prod_name'];
         }
+
+        if($this->categoryId != $this->values['prod_cat_id']){
+            rcopy($this->product->getImagePath(true, $this->categoryId), $this->product->getImagePath(true, $this->values['prod_cat_id']));
+
+            rrmdir($this->product->getImagePath(true, $this->categoryId));
+        }
     }
 
     private function getLowestVariantPrice(){
