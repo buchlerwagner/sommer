@@ -105,6 +105,9 @@ class editVariantForm extends formBuilder {
     public function onBeforeSave() {
         $this->values['pv_currency'] = $this->owner->currency;
 
+        $this->values['pv_pack_quantity'] = floatNumber($this->values['pv_pack_quantity']);
+        $this->values['pv_weight'] = floatNumber($this->values['pv_weight']);
+
         if(Empty($this->values['pv_price'])) $this->values['pv_price'] = 0;
         if(Empty($this->values['pv_price_discount'])) $this->values['pv_price_discount'] = 0;
         if(Empty($this->values['pv_stock'])) $this->values['pv_stock'] = 0;

@@ -270,6 +270,9 @@ class editProductForm extends formBuilder {
             $this->values['prod_variants'] = 0;
         }
 
+        $this->values['prod_pack_quantity'] = floatNumber($this->values['prod_pack_quantity']);
+        $this->values['prod_weight'] = floatNumber($this->values['prod_weight']);
+
         if(Empty($this->values['prod_price'])) $this->values['prod_price'] = 0;
         if(Empty($this->values['prod_stock'])) $this->values['prod_stock'] = 0;
         if(Empty($this->values['prod_price_discount'])) $this->values['prod_price_discount'] = 0;
