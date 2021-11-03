@@ -454,7 +454,7 @@ class webShop extends ancestor {
 			'cat_url',
 		];
 
-		$where = $this->buildFilterQuery($params['filters']);
+        $where = $this->buildFilterQuery($params['filters']);
 
 		$res = $this->owner->db->getFirstRow(
 			"SELECT COUNT(" . $fields[0] . ") as cnt FROM " . DB_NAME_WEB . ".products " . $where
@@ -466,10 +466,10 @@ class webShop extends ancestor {
 				if ($params['pager']['page'] < 1) {
 					$params['pager']['page'] = 1;
 				}
-				if ($params['pager']['page'] > $params['pager']['totalPages']) {
+				if ($params['pager']['page'] > $params['pager']['totalPages'] && $params['pager']['totalPages'] > 0) {
 					$params['pager']['page'] = $params['pager']['totalPages'];
 				}
-			}else{
+            }else{
 				$params['pager'] = [];
 			}
 

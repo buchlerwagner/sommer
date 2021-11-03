@@ -65,8 +65,6 @@ if($this->params[0]){
     }
     if(isset($_REQUEST['tags'])){
         $params['filters']['tags'] = $_REQUEST['tags'];
-    }else{
-        $params['filters']['tags'] = false;
     }
     if(isset($_REQUEST['sort'])){
         $params['sorter'] = $_REQUEST['sort'];
