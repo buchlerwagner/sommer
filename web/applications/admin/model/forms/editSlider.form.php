@@ -83,9 +83,6 @@ class editSliderForm extends formBuilder {
 
     public function onAfterInit() {
         $this->setSubtitle($this->values['s_title']);
-    }
-
-    public function onAfterLoadValues() {
         if(Empty($this->values['s_image'])){
             $this->removeControl('removeImg');
         }
