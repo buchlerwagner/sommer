@@ -1,7 +1,6 @@
 <?php
 /**
  * @var $this router
- * @var $shop webShop
  */
 
 $this->data['sliders'] = $this->lib->getSliders();
@@ -9,6 +8,9 @@ $this->data['sliders'] = $this->lib->getSliders();
 $shop = $this->addByClassName('webShop');
 $shop->init($this->shopId);
 
+/**
+ * @var $shop webShop
+ */
 $this->data['highlightedItems'] = $shop->getHighlightedProducts(false, [], 12);
 //$this->data['popularItems'] = $shop->getPopularItems();
 

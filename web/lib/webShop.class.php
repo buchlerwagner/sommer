@@ -270,6 +270,7 @@ class webShop extends ancestor {
         $where = [
             'prod_shop_id' => $this->shopId,
             'prod_highlight' => 1,
+            'prod_archived' => 0,
         ];
 
         if($exclude) {
