@@ -5,9 +5,15 @@
     </div>
 </section>
 
-{#
-{{ tools.pageSections(sections, _context) }}
-#}
+<section class="contact-section pt-3">
+    <div class="auto-container">
+        <div class="sec-title text-center mb-1 mt-1">
+            <div class="text">
+                {{ include(template_from_string(content.content)) }}
+            </div>
+        </div>
+    </div>
+</section>
 
 <section class="contact-section{% if sections %} pt-0{% else %} pt-2{% endif %}">
     <div class="auto-container">
