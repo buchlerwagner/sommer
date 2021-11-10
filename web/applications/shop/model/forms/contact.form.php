@@ -125,6 +125,7 @@ class contactForm extends formBuilder {
         $this->values['recaptcha'] = json_encode($this->getRecaptchaResponse());
 
         $data = [];
+        unset($this->values['agree_privacy']);
 
         foreach ($this->values as $key => $value) {
             $data['r_' . $key] = $value;
