@@ -5,7 +5,13 @@
  */
 
 $this->loadForm('contact');
-$this->data['sections'] = $this->lib->getWidgetContents('contact');
-$this->view->includeValidationJS();
+$sections = $this->lib->getWidgetContents('contact');
+if($sections){
+    foreach($sections AS $content){
+        $this->data['content'] = $content;
+        break;
+    }
+}
 
+$this->view->includeValidationJS();
 $this->data['isSuccess'] = (isset($_REQUEST['success']));

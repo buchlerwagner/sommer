@@ -865,7 +865,7 @@ class functions extends ancestor {
                 foreach($result AS $row){
                     $content[$row['id']] = $row;
                     if($row['image']) {
-                        $content[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/pages/' . $row['image'];
+                        $content[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/pages/' . $row['id'] . '/' . $row['image'];
                         
                         if(!$this->owner->data['content']['image']){
                             $this->owner->data['content']['image'] = $content[$row['id']]['image'];
