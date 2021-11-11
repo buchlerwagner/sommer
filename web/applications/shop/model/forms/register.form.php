@@ -21,6 +21,7 @@ class registerForm extends formBuilder {
             (new inputFloatingLabelText('us_phone', 'LBL_PHONE'))
                 ->onlyNumbers('+'),
             (new inputCheckbox('agree_privacy', 'LBL_I_AGREE_PRIVACY_POLICY', 0))
+                ->notDBField()
                 ->setRequired()
         );
 
