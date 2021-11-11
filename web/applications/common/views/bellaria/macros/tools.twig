@@ -28,11 +28,13 @@
                 {% endif %}
                 {{ tools.ratingStars(data.ratings.value, data.ratings.reviews) }}
                 <div class="price">
-                    {% if data.variants[0].price.discount > 0 and data.variants[0].price.value > data.variants[0].price.discount  %}
-                        <del>{{ _price(data.variants[0].price.value, data.variants[0].price.currency) }}</del>
-                        {{ _price(data.variants[0].price.discount, data.variants[0].price.currency) }}{% if data.variants[0].packaging.packageUnitName %}/{{ data.variants[0].packaging.packageUnitName }}{% endif %}{% if data.hasVariants %}{{ _('LBL_PRICE_FROM') }}{% endif %}
-                    {% else %}
-                        {{ _price(data.variants[0].price.value, data.variants[0].price.currency) }}{% if data.variants[0].packaging.packageUnitName %}/{{ data.variants[0].packaging.packageUnitName }}{% endif %}{% if data.hasVariants %}{{ _('LBL_PRICE_FROM') }}{% endif %}
+                    {% if data.available and not stopSale %}
+                        {% if data.variants[0].price.discount > 0 and data.variants[0].price.value > data.variants[0].price.discount  %}
+                            <del>{{ _price(data.variants[0].price.value, data.variants[0].price.currency) }}</del>
+                            {{ _price(data.variants[0].price.discount, data.variants[0].price.currency) }}{% if data.variants[0].packaging.packageUnitName %}/{{ data.variants[0].packaging.packageUnitName }}{% endif %}{% if data.hasVariants %}{{ _('LBL_PRICE_FROM') }}{% endif %}
+                        {% else %}
+                            {{ _price(data.variants[0].price.value, data.variants[0].price.currency) }}{% if data.variants[0].packaging.packageUnitName %}/{{ data.variants[0].packaging.packageUnitName }}{% endif %}{% if data.hasVariants %}{{ _('LBL_PRICE_FROM') }}{% endif %}
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -151,6 +153,7 @@
                     {{ data.name }}
                 </a>
             </h4>
+            {% if data.available %}
             <div class="price">
                 {% if data.variants[0].price.discount > 0 and data.variants[0].price.value > data.variants[0].price.discount  %}
                     {{ _price(data.variants[0].price.discount, data.variants[0].price.currency) }}{% if data.variants[0].packaging.packageUnitName %}/{{ data.variants[0].packaging.packageUnitName }}{% endif %}{% if data.hasVariants %}{{ _('LBL_PRICE_FROM') }}{% endif %}
@@ -158,6 +161,7 @@
                     {{ _price(data.variants[0].price.value, data.variants[0].price.currency) }}{% if data.variants[0].packaging.packageUnitName %}/{{ data.variants[0].packaging.packageUnitName }}{% endif %}{% if data.hasVariants %}{{ _('LBL_PRICE_FROM') }}{% endif %}
                 {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
 {% endmacro %}

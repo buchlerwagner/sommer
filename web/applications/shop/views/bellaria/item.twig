@@ -47,22 +47,28 @@
                                         {% endif %}
 
                                         {% for variant in item.variants %}
-                                        <div id="item-price-{{ variant.id }}" class="item-price{% if loop.index > 1 %} d-none{% endif %}" data-id="{{ item.id }}" data-variant="{{ variant.id }}" data-name="{{ variant.name }}" data-unit="{{ variant.packaging.packageUnitName }}" data-weight="{{ variant.packaging.weight }} {{ variant.packaging.weightUnitName }}" data-min="{{ variant.minSale }}" data-max="{{ variant.maxSale }}" data-img="{{ variant.imgId }}">
-                                            {% if variant.price.discount > 0 and variant.price.value > variant.price.discount  %}
-                                                <del class="small">{{ _price(variant.price.value, variant.price.currency) }}</del>
-                                                {{ _price(variant.price.discount, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
+                                            {% if item.available %}
+                                                <div id="item-price-{{ variant.id }}" class="item-price{% if loop.index > 1 %} d-none{% endif %}" data-id="{{ item.id }}" data-variant="{{ variant.id }}" data-name="{{ variant.name }}" data-unit="{{ variant.packaging.packageUnitName }}" data-weight="{{ variant.packaging.weight }} {{ variant.packaging.weightUnitName }}" data-min="{{ variant.minSale }}" data-max="{{ variant.maxSale }}" data-img="{{ variant.imgId }}">
+                                                    {% if variant.price.discount > 0 and variant.price.value > variant.price.discount  %}
+                                                        <del class="small">{{ _price(variant.price.value, variant.price.currency) }}</del>
+                                                        {{ _price(variant.price.discount, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
+                                                    {% else %}
+                                                        {{ _price(variant.price.value, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
+                                                    {% endif %}
+
+                                                    {% if variant.packaging.quantity > 1 %}
+                                                        <div class="item-packaging text-muted">({{ variant.packaging.quantity }} {{ variant.packaging.packagePcsUnitName }}/{{ variant.packaging.packageUnitName }})</div>
+                                                    {% endif %}
+
+                                                    {% if variant.packaging.packagingFee > 0 %}
+                                                        <div class="item-packaging text-muted">{{ variant.packaging.packagingName }} +{{ _price(variant.packaging.packagingFee, variant.price.currency) }}/{{ variant.packaging.packageUnitName }}</div>
+                                                    {% endif %}
+                                                </div>
                                             {% else %}
-                                                {{ _price(variant.price.value, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
+                                                <div id="item-price-{{ variant.id }}" class="{% if loop.index > 1 %} d-none{% endif %}" data-id="{{ item.id }}" data-variant="{{ variant.id }}" data-name="{{ variant.name }}" data-unit="{{ variant.packaging.packageUnitName }}" data-weight="{{ variant.packaging.weight }} {{ variant.packaging.weightUnitName }}" data-min="{{ variant.minSale }}" data-max="{{ variant.maxSale }}" data-img="{{ variant.imgId }}">
+                                                    {{ _('LBL_REQUEST_OFFER_INFO_TEXT') }}
+                                                </div>
                                             {% endif %}
-
-                                            {% if variant.packaging.quantity > 1 %}
-                                                <div class="item-packaging text-muted">({{ variant.packaging.quantity }} {{ variant.packaging.packagePcsUnitName }}/{{ variant.packaging.packageUnitName }})</div>
-                                            {% endif %}
-
-                                            {% if variant.packaging.packagingFee > 0 %}
-                                                <div class="item-packaging text-muted">{{ variant.packaging.packagingName }} +{{ _price(variant.packaging.packagingFee, variant.price.currency) }}/{{ variant.packaging.packageUnitName }}</div>
-                                            {% endif %}
-                                        </div>
                                         {% endfor %}
 
                                         <div class="text">
