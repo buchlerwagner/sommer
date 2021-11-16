@@ -184,6 +184,7 @@
                             </td>
                         </tr>
                     {% endfor %}
+                    {#
                     <tr class="bg-gray-100">
                         <td colspan="4">
                             {{ _('LBL_TOTAL') }}
@@ -192,6 +193,7 @@
                             {{ _price(form.cart.subtotal, form.cart.currency) }}
                         </td>
                     </tr>
+                    #}
                     {% if form.cart.packagingFee %}
                     <tr class="bg-gray-100">
                         <td colspan="4">
