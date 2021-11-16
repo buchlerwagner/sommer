@@ -85,7 +85,7 @@
                                         </select>
                                     </div>
                                     {% else %}
-                                        <input type="hidden" id="variant" name="variant" value="0">
+                                        <input type="hidden" id="variant" name="variant" value="{{ item.variants|first.id }}">
                                     {% endif %}
 
                                     <div class="other-options clearfix">
