@@ -72,12 +72,26 @@
                 {% if cart.getSelectedShippingInterval.id != 0 %}
                     <div class="mt-3">
                     {% if cart.getSelectedShippingInterval.id == -1 %}
+                        {% if cart.customDate %}
+                            {{ _('LBL_SELECT_SHIPPING_DATE') }}:
+                            {{ _date(cart.customDate, 41) }},
+                        {% endif %}
+
                         {{ _('LBL_CUSTOM_SHIPPING_TIME') }}: <b>{{ cart.getSelectedShippingInterval.customText }}</b>
                         {% if cart.getSelectedShippingMode.customIntervalText %}
                         <div class="text-danger">{{ cart.getSelectedShippingMode.customIntervalText }}</div>
                         {% endif %}
                     {% else %}
-                        {{ _('LBL_SHIPPING_TIME') }}: <b>{{ _date(cart.getSelectedShippingMode.shippingDate, 41) }}, {{ _date(cart.getSelectedShippingInterval.timeStart, 6, false) }} - {{ _date(cart.getSelectedShippingInterval.timeEnd, 6, false) }}</b>
+                        {{ _('LBL_SHIPPING_TIME') }}:
+                        <b>
+                            {% if cart.customDate %}
+                                {{ _date(cart.customDate, 41) }},
+                            {% else %}
+                                {{ _date(cart.getSelectedShippingMode.shippingDate, 41) }},
+                            {% endif %}
+
+                            {{ _date(cart.getSelectedShippingInterval.timeStart, 6, false) }} - {{ _date(cart.getSelectedShippingInterval.timeEnd, 6, false) }}
+                        </b>
                     {% endif %}
                 </div>
                 {% endif %}

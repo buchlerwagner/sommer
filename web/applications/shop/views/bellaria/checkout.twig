@@ -190,13 +190,24 @@
                                                     <div>{{ item.text|nl2br }}</div>
                                                     {% if item.hasIntervals %}
                                                         <div class="form-row mt-3 shipping-intervals">
-                                                            <div class="form-group col-6">
+                                                            {% if item.hasCustomDate %}
+                                                            <div class="form-group col-6 col-lg-4">
+                                                                <label class="control-label pl-0 text-white mb-1" for="shipping-date-{{ item.id }}">
+                                                                    {{ _('LBL_SELECT_SHIPPING_DATE') }}
+                                                                </label>
+                                                                <input id="shipping-date-{{ item.id }}" type="text" value="{{ _date(item.shippingDate) }}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly>
+                                                            </div>
+                                                            {% endif %}
+
+                                                            <div class="form-group col-6 col-lg-8">
                                                                 <label class="control-label pl-0 text-white mb-1" for="shipping-interval-{{ item.id }}">
                                                                     {{ _('LBL_SELECT_SHIPPING_INTERVAL') }}
                                                                 </label>
                                                                 <select name="order[interval]" class="form-control set-shipping-interval" id="shipping-interval-{{ item.id }}"{% if cart.getShippingId != item.id %} disabled{% endif %}>
                                                                     {% for interval in item.intervals %}
-                                                                        <option value="{{ interval.id }}"{% if forms.order.values.interval == interval.id %} selected{% endif %}>{{ _date(item.shippingDate, 41) }}, {{ _date(interval.timeStart, 6, false) }} - {{ _date(interval.timeEnd, 6, false) }}</option>
+                                                                        <option value="{{ interval.id }}"{% if forms.order.values.interval == interval.id %} selected{% endif %}>
+                                                                            {% if not item.hasCustomDate %}{{ _date(item.shippingDate, 41) }}, {% endif %}{{ _date(interval.timeStart, 6, false) }} - {{ _date(interval.timeEnd, 6, false) }}
+                                                                        </option>
                                                                     {% endfor %}
                                                                     {% if item.hasCustomInterval %}
                                                                         <option value="-1"{% if forms.order.values.interval == -1 %} selected{% endif %}>{{ _('LBL_CUSTOM_INTERVAL') }}</option>
@@ -209,7 +220,7 @@
 
                                                                 {% if item.customIntervalText %}
                                                                     <div class="mt-2">
-                                                                        <b>{{ item.customIntervalText }}</b>
+                                                                        <b class="text-danger">{{ item.customIntervalText }}</b>
                                                                     </div>
                                                                 {% endif %}
                                                             </div>

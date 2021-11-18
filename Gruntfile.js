@@ -62,6 +62,8 @@ module.exports = function(grunt) {
                     'web/public/vendor/revolution/js/extensions/revolution.extension.slideanims.js',
                     //'web/public/vendor/revolution/js/extensions/revolution.extension.video.js',
 
+                    'web/public/vendor/flatpickr/flatpickr.js',
+
                     'web/public/vendor/select2/js/select2.js',
                     'web/public/vendor/cookiebar/jquery.cookiebar.js',
                     'web/public/vendor/fancybox/jquery.fancybox.js',

@@ -420,6 +420,19 @@ var shoppingCart = {
             $('#ajax-modal .modal-content').html('');
         });
 
+        $('.date-picker:not(.inited)').each (function () {
+            $(this).addClass('inited');
+            var minDate = $(this).data('min-date');
+            var offDates = $(this).data('off-dates') || [];
+
+            $(this).flatpickr({
+                dateFormat: "Y-m-d",
+                minDate: minDate,
+                disable: offDates,
+                locale: 'hu'
+            });
+        });
+
         if ($.fn.parsley) {
             $('.parsley-form:not(.inited)').each (function () {
                 $(this).addClass('inited');

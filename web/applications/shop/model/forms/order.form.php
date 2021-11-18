@@ -45,6 +45,7 @@ class orderForm extends formBuilder {
             (new inputText('invoice_address', 'LBL_ADDRESS')),
 
             (new inputRadio('shipping', 'LBL_SHIPPING_MODE')),
+            (new inputDate('date', 'LBL_SHIPPING_CUSTOM_DATE')),
             (new inputSelect('interval', 'LBL_SHIPPING_INTERVAL')),
             (new inputText('custom_interval', 'LBL_SHIPPING_CUSTOM_INTERVAL')),
             (new inputRadio('payment', 'LBL_PAYMENT_MODE')),
@@ -134,7 +135,7 @@ class orderForm extends formBuilder {
 
         $this->owner->cart->init($key, false);
         $this->owner->cart->setPaymentMode((int)$this->values['payment']);
-        $this->owner->cart->setShippingMode((int)$this->values['shipping'], (int)$this->values['interval'], $this->values['custom_interval']);
+        $this->owner->cart->setShippingMode((int)$this->values['shipping'], (int)$this->values['interval'], $this->values['custom_interval'], $this->values['date']);
 
         if(!Empty($this->values['options'])) {
             $this->owner->cart->setOption('documents', $this->values['options']);
@@ -228,6 +229,7 @@ class orderForm extends formBuilder {
             $this->values['payment'],
             $this->values['shipping'],
             $this->values['interval'],
+            $this->values['date'],
             $this->values['custom_interval'],
             $this->values['invoiceaddress'],
             $this->values['createaccount'],

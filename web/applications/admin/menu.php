@@ -93,6 +93,11 @@ $GLOBALS['MENU'] = [
                 'access'  => true,
                 'userGroups' => [USER_GROUP_ADMINISTRATORS]
             ],
+            'holidays' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
             'settings' => [
                 'display' => 1,
                 'access'  => true,

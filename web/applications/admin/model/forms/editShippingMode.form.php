@@ -67,6 +67,8 @@ class editShippingModeForm extends formBuilder {
                                 ->setAppend('LBL_DAYS')
                         ),
 
+                        (new inputSwitch('sm_select_date', 'LBL_SHIPPING_CUSTOM_DATE', 0)),
+
                         (new inputSwitch('sm_intervals', 'LBL_SHIPPING_INTERVALS', 0))
                          ->changeState(1, enumChangeAction::Show(), '#interval-items')
                         ->changeDefaultState(enumChangeAction::Hide(), '#interval-items'),
@@ -97,6 +99,7 @@ class editShippingModeForm extends formBuilder {
 
     public function onBeforeSave() {
         $this->values['sm_shop_id'] = $this->owner->shopId;
+        if(Empty($this->values['sm_select_date'])) $this->values['sm_select_date'] = 0;
         if(Empty($this->values['sm_intervals'])) $this->values['sm_intervals'] = 0;
         if(Empty($this->values['sm_custom_interval'])) $this->values['sm_custom_interval'] = 0;
         if(Empty($this->values['sm_day_diff'])) $this->values['sm_day_diff'] = 0;

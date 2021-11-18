@@ -34,7 +34,10 @@ class ordersTable extends table {
             (new column('cart_ordered', 'LBL_ORDER_TIME', 2))
                 ->setTemplate('{{ _date(val, 5) }}')
                 ->addClass('text-center'),
-            (new column('us_firstname', 'LBL_NAME', 5))
+            (new column('cart_custom_date', 'LBL_SHIPPING_DATE', 2))
+                ->setTemplate('{{ _date(val, 3) }}')
+                ->addClass('text-center'),
+            (new column('us_firstname', 'LBL_NAME', 3))
                 ->setTemplate('{{ formatName(val, row.us_lastname) }}'),
             (new column('cart_total', 'LBL_TOTAL', 1))
                 ->addClass('text-right')

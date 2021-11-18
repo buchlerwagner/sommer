@@ -36,6 +36,7 @@ class cart extends ancestor {
     public $userData = [];
 	public $items = [];
 	public $remarks;
+	public $customDate;
 	public $customInterval;
 
 	private $options = [];
@@ -243,6 +244,7 @@ class cart extends ancestor {
                 'total' => $this->total,
                 'shippingMode' => $this->getSelectedShippingMode(),
                 'shippingInterval' => $this->getSelectedShippingInterval(),
+                'customDate' => $this->customDate,
                 'customInterval' => $this->customInterval,
                 'paymentMode' => $this->getSelectedPaymentMode(),
                 'orderNumber' => $this->orderNumber,
@@ -335,6 +337,7 @@ class cart extends ancestor {
                 $this->paymentFee = $cart['cart_payment_fee'];
                 $this->paymentId = $cart['cart_pm_id'];
                 $this->remarks = $cart['cart_remarks'];
+                $this->customDate = $cart['cart_custom_date'];
                 $this->customInterval = $cart['cart_custom_interval'];
 
                 if($this->userId){
@@ -803,6 +806,7 @@ class cart extends ancestor {
 
     public function getShippingModes(){
         $out = [];
+        $holidays = $this->getHolidays();
 
         $result = $this->owner->db->getRows(
             $this->owner->db->genSQLSelect(
@@ -817,6 +821,7 @@ class cart extends ancestor {
                     'sm_type AS type',
                     'sm_day_diff AS dayDiff',
                     'sm_intervals AS hasIntervals',
+                    'sm_select_date AS hasCustomDate',
                     'sm_custom_interval AS hasCustomInterval',
                     'sm_custom_text AS customIntervalText',
                 ],
@@ -832,7 +837,12 @@ class cart extends ancestor {
         if ($result) {
             foreach($result AS $row){
                 $out[$row['id']] = $row;
-                $out[$row['id']]['shippingDate'] = ($row['dayDiff'] ? dateAddDays('now', $row['dayDiff']) : date('Y-m-d'));
+                $out[$row['id']]['shippingDate'] = $this->getNextShippingDate(($row['dayDiff'] ? dateAddDays('now', $row['dayDiff']) : date('Y-m-d')));
+
+                if($out[$row['id']]['hasCustomDate']){
+                    $out[$row['id']]['offDates'] = json_encode($holidays);
+                }
+
                 $out[$row['id']]['intervals'] = [];
 
                 if($this->subtotal >= $row['freeLimit'] && !Empty($row['freeLimit'])){
@@ -883,6 +893,7 @@ class cart extends ancestor {
                         'sm_type AS type',
                         'sm_email_text AS emailText',
                         'sm_day_diff AS dayDiff',
+                        'sm_select_date AS hasCustomDate',
                         'sm_custom_text AS customIntervalText',
                     ],
                     [
@@ -892,7 +903,7 @@ class cart extends ancestor {
                 )
             );
             if($out){
-                $out['shippingDate'] = ($out['dayDiff'] ? dateAddDays($this->orderDate, $out['dayDiff']) : date('Y-m-d'));
+                $out['shippingDate'] = $this->getNextShippingDate(($out['dayDiff'] ? dateAddDays($this->orderDate, $out['dayDiff']) : date('Y-m-d')));
             }
         }
 
@@ -954,11 +965,13 @@ class cart extends ancestor {
         }
     }
 
-    public function setShippingMode($id, $intervalId = 0, $customInterval = ''){
+    public function setShippingMode($id, $intervalId = 0, $customInterval = '', $customDate = null){
         $shippingModes = $this->getShippingModes();
         if($shippingModes[$id]){
             $this->shippingId = $id;
             $this->shippingFee = $shippingModes[$id]['price'];
+
+            if(!$customDate) $customDate = null;
 
             if($intervalId > 0) {
                 $customInterval = '';
@@ -971,6 +984,7 @@ class cart extends ancestor {
                         'cart_sm_id' => (int) $id,
                         'cart_si_id' => (int) $intervalId,
                         'cart_shipping_fee' => $this->shippingFee,
+                        'cart_custom_date' => $customDate,
                         'cart_custom_interval' => $customInterval,
                     ],
                     [
@@ -1065,6 +1079,46 @@ class cart extends ancestor {
 
             $this->destroyKey();
         }
+    }
+
+    private function getNextShippingDate($date){
+        $holidays = $this->getHolidays();
+
+        if(in_array($date, $holidays)){
+            do{
+                $date = date('Y-m-d', strtotime($date . ' +1 days'));
+            }while(in_array($date, $holidays));
+        }
+
+        return $date;
+    }
+
+    public function getHolidays($json = false){
+        static $holidays = [];
+
+        if(!$holidays) {
+            $res = $this->owner->db->getRows(
+                $this->owner->db->genSQLSelect(
+                    'holidays',
+                    [
+                        'h_date',
+                    ],
+                    [
+                        'h_shop_id' => $this->owner->shopId,
+                        'h_date' => [
+                            'greater' => date('Y-m-d')
+                        ]
+                    ]
+                )
+            );
+            if ($res) {
+                foreach ($res as $r) {
+                    $holidays[] = $r['h_date'];
+                }
+            }
+        }
+
+        return ($json ? json_encode($holidays) : $holidays);
     }
 
     public function setOrderStatus($status){
