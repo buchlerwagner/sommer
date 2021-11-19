@@ -359,10 +359,31 @@ var shoppingCart = {
         $('.set-shipping-interval').on('change', function (){
             var $this = $(this);
             var $parent = $this.parents('.shipping-intervals');
+            var $dateControl = $this.parents('.shipping-intervals').find('.date-picker');
+
+            var minDate = false;
+            var offDates = false;
+
             if(parseInt($this.val()) === -1){
                 $parent.find('.custom-interval').removeClass('d-none').show();
+
+                minDate = 'today';
+                offDates = [];
             }else{
                 $parent.find('.custom-interval').hide();
+            }
+
+            if($dateControl.length > 0){
+                $dateControl.flatpickr({
+                    dateFormat: "Y-m-d",
+                    minDate: (minDate ? minDate : $dateControl.data('min-date')),
+                    disable: (offDates ? offDates : $dateControl.data('off-dates') || []),
+                    locale: 'hu'
+                });
+
+                if(!minDate) {
+                    $dateControl.val($dateControl.data('min-date'));
+                }
             }
         });
 
