@@ -3,7 +3,13 @@ ALTER TABLE `cart` ADD COLUMN `cart_shipping_date` DATE NULL DEFAULT NULL AFTER 
 ALTER TABLE `products` ADD COLUMN `prod_earliest_takeover` TIME NULL DEFAULT NULL AFTER `prod_max_sale`;
 
 
-
+CREATE TABLE `holidays` (
+    `h_id` int(11) NOT NULL AUTO_INCREMENT,
+    `h_shop_id` int(11) DEFAULT NULL,
+    `h_date` date DEFAULT NULL,
+    PRIMARY KEY (`h_id`),
+    UNIQUE KEY `date` (`h_date`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
 
 

@@ -195,7 +195,14 @@
                                                                 <label class="control-label pl-0 text-white mb-1" for="shipping-date-{{ item.id }}">
                                                                     {{ _('LBL_SELECT_SHIPPING_DATE') }}
                                                                 </label>
-                                                                <input id="shipping-date-{{ item.id }}" type="text" value="{{ _date(item.shippingDate) }}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text">
+                                                                            <i class="fal fa-calendar-alt"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                    <input id="shipping-date-{{ item.id }}" type="text" value="{{ _date(item.shippingDate) }}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly>
+                                                                </div>
                                                             </div>
                                                             {% endif %}
 
