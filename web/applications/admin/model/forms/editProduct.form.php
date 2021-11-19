@@ -162,7 +162,18 @@ class editProductForm extends formBuilder {
                 (new inputCheckGroup('prod_properties', 'LBL_PRODUCT_TAGS'))
                     ->setColor(enumColors::Primary())
                     ->setOptions($this->owner->lists->getProperties())
-                    ->notDBField()
+                    ->notDBField(),
+
+                (new groupRow('row9'))->addElements(
+                    (new inputText('prod_earliest_takeover', 'LBL_EARLIEST_TAKEOVER'))
+                        ->setColSize('col-4')
+                        ->setHelpText('LBL_EARLIEST_TAKEOVER_INFO')
+                        ->setIcon('fal fa-clock')
+                        ->setPlaceholder('LBL_NOT_SET')
+                        ->setMaxLength(5)
+                        ->onlyNumbers(':')
+                        ->addClass('text-right')
+                )
             );
 
         $tabImages = (new sectionBox('images', 'LBL_PRODUCT_IMAGES', 'far fa-images'))
@@ -238,6 +249,10 @@ class editProductForm extends formBuilder {
         $this->getControl('prod_min_sale')->setAppend($units[$this->values['prod_pack_unit']]);
         $this->getControl('prod_max_sale')->setAppend($units[$this->values['prod_pack_unit']]);
 
+        if(!Empty($this->values['prod_earliest_takeover'])){
+            $this->values['prod_earliest_takeover'] = substr($this->values['prod_earliest_takeover'], 0, 5);
+        }
+
         $url = $this->owner->hostConfig['publicSite'] . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $this->categoryURL . '/' . $this->keyFields['prod_id'] . '-' . $this->values['prod_url'] . '?show=all';
         $this->getControl('preview')->setUrl($url);
     }
@@ -257,6 +272,12 @@ class editProductForm extends formBuilder {
 
         if(!Empty($this->values['prod_properties'])){
             $this->product->setProperties($this->values['prod_properties']);
+        }
+
+        if(!Empty($this->values['prod_earliest_takeover'])){
+            $this->values['prod_earliest_takeover'] = standardTime($this->values['prod_earliest_takeover']);
+        }else{
+            $this->values['prod_earliest_takeover'] = null;
         }
 
         unset($this->values['prod_properties']);

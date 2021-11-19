@@ -127,6 +127,15 @@ class orderForm extends formBuilder {
         if ($this->values['interval'] == -1 && Empty($this->values['custom_interval'])) {
             $this->addError('ERR_2001', self::FORM_ERROR, ['custom_interval']);
         }
+
+        if (!empty($this->values['createaccount']) && !empty($this->values['email'])) {
+            $res = $this->owner->db->getFirstRow(
+                "SELECT us_id FROM users WHERE us_shop_id = " . $this->owner->shopId . " AND us_email LIKE \"" . $this->owner->db->escapeString($this->values['email']) . "\""
+            );
+            if (!empty($res)) {
+                $this->addError('ERR_EMAIL_REGISTERED_ALREADY', self::FORM_ERROR, ['email']);
+            }
+        }
     }
 
     public function saveValues() {

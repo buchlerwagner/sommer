@@ -47,6 +47,19 @@ function standardDateTime($timestamp) {
 }
 
 /**
+ * Convert time to standard time format: HH:II:SS
+ *
+ * @param string $time
+ * @return string
+ */
+function standardTime($time) {
+    if (empty($time) || $time === '00:00:00') return null;
+    $time = str_replace(['/', '.', '-'], ':', trim($time, '.'));
+    $dt = strtotime($time);
+    return date('H:i:s', $dt);
+}
+
+/**
  * Calculate day difference between 2 dates
  *
  * @param string $date1

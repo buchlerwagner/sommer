@@ -32,7 +32,17 @@ class orderFiltersForm extends filterForm {
                     ->setColSize('col-6 col-lg-2')
                     ->setMaxDate(date('Y-m-d'))
                     ->addEmptyLabel()
+                    ->setAppend('ig'),
+                (new inputDate('cart_shipping_date_min', 'LBL_SHIPPING_DATE'))
+                    ->setIcon('fa fa-calendar')
+                    ->setAppend('tól')
+                    ->setColSize('col-6 col-lg-2'),
+                (new inputDate('cart_shipping_date_max', ''))
+                    ->setIcon('fa fa-calendar')
+                    ->setColSize('col-6 col-lg-2')
+                    ->addEmptyLabel()
                     ->setAppend('ig')
+
             )
         );
     }

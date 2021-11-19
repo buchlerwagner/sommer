@@ -241,8 +241,14 @@ class mysql extends db {
                         if(isset($val['greater'])){
                             $where[] = $key . '>' . $this->prepareValue($val['greater']);
                         }
+                        if(isset($val['greater='])){
+                            $where[] = $key . '>=' . $this->prepareValue($val['greater=']);
+                        }
                         if(isset($val['less'])){
                             $where[] = $key . '<' . $this->prepareValue($val['less']);
+                        }
+                        if(isset($val['less='])){
+                            $where[] = $key . '<=' . $this->prepareValue($val['less=']);
                         }
                         if(isset($val['like'])){
                             $where[] = $key . ' LIKE ' . $this->prepareValue($val['like']);

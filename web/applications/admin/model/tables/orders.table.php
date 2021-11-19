@@ -34,7 +34,7 @@ class ordersTable extends table {
             (new column('cart_ordered', 'LBL_ORDER_TIME', 2))
                 ->setTemplate('{{ _date(val, 5) }}')
                 ->addClass('text-center'),
-            (new column('cart_custom_date', 'LBL_SHIPPING_DATE', 2))
+            (new column('cart_shipping_date', 'LBL_SHIPPING_DATE', 2))
                 ->setTemplate('{{ _date(val, 3) }}')
                 ->addClass('text-center'),
             (new column('us_firstname', 'LBL_NAME', 3))
@@ -125,6 +125,17 @@ class ordersTable extends table {
                         $this->settings['orderdir']   = 'ASC';
                         break;
 
+                    case 'cart_shipping_date_min':
+                        $where[$field] = substr($field, 0, -4) . " >= '" . standardDate($values) . "'";
+                        $this->settings['orderfield'] = 'cart_shipping_date';
+                        $this->settings['orderdir']   = 'ASC';
+                        break;
+
+                    case 'cart_shipping_date_max':
+                        $where[$field] = substr($field, 0, -4) . " <= '" . standardDate($values) . "'";
+                        $this->settings['orderfield'] = 'cart_shipping_date';
+                        $this->settings['orderdir']   = 'ASC';
+                        break;
                     default:
                         $where[$field] = $field . " = '$values'";
                         break;

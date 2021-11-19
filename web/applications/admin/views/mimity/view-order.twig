@@ -109,18 +109,13 @@
                             {% if form.cart.getSelectedShippingInterval.id > 0 %}
                                 <span class="text-secondary">{{ _('LBL_SHIPPING_TIME') }}:</span>
                                 <b>
-                                    {% if form.cart.customDate %}
-                                        {{ _date(form.cart.customDate, 41) }},
-                                    {% else %}
-                                        {{ _date(form.cart.getSelectedShippingMode.shippingDate, 41) }},
-                                    {% endif %}
-
+                                    {{ _date(form.cart.shippingDate, 41) }},
                                     {{ _date(form.cart.getSelectedShippingInterval.timeStart, 6, false) }} - {{ _date(form.cart.getSelectedShippingInterval.timeEnd, 6, false) }}
                                 </b>
                             {% elseif form.cart.getSelectedShippingInterval.id == -1 %}
-                                {% if form.cart.customDate %}
+                                {% if form.cart.shippingDate %}
                                     <span class="text-secondary">{{ _('LBL_SELECT_SHIPPING_DATE') }}:</span>
-                                    <b>{{ _date(form.cart.customDate, 41) }}</b>
+                                    <b>{{ _date(form.cart.shippingDate, 41) }}</b>
                                 {% endif %}
 
                                 <span class="text-secondary">{{ _('LBL_CUSTOM_SHIPPING_TIME') }}:</span>

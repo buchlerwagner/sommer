@@ -31,12 +31,14 @@ class cart extends ancestor {
     private $paymentId = false;
     public $packagingFee = 0;
 
+    private $earliestTakeover = false;
+
     private $userId;
 
     public $userData = [];
 	public $items = [];
 	public $remarks;
-	public $customDate;
+	public $shippingDate;
 	public $customInterval;
 
 	private $options = [];
@@ -244,7 +246,7 @@ class cart extends ancestor {
                 'total' => $this->total,
                 'shippingMode' => $this->getSelectedShippingMode(),
                 'shippingInterval' => $this->getSelectedShippingInterval(),
-                'customDate' => $this->customDate,
+                'shippingDate' => $this->shippingDate,
                 'customInterval' => $this->customInterval,
                 'paymentMode' => $this->getSelectedPaymentMode(),
                 'orderNumber' => $this->orderNumber,
@@ -331,13 +333,13 @@ class cart extends ancestor {
                 $this->packagingFee = $cart['cart_packaging_fee'];
                 $this->subtotal = $cart['cart_subtotal'] + $this->packagingFee;
                 $this->currency = $cart['cart_currency'];
+                $this->shippingDate = $cart['cart_shipping_date'];
                 $this->shippingFee = $cart['cart_shipping_fee'];
                 $this->shippingId = $cart['cart_sm_id'];
                 $this->intervalId = $cart['cart_si_id'];
                 $this->paymentFee = $cart['cart_payment_fee'];
                 $this->paymentId = $cart['cart_pm_id'];
                 $this->remarks = $cart['cart_remarks'];
-                $this->customDate = $cart['cart_custom_date'];
                 $this->customInterval = $cart['cart_custom_interval'];
 
                 if($this->userId){
@@ -394,6 +396,12 @@ class cart extends ancestor {
                         $price = (!empty($row['citem_discount']) && $row['citem_discount'] < $row['citem_price'] ? $row['citem_discount'] : $row['citem_price']);
 
                         $packaging = $this->product->getPackaging($row['citem_pv_id']);
+
+                        if($takeover = $this->product->getEarliestTakeover()){
+                            if(!$this->earliestTakeover || $this->earliestTakeover > $takeover){
+                                $this->earliestTakeover = $takeover;
+                            }
+                        }
 
                         $this->items[$row['citem_id']] = [
                             'id' => $row['citem_id'],
@@ -850,6 +858,18 @@ class cart extends ancestor {
                 }
 
                 if($row['hasIntervals']){
+                    $where = [
+                        'si_shop_id' => $this->owner->shopId,
+                        'si_sm_id' => $row['id'],
+                    ];
+
+
+                    if(!Empty($this->earliestTakeover)){
+                        $where['si_time_start'] = [
+                            'greater=' => $this->earliestTakeover
+                        ];
+                    }
+
                     $res = $this->owner->db->getRows(
                         $this->owner->db->genSQLSelect(
                             'shipping_intervals',
@@ -858,10 +878,7 @@ class cart extends ancestor {
                                 'si_time_start AS timeStart',
                                 'si_time_end AS timeEnd',
                             ],
-                            [
-                                'si_shop_id' => $this->owner->shopId,
-                                'si_sm_id' => $row['id'],
-                            ],
+                            $where,
                             [],
                             false,
                             'si_time_start'
@@ -965,13 +982,16 @@ class cart extends ancestor {
         }
     }
 
-    public function setShippingMode($id, $intervalId = 0, $customInterval = '', $customDate = null){
+    public function setShippingMode($id, $intervalId = 0, $customInterval = '', $shippingDate = null){
         $shippingModes = $this->getShippingModes();
         if($shippingModes[$id]){
             $this->shippingId = $id;
             $this->shippingFee = $shippingModes[$id]['price'];
+            $this->shippingDate = $shippingModes[$id]['shippingDate'];
 
-            if(!$customDate) $customDate = null;
+            if($shippingDate) {
+                $this->shippingDate = standardDate($shippingDate);
+            }
 
             if($intervalId > 0) {
                 $customInterval = '';
@@ -984,7 +1004,7 @@ class cart extends ancestor {
                         'cart_sm_id' => (int) $id,
                         'cart_si_id' => (int) $intervalId,
                         'cart_shipping_fee' => $this->shippingFee,
-                        'cart_custom_date' => $customDate,
+                        'cart_shipping_date' => $this->shippingDate,
                         'cart_custom_interval' => $customInterval,
                     ],
                     [

@@ -88,6 +88,14 @@ class product extends ancestor {
         return false;
     }
 
+    public function getEarliestTakeover(){
+        if($this->data['earliestTakeover']){
+            return $this->data['earliestTakeover'];
+        }else{
+            return false;
+        }
+    }
+
 	public function reorderImages($orderList = false){
 		if(!$orderList){
 			$result = $this->owner->db->getRows(
@@ -404,6 +412,7 @@ class product extends ancestor {
             'intro' => $row['prod_intro'],
             'description' => $row['prod_description'],
             'available' => $row['prod_available'],
+            'earliestTakeover' => $row['prod_earliest_takeover'],
 
             'category' => [
                 'id' => $row['cat_id'],
