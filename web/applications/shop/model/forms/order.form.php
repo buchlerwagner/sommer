@@ -1,6 +1,5 @@
 <?php
 class orderForm extends formBuilder {
-
     public $options = [];
 
     public function setupKeyFields() {

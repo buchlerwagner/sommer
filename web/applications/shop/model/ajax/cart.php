@@ -113,6 +113,7 @@ switch($action) {
         if($params['id']) {
             $id = (int)$params['id'];
             $this->cart->setShippingMode($id);
+            $this->data['.item-shipping-fee']['show'] = true;
 
             if($this->cart->shippingFee > 0) {
                 $this->data['.shipping-fee']['html'] = $this->lib->formatPrice($this->cart->shippingFee, $this->cart->currency);

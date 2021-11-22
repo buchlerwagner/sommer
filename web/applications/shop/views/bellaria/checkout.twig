@@ -361,14 +361,16 @@
                                             </span>
                                         </li>
                                         {% endif %}
-                                        <li class="checkout-item">
+                                        <li class="checkout-item item-shipping-fee{% if not cart.getShippingId %} d-none{% endif %}">
                                             <span class="item-sum">
                                                 <span>{{ _('LBL_SHIPPING_FEE') }}</span>
                                                 <span class="text-right float-right shipping-fee">
-                                                    {% if cart.shippingFee > 0 %}
-                                                        {{ _price(cart.shippingFee, cart.currency) }}
-                                                    {% else %}
-                                                        {{ _('LBL_FREE') }}
+                                                    {% if cart.getShippingId %}
+                                                        {% if cart.shippingFee > 0 %}
+                                                            {{ _price(cart.shippingFee, cart.currency) }}
+                                                        {% else %}
+                                                            {{ _('LBL_FREE') }}
+                                                        {% endif %}
                                                     {% endif %}
                                                 </span>
                                             </span>
