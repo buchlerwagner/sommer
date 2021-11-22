@@ -129,8 +129,6 @@ var shoppingCart = {
 
         $(document).on('click', '.set-shipping-mode', function () {
             var id = parseInt($(this).data('id'));
-            $('.item-shipping-fee').removeClass('d-none').show();
-
             if(id) {
                 shoppingCart.sendData('setShippingMode', {
                     id: id,
