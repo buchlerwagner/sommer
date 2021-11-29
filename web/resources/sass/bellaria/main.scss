@@ -63,7 +63,7 @@ Version: 1.0.0
 
 //@import url('https://fonts.googleapis.com/css?family=ABeeZee:400,400i|Roboto:300,400,500,700|Leckerli+One|Merienda+One&display=swap');
 //@import url('https://fonts.googleapis.com/css?family=ABeeZee:400,400i|Roboto:300,400,500,700|Leckerli+One|Italianno&display=swap');
-@import url('https://fonts.googleapis.com/css?family=ABeeZee:400,400i|Roboto:300,400,500,700|Leckerli+One|Charm:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=ABeeZee:400,400i|Roboto:300,400,500,700|Charm:wght@400;700&display=swap');
 
 	  /***
 
@@ -2899,9 +2899,14 @@ hr{
 }
 
 .service-block .services_frame svg{
-	position: relative;
-	stroke-width:12px;
+	position: absolute;
 	fill:transparent;
+	z-index: 2;
+	left: 0;
+}
+
+.service-block .services_frame svg #frame{
+	stroke-width:12px;
 	stroke:$light-blue;
 	-webkit-transition: all 500ms ease;
 	-moz-transition: all 500ms ease;
@@ -2910,7 +2915,8 @@ hr{
 	transition: all 500ms ease;
 }
 
-.service-block .inner-box:hover .services_frame svg{
+
+.service-block .inner-box:hover .services_frame svg #frame {
 	fill:$light-blue;
 }
 
@@ -2918,10 +2924,11 @@ hr{
 	position: absolute;
 	left: 0;
 	right: 0;
-	top: 27px;
-	height: 126px;
-	width: 126px;
+	top: 0;
+	height: 180px;
+	width: 180px;
 	margin: 0 auto;
+	z-index: 1;
 }
 
 .service-block .image img{

@@ -41,7 +41,7 @@ const FORM_STATE_BUTTONACTION = 'buttonaction';
 const FORM_STATE_RESETED    = 'reseted';
 
 const VERSION_JS            = '1.0.4';
-const VERSION_CSS           = '1.0.2';
+const VERSION_CSS           = '1.0.3';
 
 //
 /**

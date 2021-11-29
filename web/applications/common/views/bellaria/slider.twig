@@ -83,10 +83,10 @@
                          style="z-index: 8; min-width: 399px; max-width: 399px; white-space: normal;">
                         {% if slide.link %}<a href="{{ slide.link }}">{% endif %}
                         {% if not slide.hideTitle %}
-                            <div style="font-size: {{ slide.titleSize }}%; line-height: {{ (slide.titleSize / 100) * 14 }}px; font-weight: 400; color: #4b4342;font-family:Leckerli One;">{{ slide.title }}</div>
+                            <div style="font-size: {{ slide.titleSize }}%; line-height: {{ (slide.titleSize / 100) * 14 }}px; color: #4b4342;font-family:Charm;">{{ slide.title }}</div>
                         {% endif %}
                         {% if slide.text %}
-                            <div class="mt-2" style="font-size: {{ slide.textSize }}%; line-height: {{ (slide.textSize / 100) * 14 }}px; font-weight: 400; color: #4b4342;font-family:ABeeZee;">{{ slide.text|nl2br }}</div>
+                            <div class="mt-2" style="font-size: {{ slide.textSize }}%; line-height: {{ (slide.textSize / 100) * 14 }}px; color: #4b4342;">{{ slide.text|nl2br }}</div>
                         {% endif %}
                         {% if slide.link %}</a>{% endif %}
                     </div>

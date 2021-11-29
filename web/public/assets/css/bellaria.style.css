@@ -5,7 +5,7 @@
  * Copyright 2011-2019 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
-@import url("https://fonts.googleapis.com/css?family=ABeeZee:400,400i|Roboto:300,400,500,700|Leckerli+One|Charm:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css?family=ABeeZee:400,400i|Roboto:300,400,500,700|Charm:wght@400;700&display=swap");
 :root {
   --blue: #007bff;
   --indigo: #6610f2;
@@ -24586,7 +24586,7 @@ hr {
   line-height: 72px;
   font-weight: 400;
   color: #4b4342;
-  font-family: "Leckerli One";
+  font-family: "Charm";
   z-index: 99;
 }
 
@@ -24652,9 +24652,14 @@ hr {
 }
 
 .service-block .services_frame svg {
-  position: relative;
-  stroke-width: 12px;
+  position: absolute;
   fill: transparent;
+  z-index: 2;
+  left: 0;
+}
+
+.service-block .services_frame svg #frame {
+  stroke-width: 12px;
   stroke: #5fcac7;
   -webkit-transition: all 500ms ease;
   -moz-transition: all 500ms ease;
@@ -24663,7 +24668,7 @@ hr {
   transition: all 500ms ease;
 }
 
-.service-block .inner-box:hover .services_frame svg {
+.service-block .inner-box:hover .services_frame svg #frame {
   fill: #5fcac7;
 }
 
@@ -24671,10 +24676,11 @@ hr {
   position: absolute;
   left: 0;
   right: 0;
-  top: 27px;
-  height: 126px;
-  width: 126px;
+  top: 0;
+  height: 180px;
+  width: 180px;
   margin: 0 auto;
+  z-index: 1;
 }
 
 .service-block .image img {
