@@ -16,7 +16,7 @@
                     <thead class="cart-header">
                     <tr>
                         <th class="product-name" colspan="2">{{ _('LBL_PRODUCT') }}</th>
-                        <th class="product-price">{{ _('LBL_PRICE') }}</th>
+                        <th class="product-price">{{ _('LBL_UNIT_PRICE') }}</th>
                         <th class="product-quantity">{{ _('LBL_QUANTITY') }}</th>
                         <th class="product-subtotal">{{ _('LBL_TOTAL') }}</th>
                         <th class="product-remove">&nbsp;</th>
@@ -35,14 +35,17 @@
                             </a>
                         </td>
                         <td class="product-price">
-                            {{ _price(item.price.finalPrice, cart.currency) }} / {{ item.quantity.unit }}
+                            {{ _price(item.price.displayPrice, cart.currency) }} {{ item.price.unit }}
                         </td>
-                        <td class="product-quantity">
-                            <div class="input-group ml-auto mr-auto" style="width: 130px;" data-id="{{ item.id }}">
+                        <td class="product-quantity pr-0 pl-0">
+                            <div class="input-group" data-id="{{ item.id }}" style="max-width: 200px;">
                                 <div class="input-group-prepend">
                                     <button class="btn btn-light quantity-select btn-minus" data-value="-1" type="button" id="button-minus"> - </button>
                                 </div>
-                                <input type="text" name="quantity" data-min="{{ item.minSale }}" data-max="{{ item.maxSale }}" class="form-control bg-white text-center numbersonly quantity-input item-quantity-{{ item.id }}" value="{{ item.quantity.amount }}">
+                                <input type="text" name="quantity" data-min="{{ item.minSale }}" data-max="{{ item.maxSale }}" class="form-control bg-white text-center numbersonly quantity-input border-right-0 item-quantity-{{ item.id }}" value="{{ item.quantity.amount }}">
+                                <div class="input-group-append">
+                                    <span class="input-group-text bg-white" id="quantity-unit">{{ item.quantity.unit }}</span>
+                                </div>
                                 <div class="input-group-append">
                                     <button class="btn btn-light quantity-select btn-plus" data-value="1" type="button" id="button-plus"> + </button>
                                 </div>

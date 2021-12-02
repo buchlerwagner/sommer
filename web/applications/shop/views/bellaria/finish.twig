@@ -29,7 +29,7 @@
                         <thead class="cart-header">
                         <tr>
                             <th class="product-name" colspan="2">{{ _('LBL_PRODUCT') }}</th>
-                            <th class="product-price">{{ _('LBL_PRICE') }}</th>
+                            <th class="product-price">{{ _('LBL_UNIT_PRICE') }}</th>
                             <th class="product-quantity">{{ _('LBL_QUANTITY') }}</th>
                             <th class="product-subtotal">{{ _('LBL_TOTAL') }}</th>
                         </tr>
@@ -47,7 +47,7 @@
                                     </a>
                                 </td>
                                 <td class="product-price">
-                                    {{ _price(item.price.finalPrice, cart.currency) }} / {{ item.quantity.unit }}
+                                    {{ _price(item.price.displayPrice, cart.currency) }} {{ item.price.unit }}
                                 </td>
                                 <td class="product-quantity">
                                     {{ item.quantity.amount }} {{ item.quantity.unit }}

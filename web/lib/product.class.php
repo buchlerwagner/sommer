@@ -264,7 +264,27 @@ class product extends ancestor {
             $weightUnits = $this->owner->lists->getWeights();
             $packaging = $this->getPackagings();
 
-			foreach ($result AS $row) {
+            foreach ($result AS $row) {
+                $isWeightUnit = false;
+                $unit = $packageUnits[$row['pv_pack_pcs_unit']];
+
+                if(!Empty($row['pv_price_discount']) && $row['pv_price_discount'] < $row['pv_price']){
+                    $displayPrice = $row['pv_price_discount'];
+                }else {
+                    $displayPrice = $row['pv_price'];
+                }
+                $unitPrice = $displayPrice;
+
+                if(in_array($packageUnits[$row['pv_pack_unit']], $weightUnits)){
+                    $isWeightUnit = true;
+                    if(!$row['pv_pack_quantity']) $row['pv_pack_quantity'] = 1;
+                    $unitPrice = $unitPrice / $row['pv_pack_quantity'];
+
+                    if($row['pv_pack_quantity'] > 1){
+                        $unit = $row['pv_pack_quantity'] . ' ' . $packageUnits[$row['pv_pack_pcs_unit']];
+                    }
+                }
+
                 $variants[] = [
                     'id' => $row['pv_id'],
                     'imgId' => $row['pv_pimg_id'],
@@ -272,7 +292,11 @@ class product extends ancestor {
                     'price' => [
                         'value' => $row['pv_price'],
                         'discount' => $row['pv_price_discount'],
+                        'displayPrice' => $displayPrice,
+                        'unitPrice' => $unitPrice,
                         'currency' => $row['pv_currency'],
+                        'unit' => '/' . $unit,
+                        'isWeightUnit' => $isWeightUnit,
                     ],
                     'minSale' => $row['pv_min_sale'],
                     'maxSale' => $row['pv_max_sale'],
@@ -366,6 +390,9 @@ class product extends ancestor {
         static $packageUnits = [];
         static $weightUnits = [];
 
+        $isWeightUnit = false;
+        $unit = $packageUnits[$row['pv_pack_pcs_unit']];
+
         if(Empty($packageUnits)) {
             $packageUnits = $this->owner->lists->getUnits();
         }
@@ -379,6 +406,23 @@ class product extends ancestor {
         $url = '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $row['cat_url'] . '/' . $row['prod_id'] . '-' . $row['prod_url'] . '/';
         $path = $this->getImagePath(false, $row['prod_cat_id']);
 
+        if(!Empty($row['pv_price_discount']) && $row['pv_price_discount'] < $row['pv_price']){
+            $displayPrice = $row['pv_price_discount'];
+        }else {
+            $displayPrice = $row['pv_price'];
+        }
+        $unitPrice = $displayPrice;
+
+        if(in_array($packageUnits[$row['pv_pack_unit']], $weightUnits)){
+            $isWeightUnit = true;
+            if(!$row['pv_pack_quantity']) $row['pv_pack_quantity'] = 1;
+            $unitPrice = $unitPrice / $row['pv_pack_quantity'];
+
+            if($row['pv_pack_quantity'] > 1){
+                $unit = $row['pv_pack_quantity'] . ' ' . $packageUnits[$row['pv_pack_pcs_unit']];
+            }
+        }
+
         $variant = [
             'id' => 0,
             'imgId' => 0,
@@ -386,6 +430,10 @@ class product extends ancestor {
                 'value' => $row['prod_price'],
                 'discount' => $row['prod_price_discount'],
                 'currency' => $row['prod_currency'],
+                'displayPrice' => $displayPrice,
+                'unitPrice' => $unitPrice,
+                'unit' => '/' . $unit,
+                'isWeightUnit' => $isWeightUnit,
             ],
             'minSale' => $row['prod_min_sale'],
             'maxSale' => $row['prod_max_sale'],

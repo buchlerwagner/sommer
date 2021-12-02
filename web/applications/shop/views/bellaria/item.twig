@@ -51,12 +51,10 @@
                                                 <div id="item-price-{{ variant.id }}" class="item-price{% if loop.index > 1 %} d-none{% endif %}" data-id="{{ item.id }}" data-variant="{{ variant.id }}" data-name="{{ variant.name }}" data-unit="{{ variant.packaging.packageUnitName }}" data-weight="{{ variant.packaging.weight }} {{ variant.packaging.weightUnitName }}" data-min="{{ variant.minSale }}" data-max="{{ variant.maxSale }}" data-img="{{ variant.imgId }}">
                                                     {% if variant.price.discount > 0 and variant.price.value > variant.price.discount  %}
                                                         <del class="small">{{ _price(variant.price.value, variant.price.currency) }}</del>
-                                                        {{ _price(variant.price.discount, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
-                                                    {% else %}
-                                                        {{ _price(variant.price.value, variant.price.currency) }}{% if variant.packaging.packageUnitName %}/{{ variant.packaging.packageUnitName }}{% endif %}
                                                     {% endif %}
+                                                        {{ _price(variant.price.displayPrice, variant.price.currency) }} {{ variant.price.unit }}
 
-                                                    {% if variant.packaging.quantity > 1 %}
+                                                    {% if variant.packaging.quantity > 1 and variant.packaging.packagePcsUnitName != variant.packaging.packageUnitName %}
                                                         <div class="item-packaging text-muted">({{ variant.packaging.quantity }} {{ variant.packaging.packagePcsUnitName }}/{{ variant.packaging.packageUnitName }})</div>
                                                     {% endif %}
 

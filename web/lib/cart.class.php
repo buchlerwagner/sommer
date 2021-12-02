@@ -117,11 +117,26 @@ class cart extends ancestor {
                 $this->product->init($productId)->getProduct();
                 $quantity = $this->checkQuantity($quantity, $variantId);
 
+                $row = $this->owner->db->getFirstRow(
+                    $this->owner->db->genSQLSelect(
+                        'cart_items',
+                        [
+                            'citem_price',
+                        ],
+                        [
+                            'citem_id' => $key,
+                            'citem_cart_id' => $this->id
+                        ]
+                    )
+                );
+                $price = $row['citem_price'];
+
 				$this->owner->db->sqlQuery(
 					$this->owner->db->genSQLUpdate(
 						'cart_items',
 						[
 							'citem_quantity' => $quantity,
+							'citem_subtotal' => $price * $quantity,
 						],
 						[
 							'citem_id' => $key,
@@ -403,6 +418,8 @@ class cart extends ancestor {
                             }
                         }
 
+                        $variant = $this->product->getVariant($row['citem_pv_id']);
+
                         $this->items[$row['citem_id']] = [
                             'id' => $row['citem_id'],
                             'cartId' => $row['citem_cart_id'],
@@ -419,11 +436,14 @@ class cart extends ancestor {
                                 'value' => $row['citem_price'],
                                 'currency' => $row['citem_currency'],
                                 'discount' => $row['citem_discount'],
-                                'finalPrice' => $price,
+                                'displayPrice' => $variant['price']['displayPrice'],
+                                'unit' => $variant['price']['unit'],
+                                'isWeightUnit' => $variant['price']['isWeightUnit'],
                                 'total' => ($price * $row['citem_quantity']),
                             ],
                             'packaging' => $packaging,
                             'quantity' => [
+                                'baseAmount' => $variant['packaging']['quantity'],
                                 'amount' => $row['citem_quantity'],
                                 'unit' => $row['citem_pack_unit'],
                             ],
@@ -476,7 +496,7 @@ class cart extends ancestor {
             }
         }
 
-        $subtotal = (!Empty($variant['price']['discount']) && $variant['price']['discount'] < $variant['price']['value'] ? $variant['price']['discount'] : $variant['price']['value']);
+        //$subtotal = (!Empty($variant['price']['discount']) && $variant['price']['discount'] < $variant['price']['value'] ? $variant['price']['discount'] : $variant['price']['value']);
 
         $this->owner->db->sqlQuery(
 			$this->owner->db->genSQLInsert(
@@ -488,9 +508,9 @@ class cart extends ancestor {
 					'citem_prod_name' => $item['name'],
 					'citem_prod_img' => $image,
 					'citem_prod_variant' => $variant['name'],
-					'citem_price' => $variant['price']['value'],
+					'citem_price' => $variant['price']['unitPrice'],
 					'citem_discount' => $variant['price']['discount'],
-					'citem_subtotal' => $subtotal,
+					'citem_subtotal' => $variant['price']['unitPrice'] * $quantity,
 					'citem_currency' => $variant['price']['currency'],
 					'citem_quantity' => $quantity,
 					'citem_pack_unit' => $variant['packaging']['packageUnitName'],
