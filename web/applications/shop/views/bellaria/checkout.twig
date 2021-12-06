@@ -178,13 +178,14 @@
 
                     <div class="payment-box">
                         <div class="upper-box">
-                            <div class="payment-options">
+                            <div class="payment-options shipping-options">
                                 {% for item in cart.getShippingModes %}
                                 <ul>
                                     <li>
-                                        <div class="radio-option options">
+                                        <div class="radio-option">
                                             <input type="radio" name="order[shipping]" id="shipping-{{ item.id }}" class="set-shipping-mode" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getShippingId == item.id %} checked{% endif %}>
-                                            <label for="shipping-{{ item.id }}">
+                                            <div class="options">
+                                                <label for="shipping-{{ item.id }}" class="d-block">
                                                 <div class="row">
                                                     <div class="col-12 col-md-10">
                                                         <strong>{{ item.name }}</strong>
@@ -199,6 +200,7 @@
                                                         </span>
                                                     </div>
                                                 </div>
+                                                </label>
                                                 <span class="small-text">
                                                     <div>{{ item.text|nl2br }}</div>
                                                     {% if item.hasIntervals %}
@@ -214,41 +216,43 @@
                                                                             <i class="fal fa-calendar-alt"></i>
                                                                         </span>
                                                                     </div>
-                                                                    <input id="shipping-date-{{ item.id }}" type="text" value="{{ _date(item.shippingDate) }}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly>
+                                                                    <input id="shipping-date-{{ item.id }}" type="text" value="{{ _date(forms.order.values.date) }}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly {% if cart.getShippingId != item.id %} disabled{% endif %}>
                                                                 </div>
                                                             </div>
                                                             {% endif %}
 
-                                                            <div class="form-group col-6 col-lg-8">
+                                                            <div class="form-group col-6 col-lg-8 interval-select{% if forms.order.values.interval == -1 %} d-none{% endif %}">
                                                                 <label class="control-label pl-0 text-white mb-1" for="shipping-interval-{{ item.id }}">
                                                                     {{ _('LBL_SELECT_SHIPPING_INTERVAL') }}
                                                                 </label>
-                                                                <select name="order[interval]" class="form-control set-shipping-interval" id="shipping-interval-{{ item.id }}"{% if cart.getShippingId != item.id %} disabled{% endif %}>
+                                                                <select name="order[interval]" class="form-control" id="shipping-interval-{{ item.id }}"{% if cart.getShippingId != item.id %} disabled{% endif %}>
                                                                     {% for interval in item.intervals %}
                                                                         <option value="{{ interval.id }}"{% if forms.order.values.interval == interval.id %} selected{% endif %}>
                                                                             {% if not item.hasCustomDate %}{{ _date(item.shippingDate, 41) }}, {% endif %}{{ _date(interval.timeStart, 6, false) }} - {{ _date(interval.timeEnd, 6, false) }}
                                                                         </option>
                                                                     {% endfor %}
-                                                                    {% if item.hasCustomInterval %}
-                                                                        <option value="-1"{% if forms.order.values.interval == -1 %} selected{% endif %}>{{ _('LBL_CUSTOM_INTERVAL') }}</option>
-                                                                    {% endif %}
                                                                 </select>
                                                             </div>
                                                             {% if item.hasCustomInterval %}
-                                                            <div class="custom-interval form-group col-12{% if forms.order.values.interval != -1 %} d-none{% endif %}{% if forms.order.hasError('custom_interval') %} has-error{% endif %}">
-                                                                <input type="text" id="shipping-custom-interval-{{ item.id }}" name="order[custom_interval]" class="form-control" value="{% if forms.order.values.interval == -1 %}{{ forms.order.values.custom_interval }}{% endif %}" placeholder="{{ _('LBL_CUSTOM_INTERVAL_INPUT') }}"{% if cart.getShippingId != item.id %} disabled{% endif %}>
+                                                                <div class="checkbox form-group col-12">
+                                                                    <input id="chk-custom-interval-{{ item.id }}" type="checkbox" class="set-shipping-interval" name="order[select_custom_interval]" value="1"{% if forms.order.values.interval == -1 %} checked{% endif %} data-parsley-excluded="true">
+                                                                    <label for="chk-custom-interval-{{ item.id }}">{{ _('LBL_CUSTOM_INTERVAL') }}</label>
+                                                                </div>
 
-                                                                {% if item.customIntervalText %}
-                                                                    <div class="mt-2">
-                                                                        <b class="text-danger">{{ item.customIntervalText|raw }}</b>
-                                                                    </div>
-                                                                {% endif %}
-                                                            </div>
+                                                                <div class="custom-interval form-group col-12{% if forms.order.values.interval != -1 %} d-none{% endif %}{% if forms.order.hasError('custom_interval') %} has-error{% endif %}">
+                                                                    <input type="text" id="shipping-custom-interval-{{ item.id }}" name="order[custom_interval]" class="form-control" value="{% if forms.order.values.interval == -1 %}{{ forms.order.values.custom_interval }}{% endif %}" placeholder="{{ _('LBL_CUSTOM_INTERVAL_INPUT') }}"{% if cart.getShippingId != item.id %} disabled{% endif %}>
+
+                                                                    {% if item.customIntervalText %}
+                                                                        <div class="mt-2">
+                                                                            <b class="text-danger">{{ item.customIntervalText|raw }}</b>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
                                                             {% endif %}
                                                         </div>
                                                     {% endif %}
                                                 </span>
-                                            </label>
+                                            </div>
                                         </div>
                                     </li>
                                 </ul>
@@ -268,7 +272,8 @@
                                         <li>
                                             <div class="radio-option">
                                                 <input type="radio" name="order[payment]" id="payment-{{ item.id }}" class="set-payment-mode" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getPaymentId == item.id %} checked{% endif %}>
-                                                <label for="payment-{{ item.id }}">
+                                                <div class="options">
+                                                    <label for="payment-{{ item.id }}" class="d-block">
                                                     <div class="row">
                                                         <div class="col-12 col-md-10">
                                                             <strong>{{ item.name }}</strong>
@@ -281,8 +286,9 @@
                                                         </div>
                                                         {% endif %}
                                                     </div>
+                                                    </label>
                                                     <span class="small-text">{{ item.text|nl2br }}</span>
-                                                </label>
+                                                </div>
                                             </div>
                                         </li>
                                     </ul>

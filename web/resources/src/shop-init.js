@@ -136,16 +136,18 @@ var shoppingCart = {
             }
         });
 
-        $(document).on('change', '.set-shipping-mode', function () {
+        $(document).on('click', '.set-shipping-mode', function () {
             $('.set-shipping-mode').each(function(i, obj) {
-                var $parent = $(obj).parents('.options');
+                var $parent = $(obj).parents('.radio-option');
 
                 if($(obj).is(':checked')){
                     $parent.find('select').removeAttr('disabled');
                     $parent.find('input[type=text]').removeAttr('disabled');
+                    $parent.find('input[type=checkbox]').removeAttr('disabled');
                 }else{
                     $parent.find('select').attr('disabled', 'disabled');
                     $parent.find('input[type=text]').attr('disabled', 'disabled');
+                    $parent.find('input[type=checkbox]').attr('disabled', 'disabled');
                 }
             });
         });
@@ -364,13 +366,15 @@ var shoppingCart = {
             var minDate = false;
             var offDates = false;
 
-            if(parseInt($this.val()) === -1){
+            if($this.is(':checked')){
                 $parent.find('.custom-interval').removeClass('d-none').show();
+                $parent.find('.interval-select').hide();
 
                 minDate = 'today';
                 offDates = [];
             }else{
                 $parent.find('.custom-interval').hide();
+                $parent.find('.interval-select').removeClass('d-none').show();
             }
 
             if($dateControl.length > 0){
@@ -386,7 +390,6 @@ var shoppingCart = {
                 }
             }
         });
-
 
         $(document).on('keyup', '.numbersonly', function(){
             var chars = $(this).data('chars');
@@ -443,8 +446,14 @@ var shoppingCart = {
 
         $('.date-picker:not(.inited)').each (function () {
             $(this).addClass('inited');
+            var $isIndividual = $(this).parents('.shipping-intervals').find('.set-shipping-interval');
             var minDate = $(this).data('min-date');
             var offDates = $(this).data('off-dates') || [];
+
+            if($isIndividual.is(':checked')){
+                minDate = 'today';
+                offDates = [];
+            }
 
             $(this).flatpickr({
                 dateFormat: "Y-m-d",

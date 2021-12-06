@@ -26566,7 +26566,7 @@ iframe#gmap_canvas {
   position: relative;
 }
 
-.payment-box .payment-options li .radio-option label {
+.payment-box .payment-options li .radio-option .options {
   position: relative;
   display: block;
   padding-left: 30px;
@@ -26576,7 +26576,7 @@ iframe#gmap_canvas {
   font-size: 16px;
 }
 
-.payment-box .payment-options li .radio-option label strong {
+.payment-box .payment-options li .radio-option .options strong {
   font-weight: 400;
 }
 
@@ -26586,7 +26586,7 @@ iframe#gmap_canvas {
   top: 7px;
 }
 
-.payment-box .payment-options li .radio-option label .small-text {
+.payment-box .payment-options li .radio-option .options .small-text {
   position: relative;
   display: none;
   letter-spacing: 0px;
@@ -26599,11 +26599,11 @@ iframe#gmap_canvas {
   background-color: #5fcac7;
 }
 
-.payment-box .payment-options li .radio-option input:checked + label .small-text {
+.payment-box .payment-options li .radio-option input:checked + .options .small-text {
   display: block;
 }
 
-.payment-box .payment-options li .radio-option label .small-text:before {
+.payment-box .payment-options li .radio-option .options .small-text:before {
   position: absolute;
   content: "";
   left: 30px;
@@ -26613,7 +26613,7 @@ iframe#gmap_canvas {
   border-bottom: 8px solid #5fcac7;
 }
 
-.payment-box .payment-options li .radio-option label img {
+.payment-box .payment-options li .radio-option .options img {
   position: relative;
   display: block;
   max-width: 100%;
