@@ -216,7 +216,7 @@
                                                                             <i class="fal fa-calendar-alt"></i>
                                                                         </span>
                                                                     </div>
-                                                                    <input id="shipping-date-{{ item.id }}" type="text" value="{{ _date(forms.order.values.date) }}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly {% if cart.getShippingId != item.id %} disabled{% endif %}>
+                                                                    <input id="shipping-date-{{ item.id }}" type="text" value="{% if forms.order.values.date %}{{ _date(forms.order.values.date) }}{% else %}{{ item.shippingDate }}{% endif %}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly {% if cart.getShippingId != item.id %} disabled{% endif %}>
                                                                 </div>
                                                             </div>
                                                             {% endif %}
