@@ -185,7 +185,20 @@
                                         <div class="radio-option options">
                                             <input type="radio" name="order[shipping]" id="shipping-{{ item.id }}" class="set-shipping-mode" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getShippingId == item.id %} checked{% endif %}>
                                             <label for="shipping-{{ item.id }}">
-                                                <strong>{{ item.name }}</strong>
+                                                <div class="row">
+                                                    <div class="col-12 col-md-10">
+                                                        <strong>{{ item.name }}</strong>
+                                                    </div>
+                                                    <div class="col-12 col-md-2 text-right">
+                                                        <span class="text-muted">
+                                                            {% if item.price > 0 %}
+                                                                {{ _price(item.price, cart.currency) }}
+                                                            {% else %}
+                                                                {{ _('LBL_FREE') }}
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                                 <span class="small-text">
                                                     <div>{{ item.text|nl2br }}</div>
                                                     {% if item.hasIntervals %}
@@ -227,7 +240,7 @@
 
                                                                 {% if item.customIntervalText %}
                                                                     <div class="mt-2">
-                                                                        <b class="text-danger">{{ item.customIntervalText }}</b>
+                                                                        <b class="text-danger">{{ item.customIntervalText|raw }}</b>
                                                                     </div>
                                                                 {% endif %}
                                                             </div>
@@ -235,15 +248,6 @@
                                                         </div>
                                                     {% endif %}
                                                 </span>
-                                                <div class="item-fee">
-                                                    <span class="text-muted">
-                                                        {% if item.price > 0 %}
-                                                            {{ _price(item.price, cart.currency) }}
-                                                        {% else %}
-                                                            {{ _('LBL_FREE') }}
-                                                        {% endif %}
-                                                    </span>
-                                                </div>
                                             </label>
                                         </div>
                                     </li>
@@ -265,15 +269,19 @@
                                             <div class="radio-option">
                                                 <input type="radio" name="order[payment]" id="payment-{{ item.id }}" class="set-payment-mode" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getPaymentId == item.id %} checked{% endif %}>
                                                 <label for="payment-{{ item.id }}">
-                                                    <strong>{{ item.name }}</strong>
-                                                    <span class="small-text">{{ item.text|nl2br }}</span>
-                                                    <div class="item-fee">
-                                                    <span class="text-muted">
+                                                    <div class="row">
+                                                        <div class="col-12 col-md-10">
+                                                            <strong>{{ item.name }}</strong>
+                                                        </div>
                                                         {% if item.price > 0 %}
-                                                            {{ _price(item.price, cart.currency) }}
+                                                        <div class="col-12 col-md-2 text-right">
+                                                            <span class="text-muted">
+                                                                    {{ _price(item.price, cart.currency) }}
+                                                            </span>
+                                                        </div>
                                                         {% endif %}
-                                                    </span>
                                                     </div>
+                                                    <span class="small-text">{{ item.text|nl2br }}</span>
                                                 </label>
                                             </div>
                                         </li>
