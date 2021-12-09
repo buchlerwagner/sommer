@@ -206,19 +206,25 @@
                                                     {% if item.hasIntervals %}
                                                         <div class="form-row mt-3 shipping-intervals">
                                                             {% if item.hasCustomDate %}
-                                                            <div class="form-group col-6 col-lg-4">
-                                                                <label class="control-label pl-0 text-white mb-1" for="shipping-date-{{ item.id }}">
-                                                                    {{ _('LBL_SELECT_SHIPPING_DATE') }}
-                                                                </label>
-                                                                <div class="input-group">
-                                                                    <div class="input-group-prepend">
-                                                                        <span class="input-group-text">
-                                                                            <i class="fal fa-calendar-alt"></i>
-                                                                        </span>
-                                                                    </div>
-                                                                    <input id="shipping-date-{{ item.id }}" type="text" value="{% if forms.order.values.date %}{{ _date(forms.order.values.date) }}{% else %}{{ item.shippingDate }}{% endif %}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly {% if cart.getShippingId != item.id %} disabled{% endif %}>
+                                                                <div class="col-12">
+                                                                    <b class="text-danger">
+                                                                        {{ _('LBL_SELECT_DATE_INFO') }}
+                                                                    </b>
                                                                 </div>
-                                                            </div>
+
+                                                                <div class="form-group col-6 col-lg-4">
+                                                                    <label class="control-label pl-0 text-white mb-1" for="shipping-date-{{ item.id }}">
+                                                                        {{ _('LBL_SELECT_SHIPPING_DATE') }}
+                                                                    </label>
+                                                                    <div class="input-group">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text">
+                                                                                <i class="fal fa-calendar-alt"></i>
+                                                                            </span>
+                                                                        </div>
+                                                                        <input id="shipping-date-{{ item.id }}" type="text" value="{% if forms.order.values.date %}{{ _date(forms.order.values.date) }}{% else %}{{ item.shippingDate }}{% endif %}" data-min-date="{{ item.shippingDate }}" data-off-dates="{{ item.offDates }}" name="order[date]" class="form-control date-picker" readonly {% if cart.getShippingId != item.id %} disabled{% endif %}>
+                                                                    </div>
+                                                                </div>
                                                             {% endif %}
 
                                                             <div class="form-group col-6 col-lg-8 interval-select{% if forms.order.values.interval == -1 %} d-none{% endif %}">
