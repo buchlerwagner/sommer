@@ -4847,11 +4847,15 @@ iframe#gmap_canvas {
 .payment-box .payment-options li .radio-option .options{
 	position:relative;
 	display:block;
-	padding-left:30px;
+	margin-left:30px;
 	font-weight: 500;
 	color:#222222;
 	cursor:pointer;
 	font-size:16px;
+}
+
+.payment-box label {
+	cursor: pointer;
 }
 
 .payment-box .payment-options li .radio-option .options strong{
