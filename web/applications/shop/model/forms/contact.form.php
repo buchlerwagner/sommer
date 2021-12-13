@@ -100,7 +100,7 @@ class contactForm extends formBuilder {
                 'email' => $this->owner->settings['incomingEmail'],
             ],
             [
-                'id' => '(ID: ' . generateRandomString(8) . ')',
+                'id' => generateRandomString(8),
                 'name' => $this->values['name'],
                 'email' => $this->values['email'],
                 'phone' => $this->values['phone'],
