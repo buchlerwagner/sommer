@@ -1,6 +1,12 @@
 ALTER TABLE `product_categories` ADD COLUMN `cat_stop_sale` TINYINT(1) NULL DEFAULT 0 AFTER `cat_tags`;
+ALTER TABLE `product_categories` ADD COLUMN `cat_limit_sale` TINYINT(1) NULL DEFAULT 0 AFTER `cat_stop_sale`;
+ALTER TABLE `product_categories` ADD COLUMN `cat_limit_sale_text` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `cat_limit_sale`;
+ALTER TABLE `product_categories` ADD COLUMN `cat_date_start` DATE NULL DEFAULT NULL AFTER `cat_limit_sale_text`;
+ALTER TABLE `product_categories` ADD COLUMN `cat_date_end` DATE NULL DEFAULT NULL AFTER `cat_date_start`;
 
 
+
+ALTER TABLE `product_categories` ADD COLUMN `cat_stop_sale` TINYINT(1) NULL DEFAULT 0 AFTER `cat_tags`;
 
 
 ALTER TABLE `shipping_modes` ADD COLUMN `sm_select_date` TINYINT(1) NULL DEFAULT 0 AFTER `sm_intervals`;

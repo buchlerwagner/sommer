@@ -32,6 +32,9 @@ class cart extends ancestor {
     public $packagingFee = 0;
 
     private $earliestTakeover = false;
+    private $orderDateStart = false;
+    private $orderDateEnd = false;
+    private $saleLimitText = false;
 
     private $userId;
 
@@ -416,6 +419,16 @@ class cart extends ancestor {
                             if(!$this->earliestTakeover || $this->earliestTakeover > $takeover){
                                 $this->earliestTakeover = $takeover;
                             }
+                        }
+
+                        if($dateLimits = $this->product->getOrderDateLimitations()){
+                            if($this->orderDateStart === false || $this->orderDateStart < $dateLimits['start'] ){
+                                $this->orderDateStart = $dateLimits['start'];
+                            }
+                            if($this->orderDateEnd === false || $this->orderDateEnd > $dateLimits['end'] ){
+                                $this->orderDateEnd = $dateLimits['end'];
+                            }
+                            $this->saleLimitText = $this->product->getSaleLimitText();
                         }
 
                         $variant = $this->product->getVariant($row['citem_pv_id']);
@@ -866,6 +879,7 @@ class cart extends ancestor {
             foreach($result AS $row){
                 $out[$row['id']] = $row;
                 $out[$row['id']]['shippingDate'] = $this->getNextShippingDate(($row['dayDiff'] ? dateAddDays('now', $row['dayDiff']) : date('Y-m-d')));
+                $out[$row['id']]['shippingLastDate'] = false;
 
                 if($out[$row['id']]['hasCustomDate']){
                     $out[$row['id']]['offDates'] = json_encode($holidays);
@@ -877,12 +891,19 @@ class cart extends ancestor {
                     $out[$row['id']]['price'] = 0;
                 }
 
+                if($this->orderDateStart && $this->orderDateEnd){
+                    $out[$row['id']]['hasCustomInterval'] = false;
+                    $out[$row['id']]['offDates'] = false;
+                    $out[$row['id']]['shippingDate'] = $this->orderDateStart;
+                    $out[$row['id']]['shippingLastDate'] = $this->orderDateEnd;
+                    $out[$row['id']]['saleLimitText'] = $this->saleLimitText;
+                }
+
                 if($row['hasIntervals']){
                     $where = [
                         'si_shop_id' => $this->owner->shopId,
                         'si_sm_id' => $row['id'],
                     ];
-
 
                     if(!Empty($this->earliestTakeover)){
                         $where['si_time_start'] = [

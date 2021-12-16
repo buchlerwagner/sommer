@@ -89,6 +89,12 @@
                                     <div class="other-options clearfix">
                                         {% if not settings.stopSale and not item.category.stopSale %}
                                             {% if item.available %}
+                                                {% if item.category.limitSale and item.category.limitSaleText %}
+                                                    <div class="alert alert-warning">
+                                                        <i class="far fa-info-circle"></i>
+                                                        {{ item.category.limitSaleText|raw }}
+                                                    </div>
+                                                {% endif %}
 
                                                 <div class="row align-items-center">
                                                     <div class="col-12">

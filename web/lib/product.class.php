@@ -96,6 +96,29 @@ class product extends ancestor {
         }
     }
 
+    public function getOrderDateLimitations(){
+        $out = [];
+
+        if($this->data['category']['limitSale']){
+            $out = [
+                'start' => $this->data['category']['limitStart'],
+                'end' => $this->data['category']['limitEnd'],
+            ];
+        }
+
+        return $out;
+    }
+
+    public function getSaleLimitText(){
+        $out = false;
+
+        if($this->data['category']['limitSale']){
+            $out = $this->data['category']['limitSaleText'];
+        }
+
+        return $out;
+    }
+
 	public function reorderImages($orderList = false){
 		if(!$orderList){
 			$result = $this->owner->db->getRows(
@@ -468,6 +491,10 @@ class product extends ancestor {
                 'image' => ($row['cat_page_img'] ? FOLDER_UPLOAD . $this->shopId . '/products/' . $row['cat_id'] . '/' . $row['cat_page_img'] : false),
                 'url' => '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $row['cat_url'] . '/',
                 'stopSale' => ($row['cat_stop_sale']),
+                'limitSale' => ($row['cat_limit_sale']),
+                'limitSaleText' => $row['cat_limit_sale_text'],
+                'limitStart' => $row['cat_date_start'],
+                'limitEnd' => $row['cat_date_end'],
             ],
 
             'hasVariants' => ($row['prod_variants']),

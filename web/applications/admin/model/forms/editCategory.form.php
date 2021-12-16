@@ -27,16 +27,35 @@ class editCategoryForm extends formBuilder {
             new inputEditor('cat_description', 'LBL_DESCRIPTION')
         );
 
-        $stopSale = (new groupFieldset('stop-sale'))->addElements(
-            (new inputSwitch('cat_stop_sale', 'LBL_CATEGORY_STOP_SALE', 0))
-                ->setColor(enumColors::Danger())
-        );
-
 		$general = (new sectionBox('general', 'LBL_CATEGORY_DETAILS', 'fa fa-pencil'))
                         ->addClass('col-12 col-lg-6')
-                        ->addElements($group, $editor, $stopSale);
+                        ->addElements($group, $editor);
 
-        $this->addSections($general);
+        $stopSale = (new sectionBox('stop-sale', 'LBL_SALE_LIMITATIONS', 'fas fa-hand-paper'))
+            ->addClass('col-12 col-lg-6')
+            ->addElements(
+                (new inputSwitch('cat_limit_sale', 'LBL_CATEGORY_LIMIT_SALE', 0))
+                    ->changeState(0, enumChangeAction::Readonly(), '#cat_limit_sale_text, #cat_date_start, #cat_date_end')
+                    ->changeState(1, enumChangeAction::Editable(), '#cat_limit_sale_text, #cat_date_start, #cat_date_end')
+                    ->changeState(1, enumChangeAction::Disable(), '#cat_stop_sale')
+                    ->changeState(0, enumChangeAction::Enable(), '#cat_stop_sale')
+                    ->setColor(enumColors::Warning()),
+                (new inputText('cat_limit_sale_text', 'LBL_LIMIT_SALE_TEXT')),
+                (new groupRow('row1'))->addElements(
+                    (new inputDate('cat_date_start', 'LBL_DATE_START'))
+                        ->setColSize('col-6 col-lg-4')
+                        ->setIcon('fas fa-calendar-alt'),
+                    (new inputDate('cat_date_end', 'LBL_DATE_END'))
+                        ->setColSize('col-6 col-lg-4')
+                        ->setIcon('fas fa-calendar-alt')
+                ),
+                (new inputSwitch('cat_stop_sale', 'LBL_CATEGORY_STOP_SALE', 0))
+                    ->setColor(enumColors::Danger())
+                    ->changeState(1, enumChangeAction::Disable(), '#cat_limit_sale')
+                    ->changeState(0, enumChangeAction::Enable(), '#cat_limit_sale')
+            );
+
+        $this->addSections($general, $stopSale);
 
 
         $smartCategory = (new sectionBox('smart-group', 'LBL_SMART_CATEGORY', 'fa fa-layer-group'))
@@ -99,6 +118,22 @@ class editCategoryForm extends formBuilder {
                 $this->addError('ERR_10015', self::FORM_ERROR, ['cat_url']);
             }
         }
+
+        if($this->values['cat_limit_sale']){
+            if(Empty($this->values['cat_limit_sale_text'])){
+                $this->addError('ERR_1000', self::FORM_ERROR, ['cat_limit_sale_text']);
+            }
+            if(Empty($this->values['cat_date_start'])){
+                $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_start']);
+            }
+            if(Empty($this->values['cat_date_end'])){
+                $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_end']);
+            }
+
+            if($this->values['cat_date_end'] < $this->values['cat_date_start']){
+                $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_end']);
+            }
+        }
     }
 
     public function onBeforeSave() {
@@ -115,7 +150,20 @@ class editCategoryForm extends formBuilder {
             $this->values['cat_tags'] = '';
         }
 
-        if(Empty($this->values['cat_stop_sale'])) $this->values['cat_stop_sale'] = 0;
+        if(Empty($this->values['cat_limit_sale'])) {
+            $this->values['cat_limit_sale'] = 0;
+        }else{
+            $this->values['cat_stop_sale'] = 0;
+        }
+
+        if(Empty($this->values['cat_stop_sale'])) {
+            $this->values['cat_stop_sale'] = 0;
+        }else{
+            $this->values['cat_limit_sale'] = 0;
+        }
+
+        if(Empty($this->values['cat_date_start'])) $this->values['cat_date_start'] = null;
+        if(Empty($this->values['cat_date_end'])) $this->values['cat_date_end'] = null;
 
         if($this->values['removeImg']){
             $this->deleteImage();

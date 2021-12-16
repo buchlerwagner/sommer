@@ -455,6 +455,10 @@ class webShop extends ancestor {
 			'cat_title',
 			'cat_url',
 			'cat_stop_sale',
+			'cat_limit_sale',
+			'cat_limit_sale_text',
+			'cat_date_start',
+			'cat_date_end',
 		];
 
         $where = $this->buildFilterQuery($params['filters']);
