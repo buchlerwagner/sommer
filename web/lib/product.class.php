@@ -467,6 +467,7 @@ class product extends ancestor {
                 'name' => $row['cat_title'],
                 'image' => ($row['cat_page_img'] ? FOLDER_UPLOAD . $this->shopId . '/products/' . $row['cat_id'] . '/' . $row['cat_page_img'] : false),
                 'url' => '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $row['cat_url'] . '/',
+                'stopSale' => ($row['cat_stop_sale']),
             ],
 
             'hasVariants' => ($row['prod_variants']),

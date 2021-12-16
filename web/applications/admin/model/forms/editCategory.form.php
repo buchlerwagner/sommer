@@ -27,9 +27,14 @@ class editCategoryForm extends formBuilder {
             new inputEditor('cat_description', 'LBL_DESCRIPTION')
         );
 
+        $stopSale = (new groupFieldset('stop-sale'))->addElements(
+            (new inputSwitch('cat_stop_sale', 'LBL_CATEGORY_STOP_SALE', 0))
+                ->setColor(enumColors::Danger())
+        );
+
 		$general = (new sectionBox('general', 'LBL_CATEGORY_DETAILS', 'fa fa-pencil'))
                         ->addClass('col-12 col-lg-6')
-                        ->addElements($group, $editor);
+                        ->addElements($group, $editor, $stopSale);
 
         $this->addSections($general);
 
@@ -109,6 +114,8 @@ class editCategoryForm extends formBuilder {
             $this->values['cat_smart'] = 0;
             $this->values['cat_tags'] = '';
         }
+
+        if(Empty($this->values['cat_stop_sale'])) $this->values['cat_stop_sale'] = 0;
 
         if($this->values['removeImg']){
             $this->deleteImage();

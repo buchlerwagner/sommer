@@ -40,7 +40,7 @@
 
                             <div id="product-list" class="row clearfix">
                                 {% for id, item in products.items %}
-                                    {{ tools.productItem(item, settings.stopSale, not category.id, _context) }}
+                                    {{ tools.productItem(item, (settings.stopSale or item.category.stopSale), not category.id, _context) }}
                                 {% endfor %}
                             </div>
 

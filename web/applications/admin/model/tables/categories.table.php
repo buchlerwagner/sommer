@@ -27,6 +27,8 @@ class categoriesTable extends table {
             (new column('cat_visible', 'LBL_VISIBLE', 1, enumTableColTypes::Checkbox()))
                 ->addClass('text-center'),
             (new column('cat_title', 'LBL_TITLE', 9))
+                ->setTemplate('{% if row.cat_stop_sale %}<del class="text-danger">{% endif %}{{ val }}{% if row.cat_stop_sale %}</del>{% endif %}'),
+            (new columnHidden('cat_stop_sale'))
         );
 
         $this->addButton(

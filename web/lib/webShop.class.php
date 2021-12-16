@@ -317,6 +317,7 @@ class webShop extends ancestor {
                     'cat_id',
                     'cat_title',
                     'cat_url',
+                    'cat_stop_sale',
                 ],
                 $where,
                 [
@@ -453,6 +454,7 @@ class webShop extends ancestor {
             'cat_id',
 			'cat_title',
 			'cat_url',
+			'cat_stop_sale',
 		];
 
         $where = $this->buildFilterQuery($params['filters']);

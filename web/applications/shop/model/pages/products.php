@@ -76,3 +76,4 @@ if($this->params[0]){
     $this->setPageMetaData($categoryData);
     $this->data['products'] = $shop->getProducts($params);
 }
+

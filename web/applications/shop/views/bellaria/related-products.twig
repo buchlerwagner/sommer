@@ -6,7 +6,7 @@
 
     <div class="row clearfix">
         {% for id, item in relatedProducts %}
-            {{ tools.productItem(item, settings.stopSale, false, _context) }}
+            {{ tools.productItem(item, (settings.stopSale or item.category.stopSale), false, _context) }}
         {% endfor %}
     </div>
 </div>

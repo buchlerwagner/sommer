@@ -87,7 +87,7 @@
                                     {% endif %}
 
                                     <div class="other-options clearfix">
-                                        {% if not settings.stopSale %}
+                                        {% if not settings.stopSale and not item.category.stopSale %}
                                             {% if item.available %}
 
                                                 <div class="row align-items-center">
