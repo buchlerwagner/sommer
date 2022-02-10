@@ -30,6 +30,7 @@ class table extends model {
 	public $form;
 	public $inlineForm;
 
+	public $baseURL = './';
 	public $defaultAction = 'edit';
 	public $showRowIndex = false;
 	public $noHeader = false;
@@ -43,11 +44,14 @@ class table extends model {
 	public $copyChangeFields = [
 		'remove' 	=> [],		// list fields which need to be removed
 		'replace' 	=> [],		// list field in keys to replace its value
-		'add' 		=> []		// list field in keys to add to its original value
+		'add' 		=> [],		// list field in keys to add to its original value
+        'callback' 	=> false	// callback method name
 	];
 
 	public $tableType = 'table';    // table, datatable, div, inline
     public $sortable = false;
+    public $sortField = false;
+    public $sortGroupField = false;
 	public $multipleSelect = false;
 	public $selection = [];
 	public $rowClick = true;
@@ -73,6 +77,8 @@ class table extends model {
 	public $actualRow;
 	public $returnUrl = false;
 	public $debugSql = false;
+
+    private $fieldsToUpdate = [];
 
 	public function __construct($parameters = []) {
 		parent::__construct();
@@ -204,7 +210,7 @@ class table extends model {
         }else{
             $hasAction = true;
 
-            if($keyValues){
+            if($keyValues && $this->keyFields){
                 $tmp = (!empty($this->settings['foreignkeys'])) ? $this->settings['foreignkeys'] : [];
                 foreach($this->keyFields as $i => $keyField) {
                     $data['keyfields'][$keyField] = (isset($keyValues[$i])) ? $keyValues[$i] : 0;
@@ -247,6 +253,10 @@ class table extends model {
 
                 case 'page':
                     $this->page($params);
+                    break;
+
+                case 'sort':
+                    $this->sort($params);
                     break;
 
                 case 'reload':
@@ -319,7 +329,7 @@ class table extends model {
             }
 
             if($redirect){
-                $this->owner->pageRedirect(($this->returnUrl ? $this->returnUrl : $data['backurl']));
+                $this->owner->pageRedirect(($this->returnUrl ?: $data['backurl']));
             }
         }
 	}
@@ -388,13 +398,13 @@ class table extends model {
 
             if($this->rowGroups){
                 foreach ($this->rowGroups AS $col) {
-                    if (!empty($col['field']) && !in_array($col['field'], $select)){
-                        $select[] = $col['field'];
+                    if (!empty($col['name']) && !in_array($col['name'], $select)){
+                        $select[] = $col['name'];
                         if($col['id']){
                             $select[] = $col['id'];
                         }
-                        if($col['description']['field']){
-                            $select[] = $col['description']['field'];
+                        if($col['description']){
+                            $select[] = $col['description'];
                         }
                     }
                 }
@@ -443,34 +453,22 @@ class table extends model {
                     $groups = [];
                     if($this->rowGroups){
                         foreach($this->rowGroups AS $col){
-                            $field = $col['field'];
-                            if($col['alias']){
-                                $field = $col['alias'];
-                            }
-
-                            if($col['options']){
-                                $groups[$field]['text'] = $col['options'][$dbRow[$field]];
-                            }else {
-                                $groups[$field]['text'] = $dbRow[$field];
-                            }
-                            unset($dbRow[$field]);
-
-                            if($col['id']){
                                 $idField = $col['id'];
-                                if($col['idAlias']){
-                                    $idField = $col['idAlias'];
+                            $textField = $col['name'];
+                            if($col['alias']){
+                                $textField = $col['alias'];
                                 }
-                                $groups[$field]['id'] = $dbRow[$idField];
-                                unset($dbRow[$idField]);
-                            }
 
+                            $groups[$dbRow[$idField]] = [
+                                'id' => $dbRow[$idField],
+                                'idKey' => $idField,
+                                'text' => $dbRow[$textField],
+                                'description' => ($col['description'] ? $dbRow[$col['description']] : false)
+                            ];
+
+                            unset($dbRow[$textField]);
                             if($col['description']){
-                                $field2 = $col['description']['field'];
-                                if($col['description']['alias']){
-                                    $field2 = $col['description']['alias'];
-                                }
-                                $groups[$field]['description'] = $dbRow[$field2];
-                                unset($dbRow[$field2]);
+                                unset($dbRow[$col['description']]);
                             }
                         }
                     }
@@ -485,6 +483,7 @@ class table extends model {
 						}
 
                         $this->rows[$key] = $dbRow;
+                        $this->rows[$key]['__groupId'] = 0;
                         $this->rows[$key]['__id'] = $rowId;
                         $this->rows[$key]['options']['delete'] = true;
                         $this->rows[$key]['options']['edit'] = true;
@@ -494,7 +493,13 @@ class table extends model {
                             unset($this->rows[$key][$this->deleteField]);
                         }
                         if($this->rowGroups) {
-                            $this->rows[$key]['groups'] = $groups;
+                            foreach($groups AS $groupId => $group) {
+                                $idKey = $group['idKey'];
+                                unset($group['idKey']);
+                                $this->rows[$key]['__groupId'] = $groupId;
+                                $this->rows[$key]['groups'][$groupId] = $group;
+                                unset($this->rows[$key][$idKey]);
+                            }
                         }
                     }else {
 						$deleted = 0;
@@ -509,6 +514,10 @@ class table extends model {
 						}
                         if($this->rowGroups) {
                             $this->rows[$i][-2] = $groups;
+
+                            foreach($groups AS $groupId => $group) {
+                                $this->rows[$i][-2][$groupId] = $group;
+                            }
                         }
                         $this->rows[$i][-1]['delete'] = true;
                         $this->rows[$i][-1]['edit'] = true;
@@ -625,6 +634,10 @@ class table extends model {
 					}
 				}
 
+                if($this->copyChangeFields['callback'] && method_exists($this, $this->copyChangeFields['callback'])){
+                    $row = $this->{$this->copyChangeFields['callback']}($row);
+                }
+
 				$this->owner->db->sqlQuery(
 					$this->owner->db->genSqlInsert(
 						$this->dbTable,
@@ -698,6 +711,35 @@ class table extends model {
 		}
 	}
 
+    private function sort($params){
+        if($params['order'] && is_array($params['order'])){
+            $i = 1;
+            foreach($params['order'] AS $id){
+                if($id) {
+                    $where = [
+                        $this->keyFields[0] => (int) $id,
+                    ];
+                    if($this->sortGroupField && $params['groupId']){
+                        $where[$this->sortGroupField] = (int) $params['groupId'];
+                    }
+
+                    $this->owner->db->sqlQuery(
+                        $this->owner->db->genSQLUpdate(
+                            $this->dbTable,
+                            [
+                                $this->sortField => $i,
+                            ],
+                            $where
+                        )
+                    );
+                    $i++;
+                }
+            }
+
+            $this->onAfterSort($params);
+        }
+    }
+
     public function addColumns(column ...$columns){
 	    foreach($columns AS $column){
             $this->addColumn($column);
@@ -705,7 +747,7 @@ class table extends model {
     }
 
 	public function addColumn(column $column){
-        $this->columns[$column->getField()] = $column->getColumn();
+        $this->columns[$column->getId()] = $column->getColumn();
     }
 
 	public function onBeforeDelete($keyFields, $real = true) {
@@ -718,12 +760,13 @@ class table extends model {
 	public function onCheck($keyValues, $field, $value) {
 	}
 
-	public function onAfterLoad(){
+    public function onAfterSort($params) {
+    }
 
+	public function onAfterLoad(){
 	}
 
 	public function onAfterCopy($keyFields, $newId){
-
 	}
 
 	public function alterRow($row){
@@ -859,5 +902,28 @@ class table extends model {
             'label' => $caption,
             'items' => $items,
         ];
+    }
+
+    public function addGroup($idField, $textField, $descriptionField = false){
+        $this->rowGroups[] = [
+            'id' => $idField,
+            'name' => $textField,
+            'description' => $descriptionField,
+        ];
+    }
+
+    public function makeSortable($sortField, $groupField = false){
+        $this->sortable = true;
+        $this->sortField = $sortField;
+        $this->sortGroupField = $groupField;
+    }
+
+    public function getUpdateFields(){
+        return $this->fieldsToUpdate;
+    }
+
+    protected function setUpdateField(string $selector, enumJSActions $action, $value){
+        $this->fieldsToUpdate[$selector][$action->getValue()] = $value;
+        return $this;
     }
 }

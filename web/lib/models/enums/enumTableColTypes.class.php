@@ -9,6 +9,8 @@ use MyCLabs\Enum\Enum;
  * @method static enumTableColTypes Checkbox()
  * @method static enumTableColTypes Radio()
  * @method static enumTableColTypes CheckboxSlider()
+ * @method static enumTableColTypes YesNo()
+ * @method static enumTableColTypes Icon()
  */
 final class enumTableColTypes extends Enum {
     private const General = false;
@@ -17,4 +19,6 @@ final class enumTableColTypes extends Enum {
     private const Checkbox = 'checkbox';
     private const Radio = 'radio';
     private const CheckboxSlider = 'checkboxslider';
+    private const YesNo = 'yesno';
+    private const Icon = 'icon';
 }

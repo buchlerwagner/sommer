@@ -7,6 +7,8 @@ class cart extends ancestor {
 	const CART_STATUS_ORDERED = 'ORDERED';
 
 	const ORDER_STATUS_NEW = 'NEW';
+	const ORDER_STATUS_FINISHED = 'FINISHED';
+	const ORDER_STATUS_CLOSED = 'CLOSED';
 
 	/**
 	 * @var $product product
@@ -34,6 +36,7 @@ class cart extends ancestor {
     private $earliestTakeover = false;
     private $orderDateStart = false;
     private $orderDateEnd = false;
+    private $orderDayLimits = [];
     private $saleLimitText = false;
 
     private $userId;
@@ -41,19 +44,62 @@ class cart extends ancestor {
     public $userData = [];
 	public $items = [];
 	public $remarks;
+	public $orderType = 0;
+	public $invoiceType = 0;
+	public $localConsumption = false;
 	public $shippingDate;
 	public $customInterval;
+	public $storeId;
+	public $storeName;
 
 	private $options = [];
 
     public function init($key = false, $create = true) {
 		$this->currency = $this->owner->currency;
 
-		$this->getKey($key, $create)->loadCart();
+        $this->getKey($key, $create)->loadCart();
         $this->product = $this->owner->addByClassName('product');
 
 		return $this;
 	}
+
+    public function createNewOrder(int $type = ORDER_TYPE_STORE){
+        $pmId = 0;
+        $paymentModes = $this->getPaymentModes([PAYMENT_TYPE_CASH]);
+        if($paymentModes){
+            foreach($paymentModes AS $paymentMode){
+                $pmId = $paymentMode['id'];
+                break;
+            }
+        }
+
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLInsert(
+                'cart',
+                [
+                    'cart_key' => uuid::v4(),
+                    'cart_shop_id' => $this->owner->shopId,
+                    'cart_store_id' => $this->owner->storeId,
+                    'cart_us_id' => 0,
+                    'cart_pm_id' => $pmId,
+                    'cart_order_type' => $type,
+                    'cart_local_consumption' => ($type == ORDER_TYPE_STORE ? 1 : 0),
+                    'cart_created_by' => $this->owner->user->getUser()['id'],
+                    'cart_created' => 'NOW()',
+                    'cart_ordered' => 'NOW()',
+                    'cart_shipping_date' => 'NOW()',
+                    'cart_status' => self::CART_STATUS_NEW,
+                    'cart_currency' => $this->currency,
+                ],
+                [
+                    'cart_key',
+                    'cart_shop_id'
+                ]
+            )
+        );
+
+        return $this->owner->db->getInsertRecordId();
+    }
 
 	public function addProduct($productId, $variantId = 0, $quantity = 1){
 		$key = false;
@@ -163,12 +209,24 @@ class cart extends ancestor {
 		return $this->status;
 	}
 
+	public function getOrderType(){
+		return $this->orderType;
+	}
+
     public function isEmpty(){
         return Empty($this->items);
     }
 
+    public function isLocalConsumption(){
+        return $this->localConsumption;
+    }
+
     public function getShippingId(){
         return $this->shippingId;
+    }
+
+    public function getIntervalId(){
+        return $this->intervalId;
     }
 
     public function getPaymentId(){
@@ -215,6 +273,8 @@ class cart extends ancestor {
     }
 
 	public function makeOrder($userId, $invoiceType = 0, $remarks = ''){
+        $orderStatus = ($this->orderType == ORDER_TYPE_STORE ? self::ORDER_STATUS_FINISHED : self::ORDER_STATUS_NEW);
+
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLUpdate(
 				'cart',
@@ -222,7 +282,7 @@ class cart extends ancestor {
 					'cart_us_id' => (int) $userId,
 					'cart_order_number' => $this->generateOrderNumber(),
 					'cart_status' => self::CART_STATUS_ORDERED,
-					'cart_order_status' => self::ORDER_STATUS_NEW,
+					'cart_order_status' => $orderStatus,
 					'cart_ordered' => 'NOW()',
 					'cart_invoice_type' => (int) $invoiceType,
 					'cart_remarks' => $remarks,
@@ -241,7 +301,9 @@ class cart extends ancestor {
             }
         }
 
-        $this->sendConfirmationEmail();
+        if($this->orderType != ORDER_TYPE_STORE) {
+            $this->sendConfirmationEmail();
+        }
 
 		$this->destroyKey();
 	}
@@ -330,13 +392,26 @@ class cart extends ancestor {
 		$this->id = 0;
 
         if($this->key) {
+            $where = [
+                'cart_key' => $this->key,
+                'cart_shop_id' => $this->owner->shopId,
+            ];
+
+            if($this->owner->hostConfig['isVirtual']){
+                $where['cart_store_id'] = $this->owner->storeId;
+            }
+
             $cart = $this->owner->db->getFirstRow(
                 $this->owner->db->genSQLSelect(
                     'cart',
                     [],
+                    $where,
                     [
-                        'cart_key' => $this->key,
-                        'cart_shop_id' => $this->owner->shopId,
+                        'stores' => [
+                            'on' => [
+                                'st_code' => 'cart_store_id'
+                            ]
+                        ]
                     ]
                 )
             );
@@ -349,7 +424,7 @@ class cart extends ancestor {
                 $this->orderDate = $cart['cart_ordered'];
                 $this->total = $cart['cart_total'];
                 $this->packagingFee = $cart['cart_packaging_fee'];
-                $this->subtotal = $cart['cart_subtotal'] + $this->packagingFee;
+                $this->subtotal = $cart['cart_subtotal'];
                 $this->currency = $cart['cart_currency'];
                 $this->shippingDate = $cart['cart_shipping_date'];
                 $this->shippingFee = $cart['cart_shipping_fee'];
@@ -359,6 +434,11 @@ class cart extends ancestor {
                 $this->paymentId = $cart['cart_pm_id'];
                 $this->remarks = $cart['cart_remarks'];
                 $this->customInterval = $cart['cart_custom_interval'];
+                $this->orderType = $cart['cart_order_type'];
+                $this->invoiceType = $cart['cart_invoice_type'];
+                $this->localConsumption = (bool) $cart['cart_local_consumption'];
+                $this->storeId = $cart['st_code'];
+                $this->storeName = $cart['st_name'];
 
                 if($this->userId){
                     $user = $this->owner->user->getUserProfile($this->userId);
@@ -428,6 +508,15 @@ class cart extends ancestor {
                             if($this->orderDateEnd === false || $this->orderDateEnd > $dateLimits['end'] ){
                                 $this->orderDateEnd = $dateLimits['end'];
                             }
+
+                            if($dateLimits['days']){
+                                if(Empty($this->orderDayLimits)){
+                                    $this->orderDayLimits = $dateLimits['days'];
+                                }else {
+                                    $this->orderDayLimits = array_intersect($this->orderDayLimits, $dateLimits['days']);
+                                }
+                            }
+
                             $this->saleLimitText = $this->product->getSaleLimitText();
                         }
 
@@ -576,7 +665,7 @@ class cart extends ancestor {
 			foreach($this->items AS $item){
                 $fee = 0;
 
-                if($item['packaging']['fee'] > 0){
+                if($item['packaging']['fee'] > 0 && !$this->localConsumption){
                     $fee = ($item['packaging']['fee'] * $item['quantity']['amount']);
                 }
 
@@ -593,7 +682,6 @@ class cart extends ancestor {
 			$this->owner->db->genSQLUpdate(
 				'cart',
 				[
-					'cart_us_id' => (int) $this->owner->user->getUser()['id'],
 					'cart_subtotal' => $this->subtotal,
                     'cart_packaging_fee' => $this->packagingFee,
 					'cart_shipping_fee' => $this->shippingFee,
@@ -609,7 +697,7 @@ class cart extends ancestor {
 			)
 		);
 
-        $this->subtotal += $this->packagingFee;
+        //$this->subtotal += $this->packagingFee;
 
         return $this;
 	}
@@ -666,13 +754,29 @@ class cart extends ancestor {
 	}
 
     private function generateOrderNumber(){
-        $out = '';
-
-        if($this->id){
-            $out = date('Y') . '/' . str_pad($this->id, 5, '0', STR_PAD_LEFT);
-        }
+        $out  = ($this->owner->storeId ?: 'X') . '-';
+        $out .= date('Ymd') . '-';
+        $out .= $this->getSelectedShippingMode()['code'] . '-';
+        $out .= str_pad($this->getTodaySumOrders() + 1, 4, '0', STR_PAD_LEFT);
 
         return $out;
+    }
+
+    private function getTodaySumOrders(){
+        $row = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'cart',
+                [
+                    'COUNT(cart_id) AS num'
+                ],
+                [
+                    'cart_status' => self::CART_STATUS_ORDERED,
+                    'cart_ordered>' => date('Y-m-d 00:00:00'),
+                    'cart_ordered<' => date('Y-m-d 23:59:59'),
+                ]
+            )
+        );
+        return (int) $row['num'];
     }
 
 	public function destroyKey(){
@@ -687,6 +791,17 @@ class cart extends ancestor {
             'key' => false,
             'status' => false,
         ];
+
+        $where = [
+            'cart_shop_id' => $this->owner->shopId
+        ];
+
+        if(is_numeric($key) && $key){
+                $where['cart_id'] = (int) $key;
+        }else{
+            $where['cart_key'] = $key;
+        }
+
 		$row = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
                 'cart',
@@ -694,10 +809,7 @@ class cart extends ancestor {
                     'cart_key AS cartKey',
                     'cart_status AS cartStatus'
                 ],
-                [
-                    'cart_key' => $key,
-                    'cart_shop_id' => $this->owner->shopId
-                ]
+                $where
             )
         );
 
@@ -721,6 +833,7 @@ class cart extends ancestor {
 				[
 					'cart_key' => $this->key,
 					'cart_shop_id' => $this->owner->shopId,
+					'cart_store_id' => $this->owner->storeId,
 					'cart_us_id' => $userId,
 					'cart_created' => 'NOW()',
 					'cart_status' => self::CART_STATUS_NEW,
@@ -788,8 +901,14 @@ class cart extends ancestor {
         return $this->items[$id];
     }
 
-    public function getPaymentModes(){
+    public function getPaymentModes(array $types = []){
         $out = [];
+
+        if(!Empty($types)){
+            $pmTypes = $types;
+        }else{
+            $pmTypes = [PAYMENT_TYPE_CASH, PAYMENT_TYPE_MONEY_TRANSFER, PAYMENT_TYPE_CARD];
+        }
 
         $result = $this->owner->db->getRows(
             $this->owner->db->genSQLSelect(
@@ -805,6 +924,9 @@ class cart extends ancestor {
                 [
                     'pm_shop_id' => $this->owner->shopId,
                     'pm_enabled' => 1,
+                    'pm_type' => [
+                        'in' => $pmTypes
+                    ],
                 ],
                 [],
                 false,
@@ -899,6 +1021,11 @@ class cart extends ancestor {
                     $out[$row['id']]['saleLimitText'] = $this->saleLimitText;
                 }
 
+                if($this->orderDayLimits){
+                    $out[$row['id']]['dayLimits'] = $this->orderDayLimits;
+                    $out[$row['id']]['saleLimitText'] = $this->saleLimitText;
+                }
+
                 if($row['hasIntervals']){
                     $where = [
                         'si_shop_id' => $this->owner->shopId,
@@ -946,6 +1073,7 @@ class cart extends ancestor {
                     'shipping_modes',
                     [
                         'sm_id AS id',
+                        'sm_code AS code',
                         'sm_name AS name',
                         'sm_text AS text',
                         'sm_type AS type',
@@ -963,6 +1091,14 @@ class cart extends ancestor {
             if($out){
                 $out['shippingDate'] = $this->getNextShippingDate(($out['dayDiff'] ? dateAddDays($this->orderDate, $out['dayDiff']) : date('Y-m-d')));
             }
+        }
+
+        if(Empty($out)){
+            $out = [
+                'id' => 0,
+                'code' => $this->owner->storeId,
+                'shippingDate' => date('Y-m-d')
+            ];
         }
 
         return $out;
@@ -996,6 +1132,42 @@ class cart extends ancestor {
         }
 
         return $out;
+    }
+
+    public function setLocalConsumption($isLocal){
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLUpdate(
+                'cart',
+                [
+                    'cart_local_consumption' => (int) $isLocal,
+                ],
+                [
+                    'cart_id' => $this->id,
+                    'cart_shop_id' => $this->owner->shopId,
+                    'cart_key' => $this->key
+                ]
+            )
+        );
+
+        $this->loadCart()->summarize();
+    }
+
+    public function setCustomer($userId, $invoiceType = 0, $remarks = ''){
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLUpdate(
+                'cart',
+                [
+                    'cart_us_id' => (int) $userId,
+                    'cart_invoice_type' => (int) $invoiceType,
+                    'cart_remarks' => $remarks,
+                ],
+                [
+                    'cart_id' => $this->id,
+                    'cart_shop_id' => $this->owner->shopId,
+                    'cart_key' => $this->key
+                ]
+            )
+        );
     }
 
     public function setPaymentMode($id){
@@ -1143,12 +1315,21 @@ class cart extends ancestor {
     }
 
     private function getNextShippingDate($date){
+        $dayLimits = [1, 2, 3, 4, 5, 6, 7];
         $holidays = $this->getHolidays();
 
-        if(in_array($date, $holidays)){
+        if(!Empty($this->orderDayLimits)){
+            $dayLimits = $this->orderDayLimits;
+        }
+
+        $dow = date('N', strtotime($date));
+
+        if(in_array($date, $holidays) || !in_array($dow, $dayLimits)){
             do{
                 $date = date('Y-m-d', strtotime($date . ' +1 days'));
-            }while(in_array($date, $holidays));
+                $dow = date('N', strtotime($date));
+
+            }while(in_array($date, $holidays) || !in_array($dow, $dayLimits));
         }
 
         return $date;

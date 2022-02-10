@@ -103,6 +103,11 @@ if (!empty($table)) {
 				$table->init('refresh', $keyValues, $params);
 				break;
 
+            case 'sort':
+                $refreshPager  = false;
+                $table->init('sort', $keyValues, $params);
+                break;
+
 			default:
 				if (method_exists($table, $action)) {
 					$table->init($action, $keyValues, $params);
@@ -122,6 +127,17 @@ if (!empty($table)) {
 		} else {
 			$data['#table_' . $alias . ' tbody'] = $this->view->renderContent($table->bodyTemplate, ['table' => $table]);
 		}
+
+        if(method_exists($table, 'getUpdateFields')){
+            $fields = $table->getUpdateFields();
+            if($fields){
+                foreach ($fields AS $selector => $actions){
+                    foreach ($actions AS $action => $value){
+                        $data['fields'][$selector][$action] = $value;
+                    }
+                }
+            }
+        }
 	}
 
 	if ($refreshPager) {

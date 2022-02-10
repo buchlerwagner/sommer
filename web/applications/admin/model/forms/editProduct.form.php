@@ -60,16 +60,24 @@ class editProductForm extends formBuilder {
 
         $pricing = (new groupFieldset('pricing', ''))->addElements(
             (new groupRow('row2'))->addElements(
-                (new inputText('prod_price', 'LBL_PRICE', 0))
+                (new inputText('prod_price', 'LBL_GROSS_PRICE', 0))
                     ->setColSize('col-6 col-lg-3')
                     ->onlyNumbers()
                     ->addClass('text-right')
                     ->setAppend($this->owner->currencySign),
-                (new inputText('prod_price_discount', 'LBL_DISCOUNT_PRICE', 0))
+                (new inputText('prod_price_discount', 'LBL_GROSS_DISCOUNT_PRICE', 0))
                     ->setColSize('col-6 col-lg-3')
                     ->onlyNumbers()
                     ->addClass('text-right')
                     ->setAppend($this->owner->currencySign)
+            ),
+            (new groupRow('row9'))->addElements(
+                (new inputSelect('prod_vat_local', 'LBL_VAT_LOCAL', 5))
+                    ->setColSize('col-6 col-lg-3')
+                    ->setOptions($this->owner->lists->reset()->getVat()),
+                (new inputSelect('prod_vat_deliver', 'LBL_VAT_DELIVER', 18))
+                    ->setColSize('col-6 col-lg-3')
+                    ->setOptions($this->owner->lists->reset()->getVat())
             ),
             (new groupRow('row3'))->addElements(
                 (new inputText('prod_pack_quantity', 'LBL_PACKAGE_QUANTITY', 1))
@@ -156,6 +164,8 @@ class editProductForm extends formBuilder {
                 (new inputSwitch('prod_available', 'LBL_PRODUCT_AVAILABLE', 0))
                     ->setGroupClass('mb-0')
                     ->setColor(enumColors::Warning()),
+                (new inputSwitch('prod_in_store_only', 'LBL_ONLY_IN_STORES', 0))
+                    ->setColor(enumColors::Primary()),
                 (new inputSwitch('prod_highlight', 'LBL_PRODUCT_HIGHLIGHT', 0))
                     ->setColor(enumColors::Success()),
 
@@ -302,6 +312,7 @@ class editProductForm extends formBuilder {
         if(Empty($this->values['prod_pack_unit'])) $this->values['prod_pack_unit'] = 0;
         if(Empty($this->values['prod_visible'])) $this->values['prod_visible'] = 0;
         if(Empty($this->values['prod_available'])) $this->values['prod_available'] = 0;
+        if(Empty($this->values['prod_in_store_only'])) $this->values['prod_in_store_only'] = 0;
 
         if(Empty($this->values['prod_page_title'])){
             $this->values['prod_page_title'] = $this->values['prod_name'];

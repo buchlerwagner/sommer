@@ -34,20 +34,34 @@ class editCategoryForm extends formBuilder {
         $stopSale = (new sectionBox('stop-sale', 'LBL_SALE_LIMITATIONS', 'fas fa-hand-paper'))
             ->addClass('col-12 col-lg-6')
             ->addElements(
+                (new inputSwitch('cat_only_in_stores', 'LBL_ONLY_IN_STORES', 0))
+                    ->setColor(enumColors::Primary()),
+
+                (new inputSwitch('cat_express', 'LBL_EXPRESS_PRODUCTS', 0))
+                    ->setColor(enumColors::Primary()),
+
                 (new inputSwitch('cat_limit_sale', 'LBL_CATEGORY_LIMIT_SALE', 0))
                     ->changeState(0, enumChangeAction::Readonly(), '#cat_limit_sale_text, #cat_date_start, #cat_date_end')
                     ->changeState(1, enumChangeAction::Editable(), '#cat_limit_sale_text, #cat_date_start, #cat_date_end')
                     ->changeState(1, enumChangeAction::Disable(), '#cat_stop_sale')
+                    ->changeState(1, enumChangeAction::Enable(), '.takeover-days')
                     ->changeState(0, enumChangeAction::Enable(), '#cat_stop_sale')
+                    ->changeState(0, enumChangeAction::Disable(), '.takeover-days')
                     ->setColor(enumColors::Warning()),
                 (new inputText('cat_limit_sale_text', 'LBL_LIMIT_SALE_TEXT')),
-                (new groupRow('row1'))->addElements(
+                (new groupRow('row2'))->addElements(
                     (new inputDate('cat_date_start', 'LBL_DATE_START'))
                         ->setColSize('col-6 col-lg-4')
                         ->setIcon('fas fa-calendar-alt'),
                     (new inputDate('cat_date_end', 'LBL_DATE_END'))
                         ->setColSize('col-6 col-lg-4')
                         ->setIcon('fas fa-calendar-alt')
+                ),
+                (new groupRow('row3'))->addElements(
+                    (new inputCheckGroup('cat_takeover_days', 'LBL_TAKEOVER_DAYS'))
+                        ->addClass('takeover-days')
+                        ->setOptions($this->owner->lists->getDaysOfWeek())
+                        ->setColSize('col-6 col-lg-4')
                 ),
                 (new inputSwitch('cat_stop_sale', 'LBL_CATEGORY_STOP_SALE', 0))
                     ->setColor(enumColors::Danger())
@@ -123,15 +137,18 @@ class editCategoryForm extends formBuilder {
             if(Empty($this->values['cat_limit_sale_text'])){
                 $this->addError('ERR_1000', self::FORM_ERROR, ['cat_limit_sale_text']);
             }
-            if(Empty($this->values['cat_date_start'])){
-                $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_start']);
-            }
-            if(Empty($this->values['cat_date_end'])){
-                $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_end']);
-            }
 
-            if($this->values['cat_date_end'] < $this->values['cat_date_start']){
-                $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_end']);
+            if(Empty($this->values['cat_takeover_days'])) {
+                if (empty($this->values['cat_date_start'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_start']);
+                }
+                if (empty($this->values['cat_date_end'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_end']);
+                }
+
+                if ($this->values['cat_date_end'] < $this->values['cat_date_start']) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['cat_date_end']);
+                }
             }
         }
     }
@@ -145,6 +162,13 @@ class editCategoryForm extends formBuilder {
             $this->values['cat_url'] = safeURL($this->values['cat_url']);
         }
 
+        if(Empty($this->values['cat_only_in_stores'])) {
+            $this->values['cat_only_in_stores'] = 0;
+        }else{
+            $this->values['cat_limit_sale'] = 0;
+            $this->values['cat_stop_sale'] = 0;
+        }
+
         if(Empty($this->values['cat_smart'])){
             $this->values['cat_smart'] = 0;
             $this->values['cat_tags'] = '';
@@ -152,6 +176,7 @@ class editCategoryForm extends formBuilder {
 
         if(Empty($this->values['cat_limit_sale'])) {
             $this->values['cat_limit_sale'] = 0;
+            $this->values['cat_takeover_days'] = '';
         }else{
             $this->values['cat_stop_sale'] = 0;
         }
@@ -161,6 +186,8 @@ class editCategoryForm extends formBuilder {
         }else{
             $this->values['cat_limit_sale'] = 0;
         }
+
+        if(Empty($this->values['cat_express'])) $this->values['cat_express'] = 0;
 
         if(Empty($this->values['cat_date_start'])) $this->values['cat_date_start'] = null;
         if(Empty($this->values['cat_date_end'])) $this->values['cat_date_end'] = null;

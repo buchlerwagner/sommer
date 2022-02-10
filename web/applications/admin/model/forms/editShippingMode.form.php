@@ -21,22 +21,22 @@ class editShippingModeForm extends formBuilder {
                     ->setRequired()
                     ->setColSize('col-4 col-lg-4'),
                 (new inputText('sm_price', 'LBL_FEE', 0))
-                    ->setColSize('col-4 col-lg-3')
+                    ->setColSize('col-4 col-lg-4')
                     ->addClass('text-right')
                     ->onlyNumbers()
                     ->setAppend($this->owner->currencySign),
+
+                (new inputSelect('sm_vat', 'LBL_VAT_KEY', 27))
+                    ->setColSize('col-4')
+                    ->setOptions($this->owner->lists->reset()->getVat()),
+
                 (new inputText('sm_free_limit', 'LBL_FREE_LIMIT', 0))
-                    ->setColSize('col-4 col-lg-4')
+                    ->setColSize('col-4')
                     ->addClass('text-right')
                     ->setHelpText('LBL_HELP_SHIPPING_FREE_LIMIT')
                     ->onlyNumbers()
                     ->setAppend($this->owner->currencySign)
-            ),
-            (new groupRow('row3'))->addElements(
-                (new inputText('sm_order', 'LBL_POSITION', $this->getMaxOrder()))
-                    ->setColSize('col-12 col-lg-3')
-                    ->addClass('text-right')
-                    ->onlyNumbers()
+
             ),
             (new groupRow('row4'))->addElements(
                 (new inputTextarea('sm_text', 'LBL_DESCRIPTION'))
@@ -45,6 +45,15 @@ class editShippingModeForm extends formBuilder {
                 (new inputTextarea('sm_email_text', 'LBL_EMAIL_TEXT'))
                     ->setColSize('col-12')
                     ->setRows(4)
+            ),
+            (new groupRow('row3'))->addElements(
+                (new inputText('sm_code', 'LBL_CODE'))
+                    ->setColSize('col-6 col-lg-2')
+                    ->setMaxLength(2),
+                (new inputText('sm_order', 'LBL_POSITION', $this->getMaxOrder()))
+                    ->setColSize('col-6 col-lg-2')
+                    ->addClass('text-right')
+                    ->onlyNumbers()
             )
             //(new inputSwitch('sm_default', 'LBL_DEFAULT_SHIPPING_MODE', 0))
         );

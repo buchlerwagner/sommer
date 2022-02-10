@@ -25,7 +25,7 @@
             </div>
         {% endif %}
     {% endif %}
-    <input id="{{ element.getId }}" name="{{ inputName }}" type="{{ element.getType }}" value="{{ inputValue }}" placeholder="{{ _(element.getPlaceholder) }}"{% if element.getMaxLength %} maxlength="{{ element.getMaxLength }}"{% endif %} class="form-control{{ element.getClass }}{% if element.getInputSize %} form-control-{{ element.getInputSize }}{% endif %}"{% if element.isDisabled %} disabled{% endif %}{% if element.isReadonly %} readonly{% endif %}{{ self.attributes(element.getAttributes) }}>
+    <input id="{{ element.getId }}" name="{{ inputName }}" type="{{ element.getType }}" value="{{ inputValue }}" placeholder="{{ _(element.getPlaceholder) }}"{% if element.getMaxLength %} maxlength="{{ element.getMaxLength }}"{% endif %} class="form-control {{ element.getClass }}{% if element.getInputSize %} form-control-{{ element.getInputSize }}{% endif %}"{% if element.isDisabled %} disabled{% endif %}{% if element.isReadonly %} readonly{% endif %}{{ self.attributes(element.getAttributes) }}>
     {% if element.getClearable %}
             <i class="fa fa-times" data-toggle="clear"></i>
         </label>

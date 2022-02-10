@@ -13,7 +13,7 @@ class editCustomerForm extends formBuilder {
             (new groupRow('row1'))->addElements(
                 (new inputSelect('us_title', 'LBL_PERSON_TITLE'))
                     ->setColSize('col-3')
-                    ->setOptions($this->owner->lib->getList('titles')),
+                    ->setOptions($this->owner->lists->getTitles()),
                 (new inputText('us_lastname', 'LBL_LASTNAME'))
                     ->setRequired()
                     ->setColSize('col-5'),
@@ -45,7 +45,7 @@ class editCustomerForm extends formBuilder {
         $address = (new groupFieldset('address-data', 'LBL_SHIPPING_ADDRESS'))->addElements(
             (new groupRow('row3'))->addElements(
                 (new inputSelect('us_country', 'LBL_COUNTRY', 'HU'))
-                    ->setOptions($this->owner->lib->getList('countries'))
+                    ->setOptions($this->owner->lists->getCountries())
                     ->setColSize('col-3'),
                 (new inputText('us_zip', 'LBL_ZIP'))
                     ->onlyNumbers()
@@ -62,7 +62,7 @@ class editCustomerForm extends formBuilder {
                 (new inputText('us_invoice_name', 'LBL_INVOICE_NAME'))
                     ->setColSize('col-12'),
                 (new inputSelect('us_invoice_country', 'LBL_COUNTRY', 'HU'))
-                    ->setOptions($this->owner->lib->getList('countries'))
+                    ->setOptions($this->owner->lists->getCountries())
                     ->setColSize('col-3'),
                 (new inputText('us_invoice_zip', 'LBL_ZIP'))
                     ->onlyNumbers()

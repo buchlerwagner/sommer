@@ -1,0 +1,13 @@
+{% import "form_elements.twig" as form_elements %}
+<div class="card">
+
+    <div class="card-body">
+        <div id="table_{{ table.name }}" class="{{ table.tableClass }}" data-table="{{ table.className }}" {% if table.className != table.name %} data-alias="{{ table.name }}"{% endif %}{% if table.parameters.options %} data-options="{{ table.parameters.options|json_encode() }}"{% endif %}{% if table.parameters.foreignkeys[0] %} data-foreignkey="{{ table.parameters.foreignkeys[0] }}"{% endif %}>
+
+            <div class="tbody">
+            {% include table.bodyTemplate ~ constant('TWIG_FILE_EXTENSION') %}
+            </div>
+        </div>
+
+    </div>
+</div>

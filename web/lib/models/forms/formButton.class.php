@@ -12,6 +12,7 @@ abstract class formButton {
     protected $iconType = false;
     protected $disabled = false;
     protected $readonly = false;
+    protected $validate = true;
     protected $hidden = false;
     protected $value = 1;
 
@@ -46,6 +47,15 @@ abstract class formButton {
 
     final public function getValue():string{
         return $this->value;
+    }
+
+    final public function skipValidation(){
+        $this->validate = false;
+        return $this;
+    }
+
+    final public function validate():bool{
+        return $this->validate;
     }
 
     public function setName($name){

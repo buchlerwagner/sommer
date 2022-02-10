@@ -1,6 +1,8 @@
 <?php
 class column {
+    private $id;
     private $field;
+    private $select = false;
     private $caption;
     private $type = false;
     private $headerClass = [];
@@ -10,12 +12,28 @@ class column {
     private $template = false;
 
     public function __construct($field, $caption = false, $width = false, enumTableColTypes $type = null){
+        $this->id = $field;
         $this->field = $field;
         $this->caption = $caption;
 
         $this->setWidth($width);
         $this->setType(($type ?: enumTableColTypes::General()));
     }
+
+    final public function setId($id):column{
+        $this->id = $id;
+        return $this;
+    }
+
+    final public function getId(){
+        return $this->id;
+    }
+
+    final public function setSelect(string $select):column{
+        $this->select = $select;
+        return $this;
+    }
+
 
     final protected function setType(enumTableColTypes $type):column{
         $this->type = $type;
@@ -57,13 +75,9 @@ class column {
         return $this;
     }
 
-    final public function getField(){
-        return $this->field;
-    }
-
     public function getColumn():array{
         $column = [
-            'field'   => $this->field,
+            'field'   => ($this->select ?: $this->field),
             'caption' => $this->caption,
             'width'   => $this->width,
         ];

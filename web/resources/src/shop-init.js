@@ -449,6 +449,7 @@ var shoppingCart = {
             var $isIndividual = $(this).parents('.shipping-intervals').find('.set-shipping-interval');
             var minDate = $(this).data('min-date');
             var offDates = $(this).data('off-dates') || [];
+            var dayLimits = $(this).data('dow') || [];
 
             if($isIndividual.is(':checked')){
                 minDate = 'today';
@@ -459,6 +460,19 @@ var shoppingCart = {
                 dateFormat: "Y-m-d",
                 minDate: minDate,
                 disable: offDates,
+                enable: [
+                    function (date){
+                        if(dayLimits.length > 0){
+                            if(dayLimits.includes(date.getDay())){
+                                return true;
+                            }
+                        }else{
+                            return true;
+                        }
+
+                        return false;
+                    }
+                ],
                 locale: 'hu'
             });
         });

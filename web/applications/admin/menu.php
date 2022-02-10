@@ -88,6 +88,11 @@ $GLOBALS['MENU'] = [
                 'access'  => true,
                 'userGroups' => [USER_GROUP_ADMINISTRATORS]
             ],
+            'stores' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
             'units' => [
                 'display' => 1,
                 'access'  => true,

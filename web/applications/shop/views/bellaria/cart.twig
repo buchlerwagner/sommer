@@ -106,7 +106,7 @@
                             {{ _('LBL_TOTAL') }}
                             <div class="text-muted small">({{ _('LBL_VAT_INCLUDED') }})</div>
                         </span>
-                        <span class="col total-price cart-total">{{ _price(cart.subtotal, cart.currency) }}</span>
+                        <span class="col total-price cart-total">{{ _price(cart.subtotal + cart.packagingFee, cart.currency) }}</span>
                     </li>
                     <li class="text-right">
                         <a href="{{ getPageName('checkout') }}" class="theme-btn proceed-btn">{{ _('BTN_CHECKOUT') }}</a>

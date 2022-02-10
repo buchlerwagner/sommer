@@ -19,13 +19,21 @@ abstract class buttonModal extends formButton {
         return $this::Template;
     }
 
-    protected function postForm($action, $value = 1, $additionalAction = ''):formButton {
-        $this->addData('confirm-' . $action, ($additionalAction ? $additionalAction . ';' : '') . "$('#" . $this->getForm() . "-form').attr('action', './?" . $this->getForm() . "[" . $this->name . "]=" . $value . "').submit();");
+    protected function postForm($action, $value = false, $additionalAction = ''):formButton {
+        if($value){
+            $this->setValue($value);
+        }
+
+        $this->addData('confirm-' . $action, ($additionalAction ? $additionalAction . ';' : '') . "$('#" . $this->getForm() . "-form').attr('action', './?" . $this->getForm() . "[" . $this->name . "]=" . $this->value . "').submit();");
         return $this;
     }
 
-    protected function postModalForm($action, $value = 1, $additionalAction = ''):formButton {
-        $this->addData('confirm-' . $action, ($additionalAction ? $additionalAction . ';' : '') . 'postModalForm("#' . $this->getForm() . '-form", ' . $value . ', "' . $this->name . '")');
+    protected function postModalForm($action, $value = false, $additionalAction = ''):formButton {
+        if($value){
+            $this->setValue($value);
+        }
+
+        $this->addData('confirm-' . $action, ($additionalAction ? $additionalAction . ';' : '') . 'postModalForm("#' . $this->getForm() . '-form", ' . $this->value . ', "' . $this->name . '")');
         return $this;
     }
 

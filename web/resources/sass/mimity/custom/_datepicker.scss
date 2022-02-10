@@ -1,0 +1,114 @@
+
+/* ui date-picker css */
+.ui-datepicker {
+  background: #fff !important;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  z-index: 2000 !important;
+}
+/*
+.ui-widget {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+}
+*/
+.ui-widget-header {
+  border: 0;
+  background: none !important;
+  background-color: #ffffff;
+  font-weight: 600;
+}
+.ui-widget-header select {
+  font-weight: normal;
+}
+.ui-datepicker th {
+  font-weight: 600;
+}
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+  position: absolute;
+  top: 2px;
+  width: 1.8em;
+  height: 1.8em;
+}
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
+  display: block;
+  position: absolute;
+  left: 50%;
+  margin-left: -8px;
+  top: 50%;
+  margin-top: -8px;
+}
+.ui-datepicker .ui-datepicker-prev-hover {
+  left: 2px;
+}
+.ui-datepicker .ui-datepicker-next-hover {
+  right: 2px;
+}
+
+.ui-datepicker td span,
+.ui-datepicker td a {
+  text-align: center;
+}
+.ui-widget-header .ui-state-hover,
+.ui-widget-header .ui-state-focus {
+  border: 0;
+  background: none !important;
+}
+
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+  border: 0;
+  background: #ffffff;
+  font-weight: normal;
+  color: #000;
+}
+
+.ui-state-active,
+.ui-widget-content .ui-state-active {
+  border-radius: 4px;
+  background-color: $blue;
+  color: #ffffff;
+}
+
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus {
+  border: 0;
+  background-color: #EEEEEE;
+  border-radius: 4px;
+}
+
+.ui-state-highlight,
+.ui-widget-content .ui-state-highlight,
+.ui-widget-header .ui-state-highlight {
+  border: 0;
+  color: #FFFFFF;
+}
+
+.ui-datepicker-today,
+.ui-datepicker-today .ui-state-highlight,
+.ui-datepicker-today .ui-state-default {
+  color: $danger !important;
+}
+
+.ui-datepicker-today .ui-state-active {
+  background-color: $blue !important;
+  color: #FFFFFF;
+}
+
+.ui-datepicker-week-end,
+.ui-datepicker-week-end .ui-state-default,
+.ui-datepicker-week-end .ui-state-disabled {
+  color: $blue;
+}

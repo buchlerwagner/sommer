@@ -7,9 +7,9 @@ class buttonYesNo extends buttonModal {
     }
 
     public function setYesAction(enumModalActions $action, $value = 1, $additionalAction = false){
-        if($action == enumModalActions::PostForm()){
+        if($action === enumModalActions::PostForm()){
             $this->postForm('action', $value, $additionalAction);
-        }elseif ($action == enumModalActions::PostModalForm()){
+        }elseif ($action === enumModalActions::PostModalForm()){
             $this->postModalForm('action', $value, $additionalAction);
         }
         return $this;
@@ -25,7 +25,7 @@ class buttonYesNo extends buttonModal {
         return $this;
     }
 
-    protected function init() {
+    public function init() {
         $this->addData('toggle', 'modal');
         $this->addData('target', '#yesno-modal');
         $this->addData('backdrop', 'static');

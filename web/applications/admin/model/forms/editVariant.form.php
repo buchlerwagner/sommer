@@ -18,16 +18,24 @@ class editVariantForm extends formBuilder {
                 ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_NONE')->getProductImages($this->keyFields['pv_prod_id'])),
 
             (new groupRow('row1'))->addElements(
-                (new inputText('pv_price', 'LBL_PRICE', 0))
+                (new inputText('pv_price', 'LBL_GROSS_PRICE', 0))
                     ->setColSize('col-6')
                     ->onlyNumbers()
                     ->addClass('text-right')
                     ->setAppend($this->owner->currencySign),
-                (new inputText('pv_price_discount', 'LBL_DISCOUNT_PRICE', 0))
+                (new inputText('pv_price_discount', 'LBL_GROSS_DISCOUNT_PRICE', 0))
                     ->setColSize('col-6')
                     ->onlyNumbers()
                     ->addClass('text-right')
                     ->setAppend($this->owner->currencySign)
+            ),
+            (new groupRow('row9'))->addElements(
+                (new inputSelect('pv_vat_local', 'LBL_VAT_LOCAL', 5))
+                    ->setColSize('col-6')
+                    ->setOptions($this->owner->lists->reset()->getVat()),
+                (new inputSelect('pv_vat_deliver', 'LBL_VAT_DELIVER', 18))
+                    ->setColSize('col-6')
+                    ->setOptions($this->owner->lists->reset()->getVat())
             ),
             (new groupRow('row2'))->addElements(
                 (new inputText('pv_pack_quantity', 'LBL_PACKAGE_QUANTITY', 1))

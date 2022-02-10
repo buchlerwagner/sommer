@@ -1,0 +1,91 @@
+<div class="row mt-4">
+    <div class="col-6">
+        <div id="cart-settings" class="card" style="min-height: 240px;">
+            <div class="card-header">
+                <h4 class="text-primary">{{ _('LBL_SETTINGS') }}</h4>
+            </div>
+            <div class="card-body">
+                <hr class="mt-0">
+                {% if cart.getOrderType == 1 %}
+                    <div class="form-group list-group">
+                        <input id="local-consumption-1" name="local" type="radio" value="1"{% if cart.isLocalConsumption == 1 %} checked="checked"{% endif %} class="cart-local-consumption" />
+                        <label for="local-consumption-1" class="list-group-item">
+                            <i class="fas fa-utensils-alt mr-2"></i>
+                            {{ _('LBL_LOCAL_CONSUMPTION') }}
+                        </label>
+
+                        <input id="local-consumption-0" name="local" type="radio" value="0"{% if cart.isLocalConsumption == 0 %} checked="checked"{% endif %} class="cart-local-consumption" />
+                        <label for="local-consumption-0" class="list-group-item">
+                            <i class="fas fa-hand-holding-box mr-2"></i>
+                            {{ _('LBL_TAKEAWAY') }}
+                        </label>
+                    </div>
+                {% else %}
+                    <div id="shipping-modes" class="mb-2">
+                        <h5>{{ _('LBL_SHIPPING_MODE') }}</h5>
+                        <div class="form-group list-group mb-3">
+                            {% for item in cart.getShippingModes %}
+                                <input id="shipping-mode-{{ item.id }}" name="shippingMode" type="radio" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getShippingId == item.id %} checked="checked"{% endif %} class="set-shipping-mode" />
+                                <label for="shipping-mode-{{ item.id }}" class="list-group-item">
+                                    {{ item.name }}
+                                    {% if item.price %}
+                                        <div class="text-muted float-right">{{ _price(item.price, cart.currency) }}</div>
+                                    {% endif %}
+                                </label>
+                            {% endfor %}
+                        </div>
+                        <div id="shipping-details" class="form-row{% if not cart.getShippingId %} d-none{% endif %}"></div>
+                    </div>
+                    <hr class="mt-0">
+                    <div id="payment-modes" class="mb-3">
+                        <h5>{{ _('LBL_PAYMENT_MODE') }}</h5>
+                        <div class="form-group list-group">
+                            {% for item in cart.getPaymentModes %}
+                                <input id="payment-mode-{{ item.id }}" name="paymentMode" type="radio" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getPaymentId == item.id %} checked="checked"{% endif %} class="set-payment-mode" />
+                                <label for="payment-mode-{{ item.id }}" class="list-group-item">
+                                    {{ item.name }}
+                                    {% if item.price %}
+                                        <div class="text-muted float-right">{{ _price(item.price, cart.currency) }}</div>
+                                    {% endif %}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="text-primary">{{ _('LBL_CART_TOTAL') }}</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-condensed">
+                    <tr class="cart-item-subtotal{% if not cart.packagingFee and not cart.shippingFee %} d-none{% endif %}">
+                        <td>{{ _('LBL_TOTAL') }}:</td>
+                        <td class="text-right">
+                            <span class="total-price cart-subtotal">{{ _price(cart.subtotal, cart.currency) }}</span>
+                        </td>
+                    </tr>
+                    <tr class="cart-item-packaging {% if not cart.packagingFee %} d-none{% endif %}">
+                        <td>{{ _('LBL_PACKAGING_FEE') }}:</td>
+                        <td class="text-right"><span class="total-price cart-packaging-fee">{{ _price(cart.packagingFee, cart.currency) }}</span></td>
+                    </tr>
+                    <tr class="cart-item-shipping {% if not cart.shippingFee %} d-none{% endif %}">
+                        <td>{{ _('LBL_SHIPPING_FEE') }}:</td>
+                        <td class="text-right"><span class="total-price cart-shipping-fee">{{ _price(cart.shippingFee, cart.currency) }}</span></td>
+                    </tr>
+                    <tr>
+                        <td><b class="font-size-lg">{{ _('LBL_GRAND_TOTAL') }}:</b></td>
+                        <td class="text-right">
+                            <span class="total-price cart-total font-size-lg"><b>{{ _price(cart.total, cart.currency) }}</b></span>
+                            <div class="text-muted small">({{ _('LBL_VAT_INCLUDED') }})</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

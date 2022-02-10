@@ -914,6 +914,7 @@ class functions extends ancestor {
                         ],
                         [
                             'cat_shop_id' => $this->owner->shopId,
+                            'cat_only_in_stores' => 0,
                             'cat_visible' => 1
                         ],
                         [],

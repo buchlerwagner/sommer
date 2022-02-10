@@ -11,3 +11,8 @@
   text-decoration: line-through;
   text-decoration-color: #c2573c;
 }
+
+.table-sort-placeholder {
+  display: flex !important;
+  background-color: lighten($yellow, 40%);
+}

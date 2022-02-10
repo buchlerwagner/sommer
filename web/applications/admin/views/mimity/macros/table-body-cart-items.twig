@@ -1,0 +1,47 @@
+{% import "tools" ~ constant('TWIG_FILE_EXTENSION') as tools %}
+<tbody>
+{% if table.rows %}
+    {% for item in table.rows %}
+        <tr class="d-flex cart-item cart-item-{{ item.id }}">
+            <td class="col-1 product-thumbnail"><a href="{{ item.url }}"><img src="{{ item.image }}" class="img-thumbnail img-fluid" alt="{{ item.name }}"></a></td>
+            <td class="col-2 product-name">
+                {% if not table.isEmployee %}<a href="/webshop/products/edit|products/{{ item.productId }}/" target="_blank">{% endif %}
+                {{ item.name }}
+                {% if not table.isEmployee %}</a>{% endif %}
+                {% if item.variant %}
+                    <div class="text-muted">({{ item.variant }})</div>
+                {% endif %}
+            </td>
+            <td class="col-2 text-right product-price">
+                {{ _price(item.price.displayPrice, item.price.currency) }} {{ item.price.unit }}
+            </td>
+            <td class="col-3 product-quantity text-center">
+                <div class="input-group ml-auto mr-auto" data-id="{{ item.id }}" style="max-width: 200px;">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-light quantity-select btn-minus" data-value="-1" type="button" id="button-minus"><i class="fal fa-minus"></i></button>
+                    </div>
+                    <input type="text" name="quantity" data-min="{{ item.minSale }}" data-max="{{ item.maxSale }}" class="form-control bg-white text-center numbersonly quantity-input border-right-0 item-quantity-{{ item.id }}" value="{{ item.quantity.amount }}">
+                    <div class="input-group-append">
+                        <span class="input-group-text bg-white" id="quantity-unit">{{ item.quantity.unit }}</span>
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-light quantity-select btn-plus" data-value="1" type="button" id="button-plus"><i class="fal fa-plus"></i></button>
+                    </div>
+                </div>
+            </td>
+            <td class="col-2 text-right product-subtotal"><span class="item-total-{{ item.id }}">{{ _price(item.price.total, item.price.currency) }}</span></td>
+            <td class="col-2 text-right product-remove">
+                <a href="javascript:;" data-confirm-action="orders.removeProduct({{ item.id }});" data-confirm-question="{{ _('LBL_DELETE_ITEM') }}" data-toggle="modal" data-target="#confirm-delete" class="btn btn-light h-danger btn-sm" data-id="{{ item.id }}"><i class="far fa-trash-alt"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="6">
+            <div class="alert alert-warning">
+                {{ _('LBL_SELECT_PRODUCT') }}
+            </div>
+        </td>
+    </tr>
+{% endif %}
+</tbody>

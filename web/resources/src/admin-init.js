@@ -189,6 +189,10 @@ var app = {
             var $this = $(this);
             var $modal = $this.parents('.modal-content');
             var $form = $modal.find('form');
+            var value = $this.val() || 1;
+            var action = $form.attr('action');
+
+            $form.attr('action', action.split('?')[0] + '?' + $this.attr('name') + '=' + value);
             $form.submit();
         });
 
@@ -320,6 +324,7 @@ var app = {
                     value = $this.val();
                 }
 
+                console.log('change state: ' + value);
                 /*
                 if(typeof options !== 'object'){
                     options = JSON.parse(options);
@@ -667,12 +672,15 @@ var app = {
             var searchFields = $this.data('searchfields') || false;
             var callBackFunction = $this.data('callback') || false;
             var clearOnSelect = $this.data('clearonselect') || false;
-            var list = $this.data('list') || '';
-            var url = '/ajax/lists/' + list + '/';
+            var url = $this.data('url') || false;
+            if(!url) {
+                var list = $this.data('list') || '';
+                url = '/ajax/autocomplete/' + list + '/';
+            }
 
             $this.autoComplete({
                 resolver: 'custom',
-                minLength: 0,
+                minLength: 2,
                 preventEnter: true,
                 events: {
                     search: function (q, callback) {
@@ -806,42 +814,57 @@ var app = {
 
         $('.catselautocomplete:not(.inited)').each(function() {
             var $this  = $(this);
-            var _url  = $this.attr('data-list-url');
-            var _scope = $this.attr('data-scope') || 0;
+            var scope = $this.attr('data-scope') || 0;
+            var callBackFunction = $this.data('callback') || false;
+            var insertFields = $this.data('insert-fields') || false;
+            var clearOnSelect = $this.data('clearonselect') || false;
+            var url = $this.data('url') || false;
+            if(!url) {
+                var list = $this.data('list') || '';
+                url = '/ajax/autocomplete/' + list + '/';
+            }
+
             $this.addClass('inited');
 
-            $this.catselcomplete({
+            $this.catcomplete({
                 minLength: 2,
                 source: function(request, response) {
                     $.ajax({
-                        url: _url,
+                        url: url,
                         dataType: "jsonp",
                         data: {
-                            query: request.term,
-                            scope: _scope,
+                            q: request.term,
+                            scope: scope,
                         },
                         success : function(data) {
                             var resp = {};
                             for (var i in data) {
                                 var val = data[i];
-                                if (val.categoryid !== undefined && resp[val.categoryid] === undefined) {
-                                    resp[val.categoryid] = {
-                                        value: val.categoryid,
-                                        label: val.category,
-                                        category: val.category,
-                                        categorycode: val.categoryid,
-                                        class: 'ui-autocomplete-category'
-                                    };
+                                let subText = false;
+                                let image = false;
+                                let icon = false;
+
+                                if('data' in val){
+                                    if(val.data.subText) {
+                                        subText = val.data.subText;
+                                    }
+                                    if(val.data.image) {
+                                        image = val.data.image;
+                                    }
+                                    if(val.data.icon) {
+                                        icon = val.data.icon;
+                                    }
                                 }
-                                if (val.id !== val.categoryid) {
-                                    resp[val.id] = {
-                                        value: val.id,
-                                        label: val.label,
-                                        category: val.category,
-                                        categorycode: val.categoryid,
-                                        class: 'ui-menu-item'
-                                    };
-                                }
+                                resp[val.id] = {
+                                    value: val.id,
+                                    label: val.text,
+                                    category: val.groupName,
+                                    categoryId: val.groupId,
+                                    subText: subText,
+                                    image: image,
+                                    icon: icon,
+                                    class: 'ui-menu-item'
+                                };
                             }
                             response(resp);
                         }
@@ -862,7 +885,33 @@ var app = {
                     } else {
                         $(this).val( ui.item.label );
                         $('#' + this.id + '-id').val( ui.item.value );
+
+                        if(callBackFunction){
+                            let fn = window[callBackFunction];
+                            if(typeof fn === 'function'){
+                                let _data = {
+                                    id: ui.item.value,
+                                    scope: scope,
+                                };
+
+                                if(insertFields){
+                                    $(insertFields).each(function(idx, inp){
+                                        _data[$(inp).attr('id')] = $(inp).val();
+                                    });
+                                }
+
+                                console.log(_data);
+
+                                fn(_data);
+                            }
+                        }
                     }
+
+                    if(clearOnSelect){
+                        $(this).val('');
+                        $('#' + this.id + '-id').val('');
+                    }
+
                     return false;
                 }
             }).focusout(function() {
@@ -877,7 +926,6 @@ var app = {
 
         if ($.fn.datepicker) {
             $('.datepicker:not(.inited)').each(function() {
-
                 var $this = $(this);
                 $this.addClass('inited');
                 var _language = $this.attr('data-language') || 'en';
@@ -1265,6 +1313,46 @@ $(function() {
     app.init();
 });
 
+$.widget( "custom.catcomplete", $.ui.autocomplete, {
+    _create: function() {
+        this._super();
+        this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+    },
+    _renderMenu: function( ul, items ) {
+        var that = this, newitem = '', currentCategory = "";
+        $.each( items, function( index, item ) {
+            if ( item.categoryId !== currentCategory && item.categoryId ) {
+                newitem  = '<li class="ui-autocomplete-category">';
+                newitem += item.category + '</li>';
+
+                ul.append( newitem );
+                currentCategory = item.categoryId;
+            }
+            that._renderItemData( ul, item );
+        });
+    },
+    _renderItem: function( ul, item ){
+        let html = '<div class="ui-menu-item-wrapper">';
+        if(item.image){
+            html += '<img class="rounded mr-2" width="50" height="50" src="' + item.image + '" />';
+        }
+
+        if(item.icon){
+            html += '<i class="' + item.icon + ' mr-2"></i>';
+        }
+
+        html += item.label;
+
+        if(item.subText){
+            html += '<div class="ui-autocomplete-subtext">' + item.subText + '</div>';
+        }
+
+        html += '</div>';
+
+        return $( "<li>" ).html( html ).appendTo( ul );
+    }
+});
+
 function postModalForm(form, btnValue, btnName) {
     if(!btnValue) btnValue = 1;
     if(!btnName) btnName = 'save';
@@ -1297,7 +1385,9 @@ function pageRedirect(url){
 
 function modalFormPageRefresh(formname) {
     $('#ajax-modal').modal('hide');
+    window.location.href = window.location.href;
 
+    /*
     var $form = $('form');
     if ($form.length > 0) {
         $form = $form.first();
@@ -1314,6 +1404,7 @@ function modalFormPageRefresh(formname) {
             window.location.href += '?modalform=' + formname;
         }
     }
+    */
 }
 
 /**

@@ -4,8 +4,7 @@ class buttonModalSubmit extends buttonModal {
 
     public function init(){
         $this->addClass('btn-modal-submit');
-        $this->addClass('float-left');
-        $this->setName($this->id);
+        //$this->addClass('float-left');
         $this->setType(enumButtonTypes::Button());
 
         return $this;
@@ -14,5 +13,6 @@ class buttonModalSubmit extends buttonModal {
     public function __construct($id, $caption, $class = 'btn btn-primary'){
         parent::__construct($id, $caption, $class);
         $this->init();
+        $this->setName($this->id);
     }
 }

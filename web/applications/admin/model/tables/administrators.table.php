@@ -102,9 +102,7 @@ class administratorsTable extends table {
 	public function onAfterLoad() {
 		if($this->rows){
 			foreach($this->rows AS $key => $row){
-				$this->rows[$key]['options'] = [
-					'delete' => $this->hasHigherRole($row['us_id'], $row['us_role'])
-				];
+				$this->rows[$key]['options']['delete'] = $this->hasHigherRole($row['us_id'], $row['us_role']);
 			}
 		}
 	}

@@ -143,7 +143,7 @@ abstract class formBuilder extends model {
 							$validActions[] = [
 								'name' => $button->getName(),
 								'type' => 'button',
-								'skipValidation' => false,
+								'skipValidation' => !$button->validate(),
 							];
 						}
 					}
@@ -171,6 +171,8 @@ abstract class formBuilder extends model {
 							} else if (method_exists($this, $action['name'])) {
 								$this->state = FORM_STATE_BUTTONACTION;
 								call_user_func_array([$this, $action['name']], []);
+                                $this->state = FORM_STATE_SAVED;
+                                break;
 							}
 						} else {
 							$this->state = FORM_STATE_INVALID;
@@ -592,7 +594,7 @@ abstract class formBuilder extends model {
 
     protected function addButtons(formButton ...$buttons){
         foreach ($buttons as $button) {
-            if ($button->getName() === 'cancel' && $this->parameters['backurl']) {
+            if ($button->getName() === 'cancel' && $this->parameters['backurl'] && Empty($button->getUrl())) {
                 $button->setUrl($this->parameters['backurl']);
             }
             if ($button->getName() === 'edit' && $this->parameters['editUrl']) {

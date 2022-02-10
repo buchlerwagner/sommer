@@ -1,3 +1,40 @@
+# noinspection SqlNoDataSourceInspectionForFile
+-- 2022-02-02
+
+ALTER TABLE `products` ADD COLUMN `prod_vat_local` DOUBLE NULL DEFAULT 5 AFTER `prod_price_discount`;
+ALTER TABLE `products` ADD COLUMN `prod_vat_deliver` DOUBLE NULL DEFAULT 18 AFTER `prod_vat_local`;
+ALTER TABLE `products` ADD COLUMN `prod_in_store_only` TINYINT(1) NULL DEFAULT 0 AFTER `prod_available`;
+
+ALTER TABLE `product_categories` ADD COLUMN `cat_takeover_days` VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `cat_date_end`;
+ALTER TABLE `product_categories` ADD COLUMN `cat_only_in_stores` TINYINT(1) NULL DEFAULT 0 AFTER `cat_takover_days`;
+ALTER TABLE `product_categories` ADD COLUMN `cat_express` TINYINT(1) NULL DEFAULT 0 AFTER `cat_only_in_stores`;
+
+ALTER TABLE `product_variants` ADD COLUMN `pv_vat_local` DOUBLE NULL DEFAULT 5 AFTER `pv_price_discount`;
+ALTER TABLE `product_variants` ADD COLUMN `pv_vat_deliver` DOUBLE NULL DEFAULT 18 AFTER `pv_vat_local`;
+
+ALTER TABLE `hosts` ADD COLUMN `host_store_id` INT(11) NULL DEFAULT 0 AFTER `host_shop_id`;
+
+ALTER TABLE `cart` ADD COLUMN `cart_store_id` VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_shop_id`;
+ALTER TABLE `cart` ADD COLUMN `cart_created_by` INT(11) NULL DEFAULT 0 AFTER `cart_store_id`;
+
+ALTER TABLE `packagings` ADD COLUMN `pkg_vat` DOUBLE NULL DEFAULT 27 AFTER `pkg_price`;
+ALTER TABLE `shipping_modes` ADD COLUMN `sm_vat` DOUBLE NULL DEFAULT 27 AFTER `sm_price`;
+ALTER TABLE `payment_modes` ADD COLUMN `pm_vat` DOUBLE NULL DEFAULT 27 AFTER `pm_price`;
+ALTER TABLE `shipping_modes` ADD COLUMN `sm_code` VARCHAR(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `sm_shop_id`;
+
+ALTER TABLE `cart` ADD COLUMN `cart_order_type` TINYINT(1) NULL DEFAULT 0 AFTER `cart_order_number`;
+ALTER TABLE `cart` ADD COLUMN `cart_local_consumption` TINYINT(1) NULL DEFAULT 0 AFTER `cart_custom_interval`;
+
+
+CREATE  INDEX `store` USING BTREE ON `cart` (`cart_store_id`);
+UPDATE cart SET cart_store_id = 'W';
+
+
+
+
+
+
+
 ALTER TABLE `product_categories` ADD COLUMN `cat_stop_sale` TINYINT(1) NULL DEFAULT 0 AFTER `cat_tags`;
 ALTER TABLE `product_categories` ADD COLUMN `cat_limit_sale` TINYINT(1) NULL DEFAULT 0 AFTER `cat_stop_sale`;
 ALTER TABLE `product_categories` ADD COLUMN `cat_limit_sale_text` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `cat_limit_sale`;

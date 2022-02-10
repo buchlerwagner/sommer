@@ -173,8 +173,14 @@
             {{ form_elements._checkboxslider(params, 1, val) }}
 		{% endif %}
 		</div>
+    {% elseif column.type == 'yesno' %}
+        {% if val %}
+            <i class="fas fa-check text-success"></i>
+        {% else %}
+            <i class="fas fa-times text-danger"></i>
+        {% endif %}
 	{% elseif column.type == 'icon' %}
-		<i class="fa fa-{{ column.icons[ val ] }}{% if column.colors %} text-{{ column.colors[val] }}{% endif %}"></i>
+		<i class="{{ column.icons[ val ] }}{% if column.colors %} text-{{ column.colors[val] }}{% endif %}"></i>
     {% elseif column.type == 'styled' %}
         <div class="{{ column.cellclass }}">{{ val }}</div>
     {% elseif column.type == 'binoptions' %}
@@ -200,10 +206,10 @@
             {% endif %}
         {% else %}
             {% if table.readonly %}
-                {% if table.view %}<a href="{% if table.customUrl %}{{ table.customUrl|replace({'%keyvalue%': keyvalue, '%id%': row.__id }) }}{% else %}view|{{ table.name }}/{{ keyvalue }}/{% endif %}" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
+                {% if table.view %}<a href="{% if table.customUrl %}{{ table.customUrl|replace({'%keyvalue%': keyvalue, '%id%': row.__id }) }}{% else %}{{ table.baseURL }}view|{{ table.name }}/{{ keyvalue }}/{% endif %}" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
             {% else %}
                 {% if table.view %}<a href="view|{{ table.name }}/{{ keyvalue }}/" class="btn btn-light h-info"><i class="far fa-eye"></i></a>{% endif %}
-                {% if table.edit and ((row['options'].edit is defined and row['options'].edit != false) or row['options'].edit is not defined) %}<a href="edit|{{ table.name }}/{{ keyvalue }}/" class="btn btn-light h-info"><i class="far fa-edit"></i></a>{% endif %}
+                {% if table.edit and ((row['options'].edit is defined and row['options'].edit != false) or row['options'].edit is not defined) %}<a href="{{ table.baseURL }}edit|{{ table.name }}/{{ keyvalue }}/" class="btn btn-light h-info"><i class="far fa-edit"></i></a>{% endif %}
             {% endif %}
         {% endif %}
 

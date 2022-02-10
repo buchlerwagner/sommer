@@ -40,8 +40,8 @@ const FORM_STATE_SAVED      = 'saved';
 const FORM_STATE_BUTTONACTION = 'buttonaction';
 const FORM_STATE_RESETED    = 'reseted';
 
-const VERSION_JS            = '1.0.5';
-const VERSION_CSS           = '1.0.6';
+const VERSION_JS            = '1.0.7';
+const VERSION_CSS           = '1.0.7';
 
 //
 /**
@@ -134,6 +134,7 @@ $GLOBALS['USER_GROUPS'] = [
 
 const USER_ROLE_SUPERVISOR  = 'SUPERVISOR';
 const USER_ROLE_ADMIN       = 'ADMIN';
+const USER_ROLE_EMPLOYEE    = 'EMPLOYEE';
 const USER_ROLE_USER        = 'USER';
 const USER_ROLE_NONE        = 'NONE';
 
@@ -146,6 +147,10 @@ $GLOBALS['USER_ROLES'] = [
         USER_ROLE_ADMIN => [
             'label' => 'LBL_ROLE_ADMIN',
             'color' => 'warning',
+        ],
+        USER_ROLE_EMPLOYEE => [
+            'label' => 'LBL_ROLE_EMPLOYEE',
+            'color' => 'info',
         ],
     ],
     USER_GROUP_CUSTOMERS => [
@@ -196,6 +201,10 @@ const ORDER_STATUS_DELIVERING = 'DELIVERING';
 const ORDER_STATUS_RECEIVABLE = 'RECEIVABLE';
 const ORDER_STATUS_FINISHED = 'FINISHED';
 const ORDER_STATUS_CLOSED = 'CLOSED';
+
+const ORDER_TYPE_ONLINE = 0;
+const ORDER_TYPE_STORE  = 1;
+const ORDER_TYPE_PHONE  = 2;
 
 $GLOBALS['ORDER_STATUSES'] = [
     ORDER_STATUS_NEW => [
@@ -318,3 +327,7 @@ $GLOBALS['PAGE_NAMES'] = [
         ]
     ],
 ];
+
+const PAYMENT_TYPE_CASH = 1;
+const PAYMENT_TYPE_MONEY_TRANSFER = 2;
+const PAYMENT_TYPE_CARD = 3;

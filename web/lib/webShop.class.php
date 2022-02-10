@@ -32,6 +32,7 @@ class webShop extends ancestor {
                 ],
                 [
                     'cat_visible' => 1,
+                    'cat_only_in_stores' => 0,
                     'cat_shop_id' => $this->shopId
                 ],
                 [],
@@ -55,6 +56,7 @@ class webShop extends ancestor {
 
         if(!$this->isAdmin){
             $where['cat_visible'] = 1;
+            $where['cat_only_in_stores'] = 0;
         }
 
 		$cat = $this->owner->db->getFirstRow(
@@ -102,6 +104,7 @@ class webShop extends ancestor {
         if(!$this->isAdmin){
             $where['cat_visible'] = 1;
             $where['prod_visible'] = 1;
+            $where['prod_in_store_only'] = 0;
         }
 
 		$out = [];
@@ -138,7 +141,7 @@ class webShop extends ancestor {
 
         $where = [
             'prod_shop_id' => $this->shopId,
-            'prop_shop_id' => $this->shopId
+            'prod_in_store_only' => 0,
         ];
 
         if($params['categories']){
@@ -269,6 +272,7 @@ class webShop extends ancestor {
 
         $where = [
             'prod_shop_id' => $this->shopId,
+            'prod_in_store_only' => 0,
             'prod_highlight' => 1,
             'prod_archived' => 0,
         ];
@@ -560,6 +564,7 @@ class webShop extends ancestor {
 
         if(!$this->isAdmin) {
             $where[] = 'prod_visible = 1';
+            $where[] = 'prod_in_store_only = 0';
         }
 
 		//$where[] = '(prod_price > 0 OR prod_price_discount > 0)';

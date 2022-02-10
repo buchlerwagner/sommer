@@ -39,8 +39,16 @@ var tables = {
             if(typeof data !== 'object'){
                 data = JSON.parse(data);
             }
+
             for (var selector in data) {
-                $(selector).replaceWith(data[selector]);
+                if(selector.includes('tbody')) {
+                    $table.find('tbody').remove();
+                    $table.append(data[selector]);
+                }else if(selector === 'fields') {
+                    processJSONResponse(data[selector]);
+                }else {
+                    $(selector).replaceWith(data[selector]);
+                }
             }
 
             app.reInit();
@@ -144,10 +152,25 @@ var tables = {
             var checked = ($this.is(':checked')) ? 1 : 0;
             tables.checkBox($this.data('table'), $this.data('keyvalue'), $this.data('field'), checked, $this.data('method'));
         });
+
     },
 
     reInit: function(){
+        $('.table-sort').sortable({
+            items : 'tr:not(.no-sort)',
+            placeholder: 'table-sort-placeholder',
+            stop: function(e, ui){
+                var table = $(ui.item).data('table');
+                var keyValue = $(ui.item).data('keyvalue');
+                var groupId = $(ui.item).data('groupid') || 0;
+                var itemOrder = $(e.target).sortable("toArray");
 
+                tables.sendRequest(table, keyValue, 'sort', {
+                    groupId: groupId,
+                    order: itemOrder
+                });
+            }
+        }).disableSelection();
     },
 
     init: function(){

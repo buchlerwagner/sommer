@@ -93,6 +93,12 @@
                                                     <div class="alert alert-warning">
                                                         <i class="far fa-info-circle"></i>
                                                         {{ item.category.limitSaleText|raw }}
+
+                                                        {% if item.category.dayLimits %}
+                                                            {% for day in item.category.dayLimits %}
+                                                                <b>{{ _('LBL_DAY_' ~ day) }}</b>{% if not loop.last %}, {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
                                                     </div>
                                                 {% endif %}
 

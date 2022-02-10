@@ -6,6 +6,8 @@ class orderFiltersForm extends filterForm {
     public function setup() {
 		parent::setup();
 
+        $isEmployee = ($this->owner->user->getRole() == USER_ROLE_EMPLOYEE);
+
         $this->customRights = ACCESS_RIGHT_WRITE;
         $this->parentTable = 'orders';
 
@@ -42,8 +44,26 @@ class orderFiltersForm extends filterForm {
                     ->setColSize('col-6 col-lg-2')
                     ->addEmptyLabel()
                     ->setAppend('ig')
-
             )
         );
+
+        if(!$isEmployee){
+            $this->addControls(
+                (new groupRow('row3'))->addElements(
+                    (new inputSelect('cart_store_id', 'LBL_STORE'))
+                        ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getStores(true))
+                        ->setColSize('col-12 col-lg-2'),
+                    (new inputSelect('cart_sm_id', 'LBL_DELIVERY_PLACE'))
+                        ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getShippingModes())
+                        ->setColSize('col-12 col-lg-2'),
+                    (new inputSelect('cart_pm_id', 'LBL_PAYMENT_MODE'))
+                        ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getPaymentModes())
+                        ->setColSize('col-12 col-lg-2'),
+                    (new inputAutocomplete('cart_created_by', 'LBL_SALESCLERK'))
+                        ->setColSize('col-12 col-lg-3')
+                        ->setList('searchEmployees')
+                )
+            );
+        }
     }
 }

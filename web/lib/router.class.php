@@ -24,6 +24,7 @@ class router extends model {
 
 	public $sessionId;
 	public $shopId = 0;
+	public $storeId = '';
 	public $language;
 	public $machineId;
 	public $currency;
@@ -125,6 +126,7 @@ class router extends model {
             $this->host = $this->hostConfig['host'];
 
             $this->shopId = $this->hostConfig['shopId'];
+            $this->storeId = $this->hostConfig['storeId'];
             $this->language = $this->hostConfig['defaultLanguage'];
             $this->application = $this->hostConfig['application'];
             $this->theme = $this->hostConfig['theme'];
@@ -132,6 +134,7 @@ class router extends model {
             $this->settings = $this->lib->getWebShopSettings();
         }else{
             $this->shopId = 1;
+            $this->storeId = 'X';
             $this->host = DEFAULT_HOST;
             $this->language = DEFAULT_LANGUAGE;
             $this->application = DEFAULT_APPLICATION;
@@ -161,12 +164,22 @@ class router extends model {
                     [],
                     [
                         'host_host' => $host
+                    ],
+                    [
+                        'stores' => [
+                            'on' => [
+                                'st_id' => 'host_store_id'
+                            ]
+                        ]
                     ]
                 )
             );
             if($h){
                 $config = [
                     'shopId' => (int) $h['host_shop_id'],
+                    'storeId' => $h['st_code'],
+                    'storeName' => $h['st_name'],
+                    'isVirtual' => (bool) $h['st_virtual'],
                     'host' => $h['host_host'],
                     'name' => $h['host_name'],
                     'isMaintenance' => ($h['host_maintenance']),

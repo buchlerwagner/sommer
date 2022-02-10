@@ -16,12 +16,7 @@ class documentsTable extends table {
 		$this->settings['orderfield'] = 'dt_name, doc_filename';
 		$this->settings['orderdir']   = 'asc';
 
-        $this->rowGroups = [
-            0 => [
-                'field'   => 'dt_name',
-                'alias'   => 'dt_name',
-            ],
-        ];
+        $this->addGroup('dt_id', 'dt_name');
 
         $this->addColumns(
             (new column('doc_filename', 'LBL_FILENAME', 10))

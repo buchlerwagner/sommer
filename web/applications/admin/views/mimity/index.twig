@@ -1,3 +1,24 @@
+{% import "tools.twig" as tools %}
 <div class="page-header border-b-0 mb-2">
-    <h2 class="text-primary">{{ _('LBL_HELLO', user.firstname)|raw }}</h2>
+    <h2 class="text-primary mb-1">{{ _('LBL_HELLO', user.firstname)|raw }}</h2>
+    <div>{{ _('LBL_CURRENT_STORE') }}: <b class="text-primary">{{ storeName }}</b></div>
 </div>
+
+<hr>
+
+<div class="list-with-gap mb-3">
+    {% if access[1] %}
+    <a href="./?new=1" class="btn btn-light btn-app">
+        <i class="fas fa-plus-circle text-primary"></i>
+        {{ _('LBL_NEW_ORDER') }}
+    </a>
+    {% endif %}
+    {% if access[2] %}
+    <a href="./?new=2" class="btn btn-light btn-app">
+        <i class="fas fa-phone-square-alt text-primary"></i>
+        {{ _('LBL_NEW_PHONE_ORDER') }}
+    </a>
+    {% endif %}
+</div>
+
+{{ tools.table(table) }}

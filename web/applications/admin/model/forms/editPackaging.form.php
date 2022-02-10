@@ -17,10 +17,14 @@ class editPackagingForm extends formBuilder {
             ),
             (new groupRow('row2'))->addElements(
                 (new inputText('pkg_price', 'LBL_FEE', 0))
-                    ->setColSize('col-12 col-lg-5')
+                    ->setColSize('col-6 col-lg-5')
                     ->addClass('text-right')
                     ->onlyNumbers()
-                    ->setAppend($this->owner->currencySign . ' / ' . $this->owner->translate->getTranslation('LBL_PCS'))
+                    ->setAppend($this->owner->currencySign . ' / ' . $this->owner->translate->getTranslation('LBL_PCS')),
+                (new inputSelect('pkg_vat', 'LBL_VAT_KEY', 27))
+                    ->setColSize('col-6 col-lg-3')
+                    ->setOptions($this->owner->lists->reset()->getVat())
+
             )
         );
 

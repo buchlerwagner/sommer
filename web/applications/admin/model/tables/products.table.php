@@ -28,12 +28,7 @@ class productsTable extends table {
         $this->delete = true;
         $this->deleteField = 'prod_archived';
 
-        $this->rowGroups = [
-            0 => [
-                'field'   => 'cat_title',
-                'alias'   => 'cat_title',
-            ],
-        ];
+        $this->addGroup('cat_id', 'cat_title');
 
 		$this->settings['display']    = 100;
 		$this->settings['orderfield'] = 'cat_order, prod_name';

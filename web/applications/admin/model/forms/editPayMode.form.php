@@ -22,10 +22,13 @@ class editPayModeForm extends formBuilder {
             ),
             (new groupRow('row2'))->addElements(
                 (new inputText('pm_price', 'LBL_FEE', 0))
-                    ->setColSize('col-12 col-lg-3')
+                    ->setColSize('col-6 col-lg-3')
                     ->addClass('text-right')
                     ->onlyNumbers()
-                    ->setAppend($this->owner->currencySign)
+                    ->setAppend($this->owner->currencySign),
+                (new inputSelect('pm_vat', 'LBL_VAT_KEY', 27))
+                    ->setColSize('col-6 col-lg-3')
+                    ->setOptions($this->owner->lists->reset()->getVat())
             ),
             (new groupRow('row3'))->addElements(
                 (new inputText('pm_order', 'LBL_POSITION', $this->getMaxOrder()))

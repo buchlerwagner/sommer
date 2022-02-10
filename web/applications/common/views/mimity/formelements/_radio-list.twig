@@ -1,0 +1,20 @@
+{% import "formBuilderMacros.twig" as self %}
+<div id="{{ element.getId }}-formgroup" class="form-group list-group{{ element.getGroupClasses }}{% if element.hasError %} has-error{% endif %}">
+    {{ self.label(element) }}
+    {% for id, option in element.getOptions %}
+        <input id="{{ element.getId }}-{{ id }}" name="{{ formName }}[{{ element.getName }}]" type="radio" value="{{ id }}"{% if element.isDisabled %} disabled="disabled"{% endif %}{% if id == value %} checked="checked"{% endif %} class="{{ element.getClass }}"{{ self.attributes(element.getAttributes) }} />
+        <label for="{{ element.getId }}-{{ id }}" class="list-group-item">
+            {% if option is iterable %}
+                {% if option.icon %}
+                    <i class="{{ option.icon }}"></i>
+                {% endif %}
+                {% if option.image %}
+                    <img src="{{ option.image }}" class="mr-2{% if option.class %} {{ option.class }}{% endif %}"{% if option.width %} width="{{ option.width }}"{% endif %} alt="">
+                {% endif %}
+                {{ _(option.text)|raw }}
+            {% else %}
+                {{ _(option) }}
+            {% endif %}
+        </label>
+    {% endfor %}
+</div>

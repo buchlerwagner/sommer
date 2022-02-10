@@ -103,6 +103,7 @@ class product extends ancestor {
             $out = [
                 'start' => $this->data['category']['limitStart'],
                 'end' => $this->data['category']['limitEnd'],
+                'days' => $this->data['category']['dayLimits'],
             ];
         }
 
@@ -202,7 +203,9 @@ class product extends ancestor {
 	public function getImages(){
 		$img = [];
 
-		$sql = "SELECT * FROM " . DB_NAME_WEB . ".product_images WHERE pimg_prod_id='" . $this->productId . "' ORDER BY pimg_order LIMIT " . FILEUPLOAD_MAX_FILES;
+		$sql = "SELECT product_images.*, products.prod_cat_id  FROM " . DB_NAME_WEB . ".product_images
+		            LEFT JOIN " . DB_NAME_WEB . ".products ON (prod_id = pimg_prod_id) 
+		            WHERE pimg_prod_id='" . $this->productId . "' ORDER BY pimg_order LIMIT " . FILEUPLOAD_MAX_FILES;
 		$result = $this->owner->db->getRows($sql);
 		if($result){
 			$i = 0;
@@ -495,6 +498,7 @@ class product extends ancestor {
                 'limitSaleText' => $row['cat_limit_sale_text'],
                 'limitStart' => $row['cat_date_start'],
                 'limitEnd' => $row['cat_date_end'],
+                'dayLimits' => ( $row['cat_takeover_days'] ? explode('|', trim($row['cat_takeover_days'], '|')) : false),
             ],
 
             'hasVariants' => ($row['prod_variants']),

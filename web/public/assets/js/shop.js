@@ -447,9 +447,9 @@ var shoppingCart = {
         $('.date-picker:not(.inited)').each (function () {
             $(this).addClass('inited');
             var $isIndividual = $(this).parents('.shipping-intervals').find('.set-shipping-interval');
-
             var minDate = $(this).data('min-date');
             var offDates = $(this).data('off-dates') || [];
+            var dayLimits = $(this).data('dow') || [];
 
             if($isIndividual.is(':checked')){
                 minDate = 'today';
@@ -460,46 +460,22 @@ var shoppingCart = {
                 dateFormat: "Y-m-d",
                 minDate: minDate,
                 disable: offDates,
+                enable: [
+                    function (date){
+                        if(dayLimits.length > 0){
+                            if(dayLimits.includes(date.getDay())){
+                                return true;
+                            }
+                        }else{
+                            return true;
+                        }
+
+                        return false;
+                    }
+                ],
                 locale: 'hu'
             });
         });
-
-        /*
-        if($('.set-shipping-interval').length > 0) {
-            $('.set-shipping-interval').each(function (i, obj) {
-                var $this = $(obj);
-                var $parent = $this.parents('.shipping-intervals');
-                var $dateControl = $this.parents('.shipping-intervals').find('.date-picker');
-
-                var minDate = false;
-                var offDates = false;
-
-                if($this.is(':checked')){
-                    $parent.find('.custom-interval').removeClass('d-none').show();
-                    $parent.find('.interval-select').hide();
-
-                    minDate = 'today';
-                    offDates = [];
-                }else{
-                    $parent.find('.custom-interval').hide();
-                    $parent.find('.interval-select').removeClass('d-none').show();
-                }
-
-                if($dateControl.length > 0){
-                    $dateControl.flatpickr({
-                        dateFormat: "Y-m-d",
-                        minDate: (minDate ? minDate : $dateControl.data('min-date')),
-                        disable: (offDates ? offDates : $dateControl.data('off-dates') || []),
-                        locale: 'hu'
-                    });
-
-                    if(!minDate) {
-                        $dateControl.val($dateControl.data('min-date'));
-                    }
-                }
-            });
-        }
-        */
 
         if ($.fn.parsley) {
             $('.parsley-form:not(.inited)').each (function () {

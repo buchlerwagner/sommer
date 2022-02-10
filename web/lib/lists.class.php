@@ -11,6 +11,16 @@ class lists extends ancestor {
         return $this->setList($list)->getList();
     }
 
+    public function getDaysOfWeek(){
+        $dow = [];
+        for($i = 1; $i <= 7; $i++){
+            $dow[$i] = 'LBL_DAY_' . $i;
+        }
+        $this->setList($dow);
+
+        return $this->getList();
+    }
+
     public function numberRange($start, $end){
         $list = array_combine(range($start,$end), range($start, $end));
 
@@ -79,6 +89,42 @@ class lists extends ancestor {
         return $this->getList();
     }
 
+    public function getShippingModes(){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'shipping_modes',
+                [
+                    'sm_id AS list_key',
+                    'sm_name AS list_value'
+                ],
+                [],
+                [],
+                false,
+                'list_value'
+            )
+        );
+
+        return $this->getList();
+    }
+
+    public function getPaymentModes(){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'payment_modes',
+                [
+                    'pm_id AS list_key',
+                    'pm_name AS list_value'
+                ],
+                [],
+                [],
+                false,
+                'list_value'
+            )
+        );
+
+        return $this->getList();
+    }
+
     public function getOrderStatuses(){
         $this->list = [];
         foreach($GLOBALS['ORDER_STATUSES'] AS $key => $status){
@@ -136,11 +182,30 @@ class lists extends ancestor {
         return $this->getList();
     }
 
+    public function getStores($useCode = false){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'stores',
+                [
+                    ($useCode ? 'st_code' : 'st_id') . ' AS list_key',
+                    'st_name AS list_value',
+                ],
+                'st_shop_id = ' . $this->owner->shopId,
+                [],
+                [],
+                'list_value'
+
+            )
+        );
+
+        return $this->getList();
+    }
+
     public function getPaymentTypes(){
         $this->setList([
-            1 => 'LBL_PAYMENT_TYPE_CASH',
-            2 => 'LBL_PAYMENT_TYPE_MONEY_TRANSFER',
-            3 => 'LBL_PAYMENT_TYPE_CARD',
+            PAYMENT_TYPE_CASH => 'LBL_PAYMENT_TYPE_CASH',
+            PAYMENT_TYPE_MONEY_TRANSFER => 'LBL_PAYMENT_TYPE_MONEY_TRANSFER',
+            PAYMENT_TYPE_CARD => 'LBL_PAYMENT_TYPE_CARD',
         ]);
 
         return $this->getList();
@@ -152,8 +217,8 @@ class lists extends ancestor {
             '5' => '5%',
             '18' => '18%',
             '27' => '27%',
-            'AAM' => 'AAM',
-            'TAM' => 'TAM',
+            //'AAM' => 'AAM',
+            //'TAM' => 'TAM',
         ]);
 
         return $this->getList();
@@ -334,6 +399,115 @@ class lists extends ancestor {
         return $this->getList();
     }
 
+    public function searchEmployees($q, $params = []){
+        $where = '(us_shop_id=' . $this->owner->shopId . ' AND us_group = "' . USER_GROUP_ADMINISTRATORS . '")';
+        $where .= ' AND (us_lastname LIKE "%' . $this->owner->db->escapeString($q) . '%" OR us_firstname LIKE "%' . $this->owner->db->escapeString($q) . '%")';
+
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'users',
+                [
+                    'us_id AS list_key',
+                    'CONCAT(us_lastname, " ", us_firstname) AS list_value'
+                ],
+                $where,
+                [],
+                [],
+                [
+                    'list_value'
+                ]
+            )
+        );
+
+        return $this->getList();
+    }
+
+    public function searchCustomers($q, $params = []){
+        $where = '(us_shop_id=' . $this->owner->shopId . ' AND us_group = "' . USER_GROUP_CUSTOMERS . '") AND us_deleted = 0';
+        $where .= ' AND (
+                us_lastname LIKE "%' . $this->owner->db->escapeString($q) . '%" OR 
+                us_firstname LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_address LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_invoice_name LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_invoice_address LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_invoice_city LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_city LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_zip LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_invoice_zip LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_phone LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_email LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                us_email2 LIKE "%' . $this->owner->db->escapeString($q) . '%")';
+
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'users',
+                [
+                    'us_id AS list_key',
+                    'CONCAT(us_lastname, " ", us_firstname) AS list_value',
+                    'CONCAT("Cím: ", us_zip, " ", us_city, " ", us_address, "<br>Számlázási cím: ", us_invoice_name, " ", us_invoice_zip, " ", us_invoice_city, " ", us_invoice_address) AS list_subtext',
+                ],
+                $where,
+                [],
+                [],
+                [
+                    'list_value'
+                ]
+            )
+        );
+
+        return $this->getList();
+    }
+
+    private function checkProductImage($item){
+        if(Empty($item['img'])){
+            unset($item['list_image']);
+            $item['list_icon'] = 'fa fa-camera fa-2x text-muted';
+        }
+
+        return $item;
+    }
+
+    public function searchProducts($q, $params = []){
+        $where = 'prod_shop_id=' . $this->owner->shopId . ' AND prod_archived = 0';
+        $where .= ' AND (
+                cat_title LIKE "%' . $this->owner->db->escapeString($q) . '%" OR 
+                prod_code LIKE "%' . $this->owner->db->escapeString($q) . '%" OR 
+                prod_name LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                prod_brand_name LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                prod_intro LIKE "%' . $this->owner->db->escapeString($q) . '%" OR
+                prod_description LIKE "%' . $this->owner->db->escapeString($q) . '%")';
+
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'products',
+                [
+                    'prod_id AS list_key',
+                    'prod_name AS list_value',
+                    'CONCAT("' . FOLDER_UPLOAD . '", prod_shop_id, "/products/", prod_cat_id, "/", prod_id, "/", prod_img) AS list_image',
+                    'cat_id AS list_group_id',
+                    'cat_title AS list_group',
+                    'prod_img AS img'
+                ],
+                $where,
+                [
+                    'product_categories' => [
+                        'on' => [
+                            'cat_id' => 'prod_cat_id'
+                        ]
+                    ]
+                ],
+                [],
+                [
+                    'list_group, list_value'
+                ]
+            ),
+
+            'checkProductImage'
+        );
+
+        return $this->getList();
+    }
+
     public function getProductImages($productId){
         /**
          * @var $product product
@@ -395,7 +569,7 @@ class lists extends ancestor {
         return $this;
     }
 
-    private function sqlQuery($sql){
+    private function sqlQuery($sql, $preprocessor = null){
         $this->list = [];
         $db = $this->owner->db;
         $res = $db->getRows($sql);
@@ -403,6 +577,10 @@ class lists extends ancestor {
             $i = ($this->emptyListLabel ? 1 : 0);
 
             foreach($res as $row) {
+                if($preprocessor && method_exists($this, $preprocessor)){
+                    $row = $this->$preprocessor($row);
+                }
+
                 if($this->json){
                     $data = [
                         'id' => $row['list_key'],
@@ -414,7 +592,7 @@ class lists extends ancestor {
                         $data['groupName'] = $row['list_group'];
                     }
                     if(!Empty($row['list_subtext'])){
-                        $data['data']['subtext'] = $row['list_subtext'];
+                        $data['data']['subText'] = $row['list_subtext'];
                     }
                     if(!Empty($row['list_tokens'])){
                         $data['data']['tokens'] = $row['list_tokens'];
@@ -422,6 +600,10 @@ class lists extends ancestor {
                     if(!Empty($row['list_icon'])){
                         $data['data']['icon'] = $row['list_icon'];
                     }
+                    if(!Empty($row['list_image'])){
+                        $data['data']['image'] = $row['list_image'];
+                    }
+
                     $this->addItem($i, $data);
                 }else {
                     $attributes = false;

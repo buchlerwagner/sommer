@@ -32,7 +32,7 @@
 									{% set sumfield = table.totals[sumkey][col.field][(i-1)].sumfield %}
 									{{ include(template_from_string( col.templatestring )) }}
 								{% else %}
-									{{ _price(table.totals[sumkey][col.field][(i-1)].sumfield, table.totals[sumkey][col.field][(i-1)].unitfield) }}
+									<b>{{ _price(table.totals[sumkey][col.field][(i-1)].sumfield, table.totals[sumkey][col.field][(i-1)].unitfield) }}</b>
 								{% endif %}
 								{% if col.type == 'number' %}</div>{% endif %}
 							{% endif %}

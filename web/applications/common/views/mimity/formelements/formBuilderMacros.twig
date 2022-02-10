@@ -14,6 +14,8 @@
                     {% include 'table.twig' %}
                 {% elseif table.tableType == 'inline' %}
                     {% include 'table-boxed.twig' %}
+                {% elseif table.tableType == 'div' %}
+                    {% include 'table-div.twig' %}
                 {% endif %}
             {% endif %}
             {{ include(template_from_string( element.closeTag )) }}

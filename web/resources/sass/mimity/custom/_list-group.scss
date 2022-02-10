@@ -1,0 +1,64 @@
+.list-group-item {
+  user-select: none;
+  font-weight: normal !important;
+  padding: 0.75rem 0.75rem;
+}
+
+.list-group input[type="checkbox"] {
+  display: none;
+}
+
+.list-group input[type="checkbox"] + .list-group-item {
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/*
+.list-group input[type="checkbox"] + .list-group-item:before {
+  content: "\2713";
+  color: transparent;
+  font-weight: bold;
+  margin-right: 1em;
+}
+*/
+
+.list-group input[type="checkbox"]:checked + .list-group-item {
+  border: 1px solid $primary !important;
+  border-radius: 4px;
+  background-color: theme-color-level('primary', $table-bg-level) !important;
+  color: $primary !important;
+}
+
+.list-group input[type="checkbox"]:checked + .list-group-item:before {
+  color: inherit;
+}
+
+.list-group input[type="radio"] {
+  display: none;
+}
+
+.list-group input[type="radio"] + .list-group-item {
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/*
+.list-group input[type="radio"] + .list-group-item:before {
+  content: "\2022";
+  color: transparent;
+  font-weight: bold;
+  margin-right: 1em;
+}
+*/
+
+.list-group input[type="radio"]:checked + .list-group-item {
+  border: 1px solid $primary !important;
+  border-radius: 4px;
+  background-color: theme-color-level('primary', $table-bg-level) !important;
+  color: $primary !important;
+  font-weight: bold !important;
+}
+
+.list-group input[type="radio"]:checked + .list-group-item:before {
+  color: inherit;
+}

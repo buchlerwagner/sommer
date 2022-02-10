@@ -22,7 +22,7 @@
                                 {% endif %}
                             </ul>
                             <div class="on-cart cart-footer{% if not cart.getNumberOfCartItems %} d-none{% endif %}">
-                                <div class="shopping-cart-total"><strong>{{ _('LBL_TOTAL') }}: </strong><span class="cart-total">{{ _price(cart.subtotal, cart.currency) }}</span></div>
+                                <div class="shopping-cart-total"><strong>{{ _('LBL_TOTAL') }}: </strong><span class="cart-total">{{ _price(cart.subtotal + cart.packagingFee, cart.currency) }}</span></div>
                                 <a href="{{ getPageName('cart') }}" class="theme-btn">{{ _('LBL_CART') }}</a>
                                 <a href="{{ getPageName('checkout') }}" class="theme-btn">{{ _('LBL_CHECKOUT') }}</a>
                             </div>

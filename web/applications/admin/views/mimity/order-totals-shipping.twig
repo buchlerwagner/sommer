@@ -1,0 +1,35 @@
+{% if hasIntervals %}
+    {% if hasCustomInterval %}
+        <div class="form-group col-12">
+            <div class="checkbox checkbox-slider-primary checkbox-slider--b-flat">
+                <label>
+                    <input id="customInterval" type="checkbox" class="set-custom-interval" name="customInterval" value="-1"{% if intervalId == -1 %} checked{% endif %}>
+                    <span class="ml-2">{{ _('LBL_SET_CUSTOM_INTERVAL') }}</span>
+                </label>
+            </div>
+        </div>
+    {% endif %}
+    {% if hasCustomDate %}
+        <div class="form-group col-12 col-lg-4">
+            <label for="shipping-date" class="mb-1">{{ _('LBL_SELECT_SHIPPING_DATE') }}</label>
+            <div class="input-icon">
+                <i class="fa fa-calendar"></i>
+                <input id="shippingDate" type="text" name="shippingDate" value="{{ selectedShippingDate }}" class="date-picker save-shipping-mode form-control"{% if dayLimits %} data-dow="[{% for day in dayLimits %}{{ day }}{% if not loop.last %},{% endif %}{% endfor %}]"{% endif %} data-min-date="{{ shippingDate }}"{% if shippingLastDate %} data-max-date="{{ shippingLastDate }}"{% endif %} data-off-dates="{{ offDates }}">
+            </div>
+        </div>
+    {% endif %}
+    <div class="form-group col-12 interval-select{% if hasCustomDate %} col-lg-8{% endif %}{% if intervalId == -1 %} d-none{% endif %}">
+        <label for="shipping-date" class="mb-1">{{ _('LBL_SELECT_SHIPPING_INTERVAL') }}</label>
+        <select id="intervalId" name="interval" class="form-control save-shipping-mode" id="shippingInterval">
+            {% for intId, interval in intervals %}
+                <option value="{{ intId }}"{% if intervalId == intId %} selected{% endif %}>
+                    {% if not hasCustomDate %}{{ _date(shippingDate, 41) }}, {% endif %}{{ _date(interval.timeStart, 6, false) }} - {{ _date(interval.timeEnd, 6, false) }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group col-12{% if hasCustomDate %} col-lg-8{% endif %} custom-interval{% if intervalId != -1 %} d-none{% endif %}">
+        <label for="custom-interval-text" class="mb-1">{{ _('LBL_CUSTOM_INTERVAL') }}</label>
+        <input type="text" id="custom-interval-text" name="customIntervalText" class="form-control save-shipping-mode" value="{% if intervalId == -1 %}{{ customIntervalText }}{% endif %}">
+    </div>
+{% endif %}

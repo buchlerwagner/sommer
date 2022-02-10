@@ -19,6 +19,8 @@ class categoriesTable extends table {
             ]
         ];
 
+        $this->makeSortable('cat_order');
+
 		$this->settings['display']    = 50;
 		$this->settings['orderfield'] = 'cat_order, cat_title';
 		$this->settings['orderdir']   = 'asc';
@@ -29,6 +31,7 @@ class categoriesTable extends table {
             (new column('cat_title', 'LBL_TITLE', 9))
                 ->setTemplate('{% if row.cat_stop_sale %}<del class="text-danger">{% elseif row.cat_limit_sale %}<span class="text-warning">{% endif %}{{ val }}{% if row.cat_stop_sale %}</del>{% elseif row.cat_limit_sale %}</span>{% endif %}'),
             (new columnHidden('cat_stop_sale')),
+            (new columnHidden('cat_only_in_stores')),
             (new columnHidden('cat_limit_sale'))
         );
 
@@ -67,6 +70,10 @@ class categoriesTable extends table {
     }
 
     public function onCheck($keyValues, $field, $value) {
+        $this->owner->mem->delete(CACHE_CATEGORIES . $this->owner->shopId);
+    }
+
+    public function onAfterSort($params) {
         $this->owner->mem->delete(CACHE_CATEGORIES . $this->owner->shopId);
     }
 }

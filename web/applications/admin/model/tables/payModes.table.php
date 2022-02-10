@@ -24,6 +24,8 @@ class payModesTable extends table {
 		$this->settings['orderfield'] = 'pm_order, pm_name';
 		$this->settings['orderdir']   = 'asc';
 
+        $this->makeSortable('pm_order');
+
         $this->addColumns(
             (new column('pm_enabled', 'LBL_ENABLED', 1, enumTableColTypes::Checkbox()))
                 ->addClass('text-center'),

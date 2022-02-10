@@ -19,6 +19,11 @@ class editHostForm extends formBuilder {
                 (new inputText('host_public_site', 'LBL_PUBLIC_SITE')),
                 (new inputText('host_default_email', 'LBL_DEFAULT_EMAIL'))
                     ->setRequired(),
+                (new groupRow('row4'))->addElements(
+                    (new inputSelect('host_store_id', 'LBL_STORE'))
+                        ->setColSize('col-6')
+                        ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_NONE')->getStores())
+                ),
                 (new groupRow('row1'))->addElements(
                     (new inputSelect('host_application', 'LBL_APPLICATION'))
                         ->setColSize('col-6')
