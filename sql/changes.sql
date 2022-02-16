@@ -29,7 +29,7 @@ ALTER TABLE `cart` ADD COLUMN `cart_local_consumption` TINYINT(1) NULL DEFAULT 0
 CREATE  INDEX `store` USING BTREE ON `cart` (`cart_store_id`);
 UPDATE cart SET cart_store_id = 'W';
 
-
+ALTER TABLE `payment_modes` ADD COLUMN `pm_pp_id` INT(11) NULL DEFAULT 0 AFTER `pm_shop_id`;
 
 
 

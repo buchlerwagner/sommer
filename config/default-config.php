@@ -4,6 +4,7 @@ const DIR_WEB               = '/var/www/sommer-cukraszda.hu/web/';
 const DIR_CACHE             = '/var/www/sommer-cukraszda.hu/cache/';
 const DIR_UPLOAD            = '/var/www/sommer-cukraszda.hu/web/public/uploads/';
 const DIR_LOG               = '/var/www/sommer-cukraszda.hu/logs/';
+const DIR_PRIVATE_KEYS      = '/var/www/sommer/uploads/keys/';
 
 // Relative paths
 const FOLDER_UPLOAD         = '/uploads/';

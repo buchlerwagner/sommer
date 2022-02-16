@@ -1,0 +1,83 @@
+{% import "doc-tools.twig" as tools %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="hu">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;">
+    <title></title>
+    <style type="text/css" media="print">
+        @page {
+            margin: 20px 50px;
+        }
+    </style>
+    {% include "doc-styles.twig" %}
+</head>
+<body>
+<table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 20px">
+    <tbody>
+        <tr>
+            <td width="20%" valign="middle" align="left">
+                <img src="./uploads/{{ shopId }}/logo-mail.png" width="100" alt="">
+            </td>
+            <td width="60%">
+                <h1>Rendelés összesítő</h1>
+                {% if delivery %}
+                    <div>
+                        {{ _('LBL_DELIVERY_PLACE') }}: <b>{{ delivery }}</b>
+                    </div>
+                {% endif %}
+                {% if category %}
+                    <div>
+                        {{ _('LBL_CATEGORY') }}: <b>{{ category }}</b>
+                    </div>
+                {% endif %}
+                <div>
+                    {{ _('LBL_SHIPPING_DATE') }}: <b>{{ _date(dateMin) }}</b>{% if dateMax and dateMax != dateMin %}-tól <b>{{ _date(dateMax) }}</b>-ig{% endif %}
+                </div>
+            </td>
+            <td width="20%">
+            </td>
+        </tr>
+    </tbody>
+</table>
+<table width="100%" cellpadding="5" cellspacing="0">
+    <thead>
+        <tr>
+            <th style="border-bottom:2px solid #EDECEC;" align="left">{{ _('LBL_PRODUCT_TITLE') }}</th>
+            <th style="border-bottom:2px solid #EDECEC;" align="right">{{ _('LBL_TOTAL_QUANTITY') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if rows %}
+            {% set groupId = false %}
+            {% for r in rows %}
+
+                {% if groupId != r.__groupId %}
+                    {% set groupId = r.__groupId %}
+                    <tr style="background-color: #EDECEC;">
+                        <td colspan="2" style="border-bottom:1px solid #EDECEC;"><b style="margin: 0;">{{ r.groups[groupId].text }}</b></td>
+                    </tr>
+                {% endif %}
+
+                <tr>
+                    <td style="border-bottom:1px solid #EDECEC;padding-left: 15px;">
+                        {{ r.productName }}
+                        {% if r.variantName %}
+                        <br>
+                        {{ r.variantName }}
+                        {% endif %}
+                    </td>
+                    <td align="right" style="border-bottom:1px solid #EDECEC;">
+                        {{ r.totalQuantity }} {{ r.unit }}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2" align="center">{{ _('LBL_NO_ITEMS') }}</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,4 +1,9 @@
 {% import "form_elements.twig" as form_elements %}
+
+{% if table.includeBefore %}
+    {% include table.includeBefore ~ '.twig' %}
+{% endif %}
+
 <div class="card">
     {% if table.buttons|length > 0 and (table.buttonsPosition == 'top' or table.buttonsPosition == 'both') %}
         <div class="card-header">
@@ -14,6 +19,7 @@
                 </h3>
             </div>
         {% endif %}
+
         <table id="table_{{ table.name }}" class="{{ table.tableClass }}" data-table="{{ table.className }}" {% if table.className != table.name %} data-alias="{{ table.name }}"{% endif %}{% if table.parameters.options %} data-options="{{ table.parameters.options|json_encode() }}"{% endif %}{% if table.parameters.foreignkeys[0] %} data-foreignkey="{{ table.parameters.foreignkeys[0] }}"{% endif %}>
             {% if table.header %}
                 <thead class="thead-primary">
@@ -57,7 +63,6 @@
                 {% include "table_pager.twig" %}
             {% endif %}
         </div>
-
     </div>
     {% if table.buttons|length > 0 and (table.buttonsPosition == 'bottom' or table.buttonsPosition == 'both') %}
         <div class="card-footer">
@@ -65,3 +70,8 @@
         </div>
     {% endif %}
 </div>
+
+{% if table.includeAfter %}
+    {% include table.includeAfter ~ '.twig' %}
+{% endif %}
+

@@ -7,6 +7,9 @@
         </h3>
     </div>
 {% endif %}
+{% if table.includeBefore %}
+    {% include table.includeBefore ~ '.twig' %}
+{% endif %}
 <table id="table_{{ table.name }}" class="{{ table.tableClass }}" data-table="{{ table.className }}"{% if table.className != table.name %} data-alias="{{ table.name }}"{% endif %}{% if table.parameters.options %} data-options="{{ table.parameters.options|json_encode() }}"{% endif %}{% if table.parameters.foreignkeys[0] %} data-foreignkey="{{ table.parameters.foreignkeys[0] }}"{% endif %}>
     {% if table.header %}
         <thead class="thead-primary">
@@ -50,6 +53,10 @@
 
     {% include table.bodyTemplate ~ constant('TWIG_FILE_EXTENSION') %}
     {% include 'table_totals.twig' %}
+
+    {% if table.includeAfter %}
+        {% include table.includeAfter ~ '.twig' %}
+    {% endif %}
 </table>
 
 <div class="d-flex pl-1 pt-35 border-top flex-column flex-sm-row pt-1">

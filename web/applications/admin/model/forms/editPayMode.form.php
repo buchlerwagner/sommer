@@ -13,9 +13,13 @@ class editPayModeForm extends formBuilder {
             (new groupRow('row1'))->addElements(
                 (new inputSelect('pm_type', 'LBL_TYPE', 0))
                     ->setColSize('col-12')
-                    ->makeSelectPicker(false)
-                    ->setOptions($this->owner->lists->getPaymentTypes())
+                    ->changeState(PAYMENT_TYPE_CARD, enumChangeAction::Show(), '#pm_pp_id-formgroup')
+                    ->changeDefaultState(enumChangeAction::Hide(), '#pm_pp_id-formgroup')
+                    ->setOptions($this->owner->lists->reset()->getPaymentTypes())
                     ->setRequired(),
+                (new inputSelect('pm_pp_id', 'LBL_PAYMENT_PROVIDER', 0))
+                    ->setColSize('col-12')
+                    ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_SELECT')->getPaymentProviders()),
                 (new inputText('pm_name', 'LBL_TITLE'))
                     ->setColSize('col-12')
                     ->setRequired()
@@ -55,8 +59,18 @@ class editPayModeForm extends formBuilder {
         );
 	}
 
+    public function onValidate() {
+        if($this->values['pm_type'] == PAYMENT_TYPE_CARD && Empty($this->values['pm_pp_id'])){
+            $this->addError('ERR_1000', self::FORM_ERROR, ['pm_pp_id']);
+        }
+    }
+
     public function onBeforeSave() {
         $this->values['pm_shop_id'] = $this->owner->shopId;
+        if($this->values['pm_type'] != PAYMENT_TYPE_CARD){
+            $this->values['pm_type'] = 0;
+        }
+
         /*
         if(Empty($this->values['pm_default'])) {
             $this->values['pm_default'] = 0;

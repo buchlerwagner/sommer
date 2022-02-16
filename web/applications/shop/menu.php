@@ -28,6 +28,12 @@ $GLOBALS['MENU'] = [
 		'display' => 1,
         'header' => true,
 	],
+    'check-payment' => [
+		'display' => 0,
+	],
+    'payment-error' => [
+		'display' => 0,
+	],
     'ajax' => [
 		'display' => 0,
 	],

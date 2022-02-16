@@ -89,12 +89,12 @@ class lists extends ancestor {
         return $this->getList();
     }
 
-    public function getShippingModes(){
+    public function getShippingModes($useCode = false){
         $this->sqlQuery(
             $this->owner->db->genSQLSelect(
                 'shipping_modes',
                 [
-                    'sm_id AS list_key',
+                    ($useCode ? 'sm_code' : 'sm_id') . ' AS list_key',
                     'sm_name AS list_value'
                 ],
                 [],
@@ -114,6 +114,24 @@ class lists extends ancestor {
                 [
                     'pm_id AS list_key',
                     'pm_name AS list_value'
+                ],
+                [],
+                [],
+                false,
+                'list_value'
+            )
+        );
+
+        return $this->getList();
+    }
+
+    public function getPaymentProviders(){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'payment_providers',
+                [
+                    'pp_id AS list_key',
+                    'CONCAT(pp_name, " (", pp_currency, ")") AS list_value'
                 ],
                 [],
                 [],
@@ -387,6 +405,29 @@ class lists extends ancestor {
                 ],
                 [
                     'pkg_shop_id' => $this->owner->shopId
+                ],
+                [],
+                [],
+                [
+                    'list_value'
+                ]
+            )
+        );
+
+        return $this->getList();
+    }
+
+    public function getEmployees(){
+        $this->sqlQuery(
+            $this->owner->db->genSQLSelect(
+                'users',
+                [
+                    'us_id AS list_key',
+                    'CONCAT(us_lastname, " ", us_firstname) AS list_value'
+                ],
+                [
+                    'us_shop_id' => $this->owner->shopId,
+                    'us_group' => USER_GROUP_ADMINISTRATORS,
                 ],
                 [],
                 [],

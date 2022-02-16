@@ -40,6 +40,7 @@ class cart extends ancestor {
     private $saleLimitText = false;
 
     private $userId;
+    private $isAdmin = false;
 
     public $userData = [];
 	public $items = [];
@@ -55,6 +56,10 @@ class cart extends ancestor {
 	private $options = [];
 
     public function init($key = false, $create = true) {
+        if($this->owner->user->getGroup() == USER_GROUP_ADMINISTRATORS){
+            $this->isAdmin = true;
+        }
+
 		$this->currency = $this->owner->currency;
 
         $this->getKey($key, $create)->loadCart();
@@ -217,6 +222,10 @@ class cart extends ancestor {
         return Empty($this->items);
     }
 
+    public function isPaid(){
+        return true;
+    }
+
     public function isLocalConsumption(){
         return $this->localConsumption;
     }
@@ -274,6 +283,7 @@ class cart extends ancestor {
 
 	public function makeOrder($userId, $invoiceType = 0, $remarks = ''){
         $orderStatus = ($this->orderType == ORDER_TYPE_STORE ? self::ORDER_STATUS_FINISHED : self::ORDER_STATUS_NEW);
+        $isPaid = ($this->orderType == ORDER_TYPE_STORE ? 1 : 0);
 
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLUpdate(
@@ -285,6 +295,7 @@ class cart extends ancestor {
 					'cart_order_status' => $orderStatus,
 					'cart_ordered' => 'NOW()',
 					'cart_invoice_type' => (int) $invoiceType,
+					'cart_paid' => $isPaid,
 					'cart_remarks' => $remarks,
 				],
 				[
@@ -305,38 +316,69 @@ class cart extends ancestor {
             $this->sendConfirmationEmail();
         }
 
-		$this->destroyKey();
+        $this->destroyKey();
+        $this->initPayment();
 	}
 
-    public function sendConfirmationEmail(){
+    public function initPayment(){
+        if($payMode = $this->getSelectedPaymentMode()){
+            if($payMode['type'] == PAYMENT_TYPE_CARD && $payMode['providerId']){
+                /**
+                 * @var $payment Payments
+                 */
+                $payment = $this->owner->addByClassName('Payments');
+
+                try {
+                    $payment->init($payMode['providerId'])->createTransaction($this->id, $this->total, $this->currency);
+                }
+
+                catch (Exception $e){
+                    die($e);
+                }
+            }
+        }
+    }
+
+    public function getTransactionHistory(){
+        $out = [];
+
+        return $out;
+    }
+
+    public function getTemplateData(){
         $this->loadCart();
 
+        return [
+            'key' => $this->key,
+            'id' => $this->id,
+            'items' => $this->items,
+            'currency' => $this->currency,
+            'subtotal' => $this->subtotal,
+            'discount' => $this->discount,
+            'packagingFee' => $this->packagingFee,
+            'shippingFee' => $this->shippingFee,
+            'paymentFee' => $this->paymentFee,
+            'total' => $this->total,
+            'isPaid' => $this->isPaid(),
+            'shippingMode' => $this->getSelectedShippingMode(),
+            'shippingInterval' => $this->getSelectedShippingInterval(),
+            'shippingDate' => $this->shippingDate,
+            'customInterval' => $this->customInterval,
+            'paymentMode' => $this->getSelectedPaymentMode(),
+            'orderNumber' => $this->orderNumber,
+            'orderStatus' => $this->orderStatus,
+            'contactData' => $this->userData['contactData'],
+            'shippingAddress' => $this->userData['shippingAddress'],
+            'invoiceAddress' => $this->userData['invoiceAddress'],
+            'remarks' => $this->remarks,
+            'domain' => rtrim($this->owner->domain, '/'),
+        ];
+    }
+
+    public function sendConfirmationEmail($resend = false){
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
-            [
-                'key' => $this->key,
-                'id' => $this->id,
-                'items' => $this->items,
-                'currency' => $this->currency,
-                'subtotal' => $this->subtotal,
-                'discount' => $this->discount,
-                'packagingFee' => $this->packagingFee,
-                'shippingFee' => $this->shippingFee,
-                'paymentFee' => $this->paymentFee,
-                'total' => $this->total,
-                'shippingMode' => $this->getSelectedShippingMode(),
-                'shippingInterval' => $this->getSelectedShippingInterval(),
-                'shippingDate' => $this->shippingDate,
-                'customInterval' => $this->customInterval,
-                'paymentMode' => $this->getSelectedPaymentMode(),
-                'orderNumber' => $this->orderNumber,
-                'orderStatus' => $this->orderStatus,
-                'contactData' => $this->userData['contactData'],
-                'shippingAddress' => $this->userData['shippingAddress'],
-                'invoiceAddress' => $this->userData['invoiceAddress'],
-                'remarks' => $this->remarks,
-                'domain' => $this->owner->domain,
-            ],
+            $this->getTemplateData(),
             false
         );
 
@@ -351,7 +393,7 @@ class cart extends ancestor {
             'currency' => $this->currency,
         ];
 
-        $this->owner->email->prepareEmail(
+        return $this->owner->email->prepareEmail(
             'order-new',
             $this->userId,
             $data,
@@ -360,6 +402,10 @@ class cart extends ancestor {
             ($this->owner->settings['incomingEmail'] ?: false), // bcc
             $this->getMailAttachments()
         );
+    }
+
+    public function sendPaymentConfirmationEmail(){
+
     }
 
     private function getMailAttachments(){
@@ -782,8 +828,6 @@ class cart extends ancestor {
 	public function destroyKey(){
 		$this->owner->delSession(self::CART_SESSION_KEY);
 		setcookie(self::CART_SESSION_KEY, '', time() - 3600, '/');
-		$this->key = false;
-		$this->id = false;
 	}
 
 	private function checkCartKey($key){
@@ -796,7 +840,7 @@ class cart extends ancestor {
             'cart_shop_id' => $this->owner->shopId
         ];
 
-        if(is_numeric($key) && $key){
+        if(is_numeric($key) && $key && $this->isAdmin){
                 $where['cart_id'] = (int) $key;
         }else{
             $where['cart_key'] = $key;
@@ -930,7 +974,7 @@ class cart extends ancestor {
                 ],
                 [],
                 false,
-                'pm_default DESC, pm_order'
+                'pm_order'
             )
         );
         if ($result) {
@@ -951,6 +995,7 @@ class cart extends ancestor {
                     'payment_modes',
                     [
                         'pm_id AS id',
+                        'pm_pp_id AS providerId',
                         'pm_name AS name',
                         'pm_type AS type',
                         'pm_text AS text',
@@ -1380,4 +1425,20 @@ class cart extends ancestor {
             );
         }
     }
+
+    public function setPaid(){
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLUpdate(
+                'cart',
+                [
+                    'cart_paid' => 1,
+                ],
+                [
+                    'cart_id' => $this->id,
+                    'cart_shop_id' => $this->owner->shopId,
+                ]
+            )
+        );
+    }
+
 }

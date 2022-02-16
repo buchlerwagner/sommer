@@ -223,35 +223,37 @@ class mysql extends db {
             foreach ($fields as $key => $val) {
                 if(!is_numeric($key)) {
                     if(is_array($val)){
-                        if(!Empty($val['in'])){
-                            $where[] = $key . ' IN (' . implode(',', $val['in']) . ')';
-                        }
-                        if(!Empty($val['notin'])){
-                            $where[] = $key . ' NOT IN (' . implode(',', $val['notin']) . ')';
-                        }
-                        if(isset($val['not'])){
-                            $where[] = $key . '!="' . $val['not'] . '"';
-                        }
-                        if(isset($val['is'])){
-                            $where[] = $key . ' IS ' . $this->prepareValue($val['is']);
-                        }
-                        if(isset($val['isnot'])){
-                            $where[] = $key . ' IS NOT ' . $this->prepareValue($val['isnot']);
-                        }
-                        if(isset($val['greater'])){
-                            $where[] = $key . '>' . $this->prepareValue($val['greater']);
-                        }
-                        if(isset($val['greater='])){
-                            $where[] = $key . '>=' . $this->prepareValue($val['greater=']);
-                        }
-                        if(isset($val['less'])){
-                            $where[] = $key . '<' . $this->prepareValue($val['less']);
-                        }
-                        if(isset($val['less='])){
-                            $where[] = $key . '<=' . $this->prepareValue($val['less=']);
-                        }
-                        if(isset($val['like'])){
-                            $where[] = $key . ' LIKE ' . $this->prepareValue($val['like']);
+                        foreach($val AS $operation => $value) {
+                            if ($operation == 'in' && is_array($value) && !Empty($value)) {
+                                $where[] = $key . ' IN (' . implode(',', $value) . ')';
+                            }
+                            if ($operation == 'notin' && is_array($value) && !Empty($value)) {
+                                $where[] = $key . ' NOT IN (' . implode(',', $value) . ')';
+                            }
+                            if ($operation == 'not') {
+                                $where[] = $key . '!="' . $value . '"';
+                            }
+                            if ($operation == 'is') {
+                                $where[] = $key . ' IS ' . $this->prepareValue($value);
+                            }
+                            if ($operation == 'isnot') {
+                                $where[] = $key . ' IS NOT ' . $this->prepareValue($value);
+                            }
+                            if ($operation == 'greater') {
+                                $where[] = $key . '>' . $this->prepareValue($value);
+                            }
+                            if ($operation == 'greater=') {
+                                $where[] = $key . '>=' . $this->prepareValue($value);
+                            }
+                            if ($operation == 'less') {
+                                $where[] = $key . '<' . $this->prepareValue($value);
+                            }
+                            if ($operation == 'less=') {
+                                $where[] = $key . '<=' . $this->prepareValue($value);
+                            }
+                            if ($operation == 'like') {
+                                $where[] = $key . ' LIKE ' . $this->prepareValue($value);
+                            }
                         }
                     }elseif($key == 'custom') {
                         $where[] = $val;

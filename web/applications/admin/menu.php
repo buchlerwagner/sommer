@@ -115,12 +115,32 @@ $GLOBALS['MENU'] = [
         'display' => 1,
         'icon'  => 'fa-users',
         'access'  => true,
+        'userGroups' => [USER_GROUP_ADMINISTRATORS],
     ],
 
     'orders' => [
         'display' => 1,
         'icon'  => 'fa-shopping-cart',
         'access'  => true,
+        'userGroups' => [USER_GROUP_ADMINISTRATORS],
+    ],
+
+    'reports' => [
+        'display' => 2,
+        'icon'  => 'fa-list-alt',
+        'userGroups' => [USER_GROUP_ADMINISTRATORS],
+        'items' => [
+            'daily-orders' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
+            'sales-report' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
+        ]
     ],
 
     'settings' => [
@@ -145,7 +165,12 @@ $GLOBALS['MENU'] = [
                         'display' => 1,
                         'access'  => true,
                         'userGroups' => [USER_GROUP_ADMINISTRATORS]
-                    ]
+                    ],
+                    'payment-providers' => [
+                        'display' => 1,
+                        'access'  => true,
+                        'userGroups' => [USER_GROUP_ADMINISTRATORS]
+                    ],
 				]
 			],
 			'lists' => [

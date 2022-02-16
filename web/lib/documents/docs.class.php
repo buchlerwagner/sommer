@@ -1,11 +1,11 @@
 <?php
-require_once  DOC_ROOT . 'vendor/autoload.php';
-
 abstract class docs extends ancestor {
 	const PDF_INLINE 	= 'I';
 	const PDF_DOWNLOAD 	= 'D';
 	const PDF_FILE 		= 'F';
 	const PDF_STRING 	= 'S';
+
+    const PAGE_BREAK = '<pagebreak>';
 
     private $fileMode = self::PDF_INLINE;
     private $fileName = 'doc.pdf';
@@ -16,6 +16,8 @@ abstract class docs extends ancestor {
     private $template = false;
     private $data = [];
     private $html = '';
+    private $fixedTexts = [];
+    private $printDialog = false;
 
     abstract protected function generateContent();
 
@@ -28,6 +30,7 @@ abstract class docs extends ancestor {
         foreach($options AS $key => $value){
             $this->setOption($key, $value);
         }
+        return $this;
     }
 
 	public function setOption($key, $value){
@@ -35,13 +38,31 @@ abstract class docs extends ancestor {
         return $this;
     }
 
-    public function setData($key, $value){
+    public function setData($data){
+        $this->data = $data;
+        return $this;
+    }
+
+    public function setVar($key, $value){
         $this->data[$key] = $value;
         return $this;
     }
 
     public function setFileName($fileName){
         $this->fileName = $fileName;
+        return $this;
+    }
+
+    public function addFixedText($html, $x = 0, $y = 0, $w = 0, $h = 0, $overflow = 'auto'){
+        $this->fixedTexts[] = [
+            'html' => $html,
+            'x' => $x,
+            'y' => $y,
+            'w' => $w,
+            'h' => $h,
+            'overflow' => $overflow,
+        ];
+        return $this;
     }
 
     public function setHtml($html){
@@ -57,6 +78,11 @@ abstract class docs extends ancestor {
 	public function getHtml(){
 		return $this->html;
 	}
+
+    public function print(){
+        $this->printDialog = true;
+        return $this;
+    }
 
 	public function setPath($path){
 		$this->path = rtrim($path, '/') . '/';
@@ -89,6 +115,7 @@ abstract class docs extends ancestor {
      */
     public function getPDF($header = '', $footer = '') {
         $this->generateContent();
+        $this->renderContent();
 
         if (isset($_REQUEST['debug'])) {
             if ($_REQUEST['debug'] == 'data') {
@@ -112,18 +139,39 @@ abstract class docs extends ancestor {
             $pdf->SetHTMLHeader($header);
         }
 
-        $pdf->WriteHTML($this->getHtml());
+        if($html = $this->getHtml()) {
+            $pdf->WriteHTML($html);
+        }
+
+        if($this->fixedTexts){
+            foreach($this->fixedTexts AS $data){
+                if($data['html'] == self::PAGE_BREAK){
+                    $pdf->AddPage();
+                }else{
+                    $pdf->WriteFixedPosHTML($data['html'], $data['x'], $data['y'], $data['w'], $data['h'], $data['overflow']);
+                }
+            }
+        }
 
         if (!empty($footer)) {
             $pdf->SetHTMLFooter($footer);
         }
 
-        if ($this->fileMode == 'S') {
+        if($this->printDialog) {
+            $pdf->SetJS('this.print();');
+        }
+
+        if ($this->fileMode == self::PDF_STRING) {
             return $pdf->Output($this->fileName, $this->fileMode);
         } else {
             $pdf->Output($this->path . $this->fileName, $this->fileMode);
             return true;
         }
+    }
+
+    protected function setTemplate(string $template){
+        $this->template = $template;
+        return $this;
     }
 
     protected function getTemplate($template){
@@ -134,15 +182,15 @@ abstract class docs extends ancestor {
             $this->template = $content['tag'];
         }
 
-        $this->setData('title', $content['title']);
-        $this->setData('template', $content['text']);
+        $this->setVar('title', $content['title']);
+        $this->setVar('template', $content['text']);
 
         return $content;
     }
 
     protected function renderContent(){
         if($this->template) {
-            $this->setHtml($this->owner->view->renderContent($this->template, $this->data, false));
+            $this->setHtml($this->owner->view->renderContent($this->template, $this->data, false, false));
         }
         return $this;
     }

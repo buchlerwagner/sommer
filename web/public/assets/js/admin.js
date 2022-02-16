@@ -1355,9 +1355,7 @@ const lime   = '#cddc39'
             var $modal = $this.parents('.modal-content');
             var $form = $modal.find('form');
             var value = $this.val() || 1;
-
             var action = $form.attr('action');
-
 
             $form.attr('action', action.split('?')[0] + '?' + $this.attr('name') + '=' + value);
             $form.submit();
@@ -1477,7 +1475,9 @@ const lime   = '#cddc39'
             }
         });
 
-        $(document).on('change', '.change-state', function () {
+        $(document).on('change', '.change-state', function (e) {
+            e.stopPropagation();
+
             var $this = $(this);
             var options = $this.data('stateOptions');
             var value, found = false;
@@ -1491,7 +1491,6 @@ const lime   = '#cddc39'
                     value = $this.val();
                 }
 
-                console.log('change state: ' + value);
                 /*
                 if(typeof options !== 'object'){
                     options = JSON.parse(options);

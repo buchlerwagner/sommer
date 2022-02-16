@@ -268,6 +268,10 @@ $GLOBALS['PAGE_NAMES'] = [
             'name' => 'rendeles',
             'display' => 0,
         ],
+        'payment-error'    => [
+            'name' => 'hibas-fizetes',
+            'display' => 0,
+        ],
         'set-new-password' => [
             'name' => 'uj-jelszo',
             'display' => 0,
@@ -308,6 +312,10 @@ $GLOBALS['PAGE_NAMES'] = [
         ],
         'checkout'  => [
             'name' => 'checkout',
+            'display' => 0,
+        ],
+        'payment-error' => [
+            'name' => 'payment-error',
             'display' => 0,
         ],
         'finish'    => [

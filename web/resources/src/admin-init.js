@@ -310,7 +310,9 @@ var app = {
             }
         });
 
-        $(document).on('change', '.change-state', function () {
+        $(document).on('change', '.change-state', function (e) {
+            e.stopPropagation();
+
             var $this = $(this);
             var options = $this.data('stateOptions');
             var value, found = false;
@@ -324,7 +326,6 @@ var app = {
                     value = $this.val();
                 }
 
-                console.log('change state: ' + value);
                 /*
                 if(typeof options !== 'object'){
                     options = JSON.parse(options);

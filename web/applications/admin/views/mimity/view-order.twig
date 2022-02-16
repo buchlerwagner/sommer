@@ -98,11 +98,6 @@
                             <span class="text-secondary">{{ _('LBL_ORDER_STATUS') }}:</span>
                             <b>{{ orderState(form.cart.orderStatus)|raw }}</b>
                         </div>
-                        {% if form.cart.orderStatus != 'CLOSED' and form.cart.orderStatus != 'RATED' and not form.isOpen %}
-                        <div class="text-center mt-3">
-                            <a href="/ajax/forms/setOrderStatus/{{ form.cart.id }}/" data-toggle="modal" data-target="#ajax-modal" class="btn btn-primary">{{ _('BTN_SET_STATUS') }}</a>
-                        </div>
-                        {% endif %}
                     </div>
                     <div class="col-6">
                         <div>
@@ -169,6 +164,30 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="list-with-gap">
+    {% if form.cart.orderStatus != 'CLOSED' and form.cart.orderStatus != 'RATED' and not form.isOpen %}
+        <a href="/ajax/forms/setOrderStatus/{{ form.cart.id }}/" data-toggle="modal" data-target="#ajax-modal" class="btn btn-light btn-app">
+            <i class="far fa-flag-alt text-primary"></i>
+            {{ _('BTN_SET_STATUS') }}
+        </a>
+    {% endif %}
+
+    <a href="#" class="btn btn-light btn-app {% if form.cart.isPaid %} disabled{% endif %}">
+        <i class="far fa-check text-primary"></i>
+        {{ _('BTN_ORDER_PAID') }}
+    </a>
+
+    <a href="./?print" class="btn btn-light btn-app" target="_blank">
+        <i class="far fa-print text-primary"></i>
+        {{ _('BTN_PRINT_ORDER') }}
+    </a>
+
+    <a href="./?mail" class="btn btn-light btn-app {% if not form.cart.userData.contactData.email %} disabled{% endif %}">
+        <i class="far fa-envelope text-primary"></i>
+        {{ _('BTN_MAIL_ORDER') }}
+    </a>
 </div>
 
 {% if form.cart.items %}

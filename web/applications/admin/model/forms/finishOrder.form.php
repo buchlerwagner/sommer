@@ -41,12 +41,12 @@ class finishOrderForm extends formBuilder {
         }
 
         $invoice = (new groupFieldset('invoice'))->addElements(
-            (new inputRadio('invoiceType', false, $defaultInvoiceOption))
+            (new inputSelect('invoiceType', 'LBL_INVOICING', $defaultInvoiceOption))
                 ->notDBField()
-                ->setColor(enumColors::Primary())
+                //->setColor(enumColors::Primary())
                 ->setOptions($invoiceOptions)
-                ->changeState(1, enumChangeAction::Show(), '.invoice-data')
                 ->changeState(1, enumChangeAction::Hide(), '.invoice-vat')
+                ->changeState(1, enumChangeAction::Show(), '.invoice-data')
                 ->changeState(2, enumChangeAction::Show(), '.invoice-data, .invoice-vat')
                 ->changeDefaultState(enumChangeAction::Hide(), $defaultHidden)
         );
@@ -60,7 +60,7 @@ class finishOrderForm extends formBuilder {
                 ->addClass('form-control-lg')
                 ->callback('loadUserData')
                 ->setList('searchCustomers'),
-            (new inputButton('clear-user', 'BTN_NEW_USER', 0, 'btn btn-light'))
+            (new inputButton('clear-user', 'BTN_NEW_CUSTOMER', 0, 'btn btn-light'))
                 ->notDBField()
                 ->setIcon('fal fa-user-times')
                 ->addClass('clear-inputs')

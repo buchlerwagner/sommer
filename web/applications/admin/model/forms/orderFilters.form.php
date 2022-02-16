@@ -59,9 +59,9 @@ class orderFiltersForm extends filterForm {
                     (new inputSelect('cart_pm_id', 'LBL_PAYMENT_MODE'))
                         ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getPaymentModes())
                         ->setColSize('col-12 col-lg-2'),
-                    (new inputAutocomplete('cart_created_by', 'LBL_SALESCLERK'))
+                    (new inputSelect('cart_created_by', 'LBL_SALESCLERK'))
+                        ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getEmployees())
                         ->setColSize('col-12 col-lg-3')
-                        ->setList('searchEmployees')
                 )
             );
         }

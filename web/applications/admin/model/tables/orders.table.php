@@ -10,8 +10,6 @@ class ordersTable extends table {
         $this->where = 'cart_order_status != "CLOSED" AND cart_shop_id = ' . $this->owner->shopId;
         $isEmployee = ($this->owner->user->getRole() == USER_ROLE_EMPLOYEE);
 
-        //$isEmployee = true;
-
         if($isEmployee){
             $this->where .= ' AND cart_store_id = "' . $this->owner->storeId . '"';
             $this->where .= ' AND cart_created_by = ' . $this->owner->user->id;

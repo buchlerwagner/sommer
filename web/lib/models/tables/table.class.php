@@ -77,6 +77,8 @@ class table extends model {
 	public $actualRow;
 	public $returnUrl = false;
 	public $debugSql = false;
+	public $includeBefore = false;
+	public $includeAfter = false;
 
     private $fieldsToUpdate = [];
 
