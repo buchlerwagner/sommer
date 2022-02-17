@@ -25,6 +25,13 @@ if(isset($_REQUEST['mail']) && $this->params[1]){
     $this->pageRedirect('/orders/view|orders/' . $cartId . '/');
 }
 
+if(isset($_REQUEST['paid']) && $this->params[1]) {
+    $cartId = (int) $this->params[1];
+    $this->cart->init($cartId, false)->setPaid();
+
+    $this->pageRedirect('/orders/view|orders/' . $cartId . '/');
+}
+
 $this->data['filterForm'] = $this->loadForm('orderFilters');
 $this->data['table'] = $this->loadTable('orders');
 

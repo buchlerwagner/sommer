@@ -51,6 +51,8 @@ class PaymentGatewayTest extends PaymentProvider {
             $this->saveResponse($result);
 
             $response = $this->readResponse($result);
+            if(!$response['message']) $response['message'] = '';
+
             $this->setResult($response['status'], $response['authCode'], $response['message']);
 
             switch($response['status']){
@@ -63,6 +65,9 @@ class PaymentGatewayTest extends PaymentProvider {
                 case 3:
                     $status = enumPaymentStatus::Failed();
                     break;
+                default:
+                    $status = enumPaymentStatus::Pending();
+                    break;
             }
         }
 
@@ -74,8 +79,8 @@ class PaymentGatewayTest extends PaymentProvider {
         return json_decode($response, true);
     }
 
-    protected function refund()
+    protected function refund(float $amount):enumPaymentStatus
     {
-        // TODO: Implement refund() method.
+        return enumPaymentStatus::Failed();
     }
 }

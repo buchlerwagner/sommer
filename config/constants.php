@@ -233,6 +233,37 @@ $GLOBALS['ORDER_STATUSES'] = [
     ],
 ];
 
+$GLOBALS['PAYMENT_STATUSES'] = [
+    'OK' => [
+        'name' => 'LBL_PAYMENT_STATUS_OK',
+        'class' => 'bg-success text-white',
+    ],
+    'FAILED' => [
+        'name' => 'LBL_PAYMENT_STATUS_FAILED',
+        'class' => 'bg-danger text-white',
+    ],
+    'CANCELED' => [
+        'name' => 'LBL_PAYMENT_STATUS_CANCELED',
+        'class' => 'bg-danger text-white',
+    ],
+    'ERROR' => [
+        'name' => 'LBL_PAYMENT_STATUS_ERROR',
+        'class' => 'bg-danger text-white',
+    ],
+    'TIMEOUT' => [
+        'name' => 'LBL_PAYMENT_STATUS_TIMEOUT',
+        'class' => 'bg-danger text-white',
+    ],
+    'PENDING' => [
+        'name' => 'LBL_PAYMENT_STATUS_PENDING',
+        'class' => 'bg-warning text-white',
+    ],
+    'VOIDED' => [
+        'name' => 'LBL_PAYMENT_STATUS_VOIDED',
+        'class' => 'bg-purple text-white',
+    ],
+];
+
 $GLOBALS['PAGE_NAMES'] = [
     'hu' => [
         'register'  => [

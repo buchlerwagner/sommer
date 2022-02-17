@@ -31,9 +31,9 @@ class KHBank extends PaymentProvider {
         return $status;
     }
 
-    protected function refund()
+    protected function refund(float $amount):enumPaymentStatus
     {
-        // TODO: Implement refund() method.
+        return enumPaymentStatus::Failed();
     }
 
     protected function generateTransactionId():string

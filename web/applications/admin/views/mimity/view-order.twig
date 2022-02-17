@@ -98,6 +98,14 @@
                             <span class="text-secondary">{{ _('LBL_ORDER_STATUS') }}:</span>
                             <b>{{ orderState(form.cart.orderStatus)|raw }}</b>
                         </div>
+                        <div>
+                            <span class="text-secondary">{{ _('LBL_PAYMENT_STATUS') }}:</span>
+                            {% if form.cart.isPaid %}
+                                <span class="badge badge-success badge-sm text-white">{{ _('LBL_PAID') }}</span>
+                            {% else %}
+                                <span class="badge badge-danger badge-sm text-white">{{ _('LBL_NOT_PAID') }}</span>
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="col-6">
                         <div>
@@ -144,6 +152,13 @@
                         <div>
                             <span class="text-secondary">{{ _('LBL_SELECTED_PAYMENT_MODE') }}:</span>
                             <b>{{ form.cart.getSelectedPaymentMode.name }}</b>
+                            {% if form.cart.getSelectedPaymentMode.type == 3 %}
+                                <br>
+                                <a href="/ajax/forms/paymentHistory/{{ form.cart.id }}/" data-size="lg" data-toggle="modal" data-target="#ajax-modal">
+                                    <i class="fa fa-history"></i>
+                                    {{ _('LBL_VIEW_PAYMENT_HISTORY') }}
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -174,7 +189,7 @@
         </a>
     {% endif %}
 
-    <a href="#" class="btn btn-light btn-app {% if form.cart.isPaid %} disabled{% endif %}">
+    <a href="./?paid" class="btn btn-light btn-app {% if form.cart.isPaid %} disabled{% endif %}">
         <i class="far fa-check text-primary"></i>
         {{ _('BTN_ORDER_PAID') }}
     </a>

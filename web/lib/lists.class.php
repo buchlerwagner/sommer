@@ -79,6 +79,16 @@ class lists extends ancestor {
         return $this->getList();
     }
 
+    public function getPaymentStatus(){
+        $this->setList([
+            0  => 'LBL_ANY',
+            1  => 'LBL_PAID',
+            -1 => 'LBL_NOT_PAID',
+        ]);
+
+        return $this->getList();
+    }
+
     public function getShippingTypes(){
         $this->setList([
             1 => 'LBL_SHIPPING_TYPE_PERSONAL',

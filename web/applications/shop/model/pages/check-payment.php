@@ -21,22 +21,22 @@ if($transactionId) {
      */
     $payment = $this->addByClassName('Payments');
 
-    $status = $payment->checkTransaction($transactionId);
+    $transaction = $payment->checkTransaction($transactionId);
 
-    if($key = $payment->getCartKey()){
-        if($status->getValue() !== enumPaymentStatus::Pending()->getValue()){
-            $this->cart->init($key, false);
+    if($transaction->cartKey){
+        if($transaction->getStatus() !== enumPaymentStatus::Pending()->getValue()){
+            $this->cart->init($transaction->cartKey, false);
 
-            if($status->getValue() === enumPaymentStatus::OK()->getValue()) {
+            if($transaction->getStatus() === enumPaymentStatus::OK()->getValue()) {
                 $this->cart->setPaid();
             }
 
-            if($status !== enumPaymentStatus::Pending()){
-                $this->cart->sendPaymentConfirmationEmail();
+            if($transaction->getStatus() !== enumPaymentStatus::Pending()->getValue()){
+                $this->cart->sendPaymentConfirmationEmail($transaction);
             }
         }
 
-        $this->pageRedirect($this->getPageName('finish') . $key . '/');
+        $this->pageRedirect($this->getPageName('finish') . $transaction->cartKey . '/');
     }
 }
 

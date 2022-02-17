@@ -154,10 +154,16 @@ var shoppingCart = {
 
         $(document).on('click', '.set-payment-mode', function () {
             var id = parseInt($(this).data('id'));
+            var type = parseInt($(this).data('type'));
             if(id) {
                 shoppingCart.sendData('setPaymentMode', {
                     id: id,
                 });
+            }
+            if(type === 3){
+                $('#btnFinish').html( $('#btnFinish').data('pay') );
+            }else{
+                $('#btnFinish').html( $('#btnFinish').data('default') );
             }
         });
 

@@ -200,10 +200,11 @@ class functions extends ancestor {
 			$dt = $date;
 		}
 
-		if($addTimezone && $this->owner->user->getUser()['timezone']['code'] && date('His', $dt)>0){
-			try {
+		if($addTimezone && date('His', $dt)>0){
+            $timeZone = ($this->owner->user->getUser()['timezone']['code']? : $this->owner->hostConfig['timeZone']['code']);
+            try {
 				$datetime = new DateTime(date('Y-m-d H:i:s', $dt));
-				$tz = new DateTimeZone($this->owner->user->getUser()['timezone']['code']);
+				$tz = new DateTimeZone($timeZone);
 				$date2 =  $datetime->setTimezone($tz)->format('Y-m-d H:i:s');
 				$dt = strtotime($date2);
 			}catch (Exception $e){

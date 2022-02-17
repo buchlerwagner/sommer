@@ -33,6 +33,7 @@ class AppExtension extends AbstractExtension {
             new TwigFunction('extractArray', [$this, 'extractArray'], ['needs_context' => true]),
             new TwigFunction('valueHelper',  [$this, 'valueHelper']),
             new TwigFunction('orderState',   [$this, 'orderState']),
+            new TwigFunction('paymentState', [$this, 'paymentState']),
 		];
 	}
 
@@ -241,6 +242,12 @@ class AppExtension extends AbstractExtension {
         global $framework;
 
         return '<span class="badge badge-sm badge-' . str_replace('bg-', '', $GLOBALS['ORDER_STATUSES'][$type]['class']) . '">' . $framework->translate->getTranslation($GLOBALS['ORDER_STATUSES'][$type]['name']) . '</span>';
+    }
+
+    public function paymentState($type){
+        global $framework;
+
+        return '<span class="badge badge-sm badge-' . str_replace('bg-', '', $GLOBALS['PAYMENT_STATUSES'][$type]['class']) . '">' . $framework->translate->getTranslation($GLOBALS['PAYMENT_STATUSES'][$type]['name']) . '</span>';
     }
 
 }

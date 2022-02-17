@@ -28,6 +28,7 @@ class ordersTable extends table {
 		$this->defaultAction = 'view';
 		$this->modalSize = 'lg';
 		$this->deleteField = 'cart_deleted';
+		$this->optionsWidth = 1;
 
 		$this->settings['display']    = 100;
 		$this->settings['orderfield'] = 'cart_ordered';
@@ -71,6 +72,10 @@ class ordersTable extends table {
             (new column('cart_total', 'LBL_TOTAL', 1))
                 ->addClass('text-right')
                 ->setTemplate('{{ _price(val, row.cart_currency) }}'),
+
+            (new column('cart_paid', 'LBL_PAID', 1, enumTableColTypes::YesNo()))
+                ->addClass('text-center'),
+
             new columnHidden('cart_currency'),
             (new columnHidden('customer_last_name'))
                 ->setSelect('us1.us_lastname AS customer_last_name')
@@ -180,6 +185,15 @@ class ordersTable extends table {
                         $this->settings['orderfield'] = 'cart_shipping_date';
                         $this->settings['orderdir']   = 'ASC';
                         break;
+
+                    case 'isPaid':
+                        if($values == 1){
+                            $where[$field] = "cart_paid = 1";
+                        }elseif($values == -1){
+                            $where[$field] = "cart_paid = 0";
+                        }
+                        break;
+
                     default:
                         $where[$field] = $field . " = '$values'";
                         break;

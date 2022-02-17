@@ -25,11 +25,62 @@ ALTER TABLE `shipping_modes` ADD COLUMN `sm_code` VARCHAR(5) CHARACTER SET utf8m
 ALTER TABLE `cart` ADD COLUMN `cart_order_type` TINYINT(1) NULL DEFAULT 0 AFTER `cart_order_number`;
 ALTER TABLE `cart` ADD COLUMN `cart_local_consumption` TINYINT(1) NULL DEFAULT 0 AFTER `cart_custom_interval`;
 
-
 CREATE  INDEX `store` USING BTREE ON `cart` (`cart_store_id`);
 UPDATE cart SET cart_store_id = 'W';
+UPDATE cart SET cart_paid = 1, cart_order_status = 'FINISHED' WHERE cart_status = 'ORDERED';
 
 ALTER TABLE `payment_modes` ADD COLUMN `pm_pp_id` INT(11) NULL DEFAULT 0 AFTER `pm_shop_id`;
+ALTER TABLE `payment_modes` ADD COLUMN `pm_logo` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `pm_email_text`;
+
+CREATE TABLE `payment_providers` (
+     `pp_id` int(11) NOT NULL AUTO_INCREMENT,
+     `pp_shop_id` int(11) DEFAULT NULL,
+     `pp_name` varchar(255) DEFAULT NULL,
+     `pp_provider` varchar(100) DEFAULT NULL,
+     `pp_shopid` varchar(128) DEFAULT NULL,
+     `pp_password` varchar(255) DEFAULT NULL,
+     `pp_currency` char(3) DEFAULT 'HUF',
+     `pp_test_mode` tinyint(1) DEFAULT 0,
+     `pp_url_frontend` varchar(255) DEFAULT NULL,
+     `pp_url_return` varchar(255) DEFAULT NULL,
+     `pp_url_backend` varchar(255) DEFAULT NULL,
+     `pp_private_key` varchar(255) DEFAULT NULL,
+     PRIMARY KEY (`pp_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `payment_transactions` (
+    `pt_id` int(11) NOT NULL AUTO_INCREMENT,
+    `pt_shop_id` int(11) DEFAULT NULL,
+    `pt_cart_id` int(11) DEFAULT NULL,
+    `pt_pp_id` int(11) DEFAULT NULL,
+    `pt_created` timestamp NULL DEFAULT NULL,
+    `pt_status` enum('OK','FAILED','CANCELED','TIMEOUT','ERROR','PENDING','VOIDED') DEFAULT NULL,
+    `pt_ip` varchar(30) DEFAULT NULL,
+    `pt_language` char(2) DEFAULT 'HU',
+    `pt_transactionid` varchar(255) DEFAULT NULL,
+    `pt_amount` double DEFAULT 0,
+    `pt_refunded` float DEFAULT 0,
+    `pt_currency` char(3) DEFAULT 'HUF',
+    `pt_auth_code` varchar(50) DEFAULT NULL,
+    `pt_status_code` varchar(20) DEFAULT '0',
+    `pt_response` mediumtext DEFAULT NULL,
+    `pt_message` text DEFAULT NULL,
+    `pt_expiry` timestamp NULL DEFAULT NULL,
+    `pt_notification_sent` tinyint(1) DEFAULT 0,
+    PRIMARY KEY (`pt_id`),
+    KEY `transactionID` (`pt_transactionid`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
+
+
+INSERT INTO `access_functions` (`af_page`, `af_key`, `af_name`) VALUES
+    ('orders','orders-phone','Telefonos rendelésfelvétel'),
+    ('orders','orders-store','Bolti rendelésfelvétel');
+
+INSERT INTO `templates` (`mt_id`, `mt_shop_id`, `mt_type`, `mt_key`, `mt_language`, `mt_subject`, `mt_body`, `mt_keywords`, `mt_description`, `mt_template`) VALUES
+    (179,1,'MAIL','payment','hu','Online fizetés értesítő: {{ orderNumber }}','<div>Kedves <b>{{ firstName }}</b>!</div><div><br></div>Köszönjük megrendelését.<b><br></b><div><br></div><div>{{ order }}<br></div><div><br></div><div>Ąz alábbi linkre kattintva megtekintheti rendelését:<br></div><div><a href="{{ link }}" target="_blank">{{ link }}</a><br></div>','domain|firstName|lastName|email|link|order|orderNumber|transactionId|authCode|paymentStatus','Online fizetés értesítő',NULL);
+
+
+
 
 
 

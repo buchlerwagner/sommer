@@ -191,6 +191,7 @@ class router extends model {
                     'defaultCurrency' => $h['host_default_currency'],
                     'currencies' => explode('|', trim($h['host_currencies'], '|')),
                     'timeZoneID' => $h['host_timezone'],
+                    'timeZone' => $this->user->getTimezone($h['host_timezone']),
                     'country' => $h['host_country'],
                     'publicSite' => rtrim($h['host_public_site'], '/') . '/',
                     'defaultEmail' => $h['host_default_email'],

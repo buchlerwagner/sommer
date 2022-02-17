@@ -46,11 +46,6 @@ class Payments extends ancestor {
         return $this;
     }
 
-    public function getCartKey():string
-    {
-        return $this->cartKey;
-    }
-
     public function createTransaction(int $cartId, float $amount, string $currency):void
     {
         if(!$this->provider){
@@ -87,34 +82,44 @@ class Payments extends ancestor {
 
     }
 
-    public function checkTransaction(string $transactionId):enumPaymentStatus
+    public function checkTransaction(string $transactionId):Transaction
     {
-        $status = enumPaymentStatus::Pending();
-
         if(!Empty($transactionId)){
             if($transaction = $this->getTransaction($transactionId)) {
-                $this->cartKey = $transaction['cartKey'];
-
                 try {
-                    $this->init($transaction['providerId']);
-                    $status = $this->provider->checkTransaction($transactionId);
+                    $this->init($transaction->providerId);
+                    $transaction = $this->provider->checkTransaction($transaction);
                 }
 
                 catch(Exception $e){
 
                 }
             }
+        }else{
+            $transaction = new Transaction();
         }
 
-        return $status;
+        return $transaction;
     }
 
-    public function refund(string $transactionId)
+    public function refund(string $transactionId, float $refundAmount = 0):Transaction
     {
-        if(!$this->provider){
-            throw new Exception('Payment provider is not initialised!');
+        if(!Empty($transactionId)){
+            if($transaction = $this->getTransaction($transactionId)) {
+                try {
+                    $this->init($transaction->providerId);
+                    $transaction = $this->provider->initRefund($transaction, $refundAmount);
+                }
+
+                catch(Exception $e){
+
+                }
+            }
+        }else{
+            $transaction = new Transaction();
         }
 
+        return $transaction;
     }
 
     private function loadSettings():PaymentProviderSettings
@@ -145,15 +150,13 @@ class Payments extends ancestor {
         return new PaymentProviderSettings(($settings ?: []));
     }
 
-    public function hasPendingTransaction($cartId):int
+    public function hasPendingTransaction(int $cartId)
     {
-        $out = 0;
-
         $transaction = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
                 'payment_transactions',
                 [
-                    'pt_id AS id'
+                    'pt_transactionid AS transactionId'
                 ],
                 [
                     'pt_cart_id' => $cartId,
@@ -163,24 +166,54 @@ class Payments extends ancestor {
             )
         );
 
-        if($transaction){
-            $out = $transaction['id'];
-        }
-
-        return $out;
+        return ($transaction ? $transaction['transactionId'] : false);
     }
 
-    private function getTransaction(string $transactionId):array
+    public function getTransactionHistory(int $cartId):array
+    {
+        $out = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'payment_transactions',
+                [
+                    'pt_id AS id',
+                    'pt_created AS created',
+                    'pt_status AS status',
+                    'pt_transactionid AS transactionId',
+                    'pt_auth_code AS authCode',
+                    'pt_amount AS amount',
+                    'pt_currency AS currency',
+                    'pt_message AS message',
+                ],
+                [
+                    'pt_cart_id' => $cartId,
+                    'pt_shop_id' => $this->owner->shopId,
+                ],
+                [],
+                false,
+                'pt_created DESC'
+            )
+        );
+
+        return ($out ?: []);
+    }
+
+    public function getTransaction(string $transactionId):Transaction
     {
         $out = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
                 'payment_transactions',
                 [
-                    'pt_id AS id',
-                    'pt_transactionid AS transactionId',
-                    'pt_cart_id AS cartId',
                     'pt_pp_id AS providerId',
+                    'pt_id AS id',
+                    'pt_created AS created',
                     'pt_status AS status',
+                    'pt_transactionid AS transactionId',
+                    'pt_auth_code AS authCode',
+                    'pt_amount AS amount',
+                    'pt_currency AS currency',
+                    'pt_message AS message',
+
+                    'pt_cart_id AS cartId',
                     'cart_key AS cartKey',
                 ],
                 [
@@ -197,6 +230,6 @@ class Payments extends ancestor {
             )
         );
 
-        return ($out ?: []);
+        return new Transaction(($out ?: []));
     }
 }

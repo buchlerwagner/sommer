@@ -14,13 +14,91 @@
             <div class="divider"><img src="{{ theme }}images/icons/divider_1.png" alt=""></div>
         </div>
 
+        {% if cart.isBankCardPayment %}
+            <div class="mb-4">
+            {% if cart.isPaid %}
+                <div class="alert alert-success">
+                    <div class="text-140 mb-2">
+                        <i class="fas fa-check"></i>
+                        <b>{{ _('LBL_PAYMENT_SUCCESS') }}</b>
+                    </div>
+
+                    {{ _('LBL_TRANSACTION_ID') }}: <b>{{ transactionHistory[0].transactionId }}</b>
+                    <br>
+                    {{ _('LBL_AUTH_CODE') }}: <b>{{ transactionHistory[0].authCode }}</b>
+                </div>
+            {% else %}
+                {% if isPending %}
+                    <div class="alert alert-warning">
+                        <div class="text-140">
+                            <i class="fad fa-spinner fa-spin"></i>
+                            <b>{{ _('LBL_PAYMENT_IN_PROGRESS') }}</b>
+                        </div>
+                    </div>
+                {% else %}
+
+                    {% if transactionHistory %}
+                        {% set more = false %}
+                        {% for transaction in transactionHistory %}
+                            {% if loop.index > 1 and transactionHistory|length > 1 and not more %}
+                                {% set more = true %}
+                                <a href="#transaction-history" data-toggle="collapse">{{ _('LBL_SHOW_TRANSACTIONS') }}</a>
+                                <div id="transaction-history" class="collapse">
+                            {% endif %}
+
+                            <div class="alert alert-danger mb-2">
+                                <div class="text-140 mb-2">
+                                    <i class="fas fa-times"></i>
+                                    <b>{{ _('LBL_PAYMENT_FAILED') }}</b>
+                                </div>
+
+                                <small>{{ _date(transaction.created, 5) }}</small>
+                                <br>
+                                {{ _('LBL_TRANSACTION_ID') }}: <b>{{ transaction.transactionId }}</b>
+                                {% if transaction.message %}
+                                    <br>
+                                    {{ transaction.message }}
+                                {% endif %}
+                                <br>
+                            </div>
+                        {% endfor %}
+
+                        {% if more %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            </div>
+        {% endif %}
+
+
         {% if cart.items %}
-            <div class="mb-3">
-                {{ _('LBL_ORDER_NUMBER') }}: <b class="text-info">{{ cart.orderNumber }}</b>
-                <br>
-                {{ _('LBL_ORDER_DATE') }}: <b class="text-info">{{ _date(cart.orderDate, 1) }}</b>
-                <br>
-                {{ _('LBL_ORDER_STATUS') }}: <b class="text-info">{{ _('LBL_ORDER_STATUS_' ~ cart.orderStatus) }}</b>
+            <div class="row mb-3">
+                <div class="col-12 col-lg-6 mb-3 mb-lg-0">
+                    {{ _('LBL_ORDER_NUMBER') }}: <b class="text-info">{{ cart.orderNumber }}</b>
+                    <br>
+                    {{ _('LBL_ORDER_DATE') }}: <b class="text-info">{{ _date(cart.orderDate, 1) }}</b>
+                    <br>
+                    {{ _('LBL_ORDER_STATUS') }}: <b class="text-info">{{ _('LBL_ORDER_STATUS_' ~ cart.orderStatus) }}</b>
+                    {% if cart.isPaid %}
+                    <br>
+                    {{ _('LBL_PAID_STATUS') }}: <b class="text-info">{{ _('LBL_PAID') }}</b>
+                    {% endif %}
+                </div>
+                {% if paymentEnabled %}
+                <div class="col-12 col-lg-6 totals-table">
+                    {{ cart.getSelectedPaymentMode.text|nl2br }}
+                    <div class="mt-3 text-center">
+                        <a href="./?pay=1" class="theme-btn proceed-btn">{{ _('BTN_PAY') }}</a>
+                    </div>
+                    {% if cart.getSelectedPaymentMode.logo %}
+                        <div class="text-center mt-3">
+                            <img src="{{ cart.getSelectedPaymentMode.logo }}" alt="">
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
 
             <div class="cart-outer on-cart mb-4">
@@ -95,8 +173,10 @@
                 <h4 class="mb-3"><b>{{ _('LBL_SELECTED_PAYMENT_MODE') }}</b></h4>
                 <p>
                     <b>{{ cart.getSelectedPaymentMode.name }}</b>
-                    <br>
-                    {{ cart.getSelectedPaymentMode.text|nl2br }}
+                    {% if not cart.isBankCardPayment %}
+                        <br>
+                        {{ cart.getSelectedPaymentMode.text|nl2br }}
+                    {% endif %}
                 </p>
             </div>
         </div>

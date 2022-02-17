@@ -14,6 +14,7 @@ abstract class PaymentProvider extends ancestor {
     protected $timeout;
 
     protected $amount;
+    protected $refunded;
     protected $currency;
 
     protected $status;
@@ -26,7 +27,7 @@ abstract class PaymentProvider extends ancestor {
 
     protected abstract function check():enumPaymentStatus;
 
-    protected abstract function refund();
+    protected abstract function refund(float $amount):enumPaymentStatus;
 
     public function __construct(PaymentProviderSettings $settings, $language)
     {
@@ -78,9 +79,9 @@ abstract class PaymentProvider extends ancestor {
         $this->pay();
     }
 
-    final public function checkTransaction(string $transactionId):enumPaymentStatus
+    final public function checkTransaction(Transaction $transaction):Transaction
     {
-        $this->transactionId = $transactionId;
+        $this->transactionId = $transaction->transactionId;
         $status = $this->check();
 
         $this->owner->db->sqlQuery(
@@ -99,10 +100,51 @@ abstract class PaymentProvider extends ancestor {
             )
         );
 
-        return $status;
+        $transaction->setStatus($status);
+        $transaction->authCode = $this->authCode;
+        $transaction->message = $this->message;
+
+        return $transaction;
     }
 
-    private function getTimeout():string
+    final public function initRefund(Transaction $transaction, float $refundAmount = 0):Transaction
+    {
+        $this->transactionId = $transaction->transactionId;
+        if(!$refundAmount){
+            $refundAmount = $transaction->amount;
+        }
+
+        if($refundAmount <= $transaction->amount) {
+            $status = $this->refund($refundAmount);
+
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'payment_transactions',
+                    [
+                        'pt_status' => $status->getValue(),
+                        'pt_auth_code' => $this->authCode,
+                        'pt_status_code' => $this->statusCode,
+                        'pt_message' => $this->message,
+                        'pt_response' => $this->response,
+                        'pt_refunded' => $this->refunded,
+                    ],
+                    [
+                        'pt_transactionid' => $this->transactionId
+                    ]
+                )
+            );
+
+            $transaction->setStatus($status);
+            $transaction->authCode = $this->authCode;
+            $transaction->message = $this->message;
+        }else{
+            throw new Exception('Invalid refund amount!');
+        }
+
+        return $transaction;
+    }
+
+    protected function getTimeout():string
     {
         if(!$this->timeout){
             $this->timeout = self::DEFAULT_TIMEOUT;

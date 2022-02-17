@@ -31,6 +31,7 @@ class cart extends ancestor {
     private $intervalId = false;
 	public $paymentFee = 0;
     private $paymentId = false;
+    private $isPaid = false;
     public $packagingFee = 0;
 
     private $earliestTakeover = false;
@@ -223,7 +224,15 @@ class cart extends ancestor {
     }
 
     public function isPaid(){
-        return true;
+        return $this->isPaid;
+    }
+
+    public function isBankCardPayment(){
+        if($payMode = $this->getSelectedPaymentMode()){
+            return ($payMode['type'] == PAYMENT_TYPE_CARD && $payMode['providerId']);
+        }else{
+            return false;
+        }
     }
 
     public function isLocalConsumption(){
@@ -321,8 +330,9 @@ class cart extends ancestor {
 	}
 
     public function initPayment(){
-        if($payMode = $this->getSelectedPaymentMode()){
-            if($payMode['type'] == PAYMENT_TYPE_CARD && $payMode['providerId']){
+        if($this->isBankCardPayment()){
+            $payMode = $this->getSelectedPaymentMode();
+            if($payMode['providerId']) {
                 /**
                  * @var $payment Payments
                  */
@@ -330,19 +340,32 @@ class cart extends ancestor {
 
                 try {
                     $payment->init($payMode['providerId'])->createTransaction($this->id, $this->total, $this->currency);
-                }
-
-                catch (Exception $e){
+                } catch (Exception $e) {
                     die($e);
                 }
             }
         }
     }
 
-    public function getTransactionHistory(){
-        $out = [];
+    public function getPaymentStatus(){
+        /**
+         * @var $payment Payments
+         */
+        $payment = $this->owner->addByClassName('Payments');
+        if(!$transactionId = $payment->hasPendingTransaction($this->id)){
+            return $payment->getTransaction($transactionId);
+        }
 
-        return $out;
+        return false;
+    }
+
+    public function getTransactionHistory(){
+        /**
+         * @var $payment Payments
+         */
+        $payment = $this->owner->addByClassName('Payments');
+
+        return $payment->getTransactionHistory($this->id);
     }
 
     public function getTemplateData(){
@@ -404,8 +427,44 @@ class cart extends ancestor {
         );
     }
 
-    public function sendPaymentConfirmationEmail(){
+    public function sendPaymentConfirmationEmail(Transaction $transaction){
+        $mailData = $this->getTemplateData();
 
+        $mailData['showPaymentInfo'] = true;
+        $mailData['paymentStatus'] = $transaction->getStatus();
+        $mailData['transactionId'] = $transaction->transactionId;
+        $mailData['authCode'] = $transaction->authCode;
+        $mailData['resultMessage'] = $transaction->message;
+
+        $cartMailBody = $this->owner->view->renderContent(
+            'mail-order',
+            $mailData,
+            false
+        );
+
+        $data = [
+            'id' => $this->userId,
+            'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->key . '/',
+            'order' => $cartMailBody,
+            'orderNumber' => $this->orderNumber,
+            'status' => $this->status,
+            'key' => $this->key,
+            'total' => $this->total,
+            'currency' => $this->currency,
+            'paymentStatus' => $transaction->getStatus(),
+            'transactionId' => $transaction->transactionId,
+            'authCode' => $transaction->authCode,
+        ];
+
+        return $this->owner->email->prepareEmail(
+            'payment',
+            $this->userId,
+            $data,
+            false,  // from
+            false,  // cc
+            ($this->owner->settings['incomingEmail'] ?: false), // bcc
+            $this->getMailAttachments()
+        );
     }
 
     private function getMailAttachments(){
@@ -478,6 +537,7 @@ class cart extends ancestor {
                 $this->intervalId = $cart['cart_si_id'];
                 $this->paymentFee = $cart['cart_payment_fee'];
                 $this->paymentId = $cart['cart_pm_id'];
+                $this->isPaid = $cart['cart_paid'];
                 $this->remarks = $cart['cart_remarks'];
                 $this->customInterval = $cart['cart_custom_interval'];
                 $this->orderType = $cart['cart_order_type'];
@@ -964,6 +1024,7 @@ class cart extends ancestor {
                     'pm_price AS price',
                     'pm_text AS text',
                     'pm_default AS def',
+                    'pm_logo AS logo',
                 ],
                 [
                     'pm_shop_id' => $this->owner->shopId,
@@ -980,6 +1041,10 @@ class cart extends ancestor {
         if ($result) {
             foreach($result AS $row){
                 $out[$row['id']] = $row;
+
+                if($row['logo']){
+                    $out[$row['id']]['logo'] = FOLDER_UPLOAD . $this->owner->shopId . '/' . $row['logo'];
+                }
             }
         }
 
@@ -1000,6 +1065,7 @@ class cart extends ancestor {
                         'pm_type AS type',
                         'pm_text AS text',
                         'pm_email_text AS emailText',
+                        'pm_logo AS logo',
                     ],
                     [
                         'pm_shop_id' => $this->owner->shopId,
@@ -1007,6 +1073,11 @@ class cart extends ancestor {
                     ]
                 )
             );
+
+            if($out['logo']){
+                $out['logo'] = FOLDER_UPLOAD . $this->owner->shopId . '/' . $out['logo'];
+            }
+
         }
 
         return $out;

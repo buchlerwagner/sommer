@@ -17,9 +17,11 @@
         <div class="content-box mt-5 mb-5">
 
             <div class="alert alert-danger text-left">
-                <b class="m-0">{{ _('LBL_PAYMENT_ERROR_TEXT') }}</b>
+                {{ _('LBL_PAYMENT_ERROR_TEXT')|nl2br }}
+                {%  if transactionId %}
                 <br>
                 {{ _('LBL_TRANSACTION_ID') }}: <b>{{ transactionId }}</b>
+                {% endif %}
             </div>
 
         </div>

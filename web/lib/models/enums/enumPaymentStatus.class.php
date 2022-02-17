@@ -9,6 +9,7 @@ use MyCLabs\Enum\Enum;
  * @method static enumPaymentStatus Error()
  * @method static enumPaymentStatus Timeout()
  * @method static enumPaymentStatus Pending()
+ * @method static enumPaymentStatus Voided()
  */
 final class enumPaymentStatus extends Enum {
     private const OK         = 'OK';
@@ -17,4 +18,5 @@ final class enumPaymentStatus extends Enum {
     private const Error      = 'ERROR';
     private const Timeout    = 'TIMEOUT';
     private const Pending    = 'PENDING';
+    private const Voided     = 'VOIDED';
 }

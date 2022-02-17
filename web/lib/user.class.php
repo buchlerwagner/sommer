@@ -640,7 +640,7 @@ class user extends ancestor {
 		return $out;
 	}
 
-	private function getTimezone($timeZone){
+	public function getTimezone($timeZone){
 		$out = [];
 		$timezone = $this->owner->db->getFirstRow(
 			"SELECT * FROM " . DB_NAME_WEB . ".timezones WHERE tz_id = '" . (int) $timeZone . "'"

@@ -26249,10 +26249,10 @@ iframe#gmap_canvas {
   font-weight: 500;
   letter-spacing: 1px;
   border-radius: 30px;
-  margin-top: 30px;
   background-color: #ff91a4;
   border: 2px solid #ff91a4;
   text-transform: unset;
+  text-align: center;
   font-family: "ABeeZee";
   display: inline-block;
 }
@@ -26621,8 +26621,10 @@ iframe#gmap_canvas {
   position: relative;
   display: block;
   max-width: 100%;
-  padding-left: 30px;
-  margin-top: 20px;
+  /*
+  padding-left:30px;	
+  margin-top:20px;
+  */
 }
 
 .payment-box .payment-options li .radio-option .what-paypall {

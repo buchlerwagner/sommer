@@ -4,6 +4,31 @@
             <h4 style="margin: 10px 0;">{{ _('LBL_ORDER_NUMBER') }}: {{ orderNumber }}</h4>
         </td>
     </tr>
+    {% if showPaymentInfo %}
+    <tr>
+        <td>
+            {% if paymentStatus == 'OK' %}
+                <div style="border: 1px solid #c3e6cb; color: #155724; background-color: #d4edda; border-radius: 5px; margin:10px 0;padding:10px 15px;">
+                    <b style="font-size: 18px;margin-bottom: 10px;">{{ _('LBL_PAYMENT_SUCCESS') }}</b>
+                    <br>
+                    {{ _('LBL_TRANSACTION_ID') }}: <b>transactionId</b>
+                    <br>
+                    {{ _('LBL_AUTH_CODE') }}: <b>{{ authCode }}</b>
+                </div>
+            {% else %}
+                <div style="border: 1px solid #f5c6cb; color: #721c24; background-color: #f8d7da; border-radius: 5px; margin:10px 0;padding:10px 15px;">
+                    <b style="font-size: 18px;margin-bottom: 10px;">{{ _('LBL_PAYMENT_FAILED') }}</b>
+                    <br>
+                    {{ _('LBL_TRANSACTION_ID') }}: <b>transactionId</b>
+                    {% if resultMessage %}
+                        <br>
+                        {{ resultMessage }}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </td>
+    </tr>
+    {% endif %}
     <tr>
         <td style="border-bottom:1px solid #EDECEC;">
             <h3 style="margin: 10px 0;">{{ _('LBL_CONTACT_DATA') }}</h3>

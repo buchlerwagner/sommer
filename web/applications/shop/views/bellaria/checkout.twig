@@ -286,27 +286,39 @@
                     <div class="payment-box">
                         <div class="upper-box">
                             <div class="payment-options">
+                                {% set paymentType = 1 %}
+
                                 {% for item in cart.getPaymentModes %}
+                                    {% if cart.getPaymentId == item.id %}
+                                        {% set paymentType = item.type %}
+                                    {% endif %}
                                     <ul>
                                         <li>
                                             <div class="radio-option">
-                                                <input type="radio" name="order[payment]" id="payment-{{ item.id }}" class="set-payment-mode" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getPaymentId == item.id %} checked{% endif %}>
+                                                <input type="radio" name="order[payment]" id="payment-{{ item.id }}" class="set-payment-mode" data-type="{{ item.type }}" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getPaymentId == item.id %} checked{% endif %}>
                                                 <div class="options">
                                                     <label for="payment-{{ item.id }}" class="d-block">
-                                                    <div class="row">
-                                                        <div class="col-12 col-md-10">
-                                                            <strong>{{ item.name }}</strong>
+                                                        <div class="row">
+                                                            <div class="col-12 col-md-10">
+                                                                <strong>{{ item.name }}</strong>
+                                                            </div>
+                                                            {% if item.price > 0 %}
+                                                            <div class="col-12 col-md-2 text-right">
+                                                                <span class="text-muted">
+                                                                        {{ _price(item.price, cart.currency) }}
+                                                                </span>
+                                                            </div>
+                                                            {% endif %}
                                                         </div>
-                                                        {% if item.price > 0 %}
-                                                        <div class="col-12 col-md-2 text-right">
-                                                            <span class="text-muted">
-                                                                    {{ _price(item.price, cart.currency) }}
-                                                            </span>
+                                                    </label>
+                                                    <span class="small-text">
+                                                        {{ item.text|nl2br }}
+                                                        {% if item.logo %}
+                                                            <div class="text-center mt-2">
+                                                            <img src="{{ item.logo }}" alt="">
                                                         </div>
                                                         {% endif %}
-                                                    </div>
-                                                    </label>
-                                                    <span class="small-text">{{ item.text|nl2br }}</span>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </li>
@@ -354,9 +366,9 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
+                    <div class="form-row totals-table mt-4">
                         <div class="col form-group col-12">
-                            <button type="submit" name="order[save]" class="theme-btn proceed-btn">{{ _('BTN_ORDER') }}</button>
+                            <button id="btnFinish" type="submit" name="order[save]" class="theme-btn proceed-btn" data-default="{{ _('BTN_ORDER') }}" data-pay="{{ _('BTN_PAY') }}">{% if paymentType == 3 %}{{ _('BTN_PAY') }}{% else %}{{ _('BTN_ORDER') }}{% endif %}</button>
                         </div>
                     </div>
                 </form>
