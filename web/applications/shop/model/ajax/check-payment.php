@@ -8,9 +8,9 @@ $transactionId = trim($this->params[1]);
 
 if(!Empty($transactionId)){
     /**
-     * @var $paymentHandler PaymentChecker
+     * @var $paymentHandler PaymentHandler
      */
-    $paymentHandler = $this->addByClassName('PaymentChecker');
+    $paymentHandler = $this->addByClassName('PaymentHandler');
     $transaction = $paymentHandler->handleTransaction($transactionId);
 
     switch ($transaction->getStatus()){

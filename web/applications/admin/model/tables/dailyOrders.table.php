@@ -13,6 +13,7 @@ class dailyOrdersTable extends table {
 		$this->header = true;
 		$this->edit = false;
 		$this->view = true;
+        $this->hideCounter = true;
 
         $this->includeBefore = 'daily-orders-action-buttons';
 

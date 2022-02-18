@@ -14,23 +14,24 @@ class salesReportFiltersForm extends filterForm {
         $this->addControls(
             (new groupRow('row2'))->addElements(
 
-                (new inputDate('shippingDate_min', 'LBL_SHIPPING_DATE', $defaultDate))
+                (new inputDate('orderDate_min', 'LBL_ORDER_DATE', $defaultDate))
                     ->setIcon('fa fa-calendar')
                     ->setAppend('tól')
                     ->setColSize('col-6 col-lg-2'),
-                (new inputDate('shippingDate_max', '', $defaultDate))
+                (new inputDate('orderDate_max', '', $defaultDate))
                     ->setIcon('fa fa-calendar')
                     ->setColSize('col-6 col-lg-2')
                     ->addEmptyLabel()
                     ->setAppend('ig'),
-                (new inputSelect('shippingCode', 'LBL_DELIVERY_PLACE'))
-                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getShippingModes(true))
+                (new inputSelect('orderOrigin', 'LBL_STORE'))
+                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getStores(true))
+                    ->setColSize('col-12 col-lg-2'),
+                (new inputSelect('sellerId', 'LBL_SALESCLERK'))
+                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getEmployees())
                     ->setColSize('col-12 col-lg-4'),
-                (new inputSelect('categoryId', 'LBL_CATEGORY'))
-                    ->makeSelectPicker()
-                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getCategories(true))
-                    ->setColSize('col-12 col-sm-4')
-
+                (new inputSelect('isPaid', 'LBL_PAYMENT_STATUS'))
+                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getPaymentStatus())
+                    ->setColSize('col-12 col-lg-2')
             )
         );
     }

@@ -17,9 +17,9 @@ if(!Empty($_GET['txid'])){
 
 if($transactionId) {
     /**
-     * @var $paymentHandler PaymentChecker
+     * @var $paymentHandler PaymentHandler
      */
-    $paymentHandler = $this->addByClassName('PaymentChecker');
+    $paymentHandler = $this->addByClassName('PaymentHandler');
     $transaction = $paymentHandler->handleTransaction($transactionId);
 
     if($transaction->cartKey){

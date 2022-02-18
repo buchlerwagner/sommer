@@ -51,6 +51,8 @@ class PaymentGatewayTest extends PaymentProvider {
             $this->saveResponse($result);
 
             $response = $this->readResponse($result);
+            if(!$response['status']) $response['status'] = '';
+            if(!$response['authCode']) $response['authCode'] = '';
             if(!$response['message']) $response['message'] = '';
 
             $this->setResult($response['status'], $response['authCode'], $response['message']);

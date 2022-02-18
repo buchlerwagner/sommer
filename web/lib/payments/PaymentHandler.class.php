@@ -1,6 +1,6 @@
 <?php
 
-class PaymentChecker extends ancestor {
+class PaymentHandler extends ancestor {
 
     public function handleTransaction(string $transactionId):Transaction
     {
@@ -35,6 +35,21 @@ class PaymentChecker extends ancestor {
 
     public function checkPendingTransactions():void
     {
-
+        $result = $this->owner->db->getRows(
+            $this->owner->db->genSQLSelect(
+                'payment_transactions',
+                [
+                    'pt_transactionid AS transactionId'
+                ],
+                [
+                    'pt_status'  => enumPaymentStatus::Pending()->getValue(),
+                ]
+            )
+        );
+        if($result){
+            foreach($result AS $transaction){
+                $this->handleTransaction($transaction['transactionId']);
+            }
+        }
     }
 }
