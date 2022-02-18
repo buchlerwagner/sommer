@@ -19,7 +19,7 @@ abstract class uploader extends ancestor {
     abstract protected function doEdit(int $fileId, array $options): void;
 
     public function load($id): array{
-        $this->id = $id;
+        $this->id = (int) $id;
 
         $this->init();
         return $this->loadFiles();

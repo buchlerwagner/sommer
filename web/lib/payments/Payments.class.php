@@ -2,7 +2,6 @@
 class Payments extends ancestor {
     private $providerId;
     private $language;
-    private $cartKey = '';
 
     /**
      * @var PaymentProvider
@@ -75,11 +74,6 @@ class Payments extends ancestor {
                 $currency
             );
         }
-    }
-
-    public function checkPendingPayments()
-    {
-
     }
 
     public function checkTransaction(string $transactionId):Transaction

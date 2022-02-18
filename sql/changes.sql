@@ -6,7 +6,7 @@ ALTER TABLE `products` ADD COLUMN `prod_vat_deliver` DOUBLE NULL DEFAULT 18 AFTE
 ALTER TABLE `products` ADD COLUMN `prod_in_store_only` TINYINT(1) NULL DEFAULT 0 AFTER `prod_available`;
 
 ALTER TABLE `product_categories` ADD COLUMN `cat_takeover_days` VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `cat_date_end`;
-ALTER TABLE `product_categories` ADD COLUMN `cat_only_in_stores` TINYINT(1) NULL DEFAULT 0 AFTER `cat_takover_days`;
+ALTER TABLE `product_categories` ADD COLUMN `cat_only_in_stores` TINYINT(1) NULL DEFAULT 0 AFTER `cat_takeover_days`;
 ALTER TABLE `product_categories` ADD COLUMN `cat_express` TINYINT(1) NULL DEFAULT 0 AFTER `cat_only_in_stores`;
 
 ALTER TABLE `product_variants` ADD COLUMN `pv_vat_local` DOUBLE NULL DEFAULT 5 AFTER `pv_price_discount`;
@@ -79,6 +79,8 @@ INSERT INTO `access_functions` (`af_page`, `af_key`, `af_name`) VALUES
 INSERT INTO `templates` (`mt_id`, `mt_shop_id`, `mt_type`, `mt_key`, `mt_language`, `mt_subject`, `mt_body`, `mt_keywords`, `mt_description`, `mt_template`) VALUES
     (179,1,'MAIL','payment','hu','Online fizetés értesítő: {{ orderNumber }}','<div>Kedves <b>{{ firstName }}</b>!</div><div><br></div>Köszönjük megrendelését.<b><br></b><div><br></div><div>{{ order }}<br></div><div><br></div><div>Ąz alábbi linkre kattintva megtekintheti rendelését:<br></div><div><a href="{{ link }}" target="_blank">{{ link }}</a><br></div>','domain|firstName|lastName|email|link|order|orderNumber|transactionId|authCode|paymentStatus','Online fizetés értesítő',NULL);
 
+ALTER TABLE `gallery` ADD COLUMN `g_folder` INT(11) NULL DEFAULT 0 AFTER `g_main`;
+UPDATE gallery SET g_folder = 1;
 
 
 

@@ -29,10 +29,19 @@
                 </div>
             {% else %}
                 {% if isPending %}
-                    <div class="alert alert-warning">
-                        <div class="text-140">
+                    <div id="payment-checker" class="alert alert-warning" data-transactionid="{{ transactionId }}" data-interval="{{ refreshInterval }}">
+                        <div class="title text-140">
                             <i class="fad fa-spinner fa-spin"></i>
                             <b>{{ _('LBL_PAYMENT_IN_PROGRESS') }}</b>
+                        </div>
+                        <div class="payment-result mt-2 d-none">
+                            <div id="transaction-id">
+                                {{ _('LBL_TRANSACTION_ID') }}: <b></b>
+                            </div>
+                            <div id="auth-code" class="d-none">
+                                {{ _('LBL_AUTH_CODE') }}: <b></b>
+                            </div>
+                            <div id="message"></div>
                         </div>
                     </div>
                 {% else %}
@@ -72,7 +81,6 @@
             </div>
         {% endif %}
 
-
         {% if cart.items %}
             <div class="row mb-3">
                 <div class="col-12 col-lg-6 mb-3 mb-lg-0">
@@ -86,8 +94,8 @@
                     {{ _('LBL_PAID_STATUS') }}: <b class="text-info">{{ _('LBL_PAID') }}</b>
                     {% endif %}
                 </div>
-                {% if paymentEnabled %}
-                <div class="col-12 col-lg-6 totals-table">
+                {% if paymentEnabled or isPending %}
+                <div id="show-pay-button" class="col-12 col-lg-6 totals-table{% if isPending %} d-none{% endif %}">
                     {{ cart.getSelectedPaymentMode.text|nl2br }}
                     <div class="mt-3 text-center">
                         <a href="./?pay=1" class="theme-btn proceed-btn">{{ _('BTN_PAY') }}</a>

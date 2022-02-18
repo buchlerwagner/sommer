@@ -23,10 +23,13 @@ if(!$key){
         $this->data['isPending'] = false;
         $this->data['transactionHistory'] = $this->cart->getTransactionHistory();
 
-        if($this->data['transactionHistory']) {
+        if($this->data['transactionHistory'][0]) {
             if($this->data['transactionHistory'][0]['status'] === enumPaymentStatus::Pending()->getValue()) {
                 $this->data['isPending'] = true;
-                $this->view->addHeader(' <meta http-equiv="refresh" content="10; URL=' . $this->domain . 'check-payment/?trid=' . $this->data['transactionHistory'][0]['transactionId'] . '">');
+                $this->data['refreshInterval'] = 10;
+                $this->data['transactionId'] = $this->data['transactionHistory'][0]['transactionId'];
+
+                //$this->view->addHeader(' <meta http-equiv="refresh" content="' . $this->data['refreshInterval'] . '; URL=' . $this->domain . 'check-payment/?trid=' . $this->data['transactionHistory'][0]['transactionId'] . '">');
             }
         }
 

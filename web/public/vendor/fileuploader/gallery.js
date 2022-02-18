@@ -6,6 +6,8 @@
  * License: https://innostudio.de/fileuploader/documentation/#license
  */
 $(document).ready(function() {
+    var folder = $('input.gallery_media').data('folder');
+
     var $fileuploader = $('input.gallery_media').fileuploader({
         limit: 500,
         fileMaxSize: 5,
@@ -108,7 +110,7 @@ $(document).ready(function() {
         },
         upload: {
             //url: '/ajax/gallery/?type=upload',
-            url: '/ajax/uploader/gallery/0/upload/',
+            url: '/ajax/uploader/gallery/' + folder + '/upload/',
             data: null,
             type: 'POST',
             enctype: 'multipart/form-data',
@@ -224,7 +226,7 @@ $(document).ready(function() {
                     item.html.find('.fileuploader-action-popup').hide();
 
                     //$.post('/ajax/gallery/?type=resize', {name: item.name, id: item.data.listProps.id, _editor: JSON.stringify(item.editor)}, function() {
-                    $.post('/ajax/uploader/gallery/0/edit/', {name: item.name, id: item.data.listProps.id, _editor: JSON.stringify(item.editor)}, function() {
+                    $.post('/ajax/uploader/gallery/' + folder + '/edit/', {name: item.name, id: item.data.listProps.id, _editor: JSON.stringify(item.editor)}, function() {
                         // update the image
                         item.reader.read(function() {
                             delete item.imU;
@@ -256,7 +258,7 @@ $(document).ready(function() {
 
                 // send request
                 //$.post('/ajax/gallery/?type=sort', {
-                $.post('/ajax/uploader/gallery/0/sort/', {
+                $.post('/ajax/uploader/gallery/' + folder + '/sort/', {
                     list: JSON.stringify(list)
                 });
             }
@@ -291,7 +293,7 @@ $(document).ready(function() {
 
                     if (x && item.data.listProps) {
                         //$.post('/ajax/gallery/?type=rename', {name: item.name, id: item.data.listProps.id, title: x}, function(result) {
-                        $.post('/ajax/uploader/gallery/0/rename/', {name: item.name, id: item.data.listProps.id, title: x}, function(result) {
+                        $.post('/ajax/uploader/gallery/' + folder + '/rename/', {name: item.name, id: item.data.listProps.id, title: x}, function(result) {
                             if(typeof result != 'object') {
                                 try {
                                     result = JSON.parse(result);
@@ -324,7 +326,7 @@ $(document).ready(function() {
                 // set main
                 if ($target.is('.gallery-action-asmain') && item.data.listProps) {
                     //$.post('/ajax/gallery/?type=asmain', {name: item.name, id: item.data.listProps.id}, function(result) {
-                    $.post('/ajax/uploader/gallery/0/mark/', {name: item.name, id: item.data.listProps.id}, function(result) {
+                    $.post('/ajax/uploader/gallery/' + folder + '/mark/', {name: item.name, id: item.data.listProps.id}, function(result) {
                         if(typeof result != 'object') {
                             try {
                                 result = JSON.parse(result);
@@ -349,7 +351,7 @@ $(document).ready(function() {
             // send request
             if (item.data.listProps)
                 //$.post('/ajax/gallery/?type=remove', {
-                $.post('/ajax/uploader/gallery/0/delete/', {
+                $.post('/ajax/uploader/gallery/' + folder + '/delete/', {
                     name: item.name,
                     id: item.data.listProps.id
                 });
@@ -369,7 +371,7 @@ $(document).ready(function() {
 
     // preload the files
     //$.post('/ajax/gallery/?type=preload', null, function(result) {
-    $.post('/ajax/uploader/gallery/0/load/', null, function(result) {
+    $.post('/ajax/uploader/gallery/' + folder + '/load/', null, function(result) {
         var api = $.fileuploader.getInstance($fileuploader),
             preload = [];
 

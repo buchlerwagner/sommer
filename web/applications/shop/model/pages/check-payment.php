@@ -17,25 +17,12 @@ if(!Empty($_GET['txid'])){
 
 if($transactionId) {
     /**
-     * @var $payment Payments
+     * @var $paymentHandler PaymentChecker
      */
-    $payment = $this->addByClassName('Payments');
-
-    $transaction = $payment->checkTransaction($transactionId);
+    $paymentHandler = $this->addByClassName('PaymentChecker');
+    $transaction = $paymentHandler->handleTransaction($transactionId);
 
     if($transaction->cartKey){
-        if($transaction->getStatus() !== enumPaymentStatus::Pending()->getValue()){
-            $this->cart->init($transaction->cartKey, false);
-
-            if($transaction->getStatus() === enumPaymentStatus::OK()->getValue()) {
-                $this->cart->setPaid();
-            }
-
-            if($transaction->getStatus() !== enumPaymentStatus::Pending()->getValue()){
-                $this->cart->sendPaymentConfirmationEmail($transaction);
-            }
-        }
-
         $this->pageRedirect($this->getPageName('finish') . $transaction->cartKey . '/');
     }
 }

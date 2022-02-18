@@ -37,7 +37,8 @@ class galleryFileUploader extends uploader {
                                 'MAX(g_index) AS idx'
                             ],
                             [
-                                'g_shop_id' => $this->owner->shopId
+                                'g_shop_id' => $this->owner->shopId,
+                                'g_folder' => $this->id
                             ]
                         )
                     );
@@ -50,6 +51,7 @@ class galleryFileUploader extends uploader {
                             'gallery',
                             [
                                 'g_shop_id' => $this->owner->shopId,
+                                'g_folder' => $this->id,
                                 'g_title' => '',
                                 'g_file' => FOLDER_UPLOAD . $this->owner->shopId . '/gallery/' . $item['name'],
                                 'g_type' => $item['type'],
@@ -70,6 +72,7 @@ class galleryFileUploader extends uploader {
                             ],
                             [
                                 'g_id' => $fileId,
+                                'g_folder' => $this->id,
                                 'g_shop_id' => $this->owner->shopId,
                             ]
                         )
@@ -120,6 +123,7 @@ class galleryFileUploader extends uploader {
                 ],
                 [
                     'g_id' => $fileId,
+                    'g_folder' => $this->id,
                     'g_shop_id' => $this->owner->shopId
                 ]
             )
@@ -146,6 +150,7 @@ class galleryFileUploader extends uploader {
                     'gallery',
                     [
                         'g_id' => $fileId,
+                        'g_folder' => $this->id,
                         'g_shop_id' => $this->owner->shopId
                     ]
                 )
@@ -169,6 +174,7 @@ class galleryFileUploader extends uploader {
                     ],
                     [
                         'g_id' => $val['id'],
+                        'g_folder' => $this->id,
                         'g_shop_id' => $this->owner->shopId
                     ]
                 )
@@ -197,6 +203,7 @@ class galleryFileUploader extends uploader {
                 ],
                 [
                     'g_id' => $fileId,
+                    'g_folder' => $this->id,
                     'g_shop_id' => $this->owner->shopId
                 ]
             )
@@ -254,7 +261,8 @@ class galleryFileUploader extends uploader {
                 'gallery',
                 [],
                 [
-                    'g_shop_id' => $this->owner->shopId
+                    'g_shop_id' => $this->owner->shopId,
+                    'g_folder' => $this->id,
                 ],
                 [],
                 false,
@@ -294,6 +302,7 @@ class galleryFileUploader extends uploader {
                 ],
                 [
                     'g_id' => $fileId,
+                    'g_folder' => $this->id,
                     'g_shop_id' => $this->owner->shopId
                 ]
             )
@@ -316,6 +325,7 @@ class galleryFileUploader extends uploader {
                 ],
                 [
                     'g_id' => $fileId,
+                    'g_folder' => $this->id,
                     'g_shop_id' => $this->owner->shopId
                 ]
             )
@@ -352,6 +362,7 @@ class galleryFileUploader extends uploader {
                         ],
                         [
                             'g_id' => $fileId,
+                            'g_folder' => $this->id,
                             'g_shop_id' => $this->owner->shopId
                         ]
                     )

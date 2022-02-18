@@ -108,7 +108,7 @@ class setOrderStatusForm extends formBuilder {
         $this->sendNotification();
 
         $this->returnData['frm']['functions']['callback'] = 'pageRedirect';
-        $this->returnData['frm']['functions']['arguments'] = 'orders/view|orders/' . $this->keyFields['cart_id'] . '/';
+        $this->returnData['frm']['functions']['arguments'] = '/orders/view|orders/' . $this->keyFields['cart_id'] . '/';
     }
 
     private function sendNotification(){

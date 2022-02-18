@@ -1010,7 +1010,7 @@ class functions extends ancestor {
         return $sliders;
     }
 
-    public function getGallery(){
+    public function getGallery(int $folder){
         $gallery = $this->owner->mem->get(CACHE_GALLERY . $this->owner->shopId);
         if(!$gallery) {
             $gallery = [];
@@ -1025,7 +1025,8 @@ class functions extends ancestor {
                     ],
                     [
                         'g_shop_id' => $this->owner->shopId,
-                        'g_main' => 1
+                        'g_main' => 1,
+                        'g_folder' => $folder,
                     ],
                     [],
                     false,

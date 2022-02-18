@@ -4,6 +4,7 @@ var mzOptions = {
 
 var shoppingCart = {
     inProgress: false,
+    intervalId: null,
 
     sendData: function(action, data){
         if(!shoppingCart.inProgress) {
@@ -73,6 +74,65 @@ var shoppingCart = {
 
     filterProducts: function (){
         $('#product-filter').submit();
+    },
+
+    initPaymentCheck: function (){
+        var transactionId = $('#payment-checker').data('transactionid');
+        var interval = parseInt($('#payment-checker').data('interval')) * 1000 || 10000;
+
+        if(shoppingCart.intervalId){
+            shoppingCart.clearPaymentChecker();
+        }
+
+        if($('#payment-checker').length && transactionId != ''){
+            shoppingCart.intervalId = setInterval(shoppingCart.checkPayment, interval, transactionId);
+        }
+    },
+
+    checkPayment: function (transactionId){
+        console.log('checking: ' + transactionId);
+
+        $.ajax({
+            url: '/ajax/check-payment/' + transactionId + '/',
+            type: 'get',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (data) {
+                if(typeof data !== 'object'){
+                    data = JSON.parse(data);
+                }
+                if(!data.pending){
+                    shoppingCart.clearPaymentChecker();
+                    $('#payment-checker').removeClass('alert-warning');
+                    $('#payment-checker i').removeClass();
+                    $('#payment-checker .title b').html(data.title);
+                    $('#transaction-id b').html(data.transactionId);
+
+                    if(data.success){
+                        $('#payment-checker').addClass('alert-success');
+                        $('#payment-checker i').addClass('fas fa-check');
+                        $('#show-pay-button').remove();
+
+                        if(data.authCode){
+                            $('#auth-code b').html(data.authCode);
+                            $('#auth-code').removeClass('d-none').show();
+                        }
+                    }else{
+                        $('#payment-checker').addClass('alert-danger');
+                        $('#payment-checker i').addClass('fas fa-times');
+                        $('#message').html(data.message);
+                        $('#show-pay-button').removeClass('d-none').show();
+                    }
+
+                    $('.payment-result').removeClass('d-none').show();
+                }
+            },
+        });
+    },
+
+    clearPaymentChecker: function(){
+        clearInterval(shoppingCart.intervalId);
+        shoppingCart.intervalId = null;
     },
 
     initControls: function () {
@@ -509,6 +569,7 @@ var shoppingCart = {
 
     init: function () {
         shoppingCart.initControls();
+        shoppingCart.initPaymentCheck();
     }
 };
 

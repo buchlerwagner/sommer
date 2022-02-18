@@ -431,11 +431,14 @@ class cart extends ancestor {
         $mailData = $this->getTemplateData();
 
         $mailData['showPaymentInfo'] = true;
+        $mailData['transaction'] = $transaction;
+
+        /*
         $mailData['paymentStatus'] = $transaction->getStatus();
         $mailData['transactionId'] = $transaction->transactionId;
         $mailData['authCode'] = $transaction->authCode;
         $mailData['resultMessage'] = $transaction->message;
-
+        */
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
             $mailData,

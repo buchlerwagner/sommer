@@ -15,6 +15,6 @@ $this->data['highlightedItems'] = $shop->getHighlightedProducts(false, [], 12);
 //$this->data['popularItems'] = $shop->getPopularItems();
 
 $this->data['sections'] = $this->lib->getWidgetContents('home');
-$this->data['gallery'] = $this->lib->getGallery();
+$this->data['gallery'] = $this->lib->getGallery(1);
 
 //dd($this->data['gallery']);
