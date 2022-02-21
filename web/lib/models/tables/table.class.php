@@ -125,14 +125,6 @@ class table extends model {
             'backurl' => ''
         ];
 
-		if (empty($this->settings['rights']) && $this->owner->user->isLoggedIn()) {
-			$page = $this->owner->page;
-			if ($this->owner->originalPage) $page = $this->owner->originalPage;
-			if ($page != 'ajax') {
-				$this->settings['rights'] = $page;
-			}
-		}
-
 		$this->settings = [
 			'page'          => 1,
 			'display'       => 10,
@@ -143,12 +135,23 @@ class table extends model {
 			'filters'       => [],
 			'staticfilters' => [],
 			'foreignkeys'   => [],
-			'rights'        => ((!empty($this->owner->originalPage)) ? $this->owner->originalPage : $this->owner->page),
 		];
 
-		$this->setup();
+        if ($this->owner->page != 'ajax') {
+            $this->settings['rights'] = ((!empty($this->owner->originalPage)) ? $this->owner->originalPage : $this->owner->page);
+        }
 
-		$savedSettings = $this->getSession('table_settings_' . $this->name);
+        if (empty($this->settings['rights']) && $this->owner->user->isLoggedIn()) {
+            if ($this->owner->originalPage) $page = $this->owner->originalPage;
+            if ($page != 'ajax') {
+                $this->settings['rights'] = $page;
+            }
+        }
+
+        $this->selection = $this->owner->getSession($this->name . '-selections');
+        $this->setup();
+
+        $savedSettings = $this->getSession('table_settings_' . $this->name);
 		if (!empty($savedSettings)) {
 			$this->settings = $savedSettings;
 		}
@@ -337,7 +340,9 @@ class table extends model {
 	}
 
 	public function __destruct() {
-		$this->setSession('table_settings_' . $this->name, $this->settings);
+        if(!Empty($this->settings)) {
+            $this->setSession('table_settings_' . $this->name, $this->settings);
+        }
 	}
 
 	public function reset() {
@@ -830,7 +835,7 @@ class table extends model {
 		}
 
 		$this->buttons[$index] = [
-			'id' => 'btnNew' . $this->name,
+			'id' => ($params['id'] ?: 'btnNew' . $this->name),
 			'type' => 'href',
 			'icon' => ($params['icon'] ?: 'plus-circle'),
 			'class' => ($params['class'] ?: 'outline-primary'),

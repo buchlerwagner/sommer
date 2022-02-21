@@ -2,7 +2,7 @@
 <div id="{{ element.getId }}-formgroup" class="form-group{{ element.getGroupClasses }}{% if element.hasError %} has-error{% endif %}">
     {% set inputName = formName ~ '[' ~ element.getName ~ ']' %}
     <div class="checkbox{% if element.getColor %} checkbox-slider-{{ element.getColor }}{% endif %} checkbox-slider--b-flat">
-        <label>
+        <label class="position-relative">
             <input id="{{ element.getId }}" name="{{ inputName }}" type="checkbox" value="{{ element.getValueOn }}"{% if element.isDisabled %} disabled="disabled"{% endif %}{% if element.getValueOn == value %} checked="checked"{% endif %} class="{{ element.getClass }}"{{ self.attributes(element.getAttributes) }} />
             <span class="ml-2">{% if element.getLabel %}{{ self.label(element, false) }}{% endif %}</span>
         </label>

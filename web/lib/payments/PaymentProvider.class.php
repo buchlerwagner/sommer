@@ -29,6 +29,8 @@ abstract class PaymentProvider extends ancestor {
 
     protected abstract function refund(float $amount):enumPaymentStatus;
 
+    public abstract static function isAvailable():bool;
+
     public function __construct(PaymentProviderSettings $settings, $language)
     {
         $this->settings = $settings;

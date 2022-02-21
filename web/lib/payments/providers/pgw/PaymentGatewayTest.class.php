@@ -2,6 +2,10 @@
 
 class PaymentGatewayTest extends PaymentProvider {
 
+    public static function isAvailable(): bool {
+        return (SERVER_ID == 'development');
+    }
+
     protected function pay():void
     {
         $data = [
@@ -85,4 +89,5 @@ class PaymentGatewayTest extends PaymentProvider {
     {
         return enumPaymentStatus::Failed();
     }
+
 }

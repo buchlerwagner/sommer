@@ -35,9 +35,9 @@ class productsTable extends table {
 		$this->settings['orderdir']   = 'asc';
 
         $this->addColumns(
-            (new column('prod_visible', 'LBL_VISIBLE', 1, enumTableColTypes::Checkbox()))
+            (new column('prod_visible', 'LBL_VISIBLE', false, enumTableColTypes::CheckboxSlider()))
                 ->addClass('text-center'),
-            (new column('prod_available', 'LBL_AVAILABLE', 1, enumTableColTypes::Checkbox()))
+            (new column('prod_available', 'LBL_AVAILABLE', false, enumTableColTypes::CheckboxSlider()))
                 ->addClass('text-center'),
             (new column('prod_name', 'LBL_PRODUCT_TITLE', 8))
             //(new columnHidden('prod_cat_id'))
@@ -51,6 +51,21 @@ class productsTable extends table {
                 'form' => 'addProduct'
             ]
         );
+
+        /*
+        $this->multipleSelect = true;
+        $this->addButton(
+            'BTN_EDIT_SELECTED',
+            true,
+            [
+                'id' => 'bulk-edit',
+                'icon' => 'fas fa-check',
+                'class' => 'primary btn-table-bulk-edit float-left mr-3' . (Empty($this->selection) ? ' disabled' : ''),
+                'form' => 'bulkEditProducts',
+                'size' => 'lg',
+            ]
+        );
+        */
 	}
 
     public function loadRows() {

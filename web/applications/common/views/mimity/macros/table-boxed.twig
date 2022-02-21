@@ -27,8 +27,25 @@
                     {% set colspan = 0 %}
                     {% if table.multipleSelect %}
                         {% set colspan = colspan + 1 %}
-                        {% set params = {'id' : table.name ~ '_a--', 'name' : '', 'class': 'table-row-selector-all'} %}
-                        <th><span class="d-none d-sm-block">{{ form_elements._checkbox(params, 'all', false) }}</span></th>
+                        <th class="d-none d-sm-table-cell">
+                            <div class="btn-group">
+                                <div class="btn btn-xs btn-outline-primary">
+                                    <div class="custom-control custom-checkbox custom-checkbox-primary">
+                                        <input id="select-all-row" type="checkbox" value="all" class="custom-control-input table-row-selector-all" data-parsley-ui-enabled="false">
+                                        <label for="select-all-row" class="custom-control-label"></label>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-xs btn-outline-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a href="javascript:;" class="dropdown-item disabled">{{ _('LBL_SELECTED') }}: <span class="table-row-selector-counter">0</span></a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="javascript:;" class="dropdown-item table-row-selector-menu-all">{{ _('LBL_SELECT_ALL') }}</a>
+                                    <a href="javascript:;" class="dropdown-item table-row-selector-menu-none">{{ _('LBL_UNSELECT_ALL') }}</a>
+                                </div>
+                            </div>
+                        </th>
                     {% endif %}
                     {% if table.showRowIndex %}
                         {% set colspan = colspan + 1 %}
@@ -38,7 +55,7 @@
                         {% apply spaceless %}
                         {% if col.type != 'hidden' and (col.caption is not empty or col.rawcaption is not empty) %}
                             {% set colspan = colspan + 1 %}
-                            <th{% if col.colspan is not empty %} colspan="{{ col.colspan }}"{% endif %} class="{% if col.width %}col-{{ col.width }}{% endif %}{% if col.headerClass is not empty %} {{ col.headerClass }}{% endif %} text-primary">
+                            <th{% if col.colspan is not empty %} colspan="{{ col.colspan }}"{% endif %} class="{% if col.width %}col-{{ col.width }}{% else %}col{% endif %}{% if col.headerClass is not empty %} {{ col.headerClass }}{% endif %} text-primary">
                                 {% if col.icon is not empty %}<i class="fa fa-fw fa-{{ col.icon }} text-muted"></i> {% endif %}
                                 {{ _(col.caption)|capitalize|nl2br }}
                             </th>

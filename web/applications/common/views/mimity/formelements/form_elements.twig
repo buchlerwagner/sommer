@@ -1119,7 +1119,7 @@
 
 {% macro _checkboxslider(params, value = "", checked = false, constraints = "") %}
 	<div class="checkbox{% if params.color %} checkbox-slider-{{ params.color }}{% endif %} checkbox-slider--b-flat{% if params.outerclass %} {{ params.outerclass }}{% endif %}">
-		<label>
+		<label class="position-relative">
 			<input id="{{ params.id }}"{% if params.class %} class="{{ params.class }}"{% endif %} type="checkbox" {% if params.disabled %} disabled="disabled"{% endif %}{% if checked == value %} checked="checked" {% endif %}{% if params.name != '' %} name="{{ params.name }}"{% endif %} value="{{ value }}"{{ constraints|raw }} {% if params.data %}{% for key, val in params.data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}{% if params.altlabel %} data-altlabel="{{ _(params.altlabel) }}"{% endif %} data-parsley-ui-enabled="false" />
 			<span class="ml-2">{% if params.caption != '' %}{{ _(params.caption) }}{% endif %}</span>
 		</label>

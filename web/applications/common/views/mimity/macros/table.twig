@@ -19,7 +19,7 @@
                 {% set colspan = colspan + 1 %}
                 <th>
                     {% set params = {'id' : table.name ~ '_a--', 'name' : '', 'class': 'table-row-selector-all'} %}
-                    <span class="d-none d-sm-block">{{ form_elements._checkbox(params, 'all', false) }}</span>
+                    <span class="d-none d-sm-table-cell">{{ form_elements._checkbox(params, 'all', false) }}</span>
                 </th>
             {% endif %}
             {% if table.showRowIndex %}

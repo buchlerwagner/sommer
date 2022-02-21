@@ -2814,7 +2814,7 @@ function resetInfiniteScroll(id, pagenum) {
         }
 
         $.ajax({
-            method: "GET",
+            method: "POST",
             url: '/ajax/tables/' + url,
             data: {
                 alias: alias,
@@ -2880,6 +2880,25 @@ function resetInfiniteScroll(id, pagenum) {
         tables.reload(params[0], params[1], params[2]);
     },
 
+    selectRow: function(table, keyValues){
+        var ids = {};
+        var checked = 0;
+        var id = 0;
+
+        $('#table_' + table).find('.table-row-selector').each(function(index, obj){
+            id = parseInt($(obj).val());
+            if($(obj).is(':checked')){
+                checked = 1;
+            }else{
+                checked = 0;
+            }
+
+            ids[id] = checked;
+        });
+
+        tables.sendRequest(table, keyValues, 'select-row', {ids: ids});
+    },
+
     reload: function(table, keyValues, closeModal){
         closeModal = typeof closeModal !== 'undefined' ? closeModal : true;
 
@@ -2940,6 +2959,50 @@ function resetInfiniteScroll(id, pagenum) {
             tables.checkBox($this.data('table'), $this.data('keyvalue'), $this.data('field'), checked, $this.data('method'));
         });
 
+        $(document).on('click', '.table-row-selector', function () {
+            var $this = $(this);
+            var name = $this.parents('table').data('table');
+            var keyValues = $this.parents('table').data('foreignkey');
+            var checked = $this.is(':checked');
+
+            if(checked) {
+                $this.parents('tr').addClass('tr-selected');
+            }else{
+                $this.parents('tr').removeClass('tr-selected');
+            }
+
+            tables.selectRow(name, keyValues);
+        });
+
+        $(document).on('click', '.table-row-selector-all', function (e) {
+            var $this = $(this);
+            var name = $this.parents('table').data('table');
+            var keyValues = $this.parents('table').data('foreignkey');
+            var checked = $this.is(':checked');
+
+            if(checked) {
+                $this.parents('table').find('.table-row-selector').prop('checked', checked).parents('tr').addClass('tr-selected');
+            }else{
+                $this.parents('table').find('.table-row-selector').prop('checked', checked).parents('tr').removeClass('tr-selected');
+            }
+
+            tables.selectRow(name, keyValues);
+        });
+
+        $(document).on('click', '.table-row-selector-menu-all', function (e) {
+            $('.table-row-selector-all').trigger('click');
+        });
+
+        $(document).on('click', '.table-row-selector-menu-none', function (e) {
+            var $this = $(this);
+            var name = $this.parents('table').data('table');
+            var keyValues = $this.parents('table').data('foreignkey');
+            $this.parents('table').find('.table-row-selector').prop('checked', false).parents('tr').removeClass('tr-selected');
+            $('.table-row-selector-all').prop('checked', false);
+
+            tables.sendRequest(name, keyValues, 'unselect-row');
+        });
+
     },
 
     reInit: function(){
@@ -2958,6 +3021,12 @@ function resetInfiniteScroll(id, pagenum) {
                 });
             }
         }).disableSelection();
+
+        if ($('.table-row-selector:checked').length === $('.table-row-selector').length) {
+            $('.table-row-selector-all').prop('checked', true);
+        }else{
+            $('.table-row-selector-all').prop('checked', false);
+        }
     },
 
     init: function(){

@@ -125,7 +125,6 @@
 		{% set val = val|split('|') %}
 		{% for opt in val %}{% if opt is not empty %}{{ column.options[opt] }}, {% endif %}{% endfor %}
 	{% elseif column.type == 'checkbox' or column.type == 'radio' %}
-		<div class="text-center">
 		{% if readonly %}
 			{% if val %}
 				<i class="fas fa-check text-success"></i>
@@ -147,9 +146,7 @@
             %}
 			{{ form_elements._checkbox(params, 1, val) }}
 		{% endif %}
-		</div>
     {% elseif column.type == 'checkboxslider' %}
-		<div class="text-center">
 		{% if readonly %}
 			{% if val %}
                 <i class="fas fa-check text-success"></i>
@@ -172,7 +169,6 @@
             %}
             {{ form_elements._checkboxslider(params, 1, val) }}
 		{% endif %}
-		</div>
     {% elseif column.type == 'yesno' %}
         {% if val %}
             <i class="fas fa-check text-success"></i>

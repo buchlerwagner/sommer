@@ -30,7 +30,7 @@ $this->output = OUTPUT_JSON;
 $data = [];
 
 if (!empty($table)) {
-	$refreshBody = false;
+    $refreshBody = false;
 	$refreshPager = true;
 	$refreshTotals = false;
 	$refreshCounter = false;
@@ -106,6 +106,65 @@ if (!empty($table)) {
             case 'sort':
                 $refreshPager  = false;
                 $table->init('sort', $keyValues, $params);
+                break;
+
+            case 'select-row':
+                $refreshPager = false;
+                $list = $this->getSession($tableName . '-selections');
+                if(!$list) $list = [];
+
+                if(!Empty($params['ids']) && is_array($params['ids'])){
+                    foreach($params['ids'] AS $id => $val){
+                        if(!in_array($id, $list) && $val){
+                            $list[] = $id;
+                        }elseif(in_array($id, $list) && !$val){
+                            unset($list[array_search($id, $list)]);
+                        }
+                    }
+                }
+
+                $this->setSession($tableName . '-selections', $list);
+
+                if(!Empty($list)) {
+                    $data = [
+                        'fields' => [
+                            '.btn-table-bulk-edit' => [
+                                'removeclass' => 'disabled',
+                            ],
+                            '.table-row-selector-counter' => [
+                                'html' => count($list)
+                            ]
+                        ],
+                        'data' => $list,
+                    ];
+                }else{
+                    $data = [
+                        'fields' => [
+                            '.btn-table-bulk-edit' => [
+                                'addclass' => 'disabled',
+                            ],
+                            '.table-row-selector-counter' => [
+                                'html' => 0
+                            ]
+                        ],
+                    ];
+                }
+                break;
+
+            case 'unselect-row':
+                $refreshPager = false;
+                $this->setSession($tableName . '-selections', []);
+
+                $data = [
+                    'fields' => [
+                        '.btn-table-bulk-edit' => [
+                            'addclass' => 'disabled',
+                        ],
+                        '.table-row-selector-counter' => [
+                            'html' => 0
+                        ]
+                    ],
+                ];
                 break;
 
 			default:

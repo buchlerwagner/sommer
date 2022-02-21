@@ -41,7 +41,11 @@ class filterForm extends formBuilder {
 			$this->saveFilterPreset(null, 'default');
 		}
 
-		$this->owner->pageRedirect('./');
+        if($this->parentTable){
+            $this->delSession($this->parentTable . '-selections');
+        }
+
+        $this->owner->pageRedirect('./');
 	}
 
 	public function reset() {
@@ -55,9 +59,11 @@ class filterForm extends formBuilder {
 
 		if($this->parentTable){
 			$this->delSession('table_settings_' . $this->parentTable);
+            $this->delSession($this->parentTable . '-selections');
 		}
 
-		$this->hasFilter = false;
+        $this->selection = [];
+        $this->hasFilter = false;
 		$this->owner->pageRedirect('./');
 	}
 

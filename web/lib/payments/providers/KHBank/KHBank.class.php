@@ -4,6 +4,10 @@ class KHBank extends PaymentProvider {
     const TYPE_PAYMENT = 'PU';
     const TYPE_REFUND  = 'RE';
 
+    public static function isAvailable(): bool {
+        return true;
+    }
+
     protected function pay():void
     {
         $data = [

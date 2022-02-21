@@ -17,8 +17,13 @@ class Payments extends ancestor {
         $files = new RegexIterator($flattened, '/(\.class)(\.php)$/');
 
         foreach($files as $file) {
+            /**
+             * @var $classname PaymentProvider
+             */
             $classname = substr(basename($file), 0, -10);
-            $result[ $classname ] = $classname;
+            if($classname::isAvailable()) {
+                $result[$classname] = $classname;
+            }
         }
 
         return $result;

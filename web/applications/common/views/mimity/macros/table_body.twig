@@ -1,5 +1,4 @@
 {% import "tools.twig" as tools %}
-{% import "form_elements.twig" as form_elements %}
 {% if not table.rowGroups %}
 <tbody class="mt-1{% if table.sortable %} table-sort{% endif %}">
 {% endif %}
@@ -33,13 +32,11 @@
         {% for groupKey, group in row.groups %}
             {% if groupId != groupKey and group.text %}
                 {% set groupId = groupKey %}
-                {% if table.sortable %}
-                    {% if bodyOpen %}
-                        </tbody>
-                    {% endif %}
-                    {% set bodyOpen = true %}
-                    <tbody class="mt-1 table-sort">
+                {% if bodyOpen %}
+                    </tbody>
                 {% endif %}
+                {% set bodyOpen = true %}
+                <tbody class="mt-1{% if table.sortable %} table-sort{% endif %}">
                 <tr class="group-level-{{ loop.index }} bg-gray-100 no-hover no-sort" data-groupid="{{ groupKey }}">
                     <td colspan="{{ row|length }}"><b class="text-primary">{{ _(group.text) }}</b>{% if group.description %} - {{ group.description }}{% endif %}</td>
                 </tr>
@@ -59,10 +56,12 @@
         {% set formName = table.formName %}
     {% endif %}
     <tr{% if table.sortable %} id="{{ rowID }}" data-table="{{ table.name}}" data-keyvalue="{{ keyvalue }}" data-groupid="{{ row.__groupId }}"{% endif %} class="d-flex{% if row.options.isDeleted %} bg-deleted{% else %} bg-h-yellow{% endif %} d-style{% if table.infoRowTemplate %} double-row-h{% endif %}{% if table.rowClick and ((table.edit or table.view) and row.options.edit) %} tr-clickable{% endif %}{% if row.options.class %} {{ row.options.class }}{% endif %}{% if selected %} tr-selected{% endif %}" data-id="{{ rowID }}"{% if (table.edit or table.view) and row.options.edit %}{% if table.customUrl %}data-url="{{ table.customUrl|replace({'%keyvalue%': keyvalue, '%id%': rowID }) }}"{% else %}{% if table.rowClick %}{% if table.subTable %} data-modal="true"{% if modalSize %} data-size="{{ modalSize }}"{% endif %} data-href="/ajax/forms/{{ formName }}/{{ keyvalue }}/{{ table.name }}/{% if table.readonly or table.defaultAction == 'view' %}?view=1{% endif %}" {% else %} data-edit="{{ table.baseURL }}{{ table.defaultAction }}|{{ table.name }}/{{ keyvalue }}/"{% endif %}{% endif %}{% endif %}{% if table.target %} data-target="{{ table.target }}"{% endif %}{% endif %}>
-    {% if table.multipleselect %}
-        <td class="text-center pr-0 pos-rel col-1">
-            {% set params = {'id' : table.name ~ '_' ~ rowID, 'name' : table.name ~ '[]', 'class': 'table-row-selector'} %}
-            {{ form_elements._checkbox(params, rowID, selected) }}
+    {% if table.multipleSelect %}
+        <td class="position-relative table-options d-none d-sm-table-cell">
+            <div class="custom-control custom-checkbox custom-checkbox-warning">
+                <input id="{{ table.name }}-{{ rowID }}" type="checkbox" name="{{ table.name }}[]" value="{{ rowID }}" class="custom-control-input table-row-selector"{% if selected %} checked{% endif %} data-parsley-ui-enabled="false">
+                <label for="{{ table.name }}-{{ rowID }}" class="custom-control-label"></label>
+            </div>
         </td>
         {% endif %}
     {% if table.showRowindex %}
@@ -74,7 +73,7 @@
         {% if c >= skipFields and key != 'options' and key != 'groups' and key != '__id'  and key != '__groupId' %}
             {% set column = table.columns[key] %}
             {% if column.type != 'hidden' %}
-                <td class="{% if column.width %}col-{{ column.width }}{% endif %}{% if column.class %} {{ column.class }}{% endif %}">{{ tools.table_cell(table.name, keyvalue, column, val, row, (table.readonly or row['options'].readonly))|raw }}</td>
+                <td class="{% if column.width %}col-{{ column.width }}{% else %}col{% endif %}{% if column.class %} {{ column.class }}{% endif %}">{{ tools.table_cell(table.name, keyvalue, column, val, row, (table.readonly or row['options'].readonly))|raw }}</td>
             {% endif %}
         {% endif %}
         {% set c = c + 1 %}
