@@ -395,6 +395,7 @@ class cart extends ancestor {
             'invoiceAddress' => $this->userData['invoiceAddress'],
             'remarks' => $this->remarks,
             'domain' => rtrim($this->owner->domain, '/'),
+            'shopId' => $this->owner->shopId
         ];
     }
 
