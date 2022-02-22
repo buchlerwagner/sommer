@@ -1,4 +1,12 @@
 # noinspection SqlNoDataSourceInspectionForFile
+-- 2022-02-21
+ALTER TABLE `cart` ADD COLUMN `cart_proforma_number` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_local_consumption`;
+ALTER TABLE `cart` ADD COLUMN `cart_invoice_number` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_proforma_number`;
+ALTER TABLE `cart` ADD COLUMN `cart_invoice_provider` INT(11) NULL DEFAULT 0 AFTER `cart_invoice_number`;
+
+
+
+
 -- 2022-02-02
 
 ALTER TABLE `products` ADD COLUMN `prod_vat_local` DOUBLE NULL DEFAULT 5 AFTER `prod_price_discount`;

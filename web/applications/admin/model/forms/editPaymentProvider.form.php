@@ -13,11 +13,8 @@ class editPaymentProviderForm extends formBuilder {
         $this->addControls(
             (new inputText('pp_name', 'LBL_NAME'))
                 ->setRequired(),
-            (new inputSelect('pp_provider', 'LBL_PAYMENT_PROVIDER'))
-                ->setOptions(Payments::getPaymentProviders())
-                ->setRequired(),
-
-            (new inputText('pp_name', 'LBL_NAME'))
+            (new inputSelect('pp_provider', 'LBL_PROVIDER'))
+                ->setOptions(Payments::getProviders())
                 ->setRequired(),
 
             (new groupRow('row1'))->addElements(

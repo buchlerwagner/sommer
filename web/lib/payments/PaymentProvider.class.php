@@ -31,6 +31,8 @@ abstract class PaymentProvider extends ancestor {
 
     public abstract static function isAvailable():bool;
 
+    public abstract static function getName():string;
+
     public function __construct(PaymentProviderSettings $settings, $language)
     {
         $this->settings = $settings;

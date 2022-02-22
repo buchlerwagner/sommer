@@ -171,6 +171,11 @@ $GLOBALS['MENU'] = [
                         'access'  => true,
                         'userGroups' => [USER_GROUP_ADMINISTRATORS]
                     ],
+                    'invoice-providers' => [
+                        'display' => 1,
+                        'access'  => true,
+                        'userGroups' => [USER_GROUP_ADMINISTRATORS]
+                    ],
 				]
 			],
 			'lists' => [

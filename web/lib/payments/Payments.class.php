@@ -8,7 +8,7 @@ class Payments extends ancestor {
      */
     private $provider = null;
 
-    public static function getPaymentProviders():array
+    public static function getProviders():array
     {
         $result = [];
 
@@ -22,7 +22,7 @@ class Payments extends ancestor {
              */
             $classname = substr(basename($file), 0, -10);
             if($classname::isAvailable()) {
-                $result[$classname] = $classname;
+                $result[$classname] = $classname::getName();
             }
         }
 

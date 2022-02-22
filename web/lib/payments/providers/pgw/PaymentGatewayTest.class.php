@@ -6,6 +6,10 @@ class PaymentGatewayTest extends PaymentProvider {
         return (SERVER_ID == 'development');
     }
 
+    public static function getName(): string {
+        return 'Payment Gateway Test';
+    }
+
     protected function pay():void
     {
         $data = [

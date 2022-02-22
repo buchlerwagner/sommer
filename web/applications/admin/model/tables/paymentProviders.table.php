@@ -22,7 +22,8 @@ class paymentProvidersTable extends table {
 
         $this->addColumns(
             (new column('pp_name', 'LBL_NAME', 4)),
-            (new column('pp_provider', 'LBL_PAYMENT_PROVIDER', 4)),
+            (new columnOptions('pp_provider', 'LBL_PROVIDER', 4))
+                ->setOptions(Payments::getProviders()),
             (new column('pp_currency', 'LBL_CURRENCY', 1))
                 ->addClass('text-center'),
             (new column('pp_live', 'LBL_PRODUCTION_MODE', 1, enumTableColTypes::YesNo()))

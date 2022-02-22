@@ -8,6 +8,10 @@ class KHBank extends PaymentProvider {
         return true;
     }
 
+    public static function getName(): string {
+        return 'K&H Bank Payment Gateway';
+    }
+
     protected function pay():void
     {
         $data = [
