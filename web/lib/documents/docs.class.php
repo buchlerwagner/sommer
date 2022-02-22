@@ -189,6 +189,8 @@ abstract class docs extends ancestor {
     }
 
     protected function renderContent(){
+        $this->setVar('shopId', $this->owner->shopId);
+
         if($this->template) {
             $this->setHtml($this->owner->view->renderContent($this->template, $this->data, false, false));
         }
