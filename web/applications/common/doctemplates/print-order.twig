@@ -16,7 +16,7 @@
     <tbody>
         <tr>
             <td style="padding-bottom: 20px;" valign="middle" align="center">
-                <img src="./uploads/{{ shopId }}/logo-mail.png" width="150" alt="">
+                <img src="{{ domain }}uploads/{{ shopId }}/logo-mail.png" width="150" alt="">
             </td>
         </tr>
     </tbody>
@@ -84,7 +84,7 @@
         {% for cid, item in items %}
             <tr>
                 <td width="2%" style="border-bottom:1px solid #EDECEC;">
-                    <img src="./{{ item.image }}" width="50" alt="{{ item.name }}">
+                    <img src="{{ domain }}{{ item.image }}" width="50" alt="{{ item.name }}">
                 </td>
                 <td width="58%" style="border-bottom:1px solid #EDECEC;">
                     <b>{{ item.name }}</b>
