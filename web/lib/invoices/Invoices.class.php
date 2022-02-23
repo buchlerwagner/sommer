@@ -18,23 +18,11 @@ class Invoices extends ancestor {
     private $buyer = null;
 
     /**
-     * @var InvoiceItem
+     * @var Cart
      */
-    private $items = [];
-
-    private $cartId;
-
-    private $orderNumber;
-
-    private $orderDate;
-
-    private $currency;
-
-    private $proformaNumber;
+    private $cart = null;
 
     private $invoiceNumber;
-
-    private $invoiceType;
 
     public static function getProviders():array
     {
@@ -57,10 +45,12 @@ class Invoices extends ancestor {
         return $result;
     }
 
-    public function init(int $cartId):self
+    public function init(?Cart $cart = null):self
     {
-        $this->cartId = $cartId;
-        $this->loadCart();
+        if($cart) {
+            $this->cart = $cart;
+            $this->providerId = $cart->getInvoiceProvider();
+        }
 
         if($this->settings = $this->loadSettings($this->providerId)){
             $this->provider = $this->owner->addByClassName($this->settings->className, false, [
@@ -71,12 +61,7 @@ class Invoices extends ancestor {
         return $this;
     }
 
-    public function createProforma($paymentMethod = PAYMENT_TYPE_CARD, $issueDate = false, $dueDate = false, $fulfillmentDate = false)
-    {
-
-    }
-
-    public function deleteProforma()
+    public function getTaxPayer($taxNumber)
     {
 
     }
@@ -132,80 +117,39 @@ class Invoices extends ancestor {
         return new InvoiceProviderSettings(($settings ?: []));
     }
 
-    private function loadCart():void
+    private function setBuyer():self
     {
-        if($this->cartId){
+        $this->buyer = new InvoiceBuyer();
+        /*
+        $buyer->setEmail($cart['us_email']);
 
-
-            $cart = $this->owner->db->getFirstRow(
-                $this->owner->db->genSQLSelect(
-                    'cart',
-                    [],
-                    [
-                        'cart_id' => $this->cartId
-                    ],
-                    [
-                        'users' => [
-                            'on' => [
-                                'us_id' => 'cart_us_id'
-                            ]
-                        ]
-                    ]
-                )
-            );
-            if ($cart) {
-                $this->providerId = (int) $cart['cart_invoice_provider'];
-                $this->orderNumber = $cart['cart_order_number'];
-                $this->invoiceType = $cart['cart_invoice_type'];
-                $this->proformaNumber = $cart['cart_proforma_number'];
-                $this->invoiceNumber = $cart['cart_invoice_number'];
-
-                if($cart['cart_us_id']) {
-                    $buyer = new InvoiceBuyer();
-                    $buyer->setId($cart['us_id']);
-                    $buyer->setEmail($cart['us_email']);
-
-                    if($cart['us_email']) {
-                        $buyer->setSendEmail(true);
-                    }else{
-                        $buyer->setSendEmail(false);
-                    }
-
-                    if($this->invoiceType){
-                        $buyer->setName($cart['us_invoice_name']);
-
-                        if($this->invoiceType == 2) {
-                            $buyer->setVatNumber($cart['us_vat']);
-                        }
-
-                        $buyer->setCountry($cart['us_invoice_country']);
-                        $buyer->setZipCode($cart['us_invoice_zip']);
-                        $buyer->setCity($cart['us_invoice_city']);
-                        $buyer->setAddress($cart['us_invoice_address']);
-                    }else {
-                        $buyer->setName($cart['us_lastname'] . ' ' . $cart['us_firstname']);
-                        $buyer->setCountry($cart['us_country']);
-                        $buyer->setZipCode($cart['us_zip']);
-                        $buyer->setCity($cart['us_city']);
-                        $buyer->setAddress($cart['us_address']);
-                    }
-
-                    if($cart['us_phone']){
-                        $buyer->setPhone($cart['us_phone']);
-                    }
-
-                    $this->setBuyer($buyer);
-                }
-
-                $this->getCartItems((bool) $cart['cart_local_consumption']);
-            }
+        if($cart['us_email']) {
+            $buyer->setSendEmail(true);
+        }else{
+            $buyer->setSendEmail(false);
         }
-    }
+
+            $buyer->setName($cart['us_invoice_name']);
+
+            $buyer->setVatNumber($cart['us_vat']);
+            $buyer->setCountry($cart['us_invoice_country']);
+            $buyer->setZipCode($cart['us_invoice_zip']);
+            $buyer->setCity($cart['us_invoice_city']);
+            $buyer->setAddress($cart['us_invoice_address']);
+
+            $buyer->setName($cart['us_lastname'] . ' ' . $cart['us_firstname']);
+            $buyer->setCountry($cart['us_country']);
+            $buyer->setZipCode($cart['us_zip']);
+            $buyer->setCity($cart['us_city']);
+            $buyer->setAddress($cart['us_address']);
 
 
-    private function setBuyer(InvoiceBuyer $buyer):self
-    {
+        if($cart['us_phone']){
+            $buyer->setPhone($cart['us_phone']);
+        }
+
         $this->buyer = $buyer;
+        */
         return $this;
     }
 

@@ -3,6 +3,14 @@
 {% if table.rows %}
     {% for item in table.rows %}
         <tr class="d-flex cart-item cart-item-{{ item.id }}">
+            <td class="col text-center">
+                <div class="checkbox checkbox-slider-warning checkbox-slider--b-flat">
+                    <label class="position-relative">
+                        <input id="item-local-consumption-{{ item.id }}" class="item-local-consumption" type="checkbox"{% if item.localConsumption %} checked="checked"{% endif %}{% if table.orderType == 0 %} disabled="disabled"{% endif %} name="item[{{ item.id }}]" data-id="{{ item.id }}" value="1" data-parsley-ui-enabled="false">
+                        <span class="ml-2"></span>
+                    </label>
+                </div>
+            </td>
             <td class="col-1 product-thumbnail"><a href="{{ item.url }}"><img src="{{ item.image }}" class="img-thumbnail img-fluid" alt="{{ item.name }}"></a></td>
             <td class="col-2 product-name">
                 {% if not table.isEmployee %}<a href="/webshop/products/edit|products/{{ item.productId }}/" target="_blank">{% endif %}

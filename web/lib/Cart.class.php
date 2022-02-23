@@ -9,6 +9,8 @@ class Cart {
 
     private $orderNumber;
 
+    private $currency = 0;
+
     private $total = 0;
 
     private $discount = 0;
@@ -27,6 +29,8 @@ class Cart {
 
     private $paymentMode = [];
 
+    private $invoiceProviderId = 0;
+
     private $items = [];
 
     public function __construct(int $id)
@@ -34,7 +38,7 @@ class Cart {
         $this->id = $id;
     }
 
-    public function setOrderStatus(string $status):self
+    public function setOrderStatus(?string $status):self
     {
         $this->orderStatus = $status;
         return $this;
@@ -45,7 +49,7 @@ class Cart {
         return $this->orderStatus;
     }
 
-    public function setOrderDate(string $date):self
+    public function setOrderDate(?string $date):self
     {
         $this->orderDate = $date;
         return $this;
@@ -56,7 +60,7 @@ class Cart {
         return $this->orderDate;
     }
 
-    public function setOrderNumber(string $orderNumber):self
+    public function setOrderNumber(?string $orderNumber):self
     {
         $this->orderNumber = $orderNumber;
         return $this;
@@ -65,6 +69,17 @@ class Cart {
     public function getOrderNumber():string
     {
         return $this->orderNumber;
+    }
+
+    public function setCurrency(string $currency):self
+    {
+        $this->currency = $currency;
+        return $this;
+    }
+
+    public function getCurrency():float
+    {
+        return $this->currency;
     }
 
     public function setTotal(float $total):self
@@ -114,7 +129,7 @@ class Cart {
     }
 
 
-    public function setShippingFee(float $fee):self
+    public function setShippingFee(?float $fee):self
     {
         $this->shippingFee = $fee;
 
@@ -137,7 +152,7 @@ class Cart {
         return $this->isPaid;
     }
 
-    public function setCustomer(array $customer):self
+    public function setCustomer(?array $customer):self
     {
         $this->customer = $customer;
         return $this;
@@ -148,7 +163,7 @@ class Cart {
         return $this->customer;
     }
 
-    public function setShippingMode(array $shippingMode):self
+    public function setShippingMode(?array $shippingMode):self
     {
         $this->shippingMode = $shippingMode;
         return $this;
@@ -159,7 +174,7 @@ class Cart {
         return $this->shippingMode;
     }
 
-    public function setPaymentMode(array $paymentMode):self
+    public function setPaymentMode(?array $paymentMode):self
     {
         $this->paymentMode = $paymentMode;
         return $this;
@@ -179,5 +194,16 @@ class Cart {
     public function getItems():array
     {
         return $this->items;
+    }
+
+    public function setInvoiceProvider(int $id):self
+    {
+        $this->invoiceProviderId = $id;
+        return $this;
+    }
+
+    public function getInvoiceProvider():int
+    {
+        return $this->invoiceProviderId;
     }
 }

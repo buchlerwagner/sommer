@@ -7,18 +7,10 @@
 <hr>
 
 <div class="list-with-gap mb-3">
-    {% if access[1] %}
     <a href="./?new=1" class="btn btn-light btn-app">
         <i class="fas fa-plus-circle text-primary"></i>
         {{ _('LBL_NEW_ORDER') }}
     </a>
-    {% endif %}
-    {% if access[2] %}
-    <a href="./?new=2" class="btn btn-light btn-app">
-        <i class="fas fa-phone-square-alt text-primary"></i>
-        {{ _('LBL_NEW_PHONE_ORDER') }}
-    </a>
-    {% endif %}
 </div>
 
 {{ tools.table(table) }}

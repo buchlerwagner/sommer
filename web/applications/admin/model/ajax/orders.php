@@ -106,6 +106,17 @@ switch ($action) {
         }
         break;
 
+    case 'setOrderType':
+        if($_REQUEST['cartKey']){
+            $id = (int) $_REQUEST['type'];
+            $this->cartHandler->init($_REQUEST['cartKey'], false);
+            $this->cartHandler->setOrderType($id);
+
+            $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
+            $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
+        }
+        break;
+
     case 'setPaymentMode':
         if($_REQUEST['id'] && $_REQUEST['cartKey']){
             $id = (int) $_REQUEST['id'];
@@ -130,12 +141,9 @@ switch ($action) {
         break;
 
     case 'setLocalConsumption':
-        if($_REQUEST['cartKey']){
+        if($_REQUEST['cartKey'] && $_REQUEST['itemId']){
             $this->cartHandler->init($_REQUEST['cartKey'], false);
-            $this->cartHandler->setLocalConsumption((int) $_REQUEST['localConsumption']);
-
-            $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
-            $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
+            $this->cartHandler->setItemLocalConsumption($_REQUEST['itemId'], (int) $_REQUEST['localConsumption']);
         }
         break;
 

@@ -117,7 +117,7 @@
                                 <b>{{ form.cart.storeName }}</b>
 
                                 <span class="text-primary">
-                                {% if form.cart.localConsumption %}
+                                {% if form.cart.orderType == 1 %}
                                     (<i class="fas fa-utensils-alt"></i>
                                     {{ _('LBL_LOCAL_CONSUMPTION') }})
                                 {% else %}

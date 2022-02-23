@@ -48,7 +48,7 @@ class CartHandler extends ancestor {
 	public $remarks;
 	public $orderType = 0;
 	public $invoiceType = 0;
-	public $localConsumption = false;
+	public $invoiceProviderId = 0;
 	public $shippingDate;
 	public $customInterval;
 	public $storeId;
@@ -69,7 +69,7 @@ class CartHandler extends ancestor {
 		return $this;
 	}
 
-    public function createNewOrder(int $type = ORDER_TYPE_STORE){
+    public function createNewOrder(int $orderType = ORDER_TYPE_LOCAL){
         $pmId = 0;
         $paymentModes = $this->getPaymentModes([PAYMENT_TYPE_CASH]);
         if($paymentModes){
@@ -88,8 +88,7 @@ class CartHandler extends ancestor {
                     'cart_store_id' => $this->owner->storeId,
                     'cart_us_id' => 0,
                     'cart_pm_id' => $pmId,
-                    'cart_order_type' => $type,
-                    'cart_local_consumption' => ($type == ORDER_TYPE_STORE ? 1 : 0),
+                    'cart_order_type' => $orderType,
                     'cart_created_by' => $this->owner->user->getUser()['id'],
                     'cart_created' => 'NOW()',
                     'cart_ordered' => 'NOW()',
@@ -208,6 +207,10 @@ class CartHandler extends ancestor {
 	}
 
     public function getCart():Cart{
+        if(!$this->id){
+            throw new Exception('Cart is not loaded!');
+        }
+
         $cart = new Cart($this->id);
 
         $cart->setOrderStatus($this->orderStatus)
@@ -218,6 +221,8 @@ class CartHandler extends ancestor {
              ->setShippingFee($this->shippingFee)
              ->setPaymentFee($this->paymentFee)
              ->setTotal($this->total)
+             ->setCurrency($this->currency)
+             ->setInvoiceProvider($this->invoiceProviderId)
              ->setPaid($this->isPaid());
 
         $cart->setCustomer( $this->userData );
@@ -227,7 +232,9 @@ class CartHandler extends ancestor {
         if($this->items){
             foreach($this->items AS $item){
                 $cartItem = new CartItem($item['id'], $item['productId'], $item['variantId']);
-
+                $cartItem->setName($item['name'], $item['variant']);
+                $cartItem->setPrice($item['price']['unitPrice'], $item['price']['currency'], $item['quantity']['amount'], $item['quantity']['unit']);
+                $cartItem->setVat($item['price']['vatKey'], $item['price']['vat']);
 
                 $cart->addItem($cartItem);
             }
@@ -243,6 +250,23 @@ class CartHandler extends ancestor {
 	public function getStatus(){
 		return $this->status;
 	}
+
+    public function setOrderType(int $type){
+        $this->orderType = $type;
+
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLUpdate(
+                'cart',
+                [
+                    'cart_order_type' => $this->orderType,
+                ],
+                [
+                    'cart_id' => $this->id,
+                    'cart_shop_id' => $this->owner->shopId,
+                ]
+            )
+        );
+    }
 
 	public function getOrderType(){
 		return $this->orderType;
@@ -262,10 +286,6 @@ class CartHandler extends ancestor {
         }else{
             return false;
         }
-    }
-
-    public function isLocalConsumption(){
-        return $this->localConsumption;
     }
 
     public function getShippingId(){
@@ -320,22 +340,29 @@ class CartHandler extends ancestor {
     }
 
 	public function makeOrder($userId, $invoiceType = 0, $remarks = ''){
-        $orderStatus = ($this->orderType == ORDER_TYPE_STORE ? self::ORDER_STATUS_FINISHED : self::ORDER_STATUS_NEW);
-        $isPaid = ($this->orderType == ORDER_TYPE_STORE ? 1 : 0);
+        $orderStatus = ($this->orderType !== ORDER_TYPE_ORDER ? self::ORDER_STATUS_FINISHED : self::ORDER_STATUS_NEW);
+        $isPaid = ($this->orderType !== ORDER_TYPE_ORDER ? 1 : 0);
+
+        $data = [
+            'cart_us_id' => (int) $userId,
+            'cart_order_number' => $this->generateOrderNumber(),
+            'cart_status' => self::CART_STATUS_ORDERED,
+            'cart_order_status' => $orderStatus,
+            'cart_ordered' => 'NOW()',
+            'cart_invoice_type' => (int) $invoiceType,
+            'cart_paid' => $isPaid,
+            'cart_remarks' => $remarks,
+        ];
+
+        if($this->orderType !== ORDER_TYPE_ORDER){
+            $data['cart_sm_id'] = 0;
+            $data['cart_si_id'] = 0;
+        }
 
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLUpdate(
 				'cart',
-				[
-					'cart_us_id' => (int) $userId,
-					'cart_order_number' => $this->generateOrderNumber(),
-					'cart_status' => self::CART_STATUS_ORDERED,
-					'cart_order_status' => $orderStatus,
-					'cart_ordered' => 'NOW()',
-					'cart_invoice_type' => (int) $invoiceType,
-					'cart_paid' => $isPaid,
-					'cart_remarks' => $remarks,
-				],
+				$data,
 				[
 					'cart_id' => $this->id,
 					'cart_shop_id' => $this->owner->shopId,
@@ -350,7 +377,7 @@ class CartHandler extends ancestor {
             }
         }
 
-        if($this->orderType != ORDER_TYPE_STORE) {
+        if($this->orderType == ORDER_TYPE_ORDER) {
             $this->sendConfirmationEmail();
         }
 
@@ -574,7 +601,7 @@ class CartHandler extends ancestor {
                 $this->customInterval = $cart['cart_custom_interval'];
                 $this->orderType = $cart['cart_order_type'];
                 $this->invoiceType = $cart['cart_invoice_type'];
-                $this->localConsumption = (bool) $cart['cart_local_consumption'];
+                $this->invoiceProviderId = $cart['cart_invoice_provider'];
                 $this->storeId = $cart['st_code'];
                 $this->storeName = $cart['st_name'];
 
@@ -659,6 +686,7 @@ class CartHandler extends ancestor {
                         }
 
                         $variant = $this->product->getVariant($row['citem_pv_id']);
+                        $itemLocalConsumption = (bool) $row['citem_local_consumption'];
 
                         $this->items[$row['citem_id']] = [
                             'id' => $row['citem_id'],
@@ -672,18 +700,20 @@ class CartHandler extends ancestor {
                             'url' => $row['citem_url'],
                             'minSale' => $this->product->getMinSale($row['citem_pv_id']),
                             'maxSale' => $this->product->getMaxSale($row['citem_pv_id']),
+                            'localConsumption' => $itemLocalConsumption,
                             'price' => [
                                 'value' => $row['citem_price'],
                                 'currency' => $row['citem_currency'],
                                 'discount' => $row['citem_discount'],
                                 'displayPrice' => $variant['price']['displayPrice'],
+                                'unitPrice' => $variant['price']['unitPrice'],
                                 'unit' => $variant['price']['unit'],
                                 'isWeightUnit' => $variant['price']['isWeightUnit'],
                                 'total' => ($price * $row['citem_quantity']),
-                                'vatKey' => ($this->localConsumption ? $variant['price']['vatLocal'] : $variant['price']['vatDeliver']),
-                                'vat' => ($this->localConsumption ? $variant['price']['vatLocal'] : $variant['price']['vatDeliver']) / 100,
+                                'vatKey' => ($itemLocalConsumption ? $variant['price']['vatLocal'] : $variant['price']['vatDeliver']),
+                                'vat' => ($itemLocalConsumption ? $variant['price']['vatLocal'] : $variant['price']['vatDeliver']) / 100,
                             ],
-                            'packaging' => $packaging,
+                            'packaging' => ($itemLocalConsumption ? [] : $packaging),
                             'quantity' => [
                                 'baseAmount' => $variant['packaging']['quantity'],
                                 'amount' => $row['citem_quantity'],
@@ -807,7 +837,7 @@ class CartHandler extends ancestor {
 			foreach($this->items AS $item){
                 $fee = 0;
 
-                if($item['packaging']['fee'] > 0 && !$this->localConsumption){
+                if($item['packaging']['fee']){
                     $fee = ($item['packaging']['fee'] * $item['quantity']['amount']);
                 }
 
@@ -1061,6 +1091,7 @@ class CartHandler extends ancestor {
                     'pm_vat AS vat',
                     'pm_text AS text',
                     'pm_default AS def',
+                    'pm_limit_max AS limitMax',
                     'pm_logo AS logo',
                 ],
                 [
@@ -1077,10 +1108,12 @@ class CartHandler extends ancestor {
         );
         if ($result) {
             foreach($result AS $row){
-                $out[$row['id']] = $row;
+                if($row['limitMax'] == 0 || $row['limitMax'] >= $this->subtotal) {
+                    $out[$row['id']] = $row;
 
-                if($row['logo']){
-                    $out[$row['id']]['logo'] = FOLDER_UPLOAD . $this->owner->shopId . '/' . $row['logo'];
+                    if ($row['logo']) {
+                        $out[$row['id']]['logo'] = FOLDER_UPLOAD . $this->owner->shopId . '/' . $row['logo'];
+                    }
                 }
             }
         }
@@ -1289,20 +1322,25 @@ class CartHandler extends ancestor {
         return $out;
     }
 
-    public function setLocalConsumption($isLocal){
-        $this->owner->db->sqlQuery(
-            $this->owner->db->genSQLUpdate(
-                'cart',
-                [
-                    'cart_local_consumption' => (int) $isLocal,
-                ],
-                [
-                    'cart_id' => $this->id,
-                    'cart_shop_id' => $this->owner->shopId,
-                    'cart_key' => $this->key
-                ]
-            )
-        );
+    public function setItemLocalConsumption($itemIds, int $isLocal){
+        if(!Empty($itemIds)) {
+            if(!is_array($itemIds)) $itemIds = [$itemIds];
+
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'cart_items',
+                    [
+                        'citem_local_consumption' => $isLocal,
+                    ],
+                    [
+                        'citem_id' => [
+                            'in' => $itemIds
+                        ],
+                        'citem_cart_id' => $this->id
+                    ]
+                )
+            );
+        }
 
         $this->loadCart();
     }

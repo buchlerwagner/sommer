@@ -6,27 +6,53 @@
             </div>
             <div class="card-body">
                 <hr class="mt-0">
-                {% if cart.getOrderType == 1 %}
-                    <div class="form-group list-group">
-                        <input id="local-consumption-1" name="local" type="radio" value="1"{% if cart.isLocalConsumption == 1 %} checked="checked"{% endif %} class="cart-local-consumption" />
-                        <label for="local-consumption-1" class="list-group-item">
-                            <i class="fas fa-utensils-alt mr-2"></i>
-                            {{ _('LBL_LOCAL_CONSUMPTION') }}
-                        </label>
 
-                        <input id="local-consumption-0" name="local" type="radio" value="0"{% if cart.isLocalConsumption == 0 %} checked="checked"{% endif %} class="cart-local-consumption" />
-                        <label for="local-consumption-0" class="list-group-item">
-                            <i class="fas fa-hand-holding-box mr-2"></i>
-                            {{ _('LBL_TAKEAWAY') }}
-                        </label>
+                <div class="form-group list-group mb-2">
+                    <input id="local-consumption-1" name="local" type="radio" value="1"{% if cart.orderType == 1 %} checked="checked"{% endif %} class="set-order-type" />
+                    <label for="local-consumption-1" class="list-group-item">
+                        <i class="fas fa-utensils-alt mr-2"></i>
+                        {{ _('LBL_LOCAL_CONSUMPTION') }}
+                    </label>
+
+                    <input id="local-consumption-2" name="local" type="radio" value="2"{% if cart.orderType == 2 %} checked="checked"{% endif %} class="set-order-type" />
+                    <label for="local-consumption-2" class="list-group-item">
+                        <i class="fas fa-hand-holding-box mr-2"></i>
+                        {{ _('LBL_TAKEAWAY') }}
+                    </label>
+
+                    <input id="local-consumption-0" name="local" type="radio" value="0"{% if cart.orderType == 0 %} checked="checked"{% endif %} class="set-order-type" />
+                    <label for="local-consumption-0" class="list-group-item">
+                        <i class="fas fa-shopping-bag mr-2"></i>
+                        {{ _('LBL_ORDER') }}
+                    </label>
+                </div>
+
+                <hr class="mt-0">
+                <div id="payment-modes" class="mb-3">
+                    <h5>{{ _('LBL_PAYMENT_MODE') }}</h5>
+                    <div class="form-group list-group">
+                        {% for item in cart.getPaymentModes %}
+                            <input id="payment-mode-{{ item.id }}" name="paymentMode" type="radio" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getPaymentId == item.id %} checked="checked"{% endif %} class="set-payment-mode" />
+                            <label for="payment-mode-{{ item.id }}" class="list-group-item">
+                                <i class="fas {{ paymentIcons[item.type] }} mr-2"></i>
+                                {{ item.name }}
+                                {% if item.price %}
+                                    <div class="text-muted float-right">{{ _price(item.price, cart.currency) }}</div>
+                                {% endif %}
+                            </label>
+                        {% endfor %}
                     </div>
-                {% else %}
-                    <div id="shipping-modes" class="mb-2">
+                </div>
+
+                <div id="shipping-modes" class="{% if cart.orderType > 0 %}d-none{% endif %}">
+                    <hr class="mt-0">
+                    <div class="mb-2">
                         <h5>{{ _('LBL_SHIPPING_MODE') }}</h5>
                         <div class="form-group list-group mb-3">
                             {% for item in cart.getShippingModes %}
                                 <input id="shipping-mode-{{ item.id }}" name="shippingMode" type="radio" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getShippingId == item.id %} checked="checked"{% endif %} class="set-shipping-mode" />
                                 <label for="shipping-mode-{{ item.id }}" class="list-group-item">
+                                    <i class="fas {{ shippingIcons[item.type] }} mr-2"></i>
                                     {{ item.name }}
                                     {% if item.price %}
                                         <div class="text-muted float-right">{{ _price(item.price, cart.currency) }}</div>
@@ -36,22 +62,7 @@
                         </div>
                         <div id="shipping-details" class="form-row{% if not cart.getShippingId %} d-none{% endif %}"></div>
                     </div>
-                    <hr class="mt-0">
-                    <div id="payment-modes" class="mb-3">
-                        <h5>{{ _('LBL_PAYMENT_MODE') }}</h5>
-                        <div class="form-group list-group">
-                            {% for item in cart.getPaymentModes %}
-                                <input id="payment-mode-{{ item.id }}" name="paymentMode" type="radio" data-id="{{ item.id }}" value="{{ item.id }}"{% if cart.getPaymentId == item.id %} checked="checked"{% endif %} class="set-payment-mode" />
-                                <label for="payment-mode-{{ item.id }}" class="list-group-item">
-                                    {{ item.name }}
-                                    {% if item.price %}
-                                        <div class="text-muted float-right">{{ _price(item.price, cart.currency) }}</div>
-                                    {% endif %}
-                                </label>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
+                </div>
             </div>
         </div>
     </div>

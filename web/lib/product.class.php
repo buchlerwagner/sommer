@@ -321,6 +321,7 @@ class product extends ancestor {
                         'discount' => $row['pv_price_discount'],
                         'displayPrice' => $displayPrice,
                         'unitPrice' => $unitPrice,
+                        'currency' => $row['pv_currency'],
                         'vatLocal' => $row['pv_vat_local'],
                         'vatDeliver' => $row['pv_vat_deliver'],
                         'unit' => '/' . $unit,

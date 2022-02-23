@@ -34,7 +34,8 @@ class finishOrderForm extends formBuilder {
             1 => 'LBL_INVOICE_PRIVATE',
             2 => 'LBL_INVOICE_COMPANY',
         ];
-        if($this->orderType != ORDER_TYPE_STORE) {
+
+        if($this->orderType === ORDER_TYPE_ORDER) {
             $defaultInvoiceOption = 1;
             $defaultHidden = '.invoice-vat';
             unset($invoiceOptions[0]);
@@ -82,7 +83,7 @@ class finishOrderForm extends formBuilder {
             $general
         );
 
-        if($this->orderType != ORDER_TYPE_STORE) {
+        if($this->orderType === ORDER_TYPE_ORDER) {
             $shippingAddress = (new groupFieldset('address-data', 'LBL_SHIPPING_ADDRESS', 'invoice-data'))
                 ->addTools('LBL_SAME_AS_INVOICE_ADDRESS', 'copy-invoice-address', 'fal fa-copy')
                 ->addElements(
@@ -125,7 +126,7 @@ class finishOrderForm extends formBuilder {
                     ->setColSize('col-12')
             )
         );
-        if($this->orderType != ORDER_TYPE_STORE) {
+        if($this->orderType === ORDER_TYPE_ORDER) {
             $invoiceAddress->addTools('LBL_SAME_AS_SHIPPING_ADDRESS', 'copy-shipping-address', 'fal fa-copy');
         }
 
@@ -189,6 +190,9 @@ class finishOrderForm extends formBuilder {
                     $this->addError('ERR_1001', self::FORM_ERROR, ['us_email']);
                 }
             }
+            if(Empty($this->values['us_phone'])){
+                $this->addError('ERR_1000', self::FORM_ERROR, ['us_phone']);
+            }
             if(Empty($this->values['us_invoice_name'])){
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_name']);
             }
@@ -206,7 +210,7 @@ class finishOrderForm extends formBuilder {
             }
         }
 
-        if($this->orderType != ORDER_TYPE_STORE) {
+        if($this->orderType === ORDER_TYPE_ORDER) {
             if(Empty($this->values['us_zip'])){
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_zip']);
             }
@@ -235,7 +239,7 @@ class finishOrderForm extends formBuilder {
             $this->values['us_enabled'] = 0;
         }
 
-        if($this->orderType == ORDER_TYPE_STORE && $this->values['invoiceType'] == 0) {
+        if($this->orderType == ORDER_TYPE_LOCAL && $this->values['invoiceType'] == 0) {
             $this->dbTable = false;
             $this->keyFields['us_id'] = 0;
         }

@@ -174,6 +174,43 @@ var orders = {
             orders.loadShippingMode();
         });
 
+        $(document).on('click', '.set-order-type', function () {
+            var isLocalConsumption = 0;
+            var ids = [];
+            var orderType = parseInt($('.set-order-type:checked').val());
+
+            $('.item-local-consumption').each(function(){
+                ids.push($(this).data('id'));
+            });
+
+            $('.item-local-consumption').removeAttr('disabled');
+
+            if(orderType === 1){
+                $('#shipping-modes').hide();
+                $('.item-local-consumption').prop('checked', true);
+                isLocalConsumption = 1;
+            }else if(orderType === 2) {
+                $('#shipping-modes').hide();
+                $('.item-local-consumption').prop('checked', false);
+            }else{
+                $('#shipping-modes').removeClass('d-none').show();
+                $('.item-local-consumption').prop('checked', false).attr('disabled', 'disabled');
+            }
+
+            orders.sendRequest('setLocalConsumption', {
+                localConsumption: isLocalConsumption,
+                itemId: ids,
+                cartId: parseInt($('#cartId').val()),
+                cartKey: $('#cartKey').val()
+            });
+
+            orders.sendRequest('setOrderType', {
+                type: orderType,
+                cartId: parseInt($('#cartId').val()),
+                cartKey: $('#cartKey').val()
+            });
+        });
+
         $(document).on('click', '.set-payment-mode', function () {
             var id = parseInt($(this).data('id'));
             if(id) {
@@ -185,11 +222,12 @@ var orders = {
             }
         });
 
-        $(document).on('click', '.cart-local-consumption', function () {
-            var localConsumption = $('#cart-settings input[type="radio"]:checked').val();
+        $(document).on('click', '.item-local-consumption', function () {
+            var id = parseInt($(this).data('id'));
 
             orders.sendRequest('setLocalConsumption', {
-                localConsumption: localConsumption,
+                localConsumption: ($(this).is(':checked') ? 1 : 0),
+                itemId: id,
                 cartId: parseInt($('#cartId').val()),
                 cartKey: $('#cartKey').val()
             });

@@ -10,4 +10,4 @@ if($this->settings['stopSale']){
 $this->cartHandler->init();
 $this->data['sections'] = $this->lib->getWidgetContents('cart');
 
-dd($this->cartHandler->getCartItems());
+//dd($this->cartHandler->getCartItems());

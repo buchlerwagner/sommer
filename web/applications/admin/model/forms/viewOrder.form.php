@@ -5,6 +5,17 @@ class viewOrderForm extends formBuilder {
     public $isOpen = false;
     public $isEmployee = false;
 
+    const PAYMENT_ICONS = [
+        1 => 'fa-money-bill',
+        2 => 'fa-laptop',
+        3 => 'fa-credit-card',
+    ];
+
+    const SHIPPING_ICONS = [
+        1 => 'fa-store',
+        2 => 'fa-truck',
+    ];
+
     public function setupKeyFields() {
         $this->setKeyFields(['cart_id']);
     }
@@ -44,7 +55,9 @@ class viewOrderForm extends formBuilder {
                     ->add($this->loadSubTable('cartItems')),
 
                 (new groupInclude('order-totals', [
-                    'cart' => $this->owner->cartHandler
+                    'cart' => $this->owner->cartHandler,
+                    'paymentIcons' => self::PAYMENT_ICONS,
+                    'shippingIcons' => self::SHIPPING_ICONS,
                 ]))
             );
 

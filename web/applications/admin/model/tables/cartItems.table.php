@@ -2,6 +2,7 @@
 class cartItemsTable extends table {
     private $cartId;
     public $isEmployee = true;
+    public $orderType = 0;
 
 	public function setup() {
         $this->cartId = (int) $this->parameters['foreignkeys'][0];
@@ -15,6 +16,8 @@ class cartItemsTable extends table {
         $this->hideCounter = true;
 
         $this->addColumns(
+            (new column('local', 'LBL_LOCAL_CONSUMPTION'))
+                ->addClass('text-center'),
             (new column('name', 'LBL_PRODUCT_TITLE', 3))
                 ->setColspan(2),
             (new column('unitprice', 'LBL_UNIT_PRICE', 2))
@@ -28,7 +31,8 @@ class cartItemsTable extends table {
 
     public function loadRows() {
         $this->owner->cartHandler->init($this->cartId, false);
-        $this->rows = $this->owner->cartHandler->items;
+        $this->orderType = $this->owner->cartHandler->getOrderType();
+        $this->rows = $this->owner->cartHandler->getCartItems();
 
         if($this->owner->cartHandler->packagingFee) {
             $this->setUpdateField('.cart-item-packaging', enumJSActions::ShowHideElement(), true);
