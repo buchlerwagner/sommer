@@ -38,7 +38,7 @@
                 </div>
             </td>
             <td class="col-2 text-right product-subtotal"><span class="item-total-{{ item.id }}">{{ _price(item.price.total, item.price.currency) }}</span></td>
-            <td class="col-2 text-right product-remove">
+            <td class="col-1 text-right product-remove">
                 <a href="javascript:;" data-confirm-action="orders.removeProduct({{ item.id }});" data-confirm-question="{{ _('LBL_DELETE_ITEM') }}" data-toggle="modal" data-target="#confirm-delete" class="btn btn-light h-danger btn-sm" data-id="{{ item.id }}"><i class="far fa-trash-alt"></i></a>
             </td>
         </tr>

@@ -14,6 +14,7 @@ class cartItemsTable extends table {
         $this->tableType = 'inline';
         $this->bodyTemplate = 'table-body-cart-items';
         $this->hideCounter = true;
+        $this->optionsWidth = 1;
 
         $this->addColumns(
             (new column('local', 'LBL_LOCAL_CONSUMPTION'))
