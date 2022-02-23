@@ -54,7 +54,7 @@ class view extends ancestor {
 			//'sitedata'  	=> $GLOBALS['HOSTS'][$this->owner->host]['sitedata'],
 			'settings'  	=> $this->owner->settings,
 			'shopId'  	    => $this->owner->shopId,
-			'cart'  	    => $this->owner->cart,
+			'cart'  	    => $this->owner->cartHandler,
 		];
 	}
 

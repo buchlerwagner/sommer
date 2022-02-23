@@ -3,6 +3,6 @@
  * @var $this router
  */
 
-$this->cart->destroyKey();
+$this->cartHandler->destroyKey();
 $this->delSession();
 $this->pageRedirect('/');

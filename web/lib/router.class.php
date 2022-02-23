@@ -73,9 +73,9 @@ class router extends model {
 	public $user;
 
 	/**
-	 * @var cart
+	 * @var CartHandler
 	 */
-	public $cart = null;
+	public $cartHandler = null;
 
 	public $output = OUTPUT_HTML;
 	protected $messages = [];
@@ -265,10 +265,10 @@ class router extends model {
             $this->page = 'maintenance';
         }else {
             /**
-             * @var $cart cart
+             * @var $cart CartHandler
              */
-            $this->cart = $this->addByClassName('cart');
-            $this->cart->init(false, false);
+            $this->cartHandler = $this->addByClassName('CartHandler');
+            $this->cartHandler->init(false, false);
 
             $this->parseUrl();
 
@@ -277,7 +277,7 @@ class router extends model {
 
 
                 $this->menu['orders']['badge']['color'] = 'danger text-white';
-                $this->menu['orders']['badge']['value'] = $this->cart->getNumberOfNewOrders();
+                $this->menu['orders']['badge']['value'] = $this->cartHandler->getNumberOfNewOrders();
             }elseif($this->application == 'shop'){
                 //$fbLogin = $this->user->getFBLoginUrl();
             }

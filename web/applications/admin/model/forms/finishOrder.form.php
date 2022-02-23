@@ -7,7 +7,7 @@ class finishOrderForm extends formBuilder {
     private $close = false;
 
     /**
-     * @var cart
+     * @var CartHandler
      */
     private $order = null;
 
@@ -276,7 +276,7 @@ class finishOrderForm extends formBuilder {
                 $this->orderType = (int) $row['orderType'];
                 $this->keyFields['us_id'] = (int) $row['userId'];
 
-                $this->order = $this->owner->cart->init($this->cartKey, false);
+                $this->order = $this->owner->cartHandler->init($this->cartKey, false);
             }
         }
     }

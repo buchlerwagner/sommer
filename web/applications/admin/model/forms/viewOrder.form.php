@@ -25,7 +25,7 @@ class viewOrderForm extends formBuilder {
 
         if($this->isOpen) {
             $this->title = 'LBL_CREATE_NEW_ORDER';
-            $this->owner->cart->init($this->cartKey, false);
+            $this->owner->cartHandler->init($this->cartKey, false);
 
             $search = (new groupFieldset('search-product'))->addElements(
                 (new inputAutocomplete('product'))
@@ -44,7 +44,7 @@ class viewOrderForm extends formBuilder {
                     ->add($this->loadSubTable('cartItems')),
 
                 (new groupInclude('order-totals', [
-                    'cart' => $this->owner->cart
+                    'cart' => $this->owner->cartHandler
                 ]))
             );
 
@@ -90,8 +90,8 @@ class viewOrderForm extends formBuilder {
         if(!$this->isOpen) {
             $this->setSubtitle($this->values['cart_order_number']);
 
-            $this->owner->cart->init($this->values['cart_key'], false);
-            $this->cart = $this->owner->cart;
+            $this->owner->cartHandler->init($this->values['cart_key'], false);
+            $this->cart = $this->owner->cartHandler;
         }
     }
 
@@ -111,7 +111,7 @@ class viewOrderForm extends formBuilder {
         );
         if($cart){
             $this->cartKey = $cart['cartKey'];
-            if($cart['status'] == cart::CART_STATUS_NEW && $cart['storeId'] == $this->owner->storeId){
+            if($cart['status'] == CartHandler::CART_STATUS_NEW && $cart['storeId'] == $this->owner->storeId){
                 $this->isOpen = true;
             }
         }

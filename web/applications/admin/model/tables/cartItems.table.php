@@ -27,30 +27,30 @@ class cartItemsTable extends table {
 	}
 
     public function loadRows() {
-        $this->owner->cart->init($this->cartId, false);
-        $this->rows = $this->owner->cart->items;
+        $this->owner->cartHandler->init($this->cartId, false);
+        $this->rows = $this->owner->cartHandler->items;
 
-        if($this->owner->cart->packagingFee) {
+        if($this->owner->cartHandler->packagingFee) {
             $this->setUpdateField('.cart-item-packaging', enumJSActions::ShowHideElement(), true);
-            $this->setUpdateField('.cart-packaging-fee', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cart->packagingFee, $this->owner->cart->currency));
+            $this->setUpdateField('.cart-packaging-fee', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cartHandler->packagingFee, $this->owner->cartHandler->currency));
         }else{
             $this->setUpdateField('.cart-item-packaging', enumJSActions::ShowHideElement(), false);
         }
 
-        if($this->owner->cart->shippingFee) {
+        if($this->owner->cartHandler->shippingFee) {
             $this->setUpdateField('.cart-item-shipping', enumJSActions::ShowHideElement(), true);
-            $this->setUpdateField('.cart-shipping-fee', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cart->shippingFee, $this->owner->cart->currency));
+            $this->setUpdateField('.cart-shipping-fee', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cartHandler->shippingFee, $this->owner->cartHandler->currency));
         }else{
             $this->setUpdateField('.cart-item-shipping', enumJSActions::ShowHideElement(), false);
         }
 
-        if($this->owner->cart->shippingFee || $this->owner->cart->packagingFee) {
+        if($this->owner->cartHandler->shippingFee || $this->owner->cartHandler->packagingFee) {
             $this->setUpdateField('.cart-item-subtotal', enumJSActions::ShowHideElement(), true);
         }else{
             $this->setUpdateField('.cart-item-subtotal', enumJSActions::ShowHideElement(), false);
         }
 
-        $this->setUpdateField('.cart-subtotal', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cart->subtotal, $this->owner->cart->currency));
-        $this->setUpdateField('.cart-total', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cart->total, $this->owner->cart->currency));
+        $this->setUpdateField('.cart-subtotal', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cartHandler->subtotal, $this->owner->cartHandler->currency));
+        $this->setUpdateField('.cart-total', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cartHandler->total, $this->owner->cartHandler->currency));
     }
 }

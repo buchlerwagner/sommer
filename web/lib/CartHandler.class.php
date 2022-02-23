@@ -1,5 +1,5 @@
 <?php
-class cart extends ancestor {
+class CartHandler extends ancestor {
 	const CART_SESSION_KEY = 'cart';
 
 	const CART_STATUS_NEW = 'NEW';
@@ -156,7 +156,7 @@ class cart extends ancestor {
                 );
 			}
 
-			$this->loadCart()->summarize();
+			$this->loadCart();
 		}
 
 		return $this;
@@ -200,12 +200,41 @@ class cart extends ancestor {
 					)
 				);
 
-				$this->loadCart()->summarize();
+				$this->loadCart();
 			}
 		}
 
 		return $this;
 	}
+
+    public function getCart():Cart{
+        $cart = new Cart($this->id);
+
+        $cart->setOrderStatus($this->orderStatus)
+             ->setOrderDate($this->orderDate)
+             ->setOrderNumber($this->orderNumber)
+             ->setDiscount($this->discount)
+             ->setPackagingFee($this->packagingFee)
+             ->setShippingFee($this->shippingFee)
+             ->setPaymentFee($this->paymentFee)
+             ->setTotal($this->total)
+             ->setPaid($this->isPaid());
+
+        $cart->setCustomer( $this->userData );
+        $cart->setPaymentMode( $this->getSelectedPaymentMode() );
+        $cart->setShippingMode( $this->getSelectedShippingMode() );
+
+        if($this->items){
+            foreach($this->items AS $item){
+                $cartItem = new CartItem($item['id'], $item['productId'], $item['variantId']);
+
+
+                $cart->addItem($cartItem);
+            }
+        }
+
+        return $cart;
+    }
 
 	public function getCartItems(){
 		return $this->items;
@@ -651,6 +680,8 @@ class cart extends ancestor {
                                 'unit' => $variant['price']['unit'],
                                 'isWeightUnit' => $variant['price']['isWeightUnit'],
                                 'total' => ($price * $row['citem_quantity']),
+                                'vatKey' => ($this->localConsumption ? $variant['price']['vatLocal'] : $variant['price']['vatDeliver']),
+                                'vat' => ($this->localConsumption ? $variant['price']['vatLocal'] : $variant['price']['vatDeliver']) / 100,
                             ],
                             'packaging' => $packaging,
                             'quantity' => [
@@ -667,6 +698,8 @@ class cart extends ancestor {
                     }
                 }
             }
+
+            $this->summarize();
         }
 
 		return $this;
@@ -734,7 +767,7 @@ class cart extends ancestor {
 
 		$key = $this->owner->db->getInsertRecordId();
 
-		$this->loadCart()->summarize();
+		$this->loadCart();
 
 		return $key;
 	}
@@ -759,7 +792,7 @@ class cart extends ancestor {
 				)
 			);
 
-			$this->loadCart()->summarize();
+			$this->loadCart();
 		}
 
 		return $key;
@@ -794,7 +827,7 @@ class cart extends ancestor {
 					'cart_subtotal' => $this->subtotal,
                     'cart_packaging_fee' => $this->packagingFee,
 					'cart_shipping_fee' => $this->shippingFee,
-                    //'cart_payment_fee' => $this->paymentFee,
+                    'cart_payment_fee' => $this->paymentFee,
                     'cart_discount' => $this->discount,
                     'cart_total' => $this->total,
                 ],
@@ -1025,6 +1058,7 @@ class cart extends ancestor {
                     'pm_name AS name',
                     'pm_type AS type',
                     'pm_price AS price',
+                    'pm_vat AS vat',
                     'pm_text AS text',
                     'pm_default AS def',
                     'pm_logo AS logo',
@@ -1069,6 +1103,7 @@ class cart extends ancestor {
                         'pm_text AS text',
                         'pm_email_text AS emailText',
                         'pm_logo AS logo',
+                        'pm_vat AS vat',
                     ],
                     [
                         'pm_shop_id' => $this->owner->shopId,
@@ -1080,7 +1115,6 @@ class cart extends ancestor {
             if($out['logo']){
                 $out['logo'] = FOLDER_UPLOAD . $this->owner->shopId . '/' . $out['logo'];
             }
-
         }
 
         return $out;
@@ -1098,6 +1132,7 @@ class cart extends ancestor {
                     'sm_name AS name',
                     'sm_free_limit AS freeLimit',
                     'sm_price AS price',
+                    'sm_vat AS vat',
                     'sm_default AS def',
                     'sm_text AS text',
                     'sm_type AS type',
@@ -1200,6 +1235,7 @@ class cart extends ancestor {
                         'sm_day_diff AS dayDiff',
                         'sm_select_date AS hasCustomDate',
                         'sm_custom_text AS customIntervalText',
+                        'sm_vat AS vat',
                     ],
                     [
                         'sm_shop_id' => $this->owner->shopId,
@@ -1268,7 +1304,7 @@ class cart extends ancestor {
             )
         );
 
-        $this->loadCart()->summarize();
+        $this->loadCart();
     }
 
     public function setCustomer($userId, $invoiceType = 0, $remarks = ''){
@@ -1310,7 +1346,7 @@ class cart extends ancestor {
                 )
             );
 
-            $this->loadCart()->summarize();
+            $this->loadCart();
         }
     }
 
@@ -1347,7 +1383,7 @@ class cart extends ancestor {
                 )
             );
 
-            $this->loadCart()->summarize();
+            $this->loadCart();
         }
     }
 

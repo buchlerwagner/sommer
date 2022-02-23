@@ -10,7 +10,7 @@ $this->data['access'][ORDER_TYPE_STORE] = $this->user->hasFunctionAccess('orders
 $this->data['access'][ORDER_TYPE_PHONE] = $this->user->hasFunctionAccess('orders-phone');
 
 if($orderType && $this->data['access'][$orderType]){
-    if($id = $this->cart->createNewOrder($orderType)){
+    if($id = $this->cartHandler->createNewOrder($orderType)){
         $this->pageRedirect('/orders/view|orders/' . $id . '/');
     }
 }

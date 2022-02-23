@@ -69,7 +69,8 @@ class product extends ancestor {
         if($variant['packaging']['packagingFee']){
             return [
                 'name' => $variant['packaging']['packagingName'],
-                'fee' => $variant['packaging']['packagingFee']
+                'fee' => $variant['packaging']['packagingFee'],
+                'vat' => $variant['packaging']['packagingFeeVat']
             ];
         }
 
@@ -320,7 +321,8 @@ class product extends ancestor {
                         'discount' => $row['pv_price_discount'],
                         'displayPrice' => $displayPrice,
                         'unitPrice' => $unitPrice,
-                        'currency' => $row['pv_currency'],
+                        'vatLocal' => $row['pv_vat_local'],
+                        'vatDeliver' => $row['pv_vat_deliver'],
                         'unit' => '/' . $unit,
                         'isWeightUnit' => $isWeightUnit,
                     ],
@@ -337,6 +339,7 @@ class product extends ancestor {
                         'weightUnitName' => $weightUnits[$row['pv_weight_unit']],
                         'packagingName' => $packaging[$row['pv_pkg_id']]['name'],
                         'packagingFee' => $packaging[$row['pv_pkg_id']]['price'],
+                        'packagingFeeVat' => $packaging[$row['pv_pkg_id']]['vat'],
                     ],
                 ];
 			}
@@ -458,6 +461,8 @@ class product extends ancestor {
                 'currency' => $row['prod_currency'],
                 'displayPrice' => $displayPrice,
                 'unitPrice' => $unitPrice,
+                'vatLocal' => $row['prod_vat_local'],
+                'vatDeliver' => $row['prod_vat_deliver'],
                 'unit' => '/' . $unit,
                 'isWeightUnit' => $isWeightUnit,
             ],
@@ -474,6 +479,7 @@ class product extends ancestor {
                 'weightUnitName' => $weightUnits[$row['prod_weight_unit']],
                 'packagingName' => $packaging[$row['prod_pkg_id']]['name'],
                 'packagingFee' => $packaging[$row['prod_pkg_id']]['price'],
+                'packagingFeeVat' => $packaging[$row['prod_pkg_id']]['vat'],
             ],
         ];
 
@@ -544,6 +550,7 @@ class product extends ancestor {
                         'pkg_id AS id',
                         'pkg_name AS name',
                         'pkg_price AS price',
+                        'pkg_vat AS vat',
                     ],
                     [
                         'pkg_shop_id' => $this->owner->shopId

@@ -44,7 +44,7 @@ class setOrderStatusForm extends formBuilder {
         $this->values['notification'] = 1;
         $this->getControl('status-info')->setHtml("<div class='text-center'>{{ _('LBL_CURRENT_STATUS') }}: {{ orderState('" . $this->values['cart_order_status'] . "')|raw }}</div>");
 
-        $this->owner->cart
+        $this->owner->cartHandler
             ->init($this->values['cart_key'], false);
 
 
@@ -62,7 +62,7 @@ class setOrderStatusForm extends formBuilder {
             case ORDER_STATUS_PROCESSING:
                 $class = 'btn-success';
 
-                $shippingMode = $this->owner->cart->getSelectedShippingMode();
+                $shippingMode = $this->owner->cartHandler->getSelectedShippingMode();
                 if($shippingMode['type'] == 1){
                     $label = 'BTN_SET_RECEIVABLE';
                     $actionName = ORDER_STATUS_RECEIVABLE;
@@ -101,7 +101,7 @@ class setOrderStatusForm extends formBuilder {
 
     public function setStatus(){
         $this->state = FORM_STATE_SAVED;
-        $this->owner->cart
+        $this->owner->cartHandler
             ->init($this->values['cart_key'], false)
             ->setOrderStatus($this->values['setStatus']);
 
@@ -116,40 +116,40 @@ class setOrderStatusForm extends formBuilder {
             $cartMailBody = $this->owner->view->renderContent(
                 'mail-order',
                 [
-                    'key' => $this->owner->cart->key,
-                    'id' => $this->owner->cart->id,
-                    'items' => $this->owner->cart->items,
-                    'currency' => $this->owner->cart->currency,
-                    'subtotal' => $this->owner->cart->subtotal,
-                    'discount' => $this->owner->cart->discount,
-                    'packagingFee' => $this->owner->cart->packagingFee,
-                    'shippingFee' => $this->owner->cart->shippingFee,
-                    'paymentFee' => $this->owner->cart->paymentFee,
-                    'total' => $this->owner->cart->total,
-                    'shippingMode' => $this->owner->cart->getSelectedShippingMode(),
-                    'shippingInterval' => $this->owner->cart->getSelectedShippingInterval(),
-                    'customInterval' => $this->owner->cart->customInterval,
-                    'paymentMode' => $this->owner->cart->getSelectedPaymentMode(),
-                    'orderNumber' => $this->owner->cart->orderNumber,
+                    'key' => $this->owner->cartHandler->key,
+                    'id' => $this->owner->cartHandler->id,
+                    'items' => $this->owner->cartHandler->items,
+                    'currency' => $this->owner->cartHandler->currency,
+                    'subtotal' => $this->owner->cartHandler->subtotal,
+                    'discount' => $this->owner->cartHandler->discount,
+                    'packagingFee' => $this->owner->cartHandler->packagingFee,
+                    'shippingFee' => $this->owner->cartHandler->shippingFee,
+                    'paymentFee' => $this->owner->cartHandler->paymentFee,
+                    'total' => $this->owner->cartHandler->total,
+                    'shippingMode' => $this->owner->cartHandler->getSelectedShippingMode(),
+                    'shippingInterval' => $this->owner->cartHandler->getSelectedShippingInterval(),
+                    'customInterval' => $this->owner->cartHandler->customInterval,
+                    'paymentMode' => $this->owner->cartHandler->getSelectedPaymentMode(),
+                    'orderNumber' => $this->owner->cartHandler->orderNumber,
                     'orderStatus' => $this->values['setStatus'],
-                    'contactData' => $this->owner->cart->userData['contactData'],
-                    'shippingAddress' => $this->owner->cart->userData['shippingAddress'],
-                    'invoiceAddress' => $this->owner->cart->userData['invoiceAddress'],
-                    'remarks' => $this->owner->cart->remarks,
-                    'domain' => $this->owner->cart->owner->domain,
+                    'contactData' => $this->owner->cartHandler->userData['contactData'],
+                    'shippingAddress' => $this->owner->cartHandler->userData['shippingAddress'],
+                    'invoiceAddress' => $this->owner->cartHandler->userData['invoiceAddress'],
+                    'remarks' => $this->owner->cartHandler->remarks,
+                    'domain' => $this->owner->cartHandler->owner->domain,
                 ],
                 false
             );
 
             $data = [
                 'id' => $this->values['cart_us_id'],
-                'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->owner->cart->key . '/',
+                'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->owner->cartHandler->key . '/',
                 'order' => $cartMailBody,
-                'orderNumber' => $this->owner->cart->orderNumber,
+                'orderNumber' => $this->owner->cartHandler->orderNumber,
                 'status' => $this->values['setStatus'],
-                'key' => $this->owner->cart->key,
-                'total' => $this->owner->cart->total,
-                'currency' => $this->owner->cart->currency,
+                'key' => $this->owner->cartHandler->key,
+                'total' => $this->owner->cartHandler->total,
+                'currency' => $this->owner->cartHandler->currency,
             ];
 
             $this->owner->email->prepareEmail(
