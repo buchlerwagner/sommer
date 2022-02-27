@@ -33,6 +33,7 @@ class CartHandler extends ancestor {
     private $paymentId = false;
     private $isPaid = false;
     public $packagingFee = 0;
+    private $packagingFeeVat = 0;
 
     private $earliestTakeover = false;
     private $orderDateStart = false;
@@ -49,6 +50,8 @@ class CartHandler extends ancestor {
 	public $orderType = 0;
 	public $invoiceType = 0;
 	public $invoiceProviderId = 0;
+	public $invoiceNumber = false;
+	public $invoiceFileName = false;
 	public $shippingDate;
 	public $customInterval;
 	public $storeId;
@@ -211,34 +214,38 @@ class CartHandler extends ancestor {
             throw new Exception('Cart is not loaded!');
         }
 
-        $cart = new Cart($this->id);
+        $cart = new Cart($this->id, Cart::PRICE_BASE_GROSS);
 
         $cart->setOrderStatus($this->orderStatus)
              ->setOrderDate($this->orderDate)
+             ->setOrderType($this->orderType)
+             ->setShippingDate($this->shippingDate)
+             ->setInvoiceNumber($this->invoiceNumber)
+             ->setInvoiceFileName($this->invoiceFileName)
              ->setOrderNumber($this->orderNumber)
              ->setDiscount($this->discount)
-             ->setPackagingFee($this->packagingFee)
-             ->setShippingFee($this->shippingFee)
-             ->setPaymentFee($this->paymentFee)
              ->setTotal($this->total)
              ->setCurrency($this->currency)
              ->setInvoiceProvider($this->invoiceProviderId)
              ->setPaid($this->isPaid());
 
         $cart->setCustomer( $this->userData );
-        $cart->setPaymentMode( $this->getSelectedPaymentMode() );
-        $cart->setShippingMode( $this->getSelectedShippingMode() );
 
         if($this->items){
             foreach($this->items AS $item){
                 $cartItem = new CartItem($item['id'], $item['productId'], $item['variantId']);
                 $cartItem->setName($item['name'], $item['variant']);
-                $cartItem->setPrice($item['price']['unitPrice'], $item['price']['currency'], $item['quantity']['amount'], $item['quantity']['unit']);
                 $cartItem->setVat($item['price']['vatKey'], $item['price']['vat']);
+                $cartItem->setQuantity($item['quantity']['amount'], $item['quantity']['unit']);
+                $cartItem->setUnitPrice($item['price']['unitPrice']);
 
                 $cart->addItem($cartItem);
             }
         }
+
+        $cart->setPackagingFee($this->packagingFee, $this->packagingFeeVat)
+             ->setShipping($this->getSelectedShippingMode(), $this->shippingFee)
+             ->setPayment($this->getSelectedPaymentMode(), $this->paymentFee);
 
         return $cart;
     }
@@ -340,9 +347,19 @@ class CartHandler extends ancestor {
     }
 
 	public function makeOrder($userId, $invoiceType = 0, $remarks = ''){
-        $orderStatus = ($this->orderType !== ORDER_TYPE_ORDER ? self::ORDER_STATUS_FINISHED : self::ORDER_STATUS_NEW);
-        $isPaid = ($this->orderType !== ORDER_TYPE_ORDER ? 1 : 0);
+        switch($this->orderType){
+            case ORDER_TYPE_LOCAL:
+            case ORDER_TYPE_TAKEAWAY:
+                $isPaid = 1;
+                $orderStatus = self::ORDER_STATUS_FINISHED;
+                break;
 
+            default:
+                $orderStatus = self::ORDER_STATUS_NEW;
+                $isPaid = 0;
+                break;
+        }
+        
         $data = [
             'cart_us_id' => (int) $userId,
             'cart_order_number' => $this->generateOrderNumber(),
@@ -354,7 +371,7 @@ class CartHandler extends ancestor {
             'cart_remarks' => $remarks,
         ];
 
-        if($this->orderType !== ORDER_TYPE_ORDER){
+        if($this->orderType == ORDER_TYPE_LOCAL || $this->orderType == ORDER_TYPE_TAKEAWAY){
             $data['cart_sm_id'] = 0;
             $data['cart_si_id'] = 0;
         }
@@ -548,6 +565,12 @@ class CartHandler extends ancestor {
             }
         }
 
+        $savePath = DIR_UPLOAD . $this->owner->shopId . '/invoices/';
+
+        if($this->invoiceFileName && file_exists($savePath . $this->invoiceFileName)){
+            $files[$this->invoiceNumber . '.pdf'] = $savePath . $this->invoiceFileName;
+        }
+
         return $files;
     }
 
@@ -602,6 +625,8 @@ class CartHandler extends ancestor {
                 $this->orderType = $cart['cart_order_type'];
                 $this->invoiceType = $cart['cart_invoice_type'];
                 $this->invoiceProviderId = $cart['cart_invoice_provider'];
+                $this->invoiceNumber = $cart['cart_invoice_number'];
+                $this->invoiceFileName = $cart['cart_invoice_filename'];
                 $this->storeId = $cart['st_code'];
                 $this->storeName = $cart['st_name'];
 
@@ -832,6 +857,7 @@ class CartHandler extends ancestor {
 		$this->total = 0;
 		$this->subtotal = 0;
 		$this->packagingFee = 0;
+		$this->packagingFeeVat = 0;
 
 		if($this->items){
 			foreach($this->items AS $item){
@@ -843,6 +869,8 @@ class CartHandler extends ancestor {
 
 				$this->subtotal += $item['price']['total'];
                 $this->packagingFee += $fee;
+
+                $this->packagingFeeVat = $item['packaging']['vat'];
 			}
 		}
 

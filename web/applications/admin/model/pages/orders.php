@@ -28,6 +28,43 @@ if(isset($_REQUEST['mail']) && $this->params[1]){
 if(isset($_REQUEST['paid']) && $this->params[1]) {
     $cartId = (int) $this->params[1];
     $this->cartHandler->init($cartId, false)->setPaid();
+    $this->addMessage(router::MESSAGE_SUCCESS, 'LBL_INVOICE', 'LBL_INVOICE_MARKED_AS_PAID');
+
+    /**
+     * @var $invoice Invoices
+     */
+    $invoice = $this->addByClassName('Invoices');
+    if($invoice->hasInvoiceProvider()) {
+        try {
+            $result = $invoice->init($this->cartHandler->getCart())->setPaid();
+            if ($result) {
+                $this->addMessage(router::MESSAGE_SUCCESS, 'LBL_INVOICE', 'LBL_INVOICE_AGENT_PAID');
+            } else {
+                $this->addMessage(router::MESSAGE_WARNING, 'LBL_INVOICE', 'LBL_INVOICE_AGENT_PAID_FAILED');
+            }
+        } catch (Exception $e) {
+            $this->addMessage(router::MESSAGE_DANGER, 'LBL_INVOICE_ERROR', $e->getMessage());
+        }
+    }
+
+    $this->pageRedirect('/orders/view|orders/' . $cartId . '/');
+}
+
+if(isset($_REQUEST['invoice']) && $this->params[1]) {
+    $cartId = (int) $this->params[1];
+    $cart = $this->cartHandler->init($cartId, false)->getCart();
+
+    /**
+     * @var $invoice Invoices
+     */
+    $invoice = $this->addByClassName('Invoices');
+    try {
+        $invoice->init($cart)->createInvoice();
+        $this->addMessage(router::MESSAGE_SUCCESS, 'LBL_INVOICE', 'LBL_INVOICE_ISSUED');
+    }
+    catch (Exception $e){
+        $this->addMessage(router::MESSAGE_DANGER, 'LBL_INVOICE_ERROR', $e->getMessage());
+    }
 
     $this->pageRedirect('/orders/view|orders/' . $cartId . '/');
 }

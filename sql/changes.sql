@@ -8,6 +8,8 @@ ALTER TABLE `cart_items` ADD COLUMN `citem_local_consumption` TINYINT(1) NULL DE
 ALTER TABLE `cart` DROP COLUMN `cart_local_consumption` ;
 
 ALTER TABLE `payment_modes` ADD COLUMN `pm_limit_max` FLOAT NULL DEFAULT 0 AFTER `pm_order`;
+ALTER TABLE `cart` ADD COLUMN `cart_invoice_filename` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_invoice_provider`;
+
 
 
 

@@ -4,6 +4,8 @@ class viewOrderForm extends formBuilder {
     public $cartKey;
     public $isOpen = false;
     public $isEmployee = false;
+    public $hasInvoiceProvider = false;
+    public $invoiceDir = '';
 
     const PAYMENT_ICONS = [
         1 => 'fa-money-bill',
@@ -86,6 +88,14 @@ class viewOrderForm extends formBuilder {
         }else {
             $this->title = 'LBL_VIEW_ORDER';
             $this->includeBefore = 'view-order';
+
+            $this->invoiceDir = FOLDER_UPLOAD . $this->owner->shopId . '/invoices/';
+
+            /**
+             * @var $invoice Invoices
+             */
+            $invoice = $this->owner->addByClassName('Invoices');
+            $this->hasInvoiceProvider = $invoice->hasInvoiceProvider();
 
             $this->addButtons(
                 new buttonCancel('BTN_BACK')

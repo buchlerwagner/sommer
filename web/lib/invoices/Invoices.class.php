@@ -1,5 +1,7 @@
 <?php
 class Invoices extends ancestor {
+    const TRANSFER_DAYS = 8;
+
     /**
      * @var InvoiceProvider
      */
@@ -13,16 +15,9 @@ class Invoices extends ancestor {
     private $settings = [];
 
     /**
-     * @var InvoiceBuyer
-     */
-    private $buyer = null;
-
-    /**
      * @var Cart
      */
     private $cart = null;
-
-    private $invoiceNumber;
 
     public static function getProviders():array
     {
@@ -45,6 +40,11 @@ class Invoices extends ancestor {
         return $result;
     }
 
+    public function hasInvoiceProvider():bool
+    {
+        return (!Empty($this->loadSettings()));
+    }
+
     public function init(?Cart $cart = null):self
     {
         if($cart) {
@@ -53,40 +53,173 @@ class Invoices extends ancestor {
         }
 
         if($this->settings = $this->loadSettings($this->providerId)){
-            $this->provider = $this->owner->addByClassName($this->settings->className, false, [
-                $this->settings
-            ]);
+            if(class_exists($this->settings->className)) {
+                $this->provider = new $this->settings->className($this->settings, $this->owner->language);
+            }
         }
 
         return $this;
     }
 
-    public function getTaxPayer($taxNumber)
+    public function getTaxPayer(string $taxNumber):?array
     {
+        if(!$this->provider){
+            throw new Exception('Invoice provider is not inited!');
+        }
 
+        list($taxNumber, ) = explode('-', $taxNumber);
+
+        return $this->provider->getTaxPayer($taxNumber);
     }
 
-    public function createInvoice()
+    public function createInvoice($issueDate = '', $dueDate = '', $fulfillmentDate = ''):string
     {
+        if(!$this->provider){
+            throw new Exception('Invoice provider is not inited!');
+        }
 
+        if(!$this->cart){
+            throw new Exception('Cart is empty!');
+        }
+
+        if(!$this->cart->getInvoiceNumber()) {
+            $buyer = new InvoiceBuyer();
+
+            $customer = $this->cart->getCustomer();
+
+            $buyer->setName($customer['invoiceAddress']['name']);
+            $buyer->setCountry($customer['invoiceAddress']['country']);
+            $buyer->setZipCode($customer['invoiceAddress']['zip']);
+            $buyer->setCity($customer['invoiceAddress']['city']);
+            $buyer->setAddress($customer['invoiceAddress']['address']);
+
+            if ($customer['invoiceAddress']['vatNumber']) {
+                $buyer->setVatNumber($customer['invoiceAddress']['vatNumber']);
+            }
+
+            if ($customer['contactData']['email']) {
+                $buyer->setEmail($customer['contactData']['email']);
+                $buyer->setSendEmail(true);
+            } else {
+                $buyer->setSendEmail(false);
+            }
+
+            if ($customer['contactData']['phone']) {
+                $buyer->setPhone($customer['contactData']['phone']);
+            }
+
+            $this->provider->setBuyer($buyer);
+
+            $this->provider->setOrderNumber($this->cart->getOrderNumber());
+
+            $today = date('Y-m-d');
+            $issueDate = standardDate($issueDate ?: $this->cart->getOrderDate());
+            if ($issueDate < $today) {
+                $issueDate = $today;
+            }
+
+            $this->provider->setIssueDate($issueDate);
+            $this->provider->setFulfillmentDate(($fulfillmentDate ? standardDate($fulfillmentDate) : $issueDate));
+
+            $paymentMode = $this->cart->getPaymentMode();
+            $this->provider->setPaymentMethod($paymentMode['type']);
+            $this->provider->setCurrency($this->cart->getCurrency());
+            $this->provider->setPaid($this->cart->isPaid());
+
+            if ($paymentMode['type'] == PAYMENT_TYPE_MONEY_TRANSFER) {
+                $this->provider->setDueDate(($dueDate ? standardDate($dueDate) : dateAddDays($issueDate, self::TRANSFER_DAYS)));
+
+            } else {
+                $this->provider->setDueDate(($dueDate ? standardDate($dueDate) : $issueDate));
+            }
+
+            /**
+             * @var $item CartItem
+             */
+
+            $cartItems = $this->cart->getItems();
+            if ($cartItems) {
+                foreach ($cartItems as $item) {
+                    $invoiceItem = new InvoiceItem();
+
+                    $invoiceItem->setId($item->id);
+                    $invoiceItem->setName($item->getName());
+
+                    if ($item->getVariantName()) {
+                        $invoiceItem->setComment($item->getVariantName());
+                    }
+
+                    $invoiceItem->setVat($item->getVatKey());
+                    $invoiceItem->setQuantity($item->getQuantity(), $item->getQuantityUnit());
+
+                    $invoiceItem->setNetUnitPrice($item->getUnitPrice());
+                    $invoiceItem->setNetPrice($item->getNetPrice());
+                    $invoiceItem->setGrossPrice($item->getGrossPrice());
+                    $invoiceItem->setVatAmount($item->getVatAmount());
+
+                    $this->provider->addItem($invoiceItem);
+                }
+            }
+
+            if ($this->provider->createInvoice()) {
+                $this->saveInvoiceNumber();
+                $this->downloadInvoice();
+            }
+        }
+
+        return $this->provider->getInvoiceNumber();
     }
 
     public function setPaid()
     {
+        if(!$this->provider){
+            throw new Exception('Invoice provider is not inited!');
+        }
 
+        if(!$this->cart){
+            throw new Exception('Cart is empty!');
+        }
+
+        if(!$this->cart->getInvoiceNumber()){
+            throw new Exception('Missing invoice number!');
+        }
+
+        if(!$this->cart->isPaid()) {
+            $this->provider->setInvoiceNumber($this->cart->getInvoiceNumber());
+            $paymentMode = $this->cart->getPaymentMode();
+            $this->provider->setPaymentMethod($paymentMode['type']);
+        }
+
+        return $this->provider->setInvoicePaid($this->cart->getTotal());
     }
 
-    public function getInvoice()
+    public function downloadInvoice()
     {
+        if(!$this->provider){
+            throw new Exception('Invoice provider is not inited!');
+        }
 
+        if(!$this->provider->getInvoiceNumber()){
+            $this->provider->setInvoiceNumber($this->cart->getInvoiceNumber());
+        }
+
+        if($origFileName = $this->provider->downloadInvoice()){
+
+            $savePath = DIR_UPLOAD . $this->owner->shopId . '/invoices/';
+            $fileName = uuid::v4() . '.pdf';
+
+            if(!is_dir($savePath)){
+                @mkdir($savePath, 0777, true);
+                @chmod($savePath, 0777);
+            }
+
+            rename($origFileName, $savePath . $fileName);
+
+            $this->saveInvoiceFile($fileName);
+        }
     }
 
-    public function sendInvoice()
-    {
-
-    }
-
-    private function loadSettings(int $providerId = 0):InvoiceProviderSettings
+    private function loadSettings(int $providerId = 0):?InvoiceProviderSettings
     {
         $where = [
             'iv_shop_id' => $this->owner->shopId,
@@ -117,50 +250,41 @@ class Invoices extends ancestor {
         return new InvoiceProviderSettings(($settings ?: []));
     }
 
-    private function setBuyer():self
+    private function saveInvoiceNumber():void
     {
-        $this->buyer = new InvoiceBuyer();
-        /*
-        $buyer->setEmail($cart['us_email']);
-
-        if($cart['us_email']) {
-            $buyer->setSendEmail(true);
-        }else{
-            $buyer->setSendEmail(false);
+        if($this->cart->id && $this->provider->getInvoiceNumber()){
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'cart',
+                    [
+                        'cart_invoice_number' => $this->provider->getInvoiceNumber(),
+                        'cart_invoice_provider' => $this->providerId
+                    ],
+                    [
+                        'cart_id' => $this->cart->id,
+                        'cart_shop_id' => $this->owner->shopId,
+                    ]
+                )
+            );
         }
-
-            $buyer->setName($cart['us_invoice_name']);
-
-            $buyer->setVatNumber($cart['us_vat']);
-            $buyer->setCountry($cart['us_invoice_country']);
-            $buyer->setZipCode($cart['us_invoice_zip']);
-            $buyer->setCity($cart['us_invoice_city']);
-            $buyer->setAddress($cart['us_invoice_address']);
-
-            $buyer->setName($cart['us_lastname'] . ' ' . $cart['us_firstname']);
-            $buyer->setCountry($cart['us_country']);
-            $buyer->setZipCode($cart['us_zip']);
-            $buyer->setCity($cart['us_city']);
-            $buyer->setAddress($cart['us_address']);
-
-
-        if($cart['us_phone']){
-            $buyer->setPhone($cart['us_phone']);
-        }
-
-        $this->buyer = $buyer;
-        */
-        return $this;
     }
 
-    private function addItem(InvoiceItem $item):self
+
+    private function saveInvoiceFile(string $fileName):void
     {
-        $this->items[] = $item;
-
-        return $this;
-    }
-
-    private function updateCart(){
-
+        if($this->cart->id && $fileName){
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'cart',
+                    [
+                        'cart_invoice_filename' => $fileName,
+                    ],
+                    [
+                        'cart_id' => $this->cart->id,
+                        'cart_shop_id' => $this->owner->shopId,
+                    ]
+                )
+            );
+        }
     }
 }

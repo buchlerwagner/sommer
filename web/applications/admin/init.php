@@ -24,6 +24,8 @@ $this->addCss('bootstrap-select/css/bootstrap-select.css', 'bs-select', false, f
 $this->addJs('bootstrap/bootstrap.bundle.min.js', 'bootstrap', false, false, false);
 $this->addJs("autocomplete/bootstrap-autocomplete.min.js", 'autocomplete', false, false, false);
 $this->addJs("zoom/jquery.zoom.min.js", 'zoom', false, false, false);
+$this->addJs('inputmask/jquery.inputmask.min.js', 'inputmask', false, false, false);
+$this->addJs('inputmask/bindings/inputmask.binding.js', 'inputmask-bindings', false, false, false);
 
 //$this->addJs('select2/js/select2.min.js', 'bs-select2', false, false, false);
 //$this->addCss('select2/css/select2.css', 'bs-select2', false, false);

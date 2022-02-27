@@ -79,7 +79,7 @@ class InvoiceItem {
         return $this;
     }
 
-    public function getGrossPrice():string
+    public function getGrossPrice():float
     {
         return $this->grossPrice;
     }

@@ -17,7 +17,7 @@ class Log {
     /**
      * Naplók útvonala
      */
-    const LOG_PATH = './logs';
+    const LOG_PATH = 'logs';
 
     /**
      * Naplózási szint: nincs naplózás

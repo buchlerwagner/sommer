@@ -80,13 +80,13 @@ class InvoiceBuyer {
         return $this->address;
     }
 
-    public function setVatNumber(string $vatNumber):self
+    public function setVatNumber(?string $vatNumber):self
     {
         $this->vatNumber = $vatNumber;
         return $this;
     }
 
-    public function getVatNumber():string
+    public function getVatNumber():?string
     {
         return $this->vatNumber;
     }

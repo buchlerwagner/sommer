@@ -1,15 +1,26 @@
 <?php
 
 class Cart {
-    private $id;
+    const PRICE_BASE_NET = 1;
+    const PRICE_BASE_GROSS = 2;
+
+    public $id;
+
+    private $priceBase;
 
     private $orderStatus;
 
     private $orderDate;
 
+    private $shippingDate;
+
     private $orderNumber;
 
-    private $currency = 0;
+    private $invoiceNumber;
+
+    private $invoiceFileName;
+
+    private $currency;
 
     private $total = 0;
 
@@ -31,11 +42,18 @@ class Cart {
 
     private $invoiceProviderId = 0;
 
+    private $orderType = 0;
+
+    /**
+     * @var $items CartItem
+     */
     private $items = [];
 
-    public function __construct(int $id)
+    public function __construct(int $id, int $priceBae = self::PRICE_BASE_NET)
     {
         $this->id = $id;
+
+        $this->priceBase = $priceBae;
     }
 
     public function setOrderStatus(?string $status):self
@@ -60,6 +78,17 @@ class Cart {
         return $this->orderDate;
     }
 
+    public function setShippingDate(?string $date):self
+    {
+        $this->shippingDate = $date;
+        return $this;
+    }
+
+    public function getShippingDate():string
+    {
+        return $this->shippingDate;
+    }
+
     public function setOrderNumber(?string $orderNumber):self
     {
         $this->orderNumber = $orderNumber;
@@ -71,13 +100,24 @@ class Cart {
         return $this->orderNumber;
     }
 
+    public function getInvoiceNumber():string
+    {
+        return $this->invoiceNumber;
+    }
+
+    public function setInvoiceNumber(?string $invoiceNumber):self
+    {
+        $this->invoiceNumber = $invoiceNumber;
+        return $this;
+    }
+
     public function setCurrency(string $currency):self
     {
         $this->currency = $currency;
         return $this;
     }
 
-    public function getCurrency():float
+    public function getCurrency():string
     {
         return $this->currency;
     }
@@ -104,9 +144,19 @@ class Cart {
         return $this->discount;
     }
 
-    public function setPackagingFee(float $fee):self
+    public function setPackagingFee(float $fee, string $vat = ''):self
     {
         $this->packagingFee = $fee;
+
+        if($this->packagingFee){
+            $item = new CartItem();
+            $item->setName('Csomagolás'); // @todo: localize
+            $item->setUnitPrice($this->packagingFee);
+            $item->setVat($vat, $vat / 100);
+            $item->setQuantity(1);
+
+            $this->addItem($item);
+        }
 
         return $this;
     }
@@ -116,29 +166,60 @@ class Cart {
         return $this->packagingFee;
     }
 
-    public function setPaymentFee(float $fee):self
+    public function setShipping(?array $shippingMode, ?float $shippingFee = 0):self
     {
-        $this->paymentFee = $fee;
+        $this->shippingMode = $shippingMode;
+        $this->shippingFee = $shippingFee;
+
+        if($this->shippingFee){
+            $item = new CartItem();
+            $item->setName($this->shippingMode['name']);
+            $item->setUnitPrice($this->shippingFee);
+            $item->setVat($this->shippingMode['vat'], $this->shippingMode['vat'] / 100);
+            $item->setQuantity(1);
+
+            $this->addItem($item);
+        }
 
         return $this;
     }
 
-    public function getPaymentFee():float
+    public function getShippingMode():array
     {
-        return $this->paymentFee;
-    }
-
-
-    public function setShippingFee(?float $fee):self
-    {
-        $this->shippingFee = $fee;
-
-        return $this;
+        return $this->shippingMode;
     }
 
     public function getShippingFee():float
     {
         return $this->shippingFee;
+    }
+
+    public function setPayment(?array $paymentMode, ?float $paymentFee = 0):self
+    {
+        $this->paymentMode = $paymentMode;
+        $this->paymentFee = $paymentFee;
+
+        if($this->paymentFee){
+            $item = new CartItem();
+            $item->setName('Kezelési költség'); // @todo: localize
+            $item->setUnitPrice($this->paymentFee);
+            $item->setVat($this->paymentMode['vat'], $this->paymentMode['vat'] / 100);
+            $item->setQuantity(1);
+
+            $this->addItem($item);
+        }
+
+        return $this;
+    }
+
+    public function getPaymentMode():array
+    {
+        return $this->paymentMode;
+    }
+
+    public function getPaymentFee():float
+    {
+        return $this->paymentFee;
     }
 
     public function setPaid(bool $paid):self
@@ -163,31 +244,9 @@ class Cart {
         return $this->customer;
     }
 
-    public function setShippingMode(?array $shippingMode):self
-    {
-        $this->shippingMode = $shippingMode;
-        return $this;
-    }
-
-    public function getShippingMode():array
-    {
-        return $this->shippingMode;
-    }
-
-    public function setPaymentMode(?array $paymentMode):self
-    {
-        $this->paymentMode = $paymentMode;
-        return $this;
-    }
-
-    public function getPaymentMode():array
-    {
-        return $this->paymentMode;
-    }
-
     public function addItem(CartItem $item):self
     {
-        $this->items[] = $item;
+        $this->items[] = $item->summarize($this->priceBase);
         return $this;
     }
 
@@ -205,5 +264,27 @@ class Cart {
     public function getInvoiceProvider():int
     {
         return $this->invoiceProviderId;
+    }
+
+    public function setOrderType(int $orderType):self
+    {
+        $this->orderType = $orderType;
+        return $this;
+    }
+
+    public function getOrderType():int
+    {
+        return $this->orderType;
+    }
+
+    public function setInvoiceFileName(?string $fileName):self
+    {
+        $this->invoiceFileName = $fileName;
+        return $this;
+    }
+
+    public function getInvoiceFileName():string
+    {
+        return $this->invoiceFileName;
     }
 }

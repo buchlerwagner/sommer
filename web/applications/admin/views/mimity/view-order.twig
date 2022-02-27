@@ -95,6 +95,17 @@
                             <b>{{ _date(form.cart.orderDate, 5) }}</b>
                         </div>
                         <div>
+                            <span class="text-secondary">{{ _('LBL_INVOICE_NUMBER') }}:</span>
+                            {% if form.cart.invoiceNumber %}
+                                <a href="/ajax/preview/?src={{ form.invoiceDir }}{{ form.cart.invoiceFileName }}" data-target="#ajax-modal" data-toggle="modal" data-size="xl">
+                                    <i class="fas fa-file-download"></i>
+                                    <b>{{ form.cart.invoiceNumber }}</b>
+                                </a>
+                            {% else %}
+                                <span class="text-danger">{{ _('LBL_NO_INVOICE') }}</span>
+                            {% endif %}
+                        </div>
+                        <div>
                             <span class="text-secondary">{{ _('LBL_ORDER_STATUS') }}:</span>
                             <b>{{ orderState(form.cart.orderStatus)|raw }}</b>
                         </div>
@@ -186,6 +197,18 @@
         <a href="/ajax/forms/setOrderStatus/{{ form.cart.id }}/" data-toggle="modal" data-target="#ajax-modal" class="btn btn-light btn-app">
             <i class="far fa-flag-alt text-primary"></i>
             {{ _('BTN_SET_STATUS') }}
+        </a>
+    {% endif %}
+
+    {% if form.hasInvoiceProvider %}
+        <a{% if not form.cart.invoiceNumber %} href="./?invoice"{% endif %} class="btn btn-light btn-app{% if form.cart.invoiceNumber %} disabled{% endif %}">
+            <i class="far fa-file-invoice text-primary"></i>
+            {{ _('BTN_CREATE_INVOICE') }}
+        </a>
+    {% else %}
+        <a href="#" class="btn btn-light btn-app disabled">
+            <i class="far fa-file-invoice text-primary"></i>
+            {{ _('BTN_CREATE_INVOICE') }}
         </a>
     {% endif %}
 

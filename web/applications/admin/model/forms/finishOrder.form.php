@@ -122,7 +122,7 @@ class finishOrderForm extends formBuilder {
             ),
             (new groupRow('row6', false, 'invoice-vat'))->addElements(
                 (new inputText('us_vat', 'LBL_VAT_NUMBER'))
-                    ->onlyNumbers('-')
+                    ->setCustomMask('99999999-9-99')
                     ->setColSize('col-12')
             )
         );

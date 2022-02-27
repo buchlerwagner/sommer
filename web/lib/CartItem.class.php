@@ -1,31 +1,33 @@
 <?php
 
 class CartItem {
-    private $id;
+    public $id;
 
-    private $productId;
+    public $productId;
 
-    private $variantId;
+    public $variantId;
 
     private $name;
 
     private $variantName;
 
-    private $currency;
-
     private $unitPrice = 0;
 
-    private $totalPrice = 0;
+    private $totalNetPrice = 0;
+
+    private $totalGrossPrice = 0;
 
     private $vatKey;
 
-    private $vat;
+    private $vatAmount = 0;
+
+    private $vat = 1;
 
     private $quantity = 1;
 
     private $quantityUnit;
 
-    public function __construct(int $id, int $productId, int $variantId)
+    public function __construct(int $id = 0, int $productId = 0, int $variantId = 0)
     {
         $this->id = $id;
 
@@ -53,17 +55,9 @@ class CartItem {
         return $this->variantName;
     }
 
-    public function setPrice(float $unitPrice, string $currency, int $quantity = 1, string $unit = 'db'):self
+    public function setUnitPrice(float $unitPrice):self
     {
         $this->unitPrice = $unitPrice;
-
-        $this->currency = $currency;
-
-        $this->quantity = $quantity;
-
-        $this->quantityUnit = $unit;
-
-        $this->totalPrice = $this->unitPrice * $this->quantity;
 
         return $this;
     }
@@ -73,9 +67,19 @@ class CartItem {
         return $this->unitPrice;
     }
 
-    public function getCurrency():string
+    public function getNetPrice():float
     {
-        return $this->currency;
+        return $this->totalNetPrice;
+    }
+
+    public function getGrossPrice():float
+    {
+        return $this->totalGrossPrice;
+    }
+
+    public function getVatAmount():float
+    {
+        return $this->vatAmount;
     }
 
     public function setVat(string $vatKey, float $vat):self
@@ -114,6 +118,25 @@ class CartItem {
     public function getQuantityUnit():string
     {
         return $this->quantityUnit;
+    }
+
+    final public function summarize(int $priceBase):self
+    {
+        if($priceBase == Cart::PRICE_BASE_GROSS){
+            $this->totalGrossPrice = $this->unitPrice * $this->quantity;
+            $this->totalNetPrice = round($this->totalGrossPrice / (1 + $this->vat));
+
+            $this->vatAmount = $this->totalGrossPrice - $this->totalNetPrice;
+
+            $this->unitPrice = round($this->unitPrice / (1 + $this->vat));
+        }else{
+            $this->totalNetPrice = $this->unitPrice * $this->quantity;
+            $this->vatAmount = round($this->totalNetPrice * $this->vat);
+
+            $this->totalGrossPrice = $this->totalNetPrice + $this->vatAmount;
+        }
+
+        return $this;
     }
 
 }
