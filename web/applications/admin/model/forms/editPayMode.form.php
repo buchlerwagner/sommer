@@ -65,7 +65,7 @@ class editPayModeForm extends formBuilder {
                     ->addData('show-remove', 'false')
                     ->addData('show-cancel', 'false')
                     ->addData('show-close', 'false')
-                    ->addData('allowed-file-extensions', '["jpg", "png", "jpeg", "gif"]')
+                    ->addData('allowed-file-extensions', '["jpg", "png", "jpeg", "gif", "svg"]')
                     ->addData('show-preview', 'false')
                     ->notDBField(),
 

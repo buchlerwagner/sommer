@@ -305,7 +305,7 @@
                                                             {% if item.price > 0 %}
                                                             <div class="col-12 col-md-2 text-right">
                                                                 <span class="text-muted">
-                                                                        {{ _price(item.price, cart.currency) }}
+                                                                    {{ _price(item.price, cart.currency) }}
                                                                 </span>
                                                             </div>
                                                             {% endif %}
@@ -315,8 +315,8 @@
                                                         {{ item.text|nl2br }}
                                                         {% if item.logo %}
                                                             <div class="text-center mt-2">
-                                                            <img src="{{ item.logo }}" alt="">
-                                                        </div>
+                                                                <img src="{{ item.logo }}" width="300" alt="">
+                                                            </div>
                                                         {% endif %}
                                                     </span>
                                                 </div>
