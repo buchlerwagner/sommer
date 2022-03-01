@@ -20,6 +20,9 @@ class editInvoiceProviderForm extends formBuilder {
             (new inputSwitch('iv_test_mode', 'LBL_TEST_MODE'))
                 ->setColor(enumColors::Danger()),
 
+            (new inputSwitch('iv_manual', 'LBL_MANUAL_MODE'))
+                ->setColor(enumColors::Primary()),
+
             (new inputText('iv_user_name', 'LBL_USER_NAME')),
 
             (new inputPassword('iv_password', 'LBL_PASSWORD'))
@@ -41,6 +44,7 @@ class editInvoiceProviderForm extends formBuilder {
         $this->values['iv_shop_id'] = $this->owner->shopId;
         if(Empty($this->values['iv_test_mode'])) $this->values['iv_test_mode'] = 0;
         if(Empty($this->values['iv_enabled'])) $this->values['iv_enabled'] = 0;
+        if(Empty($this->values['iv_manual'])) $this->values['iv_manual'] = 0;
 
         if($this->values['iv_password']){
             $this->values['iv_password'] = serialize(cryptString(SMTP_HASH_KEY, $this->values['pp_password']));

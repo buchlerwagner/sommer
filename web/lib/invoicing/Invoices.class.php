@@ -19,6 +19,8 @@ class Invoices extends ancestor {
      */
     private $cart = null;
 
+    private $allowInvoicing = true;
+
     public static function getProviders():array
     {
         $result = [];
@@ -42,17 +44,33 @@ class Invoices extends ancestor {
 
     public function hasInvoiceProvider():bool
     {
-        return (!Empty($this->loadSettings()));
+        return (!Empty($this->loadDefaultSettings()));
+    }
+
+    public function overrideInvoicingAllowance():self
+    {
+        $this->allowInvoicing = true;
+        return $this;
     }
 
     public function init(?Cart $cart = null):self
     {
+        $this->providerId = 0;
+
         if($cart) {
             $this->cart = $cart;
             $this->providerId = $cart->getInvoiceProvider();
         }
 
-        if($this->settings = $this->loadSettings($this->providerId)){
+        if($this->providerId){
+            $this->settings = $this->loadSettings($this->providerId);
+        }else{
+            $this->settings = $this->loadDefaultSettings();
+        }
+
+        if($this->settings){
+            $this->allowInvoicing = !$this->settings->isManual();
+
             if(class_exists($this->settings->className)) {
                 $this->provider = new $this->settings->className($this->settings, $this->owner->language);
             }
@@ -61,8 +79,12 @@ class Invoices extends ancestor {
         return $this;
     }
 
-    public function getTaxPayer(string $taxNumber):?array
+    public function getTaxPayer(string $taxNumber):?InvoiceBuyer
     {
+        if(!$this->settings){
+            return null;
+        }
+
         if(!$this->provider){
             throw new Exception('Invoice provider is not inited!');
         }
@@ -76,6 +98,10 @@ class Invoices extends ancestor {
     {
         if(!$this->provider){
             throw new Exception('Invoice provider is not inited!');
+        }
+
+        if(!$this->allowInvoicing){
+            return '';
         }
 
         if(!$this->cart){
@@ -161,16 +187,16 @@ class Invoices extends ancestor {
                 }
             }
 
-            if ($this->provider->createInvoice()) {
-                $this->saveInvoiceNumber();
-                $this->downloadInvoice();
+            if ($invoiceNumber = $this->provider->createInvoice()) {
+                $this->saveInvoiceNumber($invoiceNumber);
+                $this->downloadInvoice($invoiceNumber);
             }
         }
 
         return $this->provider->getInvoiceNumber();
     }
 
-    public function setPaid()
+    public function setPaid():bool
     {
         if(!$this->provider){
             throw new Exception('Invoice provider is not inited!');
@@ -187,20 +213,25 @@ class Invoices extends ancestor {
         if(!$this->cart->isPaid()) {
             $this->provider->setInvoiceNumber($this->cart->getInvoiceNumber());
             $paymentMode = $this->cart->getPaymentMode();
+
             $this->provider->setPaymentMethod($paymentMode['type']);
+
+            return $this->provider->setInvoicePaid($this->cart->getTotal());
         }
 
-        return $this->provider->setInvoicePaid($this->cart->getTotal());
+        return false;
     }
 
-    public function downloadInvoice()
+    public function downloadInvoice(string $invoiceNumber = ''):void
     {
         if(!$this->provider){
             throw new Exception('Invoice provider is not inited!');
         }
 
-        if(!$this->provider->getInvoiceNumber()){
+        if(Empty($invoiceNumber)){
             $this->provider->setInvoiceNumber($this->cart->getInvoiceNumber());
+        }else{
+            $this->provider->setInvoiceNumber($invoiceNumber);
         }
 
         if($origFileName = $this->provider->downloadInvoice()){
@@ -219,45 +250,92 @@ class Invoices extends ancestor {
         }
     }
 
-    private function loadSettings(int $providerId = 0):?InvoiceProviderSettings
+    public function getInvoice(string $invoiceNumber = ''):InvoiceProvider
     {
-        $where = [
-            'iv_shop_id' => $this->owner->shopId,
-        ];
-
-        if($providerId){
-            $where['iv_id'] = $providerId;
-        }else{
-            $where['iv_enabled'] = 1;
+        if(!$this->provider){
+            throw new Exception('Invoice provider is not inited!');
         }
 
-        $settings = $this->owner->db->getFirstRow(
-            $this->owner->db->genSQLSelect(
-                'invoice_providers',
-                [
-                    'iv_id AS id',
-                    'iv_name AS name',
-                    'iv_provider AS className',
-                    'iv_user_name AS userName',
-                    'iv_password AS password',
-                    'iv_api_key AS apiKey',
-                    'iv_test_mode AS isTest',
-                ],
-                $where
-            )
-        );
+        if(Empty($invoiceNumber)){
+            $this->provider->setInvoiceNumber($this->cart->getInvoiceNumber());
+        }else{
+            $this->provider->setInvoiceNumber($invoiceNumber);
+        }
+
+        return $this->provider->getInvoice();
+    }
+
+    private function loadDefaultSettings():?InvoiceProviderSettings
+    {
+        static $settings = false;
+
+        if(!$settings) {
+            $settings = $this->owner->db->getFirstRow(
+                $this->owner->db->genSQLSelect(
+                    'invoice_providers',
+                    [
+                        'iv_id AS id',
+                        'iv_name AS name',
+                        'iv_provider AS className',
+                        'iv_user_name AS userName',
+                        'iv_password AS password',
+                        'iv_api_key AS apiKey',
+                        'iv_test_mode AS isTest',
+                        'iv_manual AS isManual',
+                    ],
+                    [
+                        'iv_enabled' => 1,
+                        'iv_shop_id' => $this->owner->shopId,
+                    ]
+                )
+            );
+
+            $this->providerId = ($settings['id'] ?: 0);
+        }
 
         return new InvoiceProviderSettings(($settings ?: []));
     }
 
-    private function saveInvoiceNumber():void
+    private function loadSettings(int $providerId):?InvoiceProviderSettings
+    {
+        static $settings = false;
+
+        if(!$settings) {
+            $settings = $this->owner->db->getFirstRow(
+                $this->owner->db->genSQLSelect(
+                    'invoice_providers',
+                    [
+                        'iv_id AS id',
+                        'iv_name AS name',
+                        'iv_provider AS className',
+                        'iv_user_name AS userName',
+                        'iv_password AS password',
+                        'iv_api_key AS apiKey',
+                        'iv_test_mode AS isTest',
+                        'iv_manual AS isManual',
+                    ],
+                    [
+                        'iv_id' => $providerId,
+                        'iv_shop_id' => $this->owner->shopId,
+                    ]
+                )
+            );
+            if(!$settings){
+                return $this->loadDefaultSettings();
+            }
+        }
+
+        return new InvoiceProviderSettings(($settings ?: []));
+    }
+
+    private function saveInvoiceNumber(string $invoiceNumber):void
     {
         if($this->cart->id && $this->provider->getInvoiceNumber()){
             $this->owner->db->sqlQuery(
                 $this->owner->db->genSQLUpdate(
                     'cart',
                     [
-                        'cart_invoice_number' => $this->provider->getInvoiceNumber(),
+                        'cart_invoice_number' => $invoiceNumber,
                         'cart_invoice_provider' => $this->providerId
                     ],
                     [
@@ -268,7 +346,6 @@ class Invoices extends ancestor {
             );
         }
     }
-
 
     private function saveInvoiceFile(string $fileName):void
     {

@@ -7,15 +7,12 @@ use \SzamlaAgent\SzamlaAgentUtil;
 use \SzamlaAgent\CreditNote\InvoiceCreditNote;
 use \SzamlaAgent\Buyer;
 use \SzamlaAgent\TaxPayer;
-
-use \SzamlaAgent\Seller;
-use \SzamlaAgent\Currency;
-use \SzamlaAgent\Language;
-
 use \SzamlaAgent\Document\Invoice\Invoice;
 use \SzamlaAgent\Item\InvoiceItem;
 
 class Szamlazz extends InvoiceProvider {
+    const PROVIDER_NAME = 'Számlázz.hu';
+
     /**
      * @var $agent SzamlaAgentAPI
      */
@@ -26,7 +23,7 @@ class Szamlazz extends InvoiceProvider {
     }
 
     public static function getName(): string {
-        return 'Számlázz.hu';
+        return self::PROVIDER_NAME;
     }
 
     protected function init(): void {
@@ -44,16 +41,17 @@ class Szamlazz extends InvoiceProvider {
         }
     }
 
-    public function getTaxPayer(string $taxNumber): ?array {
-        $data = [];
-
+    public function getTaxPayer(string $taxNumber): ?InvoiceBuyer {
         $result = $this->agent->getTaxPayer($taxNumber);
-        dd($result);
+        if($result->isSuccess()) {
+            return $this->parseTaxPayerXML($result->getTaxPayerData());
+        }
 
-        return $data;
+        return null;
     }
 
-    public function createInvoice() {
+    public function createInvoice():?string
+    {
         // Új e-számla létrehozása alapértelmezett adatokkal
         $invoice = new Invoice(Invoice::INVOICE_TYPE_E_INVOICE);
 
@@ -137,14 +135,13 @@ class Szamlazz extends InvoiceProvider {
 
         // Számla elkészítése
         $result = $this->agent->generateInvoice($invoice);
+
         // Agent válasz sikerességének ellenőrzése
         if ($result->isSuccess()) {
             $this->setInvoiceNumber($result->getDocumentNumber());
-
-            return true;
-        }else{
-            return false;
         }
+
+        return $this->getInvoiceNumber();
     }
 
     public function setPaymentMethod(int $method):InvoiceProvider
@@ -164,7 +161,7 @@ class Szamlazz extends InvoiceProvider {
         return $this;
     }
 
-    public function downloadInvoice()
+    public function downloadInvoice():string
     {
         $path = SzamlaAgentUtil::getBasePath() . ltrim(SzamlaAgentAPI::PDF_FILE_SAVE_PATH, '.') . '/';
         $fileName = $path . $this->invoiceNumber . '.pdf';
@@ -177,7 +174,7 @@ class Szamlazz extends InvoiceProvider {
                 //$result->downloadPdf();
                 return $result->getPdfFileName(true);
             } else {
-                return false;
+                return '';
             }
         }else{
             return $fileName;
@@ -207,5 +204,62 @@ class Szamlazz extends InvoiceProvider {
         $result = $this->agent->payInvoice($invoice);
 
         return $result->isSuccess();
+    }
+
+    private function parseTaxPayerXML(string $xml):InvoiceBuyer
+    {
+        $buyer = new InvoiceBuyer();
+
+        preg_match('/<ns2:taxpayerValidity>(.*?)<\/ns2:taxpayerValidity>/is', $xml, $m);
+        $buyer->setValid( (mb_convert_case($m[1], MB_CASE_LOWER) === 'true') );
+
+        //preg_match('/<ns2:incorporation>.*?<\/ns2:incorporation>/is', $xml, $m);
+
+        //preg_match('/<ns2:taxpayerName>(.*?)<\/ns2:taxpayerName>/is', $xml, $m);
+        //$buyer->setName(htmlspecialchars_decode($m[1]));
+
+        preg_match('/<ns2:taxpayerShortName>(.*?)<\/ns2:taxpayerShortName>/is', $xml, $m);
+        $buyer->setName(htmlspecialchars_decode($m[1]));
+
+        preg_match('/<ns3:countryCode>(.*?)<\/ns3:countryCode>/is', $xml, $m);
+        $buyer->setCountry($m[1]);
+
+        preg_match('/<ns3:postalCode>(.*?)<\/ns3:postalCode>/is', $xml, $m);
+        $buyer->setZipCode($m[1]);
+
+        preg_match('/<ns3:city>(.*?)<\/ns3:city>/is', $xml, $m);
+        $buyer->setCity(mb_convert_case($m[1], MB_CASE_TITLE));
+
+        preg_match('/<ns3:streetName>(.*?)<\/ns3:streetName>/is', $xml, $m);
+        $address = mb_convert_case($m[1], MB_CASE_TITLE);
+
+        preg_match('/<ns3:publicPlaceCategory>(.*?)<\/ns3:publicPlaceCategory>/is', $xml, $m);
+        $address .= ' ' . mb_convert_case($m[1], MB_CASE_LOWER);
+
+        preg_match('/<ns3:number>(.*?)<\/ns3:number>/is', $xml, $m);
+        $address .= ' ' . $m[1];
+        $buyer->setAddress(trim($address));
+
+        preg_match('/<ns3:taxpayerId>(.*?)<\/ns3:taxpayerId>/is', $xml, $m);
+        $vat = $m[1];
+        preg_match('/<ns3:vatCode>(.*?)<\/ns3:vatCode>/is', $xml, $m);
+        $vat .= '-' . $m[1];
+        preg_match('/<ns3:countyCode>(.*?)<\/ns3:countyCode>/is', $xml, $m);
+        $vat .= '-' . $m[1];
+        $buyer->setVatNumber($vat);
+
+        return $buyer;
+    }
+
+    public function getInvoice(): ?InvoiceProvider
+    {
+        $result = $this->agent->getInvoiceData($this->invoiceNumber);
+
+        // Agent válasz sikerességének ellenőrzése
+        if ($result->isSuccess()) {
+            var_dump($result->getData());
+        }
+
+        return $this;
     }
 }

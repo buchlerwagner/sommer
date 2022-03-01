@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Airwin tester</title>
+	<title>Tester</title>
 	<!-- Bootstrap -->
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
@@ -77,7 +77,7 @@
 	<div class="panel-body">
 		<?php if(!$standalone_mode) {?>
 		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation"<?php if(_TAB=='web'){?> class="active"<?php } ?>><a href="index.php">WEB</a></li>
+			<li role="presentation" class="active"><a href="index.php">WEB</a></li>
 			<li role="presentation"><a href="index.php?getinfo" target="_blank">PHP info</a></li>
 		</ul>
 		<?php } ?>

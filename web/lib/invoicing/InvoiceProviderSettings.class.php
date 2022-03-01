@@ -7,10 +7,13 @@ class InvoiceProviderSettings {
     public $apiKey;
 
     private $isTest = 0;
+    private $isManual = 1;
     private $password = '';
 
     public function __construct(array $settings)
     {
+        $this->id = null;
+
         if($settings){
             foreach($settings AS $key => $value){
                 if(property_exists($this, $key)){
@@ -18,6 +21,11 @@ class InvoiceProviderSettings {
                 }
             }
         }
+    }
+
+    public function isManual():bool
+    {
+        return ($this->isManual);
     }
 
     public function isTestMode():bool

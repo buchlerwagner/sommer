@@ -40,9 +40,3 @@ if($this->owner->language != 'en'){
 }
 
 $this->addJs('admin' . $postfix . '.js', 'app-' . APPLICATION_NAME, false, false, $addVersion);
-
-
-/**
- * @todo remove
- */
-$this->addJs('order.js', 'order', false, false, false);

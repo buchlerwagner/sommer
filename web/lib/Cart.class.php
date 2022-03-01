@@ -100,7 +100,7 @@ class Cart {
         return $this->orderNumber;
     }
 
-    public function getInvoiceNumber():string
+    public function getInvoiceNumber():?string
     {
         return $this->invoiceNumber;
     }

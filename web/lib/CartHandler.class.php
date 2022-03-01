@@ -48,7 +48,7 @@ class CartHandler extends ancestor {
 	public $items = [];
 	public $remarks;
 	public $orderType = 0;
-	public $invoiceType = 0;
+	public $invoiceType = -1;
 	public $invoiceProviderId = 0;
 	public $invoiceNumber = false;
 	public $invoiceFileName = false;
@@ -243,9 +243,13 @@ class CartHandler extends ancestor {
             }
         }
 
-        $cart->setPackagingFee($this->packagingFee, $this->packagingFeeVat)
-             ->setShipping($this->getSelectedShippingMode(), $this->shippingFee)
-             ->setPayment($this->getSelectedPaymentMode(), $this->paymentFee);
+        if($this->packagingFee) {
+            $cart->setPackagingFee($this->packagingFee, $this->packagingFeeVat);
+        }
+
+        $cart->setShipping($this->getSelectedShippingMode(), $this->shippingFee);
+
+        $cart->setPayment($this->getSelectedPaymentMode(), $this->paymentFee);
 
         return $cart;
     }
@@ -346,7 +350,7 @@ class CartHandler extends ancestor {
         return $out;
     }
 
-	public function makeOrder($userId, $invoiceType = 0, $remarks = ''){
+	public function makeOrder($userId, $invoiceType = -1, $remarks = ''){
         switch($this->orderType){
             case ORDER_TYPE_LOCAL:
             case ORDER_TYPE_TAKEAWAY:
@@ -359,19 +363,24 @@ class CartHandler extends ancestor {
                 $isPaid = 0;
                 break;
         }
-        
+
+        $this->invoiceType = (int) $invoiceType;
+        $this->orderNumber = $this->generateOrderNumber();
+
+        $this->loadCustomerData($userId, $this->invoiceType);
+
         $data = [
             'cart_us_id' => (int) $userId,
-            'cart_order_number' => $this->generateOrderNumber(),
+            'cart_order_number' => $this->orderNumber,
             'cart_status' => self::CART_STATUS_ORDERED,
             'cart_order_status' => $orderStatus,
             'cart_ordered' => 'NOW()',
-            'cart_invoice_type' => (int) $invoiceType,
+            'cart_invoice_type' => $this->invoiceType,
             'cart_paid' => $isPaid,
             'cart_remarks' => $remarks,
         ];
 
-        if($this->orderType == ORDER_TYPE_LOCAL || $this->orderType == ORDER_TYPE_TAKEAWAY){
+        if(in_array($this->orderType, [ORDER_TYPE_LOCAL, ORDER_TYPE_TAKEAWAY])){
             $data['cart_sm_id'] = 0;
             $data['cart_si_id'] = 0;
         }
@@ -403,7 +412,7 @@ class CartHandler extends ancestor {
 	}
 
     public function initPayment(){
-        if($this->isBankCardPayment()){
+        if($this->isBankCardPayment() && $this->orderType == ORDER_TYPE_ORDER){
             $payMode = $this->getSelectedPaymentMode();
             if($payMode['providerId']) {
                 /**
@@ -417,6 +426,8 @@ class CartHandler extends ancestor {
                     die($e);
                 }
             }
+        }else{
+            $this->issueInvoice();
         }
     }
 
@@ -606,6 +617,7 @@ class CartHandler extends ancestor {
                 $this->id = $cart['cart_id'];
                 $this->userId = $cart['cart_us_id'];
                 $this->status = $cart['cart_status'];
+                $this->orderType = (int) $cart['cart_order_type'];
                 $this->orderStatus = $cart['cart_order_status'];
                 $this->orderNumber = $cart['cart_order_number'];
                 $this->orderDate = $cart['cart_ordered'];
@@ -617,13 +629,12 @@ class CartHandler extends ancestor {
                 $this->shippingFee = $cart['cart_shipping_fee'];
                 $this->shippingId = $cart['cart_sm_id'];
                 $this->intervalId = $cart['cart_si_id'];
+                $this->customInterval = $cart['cart_custom_interval'];
                 $this->paymentFee = $cart['cart_payment_fee'];
                 $this->paymentId = $cart['cart_pm_id'];
                 $this->isPaid = $cart['cart_paid'];
                 $this->remarks = $cart['cart_remarks'];
-                $this->customInterval = $cart['cart_custom_interval'];
-                $this->orderType = $cart['cart_order_type'];
-                $this->invoiceType = $cart['cart_invoice_type'];
+                $this->invoiceType = (int) $cart['cart_invoice_type'];
                 $this->invoiceProviderId = $cart['cart_invoice_provider'];
                 $this->invoiceNumber = $cart['cart_invoice_number'];
                 $this->invoiceFileName = $cart['cart_invoice_filename'];
@@ -631,36 +642,7 @@ class CartHandler extends ancestor {
                 $this->storeName = $cart['st_name'];
 
                 if($this->userId){
-                    $user = $this->owner->user->getUserProfile($this->userId);
-                    $this->userData['contactData'] = [
-                        'id' => $user['id'],
-                        'firstName' => $user['firstname'],
-                        'lastName' => $user['lastname'],
-                        'name' => $user['name'],
-                        'email' => $user['email'],
-                        'phone' => $user['phone'],
-                    ];
-
-                    $this->userData['shippingAddress'] = [
-                        'name' => $user['name'],
-                        'country' => $user['country'],
-                        'zip' => $user['zip'],
-                        'city' => $user['city'],
-                        'address' => $user['address'],
-                    ];
-
-                    if($cart['cart_invoice_type']){
-                        $this->userData['invoiceAddress'] = [
-                            'name' => $user['invoice_name'],
-                            'country' => $user['invoice_country'],
-                            'zip' => $user['invoice_zip'],
-                            'city' => $user['invoice_city'],
-                            'address' => $user['invoice_address'],
-                            'vatNumber' => ($cart['cart_invoice_type'] == 2 ? $user['vat'] : false),
-                        ];
-                    }else {
-                        $this->userData['invoiceAddress'] = $this->userData['shippingAddress'];
-                    }
+                    $this->loadCustomerData($this->userId, $this->invoiceType);
                 }
 
                 $result = $this->owner->db->getRows(
@@ -759,6 +741,43 @@ class CartHandler extends ancestor {
 
 		return $this;
 	}
+
+    private function loadCustomerData($userId, $invoiceType){
+        if($userId){
+            $this->userId = $userId;
+
+            $user = $this->owner->user->getUserProfile($userId);
+            $this->userData['contactData'] = [
+                'id' => $user['id'],
+                'firstName' => $user['firstname'],
+                'lastName' => $user['lastname'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'phone' => $user['phone'],
+            ];
+
+            $this->userData['shippingAddress'] = [
+                'name' => $user['name'],
+                'country' => $user['country'],
+                'zip' => $user['zip'],
+                'city' => $user['city'],
+                'address' => $user['address'],
+            ];
+
+            if($invoiceType){
+                $this->userData['invoiceAddress'] = [
+                    'name' => $user['invoice_name'],
+                    'country' => $user['invoice_country'],
+                    'zip' => $user['invoice_zip'],
+                    'city' => $user['invoice_city'],
+                    'address' => $user['invoice_address'],
+                    'vatNumber' => ($invoiceType == 2 ? $user['vat'] : false),
+                ];
+            }else {
+                $this->userData['invoiceAddress'] = $this->userData['shippingAddress'];
+            }
+        }
+    }
 
 	private function isProductInCart($productId, $variantId = 0){
 		$out = false;
@@ -1136,7 +1155,7 @@ class CartHandler extends ancestor {
         );
         if ($result) {
             foreach($result AS $row){
-                if($row['limitMax'] == 0 || $row['limitMax'] >= $this->subtotal) {
+                if($row['limitMax'] == 0 || $row['limitMax'] >= $this->subtotal || $this->storeId != 'W') {
                     $out[$row['id']] = $row;
 
                     if ($row['logo']) {
@@ -1374,6 +1393,8 @@ class CartHandler extends ancestor {
     }
 
     public function setCustomer($userId, $invoiceType = 0, $remarks = ''){
+        $this->loadCustomerData($userId, $invoiceType);
+
         $this->owner->db->sqlQuery(
             $this->owner->db->genSQLUpdate(
                 'cart',
@@ -1603,6 +1624,8 @@ class CartHandler extends ancestor {
     }
 
     public function setPaid(){
+        $this->isPaid = true;
+
         $this->owner->db->sqlQuery(
             $this->owner->db->genSQLUpdate(
                 'cart',
@@ -1615,6 +1638,22 @@ class CartHandler extends ancestor {
                 ]
             )
         );
+    }
+
+    public function issueInvoice(){
+        if($this->invoiceType != -1){
+            /**
+             * @var $invoice Invoices
+             */
+            $invoice = $this->owner->addByClassName('Invoices');
+            if($invoice->hasInvoiceProvider()) {
+                try {
+                    $invoice->init($this->getCart())->createInvoice();
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+            }
+        }
     }
 
 }

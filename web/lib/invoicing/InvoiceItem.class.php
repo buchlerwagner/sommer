@@ -106,13 +106,13 @@ class InvoiceItem {
         return $this->vatAmount;
     }
 
-    public function setComment(string $comment):self
+    public function setComment(?string $comment):self
     {
         $this->comment = $comment;
         return $this;
     }
 
-    public function getComment():string
+    public function getComment():?string
     {
         return $this->comment;
     }

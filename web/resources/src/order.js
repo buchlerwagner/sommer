@@ -237,6 +237,12 @@ var orders = {
             orders.saveShippingMode();
         });
 
+        $(document).on('change', '.check-tax-number', function () {
+            orders.sendRequest('checkTaxNumber', {
+                taxNumber: $(this).val(),
+            });
+        });
+
         $(document).on('click', '.set-custom-interval', function () {
             var $this = $(this);
             var $parent = $this.parents('#shipping-details');
@@ -336,8 +342,6 @@ var orders = {
 $(function() {
     $.fn.modal.Constructor.prototype._enforceFocus = function () { };
     orders.init();
-
-
 });
 
 function loadUserData(params){

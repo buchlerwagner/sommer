@@ -24,6 +24,9 @@ class PaymentHandler extends ancestor {
 
                 if($transaction->getStatus() === enumPaymentStatus::OK()->getValue()) {
                     $this->owner->cartHandler->setPaid();
+
+                    // Issue invoice after successful bank card payment
+                    $this->owner->cartHandler->issueInvoice();
                 }
 
                 if($transaction->getStatus() !== enumPaymentStatus::Pending()->getValue()){

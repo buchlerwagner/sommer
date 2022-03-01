@@ -35,7 +35,8 @@ module.exports = function(grunt) {
                     'web/resources/src/admin-theme.js',
                     'web/resources/src/toastr.js',
                     'web/resources/src/admin-init.js',
-                    'web/resources/src/tables.js'
+                    'web/resources/src/tables.js',
+                    'web/resources/src/order.js'
                 ],
                 dest: 'web/public/assets/js/admin.js'
             },

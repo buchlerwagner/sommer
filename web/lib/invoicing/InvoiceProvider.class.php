@@ -39,11 +39,13 @@ abstract class InvoiceProvider {
 
     protected abstract function init(): void;
 
-    public abstract function getTaxPayer(string $taxNumber):?array;
+    public abstract function getTaxPayer(string $taxNumber):?InvoiceBuyer;
 
-    public abstract function createInvoice();
+    public abstract function createInvoice():?string;
 
-    public abstract function downloadInvoice();
+    public abstract function getInvoice():?InvoiceProvider;
+
+    public abstract function downloadInvoice():?string;
 
     public abstract function setInvoicePaid(float $amount):bool;
 

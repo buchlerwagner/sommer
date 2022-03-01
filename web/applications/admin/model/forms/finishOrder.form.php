@@ -30,7 +30,7 @@ class finishOrderForm extends formBuilder {
         $defaultInvoiceOption = 0;
         $defaultHidden = '.invoice-data';
         $invoiceOptions = [
-            0 => 'LBL_INVOICE_NO',
+            -1 => 'LBL_INVOICE_NO',
             1 => 'LBL_INVOICE_PRIVATE',
             2 => 'LBL_INVOICE_COMPANY',
         ];
@@ -38,7 +38,7 @@ class finishOrderForm extends formBuilder {
         if($this->orderType === ORDER_TYPE_ORDER) {
             $defaultInvoiceOption = 1;
             $defaultHidden = '.invoice-vat';
-            unset($invoiceOptions[0]);
+            unset($invoiceOptions[-1]);
         }
 
         $invoice = (new groupFieldset('invoice'))->addElements(
@@ -106,25 +106,27 @@ class finishOrderForm extends formBuilder {
 
         $invoiceAddress = (new groupFieldset('invoice-address-data', 'LBL_INVOICE_ADDRESS', 'invoice-data'))
             ->addElements(
-            (new groupRow('row4'))->addElements(
-                (new inputText('us_invoice_name', 'LBL_INVOICE_NAME'))
-                    ->setColSize('col-12'),
-                (new inputSelect('us_invoice_country', 'LBL_COUNTRY', 'HU'))
-                    ->setOptions($this->owner->lists->getCountries())
-                    ->setColSize('col-3'),
-                (new inputText('us_invoice_zip', 'LBL_ZIP'))
-                    ->onlyNumbers()
-                    ->setColSize('col-2'),
-                (new inputText('us_invoice_city', 'LBL_CITY'))
-                    ->setColSize('col-7'),
-                (new inputText('us_invoice_address', 'LBL_ADDRESS'))
-                    ->setColSize('col-12')
-            ),
-            (new groupRow('row6', false, 'invoice-vat'))->addElements(
-                (new inputText('us_vat', 'LBL_VAT_NUMBER'))
-                    ->setCustomMask('99999999-9-99')
-                    ->setColSize('col-12')
-            )
+                (new groupRow('row6', false, 'invoice-vat'))->addElements(
+                    (new inputText('us_vat', 'LBL_VAT_NUMBER'))
+                        ->addClass('check-tax-number')
+                        ->setCustomMask('99999999-9-99')
+                        ->setColSize('col-12 col-lg-4')
+                ),
+
+                (new groupRow('row4'))->addElements(
+                    (new inputText('us_invoice_name', 'LBL_INVOICE_NAME'))
+                        ->setColSize('col-12'),
+                    (new inputSelect('us_invoice_country', 'LBL_COUNTRY', 'HU'))
+                        ->setOptions($this->owner->lists->getCountries())
+                        ->setColSize('col-3'),
+                    (new inputText('us_invoice_zip', 'LBL_ZIP'))
+                        ->onlyNumbers()
+                        ->setColSize('col-2'),
+                    (new inputText('us_invoice_city', 'LBL_CITY'))
+                        ->setColSize('col-7'),
+                    (new inputText('us_invoice_address', 'LBL_ADDRESS'))
+                        ->setColSize('col-12')
+                )
         );
         if($this->orderType === ORDER_TYPE_ORDER) {
             $invoiceAddress->addTools('LBL_SAME_AS_SHIPPING_ADDRESS', 'copy-shipping-address', 'fal fa-copy');
@@ -176,37 +178,54 @@ class finishOrderForm extends formBuilder {
             }
         }
 
-        if($this->values['invoiceType']){
-            if(Empty($this->values['us_lastname'])){
+        if($this->values['invoiceType'] != -1) {
+            if (empty($this->values['us_lastname'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_lastname']);
             }
-            if(Empty($this->values['us_firstname'])){
+            if (empty($this->values['us_firstname'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_firstname']);
             }
-            if(Empty($this->values['us_email'])){
+            if (empty($this->values['us_email'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_email']);
-            }else{
-                if(!checkEmail($this->values['us_email'])){
+            } else {
+                if (!checkEmail($this->values['us_email'])) {
                     $this->addError('ERR_1001', self::FORM_ERROR, ['us_email']);
                 }
             }
-            if(Empty($this->values['us_phone'])){
+            if (empty($this->values['us_phone'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_phone']);
             }
-            if(Empty($this->values['us_invoice_name'])){
+            if (empty($this->values['us_invoice_name'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_name']);
             }
-            if(Empty($this->values['us_invoice_zip'])){
+            if (empty($this->values['us_invoice_zip'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_zip']);
             }
-            if(Empty($this->values['us_invoice_city'])){
+            if (empty($this->values['us_invoice_city'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_city']);
             }
-            if(Empty($this->values['us_invoice_address'])){
+            if (empty($this->values['us_invoice_address'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_address']);
             }
-            if($this->values['invoiceType'] == 2 && Empty($this->values['us_vat'])){
-                $this->addError('ERR_1000', self::FORM_ERROR, ['us_vat']);
+            if ($this->values['invoiceType'] == 2) {
+                if(Empty($this->values['us_vat'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['us_vat']);
+                }else {
+                    /**
+                     * @var $invoice Invoices
+                     */
+                    $invoice = $this->owner->addByClassName('Invoices');
+                    if($invoice->hasInvoiceProvider()) {
+                        try {
+                            $buyer = $invoice->init()->getTaxPayer($this->values['us_vat']);
+                            if (!$buyer->isValid()) {
+                                $this->addError('ERR_INVALID_VAT_NUMBER', self::FORM_ERROR, ['us_vat']);
+                            }
+                        } catch (Exception $e) {
+                            $this->addError('ERR_INVALID_VAT_NUMBER', self::FORM_ERROR, ['us_vat']);
+                        }
+                    }
+                }
             }
         }
 
@@ -229,7 +248,11 @@ class finishOrderForm extends formBuilder {
             $this->keyFields['us_id'] = (int) $this->values['user']['id'];
         }
 
-        if(!$this->keyFields['us_id']){
+        if(in_array($this->orderType, [ORDER_TYPE_TAKEAWAY, ORDER_TYPE_LOCAL]) && $this->values['invoiceType'] == -1) {
+            $this->dbTable = false;
+            unset($this->keyFields);
+
+        }elseif(!$this->keyFields['us_id']){
             $this->values['us_group'] = USER_GROUP_CUSTOMERS;
             $this->values['us_role'] = USER_ROLE_NONE;
             $this->values['us_email2'] = $this->values['us_email'];
@@ -237,11 +260,6 @@ class finishOrderForm extends formBuilder {
             $this->values['us_hash'] = uuid::v4();
             $this->values['us_registered'] = 'NOW()';
             $this->values['us_enabled'] = 0;
-        }
-
-        if($this->orderType == ORDER_TYPE_LOCAL && $this->values['invoiceType'] == 0) {
-            $this->dbTable = false;
-            $this->keyFields['us_id'] = 0;
         }
     }
 
@@ -251,10 +269,16 @@ class finishOrderForm extends formBuilder {
     }
 
     public function onAfterSave($statement) {
+        if($this->keyFields['us_id']){
+            $userId = (int) $this->keyFields['us_id'];
+        }else{
+            $userId = 0;
+        }
+
         if($this->close){
-            $this->order->makeOrder($this->keyFields['us_id'], $this->values['invoiceType'], $this->values['remarks']);
+            $this->order->makeOrder($userId, $this->values['invoiceType'], $this->values['remarks']);
         }else {
-            $this->order->setCustomer($this->keyFields['us_id'], $this->values['invoiceType'], $this->values['remarks']);
+            $this->order->setCustomer($userId, $this->values['invoiceType'], $this->values['remarks']);
         }
     }
 

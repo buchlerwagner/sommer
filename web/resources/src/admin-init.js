@@ -742,7 +742,6 @@ var app = {
                 if(callBackFunction){
                     var fn = window[callBackFunction];
                     if(typeof fn === 'function'){
-                        console.log('call function');
                         _data = {};
                         _data.id = item.id;
 
@@ -900,8 +899,6 @@ var app = {
                                         _data[$(inp).attr('id')] = $(inp).val();
                                     });
                                 }
-
-                                console.log(_data);
 
                                 fn(_data);
                             }

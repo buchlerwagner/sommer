@@ -201,7 +201,7 @@
     {% endif %}
 
     {% if form.hasInvoiceProvider %}
-        <a{% if not form.cart.invoiceNumber %} href="./?invoice"{% endif %} class="btn btn-light btn-app{% if form.cart.invoiceNumber %} disabled{% endif %}">
+        <a{% if not form.cart.invoiceNumber and form.cart.userData %} href="/ajax/forms/issueInvoice/{{ form.cart.id }}/" data-target="#ajax-modal" data-toggle="modal" {% endif %} class="btn btn-light btn-app{% if form.cart.invoiceNumber or not form.cart.userData%} disabled{% endif %}">
             <i class="far fa-file-invoice text-primary"></i>
             {{ _('BTN_CREATE_INVOICE') }}
         </a>
@@ -212,7 +212,7 @@
         </a>
     {% endif %}
 
-    <a href="./?paid" class="btn btn-light btn-app {% if form.cart.isPaid %} disabled{% endif %}">
+    <a href="#" data-target="#confirm-delete" data-confirm-action="pageRedirect('./?paid');" data-confirm-question="{{ _('LBL_CONFIRM_PAID_STATUS') }}" data-confirm-button="{{ _('BTN_ORDER_PAID') }}" data-color="warning" data-toggle="modal" class="btn btn-light btn-app {% if form.cart.isPaid %} disabled{% endif %}">
         <i class="far fa-check text-primary"></i>
         {{ _('BTN_ORDER_PAID') }}
     </a>

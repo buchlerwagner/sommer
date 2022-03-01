@@ -174,4 +174,30 @@ switch ($action) {
         }
 
         break;
+
+    case 'checkTaxNumber':
+        if($_REQUEST['taxNumber']){
+            /**
+             * @var $invoice Invoices
+             */
+            $invoice = $this->addByClassName('Invoices');
+            try {
+                $buyer = $invoice->init()->getTaxPayer($_REQUEST['taxNumber']);
+                if($buyer->isValid()) {
+                    $this->data['#us_invoice_name']['value'] = $buyer->getName();
+                    $this->data['#us_invoice_country']['value'] = $buyer->getCountry();
+                    $this->data['#us_invoice_zip']['value'] = $buyer->getZipCode();
+                    $this->data['#us_invoice_city']['value'] = $buyer->getCity();
+                    $this->data['#us_invoice_address']['value'] = $buyer->getAddress();
+
+                    $this->data['#us_vat-formgroup']['removeclass'] = 'has-error';
+                    $this->data['#us_vat-formgroup']['addclass'] = 'has-success';
+                }else{
+                    $this->data['#us_vat-formgroup']['addclass'] = 'has-error';
+                }
+            } catch (Exception $e) {
+                $this->data['#us_vat-formgroup']['addclass'] = 'has-error';
+            }
+        }
+        break;
 }

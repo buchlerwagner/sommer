@@ -12,6 +12,7 @@ class InvoiceBuyer {
     private $phone;
     private $comment;
 
+    private $isValid = false;
     private $sendEmail = true;
 
     public function setId(int $id):self
@@ -25,57 +26,57 @@ class InvoiceBuyer {
         return $this->id;
     }
 
-    public function setName(string $name):self
+    public function setName(?string $name):self
     {
         $this->name = $name;
         return $this;
     }
 
-    public function getName():string
+    public function getName():?string
     {
         return $this->name;
     }
 
-    public function setCountry(string $country):self
+    public function setCountry(?string $country):self
     {
         $this->country = $country;
         return $this;
     }
 
-    public function getCountry():string
+    public function getCountry():?string
     {
         return $this->country;
     }
 
-    public function setZipCode(string $zipCode):self
+    public function setZipCode(?string $zipCode):self
     {
         $this->zipCode = $zipCode;
         return $this;
     }
 
-    public function getZipCode():string
+    public function getZipCode():?string
     {
         return $this->zipCode;
     }
 
-    public function setCity(string $city):self
+    public function setCity(?string $city):self
     {
         $this->city = $city;
         return $this;
     }
 
-    public function getCity():string
+    public function getCity():?string
     {
         return $this->city;
     }
 
-    public function setAddress(string $address):self
+    public function setAddress(?string $address):self
     {
         $this->address = $address;
         return $this;
     }
 
-    public function getAddress():string
+    public function getAddress():?string
     {
         return $this->address;
     }
@@ -91,35 +92,35 @@ class InvoiceBuyer {
         return $this->vatNumber;
     }
 
-    public function setEmail(string $email):self
+    public function setEmail(?string $email):self
     {
         $this->email = $email;
         return $this;
     }
 
-    public function getEmail():string
+    public function getEmail():?string
     {
         return $this->email;
     }
 
-    public function setPhone(string $phone):self
+    public function setPhone(?string $phone):self
     {
         $this->phone = $phone;
         return $this;
     }
 
-    public function getPhone():string
+    public function getPhone():?string
     {
         return $this->phone;
     }
 
-    public function setComment(string $comment):self
+    public function setComment(?string $comment):self
     {
         $this->comment = $comment;
         return $this;
     }
 
-    public function getComment():string
+    public function getComment():?string
     {
         return $this->comment;
     }
@@ -133,5 +134,16 @@ class InvoiceBuyer {
     public function isSendEmail():bool
     {
         return $this->sendEmail;
+    }
+
+    public function setValid(bool $valid):self
+    {
+        $this->isValid = $valid;
+        return $this;
+    }
+
+    public function isValid():bool
+    {
+        return $this->isValid;
     }
 }
