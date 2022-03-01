@@ -50,7 +50,7 @@ class editPaymentProviderForm extends formBuilder {
                     ->addData('show-remove', 'false')
                     ->addData('show-cancel', 'false')
                     ->addData('show-close', 'false')
-                    ->addData('allowed-file-extensions', '["pem"]')
+                    ->addData('allowed-file-extensions', '["pem", "key", "pub"]')
                     ->addData('show-preview', 'false')
                     ->notDBField(),
 

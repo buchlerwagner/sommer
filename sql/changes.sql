@@ -1,15 +1,27 @@
 # noinspection SqlNoDataSourceInspectionForFile
 -- 2022-02-21
+CREATE TABLE `invoice_providers` (
+     `iv_id` int(11) NOT NULL AUTO_INCREMENT,
+     `iv_shop_id` int(11) DEFAULT 0,
+     `iv_name` varchar(255) DEFAULT NULL,
+     `iv_provider` varchar(100) DEFAULT NULL,
+     `iv_user_name` varchar(128) DEFAULT NULL,
+     `iv_password` varchar(128) DEFAULT NULL,
+     `iv_api_key` varchar(128) DEFAULT NULL,
+     `iv_test_mode` varchar(128) DEFAULT NULL,
+     `iv_enabled` tinyint(1) DEFAULT 0,
+     `iv_manual` tinyint(1) DEFAULT 0,
+     PRIMARY KEY (`iv_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
 ALTER TABLE `cart` ADD COLUMN `cart_invoice_number` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_custom_interval`;
 ALTER TABLE `cart` ADD COLUMN `cart_invoice_provider` INT(11) NULL DEFAULT 0 AFTER `cart_invoice_number`;
+ALTER TABLE `cart` ADD COLUMN `cart_invoice_filename` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_invoice_provider`;
 
 ALTER TABLE `cart_items` ADD COLUMN `citem_local_consumption` TINYINT(1) NULL DEFAULT 0 AFTER `citem_url`;
+ALTER TABLE `payment_modes` ADD COLUMN `pm_limit_max` FLOAT NULL DEFAULT 0 AFTER `pm_order`;
 
 ALTER TABLE `cart` DROP COLUMN `cart_local_consumption` ;
-
-ALTER TABLE `payment_modes` ADD COLUMN `pm_limit_max` FLOAT NULL DEFAULT 0 AFTER `pm_order`;
-ALTER TABLE `cart` ADD COLUMN `cart_invoice_filename` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_invoice_provider`;
-ALTER TABLE `invoice_providers` ADD COLUMN `iv_manual` TINYINT(1) NULL DEFAULT 0 AFTER `iv_enabled`;
 
 
 
