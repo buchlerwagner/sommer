@@ -293,7 +293,7 @@ class Invoices extends ancestor {
             $this->providerId = ($settings['id'] ?: 0);
         }
 
-        return new InvoiceProviderSettings(($settings ?: []));
+        return ($settings ? new InvoiceProviderSettings($settings) : null);
     }
 
     private function loadSettings(int $providerId):?InvoiceProviderSettings
@@ -325,7 +325,7 @@ class Invoices extends ancestor {
             }
         }
 
-        return new InvoiceProviderSettings(($settings ?: []));
+        return ($settings ? new InvoiceProviderSettings($settings) : null);
     }
 
     private function saveInvoiceNumber(string $invoiceNumber):void
