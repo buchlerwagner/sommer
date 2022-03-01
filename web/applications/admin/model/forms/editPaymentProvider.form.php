@@ -18,7 +18,7 @@ class editPaymentProviderForm extends formBuilder {
                 ->setRequired(),
 
             (new groupRow('row1'))->addElements(
-                (new inputText('pp_shopid', 'LBL_SHOP_ID'))
+                (new inputText('pp_merchant_id', 'LBL_MERCHANT_ID'))
                     ->setColSize('col-6')
                     ->setRequired(),
 

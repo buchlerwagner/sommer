@@ -4,6 +4,7 @@ class PaymentProviderSettings {
     public $id;
     public $className;
     public $shopId;
+    public $merchantId;
     public $currency;
     public $urlFrontend;
     public $urlReturn;
@@ -42,8 +43,12 @@ class PaymentProviderSettings {
 
     public function getPrivateKey():string
     {
-        if(!Empty($filename)) {
-            return DIR_PRIVATE_KEYS . $this->privateKey;
+        if(!Empty($this->privateKey)) {
+            $fp = fopen(DIR_PRIVATE_KEYS . $this->shopId . '/' . $this->privateKey, 'r');
+            $privateKey = fread($fp, 8192);
+            fclose($fp);
+
+            return $privateKey;
         }
 
         return '';

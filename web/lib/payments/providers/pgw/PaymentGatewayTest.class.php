@@ -15,7 +15,7 @@ class PaymentGatewayTest extends PaymentProvider {
         $data = [
             'action' => 'init',
             'trid' => $this->transactionId,
-            'shopid' => $this->settings->shopId,
+            'shopid' => $this->settings->merchantId,
             'amount' => $this->amount,
             'currency' => $this->currency,
             'return_url' => base64_encode($this->settings->urlReturn),

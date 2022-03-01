@@ -1,4 +1,8 @@
 # noinspection SqlNoDataSourceInspectionForFile
+ALTER TABLE `payment_providers` CHANGE COLUMN `pp_shopid` `pp_merchant_id` VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL  COMMENT '' AFTER `pp_provider`;
+
+
+
 -- 2022-02-21
 CREATE TABLE `invoice_providers` (
      `iv_id` int(11) NOT NULL AUTO_INCREMENT,

@@ -423,7 +423,7 @@ class CartHandler extends ancestor {
                 try {
                     $payment->init($payMode['providerId'])->createTransaction($this->id, $this->total, $this->currency);
                 } catch (Exception $e) {
-                    die($e);
+                    die($e->getMessage());
                 }
             }
         }else{

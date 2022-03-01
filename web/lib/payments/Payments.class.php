@@ -130,7 +130,8 @@ class Payments extends ancestor {
                     'pp_id AS id',
                     'pp_name AS name',
                     'pp_provider AS className',
-                    'pp_shopid AS shopId',
+                    'pp_shop_id AS shopId',
+                    'pp_merchant_id AS merchantId',
                     'pp_password AS password',
                     'pp_currency AS currency',
                     'pp_test_mode AS isTest',
@@ -149,7 +150,7 @@ class Payments extends ancestor {
         return new PaymentProviderSettings(($settings ?: []));
     }
 
-    public function hasPendingTransaction(int $cartId)
+    public function hasPendingTransaction(int $cartId):bool
     {
         $transaction = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
@@ -165,7 +166,7 @@ class Payments extends ancestor {
             )
         );
 
-        return ($transaction ? $transaction['transactionId'] : false);
+        return (bool) $transaction;
     }
 
     public function getTransactionHistory(int $cartId):array
