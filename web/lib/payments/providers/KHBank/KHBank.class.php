@@ -18,14 +18,14 @@ class KHBank extends PaymentProvider {
         return 'K&H Bank Payment Gateway';
     }
 
+    public function hasRefund(): bool
+    {
+        return self::HAS_REFUND;
+    }
+
     protected function init(): void
     {
         $this->setTimeout(self::TIME_OUT);
-    }
-
-    protected function hasRefund(): bool
-    {
-        return self::HAS_REFUND;
     }
 
     protected function pay():void

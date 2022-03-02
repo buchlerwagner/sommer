@@ -29,6 +29,10 @@ class PaymentHandler extends ancestor {
                     $this->owner->cartHandler->issueInvoice();
                 }
 
+                if($transaction->getStatus() === enumPaymentStatus::Voided()->getValue()) {
+                    $this->owner->cartHandler->setRefunded($transaction->amount);
+                }
+
                 if($transaction->getStatus() !== enumPaymentStatus::Pending()->getValue()){
                     $this->owner->cartHandler->sendPaymentConfirmationEmail($transaction);
                 }

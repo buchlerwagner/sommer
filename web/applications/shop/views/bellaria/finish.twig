@@ -27,6 +27,17 @@
                     <br>
                     {{ _('LBL_AUTH_CODE') }}: <b>{{ transactionHistory[0].authCode }}</b>
                 </div>
+            {% elseif cart.isRefunded %}
+                <div class="alert alert-info">
+                    <div class="text-140 mb-2">
+                        <i class="fas fa-undo"></i>
+                        <b>{{ _('LBL_PAYMENT_REFUNDED') }}</b>
+                    </div>
+
+                    {{ _('LBL_TRANSACTION_ID') }}: <b>{{ transactionHistory[0].transactionId }}</b>
+                    <br>
+                    {{ _('LBL_AUTH_CODE') }}: <b>{{ transactionHistory[0].authCode }}</b>
+                </div>
             {% else %}
                 {% if isPending %}
                     <div id="payment-checker" class="alert alert-warning" data-transactionid="{{ transactionId }}" data-interval="{{ refreshInterval }}">
@@ -94,7 +105,7 @@
                     {{ _('LBL_PAID_STATUS') }}: <b class="text-info">{{ _('LBL_PAID') }}</b>
                     {% endif %}
                 </div>
-                {% if paymentEnabled or isPending %}
+                {% if (paymentEnabled or isPending) and not cart.isRefunded %}
                 <div id="show-pay-button" class="col-12 col-lg-6 totals-table{% if isPending %} d-none{% endif %}">
                     {{ cart.getSelectedPaymentMode.text|nl2br }}
                     <div class="mt-3 text-center">

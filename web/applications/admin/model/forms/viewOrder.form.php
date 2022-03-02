@@ -5,6 +5,7 @@ class viewOrderForm extends formBuilder {
     public $isOpen = false;
     public $isEmployee = false;
     public $hasInvoiceProvider = false;
+    public $isRefundable = false;
     public $invoiceDir = '';
 
     const PAYMENT_ICONS = [
@@ -115,6 +116,10 @@ class viewOrderForm extends formBuilder {
 
             $this->owner->cartHandler->init($this->values['cart_key'], false);
             $this->cart = $this->owner->cartHandler;
+
+            if($this->owner->user->hasFunctionAccess('orders-refund')){
+                $this->isRefundable = $this->cart->isRefundable();
+            }
         }
     }
 

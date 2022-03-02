@@ -80,7 +80,7 @@ class router extends model {
 	public $output = OUTPUT_HTML;
 	protected $messages = [];
 
-	public function __construct(){
+	public function __construct($host = false){
 		parent::__construct();
 
 		try {
@@ -101,7 +101,7 @@ class router extends model {
 		$this->user = $this->addByClassName('user');
 		$this->email = $this->addByClassName('email');
 
-        $this->setHost($_SERVER['HTTP_HOST']);
+        $this->setHost(($host ?: $_SERVER['HTTP_HOST']));
 
         if($this->hostConfig['shareSession']) {
             if(substr_count($this->host, '.') > 1) {
@@ -155,6 +155,7 @@ class router extends model {
 
     private function loadHostConfig($host){
         $host = strtolower(trim($host));
+        if(Empty($host)) $host = 'default';
 
         $config = $this->mem->get(HOST_SETTINGS . $host);
         if(!$config){

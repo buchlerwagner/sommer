@@ -1,7 +1,7 @@
 <?php
 include 'cron.includes.php';
 
-$ibe = new router();
+$ibe = new router(DEFAULT_HOST);
 $ibe->init();
 
 $res = $ibe->db->getRows(

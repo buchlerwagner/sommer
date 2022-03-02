@@ -25,13 +25,13 @@ abstract class PaymentProvider extends ancestor {
 
     protected abstract function init():void;
 
-    protected abstract function hasRefund():bool;
-
     protected abstract function pay():void;
 
     protected abstract function check():enumPaymentStatus;
 
     protected abstract function refund(float $amount):enumPaymentStatus;
+
+    public abstract function hasRefund():bool;
 
     public abstract static function isAvailable():bool;
 
@@ -117,45 +117,59 @@ abstract class PaymentProvider extends ancestor {
         return $transaction;
     }
 
-    final public function initRefund(Transaction $transaction, float $refundAmount = 0):Transaction
+    final public function hasRefundError(Transaction $transaction, float $refundAmount)
     {
-        $this->init();
-
         if($transaction->getStatus() != enumPaymentStatus::OK()->getValue()){
-            throw new PaymentException(PaymentException::INVALID_TRANSACTION_STATUS);
+            return PaymentException::INVALID_TRANSACTION_STATUS;
         }
 
         $checkDate = dateAddDays($transaction->created, 1);
         if($checkDate > date('Y-m-d H:i:s')){
-            throw new PaymentException(PaymentException::REFUND_NOT_ALLOWED_YET);
+            return PaymentException::REFUND_NOT_ALLOWED_YET;
         }
 
-        $this->transactionId = $transaction->transactionId;
+        if($refundAmount > $transaction->amount || $refundAmount == 0) {
+            return PaymentException::INVALID_REFUND_AMOUNT;
+        }
+
+        return false;
+    }
+
+    final public function initRefund(Transaction $transaction, float $refundAmount = 0):Transaction
+    {
+        $this->init();
+
         if(!$refundAmount){
             $refundAmount = $transaction->amount;
         }
 
-        if($refundAmount <= $transaction->amount) {
+        if(!$this->hasRefundError($transaction, $refundAmount)) {
+            $this->transactionId = $transaction->transactionId;
             $status = $this->refund($refundAmount);
 
-            $this->owner->db->sqlQuery(
-                $this->owner->db->genSQLUpdate(
-                    'payment_transactions',
-                    [
-                        'pt_status' => $status->getValue(),
-                        'pt_response' => $this->response,
-                        'pt_refunded' => $refundAmount,
-                    ],
-                    [
-                        'pt_transactionid' => $this->transactionId
-                    ]
-                )
-            );
+            if($status->getValue() == enumPaymentStatus::Voided()->getValue() || $status->getValue() == enumPaymentStatus::Pending()->getValue()){
+                $this->owner->db->sqlQuery(
+                    $this->owner->db->genSQLUpdate(
+                        'payment_transactions',
+                        [
+                            'pt_status' => $status->getValue(),
+                            'pt_response' => $this->response,
+                            'pt_auth_code' => $this->authCode,
+                            'pt_status_code' => $this->statusCode,
+                            'pt_message' => $this->message,
+                            'pt_refunded' => $refundAmount,
+                        ],
+                        [
+                            'pt_transactionid' => $this->transactionId
+                        ]
+                    )
+                );
+            }
 
             $transaction->setStatus($status);
+            $transaction->amount = $refundAmount;
+            $transaction->authCode = $this->authCode;
             $transaction->message = $this->message;
-        }else{
-            throw new PaymentException(PaymentException::INVALID_REFUND_AMOUNT);
         }
 
         return $transaction;

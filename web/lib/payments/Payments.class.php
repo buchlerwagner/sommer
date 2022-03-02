@@ -55,6 +55,7 @@ class Payments extends ancestor {
         if(!$this->provider){
             throw new PaymentException(PaymentException::PAYMENT_PROVIDER_NOT_INITED);
         }
+
         if(!$this->hasPendingTransaction($cartId)){
             $this->owner->db->sqlQuery(
                 $this->owner->db->genSQLInsert(
@@ -87,34 +88,57 @@ class Payments extends ancestor {
             if($transaction = $this->getTransaction($transactionId)) {
                 try {
                     $this->init($transaction->providerId);
-                    $transaction = $this->provider->checkTransaction($transaction);
+                    return $this->provider->checkTransaction($transaction);
                 }
-
                 catch(PaymentException $e){
-
                 }
             }
-        }else{
-            $transaction = null;
         }
 
-        return $transaction;
+        return null;
     }
 
-    public function refund(string $transactionId, float $refundAmount = 0):bool
+    public function hasRefund():bool
     {
-        $success = false;
+        if($this->provider){
+            return $this->provider->hasRefund();
+        }
 
-        if(!Empty($transactionId)){
-            if($transaction = $this->getTransaction($transactionId)) {
-                $this->init($transaction->providerId);
-                $transaction = $this->provider->initRefund($transaction, $refundAmount);
+        return false;
+    }
 
-                $success = ($transaction->getStatus() == enumPaymentStatus::Voided());
+    public function isValidRefundRequest(Transaction $transaction, float $refundAmount ):bool
+    {
+        $isValid = false;
+
+        if($this->provider){
+            $error = $this->provider->hasRefundError($transaction, $refundAmount);
+
+            if(!$error) {
+                $isValid = true;
+            }else{
+                throw new PaymentException($error);
             }
         }
 
-        return $success;
+        return $isValid;
+    }
+
+    public function refund(string $transactionId, float $refundAmount = 0):?Transaction
+    {
+        if(!Empty($transactionId)){
+            if($transaction = $this->getTransaction($transactionId)) {
+                try {
+                    $this->init($transaction->providerId);
+
+                    return $this->provider->initRefund($transaction, $refundAmount);
+                }
+                catch (PaymentException $e){
+                }
+            }
+        }
+
+        return null;
     }
 
     private function loadSettings():?PaymentProviderSettings
@@ -249,7 +273,11 @@ class Payments extends ancestor {
                     'pt_cart_id' => $cartId,
                     'pt_shop_id' => $this->owner->shopId,
                     'pt_status'  => enumPaymentStatus::OK()->getValue(),
-                ]
+                ],
+                [],
+                false,
+                'pt_created DESC',
+                1
             )
         );
 

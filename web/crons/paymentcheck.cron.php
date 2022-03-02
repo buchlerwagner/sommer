@@ -1,7 +1,7 @@
 <?php
 include 'cron.includes.php';
 
-$framework = new router();
+$framework = new router(DEFAULT_HOST);
 $framework->init();
 
 /**

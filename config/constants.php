@@ -260,7 +260,7 @@ $GLOBALS['PAYMENT_STATUSES'] = [
     ],
     'VOIDED' => [
         'name' => 'LBL_PAYMENT_STATUS_VOIDED',
-        'class' => 'bg-purple text-white',
+        'class' => 'bg-info text-white',
     ],
 ];
 

@@ -32,6 +32,7 @@ class CartHandler extends ancestor {
 	public $paymentFee = 0;
     private $paymentId = false;
     private $isPaid = false;
+    private $isRefunded = false;
     public $packagingFee = 0;
     private $packagingFeeVat = 0;
 
@@ -291,6 +292,10 @@ class CartHandler extends ancestor {
         return $this->isPaid;
     }
 
+    public function isRefunded(){
+        return $this->isRefunded;
+    }
+
     public function isBankCardPayment(){
         if($payMode = $this->getSelectedPaymentMode()){
             return ($payMode['type'] == PAYMENT_TYPE_CARD && $payMode['providerId']);
@@ -433,6 +438,24 @@ class CartHandler extends ancestor {
         }
     }
 
+    public function isRefundable(){
+        $out = false;
+
+        if($this->isPaid() && $this->isBankCardPayment() && $this->orderType == ORDER_TYPE_ORDER){
+            /**
+             * @var $payment Payments
+             */
+            $payment = $this->owner->addByClassName('Payments');
+            if($transaction = $payment->getRefundableTransaction($this->id)){
+                if($payment->init($transaction->providerId)->hasRefund()){
+                    $out = true;
+                }
+            }
+        }
+
+        return $out;
+    }
+
     public function getPaymentStatus(){
         /**
          * @var $payment Payments
@@ -479,6 +502,7 @@ class CartHandler extends ancestor {
             'paymentFee' => $this->paymentFee,
             'total' => $this->total,
             'isPaid' => $this->isPaid(),
+            'isRefunded' => $this->isRefunded(),
             'shippingMode' => $this->getSelectedShippingMode(),
             'shippingInterval' => $this->getSelectedShippingInterval(),
             'shippingDate' => $this->shippingDate,
@@ -634,7 +658,8 @@ class CartHandler extends ancestor {
                 $this->customInterval = $cart['cart_custom_interval'];
                 $this->paymentFee = $cart['cart_payment_fee'];
                 $this->paymentId = $cart['cart_pm_id'];
-                $this->isPaid = $cart['cart_paid'];
+                $this->isPaid = ($cart['cart_paid'] == 1);
+                $this->isRefunded = ($cart['cart_paid'] == -1);
                 $this->remarks = $cart['cart_remarks'];
                 $this->invoiceType = (int) $cart['cart_invoice_type'];
                 $this->invoiceProviderId = $cart['cart_invoice_provider'];
@@ -1633,6 +1658,25 @@ class CartHandler extends ancestor {
                 'cart',
                 [
                     'cart_paid' => 1,
+                ],
+                [
+                    'cart_id' => $this->id,
+                    'cart_shop_id' => $this->owner->shopId,
+                ]
+            )
+        );
+    }
+
+    public function setRefunded(float $amount = 0){
+        $this->isPaid = false;
+        $this->isRefunded = true;
+
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLUpdate(
+                'cart',
+                [
+                    'cart_paid' => -1,
+                    'cart_refunded' => $amount,
                 ],
                 [
                     'cart_id' => $this->id,

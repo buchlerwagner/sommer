@@ -1,7 +1,6 @@
 <?php
 
 class PaymentException extends \Exception {
-
     const INVALID_TRANSACTION_ID = 'LBL_INVALID_TRANSACTION_ID';
     const INVALID_TRANSACTION_STATUS = 'LBL_INVALID_TRANSACTION_STATUS';
     const INVALID_REFUND_AMOUNT = 'LBL_INVALID_REFUND_AMOUNT';
@@ -14,9 +13,5 @@ class PaymentException extends \Exception {
     public function __construct($message, $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
-    }
-
-    public function __toString() {
-        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
     }
 }

@@ -1,4 +1,9 @@
 # noinspection SqlNoDataSourceInspectionForFile
+ALTER TABLE `cart` ADD COLUMN `cart_refunded` FLOAT NULL DEFAULT NULL AFTER `cart_invoice_filename`;
+
+
+
+
 ALTER TABLE `payment_providers` CHANGE COLUMN `pp_shopid` `pp_merchant_id` VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL  COMMENT '' AFTER `pp_provider`;
 
 

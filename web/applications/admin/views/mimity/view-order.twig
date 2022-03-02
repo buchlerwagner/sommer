@@ -113,6 +113,8 @@
                             <span class="text-secondary">{{ _('LBL_PAYMENT_STATUS') }}:</span>
                             {% if form.cart.isPaid %}
                                 <span class="badge badge-success badge-sm text-white">{{ _('LBL_PAID') }}</span>
+                            {% elseif form.cart.isRefunded %}
+                                <span class="badge badge-info badge-sm text-white">{{ _('LBL_REFUNDED') }}</span>
                             {% else %}
                                 <span class="badge badge-danger badge-sm text-white">{{ _('LBL_NOT_PAID') }}</span>
                             {% endif %}
@@ -212,7 +214,7 @@
         </a>
     {% endif %}
 
-    <a href="#" data-target="#confirm-delete" data-confirm-action="pageRedirect('./?paid');" data-confirm-question="{{ _('LBL_CONFIRM_PAID_STATUS') }}" data-confirm-button="{{ _('BTN_ORDER_PAID') }}" data-color="warning" data-toggle="modal" class="btn btn-light btn-app {% if form.cart.isPaid %} disabled{% endif %}">
+    <a href="#" data-target="#confirm-delete" data-confirm-action="pageRedirect('./?paid');" data-confirm-question="{{ _('LBL_CONFIRM_PAID_STATUS') }}" data-confirm-button="{{ _('BTN_ORDER_PAID') }}" data-color="warning" data-toggle="modal" class="btn btn-light btn-app {% if form.cart.isPaid or form.cart.isRefunded %} disabled{% endif %}">
         <i class="far fa-check text-primary"></i>
         {{ _('BTN_ORDER_PAID') }}
     </a>
@@ -226,6 +228,13 @@
         <i class="far fa-envelope text-primary"></i>
         {{ _('BTN_MAIL_ORDER') }}
     </a>
+
+    {% if form.isRefundable %}
+    <a href="/ajax/forms/refundTransaction/{{ form.cart.id }}/" class="btn btn-light btn-app ml-4" data-target="#ajax-modal" data-toggle="modal">
+        <i class="far fa-undo text-warning"></i>
+        {{ _('BTN_REFUND') }}
+    </a>
+    {% endif %}
 </div>
 
 {% if form.cart.items %}

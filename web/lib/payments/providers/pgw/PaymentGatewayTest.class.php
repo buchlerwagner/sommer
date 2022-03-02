@@ -10,14 +10,14 @@ class PaymentGatewayTest extends PaymentProvider {
         return 'Payment Gateway Test';
     }
 
+    public function hasRefund(): bool
+    {
+        return true;
+    }
+
     protected function init(): void
     {
 
-    }
-
-    protected function hasRefund(): bool
-    {
-        return true;
     }
 
     protected function pay():void

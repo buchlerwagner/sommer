@@ -15,6 +15,14 @@
                     <br>
                     {{ _('LBL_AUTH_CODE') }}: <b>{{ transaction.authCode }}</b>
                 </div>
+            {% elseif transaction.getStatus == 'VOIDED' %}
+                <div style="border: 1px solid #bee5eb; color: #0c5460; background-color: #d1ecf1; border-radius: 5px; margin:10px 0;padding:10px 15px;">
+                    <b style="font-size: 18px;margin-bottom: 10px;">{{ _('LBL_PAYMENT_REFUNDED') }}</b>
+                    <br>
+                    {{ _('LBL_TRANSACTION_ID') }}: <b>{{ transaction.transactionId }}</b>
+                    <br>
+                    {{ _('LBL_AUTH_CODE') }}: <b>{{ transaction.authCode }}</b>
+                </div>
             {% else %}
                 <div style="border: 1px solid #f5c6cb; color: #721c24; background-color: #f8d7da; border-radius: 5px; margin:10px 0;padding:10px 15px;">
                     <b style="font-size: 18px;margin-bottom: 10px;">{{ _('LBL_PAYMENT_FAILED') }}</b>
