@@ -498,7 +498,6 @@ class CartHandler extends ancestor {
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
             $this->getTemplateData(),
-            false,
             false
         );
 
@@ -530,12 +529,6 @@ class CartHandler extends ancestor {
         $mailData['showPaymentInfo'] = true;
         $mailData['transaction'] = $transaction;
 
-        /*
-        $mailData['paymentStatus'] = $transaction->getStatus();
-        $mailData['transactionId'] = $transaction->transactionId;
-        $mailData['authCode'] = $transaction->authCode;
-        $mailData['resultMessage'] = $transaction->message;
-        */
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
             $mailData,
@@ -544,7 +537,7 @@ class CartHandler extends ancestor {
 
         $data = [
             'id' => $this->userId,
-            'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->key . '/',
+            'link' => $this->getDomain() . $this->owner->getPageName('finish') . $this->key . '/',
             'order' => $cartMailBody,
             'orderNumber' => $this->orderNumber,
             'status' => $this->status,

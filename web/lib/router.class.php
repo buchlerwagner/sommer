@@ -193,7 +193,7 @@ class router extends model {
                     'timeZoneID' => $h['host_timezone'],
                     'timeZone' => $this->user->getTimezone($h['host_timezone']),
                     'country' => $h['host_country'],
-                    'publicSite' => rtrim($h['host_public_site'], '/') . '/',
+                    'publicSite' => ($h['host_public_site'] ? rtrim($h['host_public_site'], '/') . '/' : ''),
                     'defaultEmail' => $h['host_default_email'],
                     'production' => ($h['host_production']),
                     'shareSession' => ($h['host_share_session']),

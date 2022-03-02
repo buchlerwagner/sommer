@@ -36,8 +36,14 @@ class view extends ancestor {
 			}
 		}
 
-		$this->common = [
+        $publicDomain = false;
+        if(!Empty($this->owner->getHostConfig()['publicSite'])){
+            $publicDomain = rtrim($this->owner->getHostConfig()['publicSite'], '/') . '/';
+        }
+
+        $this->common = [
 			'domain'        => $this->owner->domain,
+			'publicDomain'  => ($publicDomain ?: $this->owner->domain),
 			'host'        	=> $this->owner->host,
             'language'      => $this->owner->language,
             'languages'     => $this->owner->lists->getLanguages(),
