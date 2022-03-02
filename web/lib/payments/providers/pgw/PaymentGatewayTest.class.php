@@ -50,6 +50,42 @@ class PaymentGatewayTest extends PaymentProvider {
         $url = $this->settings->urlCallback . 'pay.php?' . http_build_query($request);
         $this->saveLog($url, 'checkPayment');
 
+        $result = $this->sendRequest($url);
+        $this->saveLog($result, 'checkPayment', 'rs');
+
+        if (!empty($result)) {
+            $status = $this->getStatus($result);
+        }
+
+        return $status;
+    }
+
+    protected function refund(float $amount):enumPaymentStatus
+    {
+        $status = enumPaymentStatus::Pending();
+
+        $request = [
+            'action' => 'void',
+            'amount' => $amount,
+            'trid' => $this->transactionId,
+            'shopid' => $this->settings->merchantId,
+        ];
+
+        $url = $this->settings->urlCallback . 'pay.php?' . http_build_query($request);
+        $this->saveLog($url, 'voidPayment');
+
+        $result = $this->sendRequest($url);
+        $this->saveLog($result, 'voidPayment', 'rs');
+
+        if (!empty($result)) {
+            $status = $this->getStatus($result);
+        }
+
+        return $status;
+    }
+
+    private function sendRequest(string $url):string
+    {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
@@ -63,35 +99,8 @@ class PaymentGatewayTest extends PaymentProvider {
         }
 
         curl_close($ch);
-        $this->saveLog($result, 'checkPayment', 'rs');
 
-        if (!empty($result)) {
-            $this->saveResponse($result);
-
-            $response = $this->readResponse($result);
-            if(!$response['status']) $response['status'] = '';
-            if(!$response['authCode']) $response['authCode'] = '';
-            if(!$response['message']) $response['message'] = '';
-
-            $this->setResult($response['status'], $response['authCode'], $response['message']);
-
-            switch($response['status']){
-                case 1:
-                    $status = enumPaymentStatus::OK();
-                    break;
-                case 2:
-                    $status = enumPaymentStatus::Canceled();
-                    break;
-                case 3:
-                    $status = enumPaymentStatus::Failed();
-                    break;
-                default:
-                    $status = enumPaymentStatus::Pending();
-                    break;
-            }
-        }
-
-        return $status;
+        return $result;
     }
 
     private function readResponse($response):array
@@ -99,8 +108,36 @@ class PaymentGatewayTest extends PaymentProvider {
         return json_decode($response, true);
     }
 
-    protected function refund(float $amount):enumPaymentStatus
+    private function getStatus(string $result):enumPaymentStatus
     {
-        return enumPaymentStatus::Failed();
+        $this->saveResponse($result);
+
+        $response = $this->readResponse($result);
+
+        if(!$response['status']) $response['status'] = '';
+        if(!$response['authCode']) $response['authCode'] = '';
+        if(!$response['message']) $response['message'] = '';
+
+        $this->setResult($response['status'], $response['authCode'], $response['message']);
+
+        switch($response['status']){
+            case 1:
+                $status = enumPaymentStatus::OK();
+                break;
+            case 2:
+                $status = enumPaymentStatus::Canceled();
+                break;
+            case 3:
+                $status = enumPaymentStatus::Failed();
+                break;
+            case 4:
+                $status = enumPaymentStatus::Voided();
+                break;
+            default:
+                $status = enumPaymentStatus::Pending();
+                break;
+        }
+
+        return $status;
     }
 }

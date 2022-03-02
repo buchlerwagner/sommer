@@ -69,6 +69,7 @@ class refundTransactionForm extends formBuilder {
                 $this->transaction = $this->payment->refund($this->transaction->transactionId, abs($this->values['amount']));
 
                 if($this->transaction->getStatus() == enumPaymentStatus::Voided()->getValue()) {
+                    $this->owner->cartHandler->init($this->keyFields['cart_id'], false);
                     $this->owner->cartHandler->setRefunded(abs($this->values['amount']));
                     $this->owner->cartHandler->sendPaymentConfirmationEmail($this->transaction);
 
