@@ -2,16 +2,16 @@
 
 class PaymentHandler extends ancestor {
 
-    public function handleTransaction(string $transactionId):Transaction
+    public function handleTransaction(string $transactionId):?Transaction
     {
         /**
          * @var $payment Payments
          */
         $payment = $this->owner->addByClassName('Payments', false, [], true);
 
-        $transaction = $payment->checkTransaction($transactionId);
-
-        $this->updateCart($transaction);
+        if($transaction = $payment->checkTransaction($transactionId)) {
+            $this->updateCart($transaction);
+        }
 
         return $transaction;
     }

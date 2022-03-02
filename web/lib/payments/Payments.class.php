@@ -81,7 +81,7 @@ class Payments extends ancestor {
         }
     }
 
-    public function checkTransaction(string $transactionId):Transaction
+    public function checkTransaction(string $transactionId):?Transaction
     {
         if(!Empty($transactionId)){
             if($transaction = $this->getTransaction($transactionId)) {
@@ -95,7 +95,7 @@ class Payments extends ancestor {
                 }
             }
         }else{
-            $transaction = new Transaction();
+            $transaction = null;
         }
 
         return $transaction;
