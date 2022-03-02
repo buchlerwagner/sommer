@@ -114,7 +114,7 @@ class router extends model {
             ini_set('session.cookie_domain', $mainDomain);
         }
 
-        if($this->hostConfig['auth']) {
+        if($this->hostConfig['auth'] && !$host) {
             $this->setBasicAuth();
         }
 
