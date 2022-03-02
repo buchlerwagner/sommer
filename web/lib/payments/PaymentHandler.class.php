@@ -46,6 +46,9 @@ class PaymentHandler extends ancestor {
                 ],
                 [
                     'pt_status'  => enumPaymentStatus::Pending()->getValue(),
+                    'pt_expiry' => [
+                        'less' => 'NOW()'
+                    ]
                 ]
             )
         );

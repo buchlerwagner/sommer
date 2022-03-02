@@ -122,7 +122,7 @@ class router extends model {
 	}
 
     private function setHost($host){
-        if($this->hostConfig = $this->getHostConfig($host)){
+        if($this->hostConfig = $this->loadHostConfig($host)){
             $this->host = $this->hostConfig['host'];
 
             $this->shopId = $this->hostConfig['shopId'];
@@ -153,7 +153,7 @@ class router extends model {
         $this->domain = $protocol . $this->host . '/';
     }
 
-    private function getHostConfig($host){
+    private function loadHostConfig($host){
         $host = strtolower(trim($host));
 
         $config = $this->mem->get(HOST_SETTINGS . $host);
@@ -229,6 +229,10 @@ class router extends model {
         return $config;
     }
 
+    public function getHostConfig(){
+        return $this->hostConfig;
+    }
+
 	public function init(){
 		session_start();
 
@@ -273,25 +277,21 @@ class router extends model {
             $this->parseUrl();
 
             if ($this->application == 'admin') {
-
-
+                /*
+                if($this->user->getUser() && $this->user->getUser()['force_pwchange'] && $this->page != 'logout'){
+                    if (!empty($this->user->getUser()['force_pwchange'])) {
+                        $this->addMessage('warning', 'LBL_PASSWORD_CHANGE_NEEDED', 'LBL_PASSWORD_CHANGE_NEEDED');
+                    }
+                    $this->page = 'change-pwd';
+                }
+                */
 
                 $this->menu['orders']['badge']['color'] = 'danger text-white';
                 $this->menu['orders']['badge']['value'] = $this->cartHandler->getNumberOfNewOrders();
-            }elseif($this->application == 'shop'){
+            //}elseif($this->application == 'shop'){
                 //$fbLogin = $this->user->getFBLoginUrl();
             }
-
-            /*
-            if($this->user->getUser() && $this->user->getUser()['force_pwchange'] && $this->page != 'logout'){
-                if (!empty($this->user->getUser()['force_pwchange'])) {
-                    $this->addMessage('warning', 'LBL_PASSWORD_CHANGE_NEEDED', 'LBL_PASSWORD_CHANGE_NEEDED');
-                }
-                $this->page = 'change-pwd';
-            }
-            */
         }
-
 
 		$this->view->init();
 		if ($this->page == 'ajax') {

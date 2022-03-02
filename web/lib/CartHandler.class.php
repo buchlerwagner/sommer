@@ -413,17 +413,19 @@ class CartHandler extends ancestor {
 
     public function initPayment(){
         if($this->isBankCardPayment() && $this->orderType == ORDER_TYPE_ORDER){
-            $payMode = $this->getSelectedPaymentMode();
-            if($payMode['providerId']) {
-                /**
-                 * @var $payment Payments
-                 */
-                $payment = $this->owner->addByClassName('Payments');
+            if($this->owner->getHostConfig()['isVirtual']){
+                $payMode = $this->getSelectedPaymentMode();
+                if($payMode['providerId']) {
+                    /**
+                     * @var $payment Payments
+                     */
+                    $payment = $this->owner->addByClassName('Payments');
 
-                try {
-                    $payment->init($payMode['providerId'])->createTransaction($this->id, $this->total, $this->currency);
-                } catch (Exception $e) {
-                    die($e->getMessage());
+                    try {
+                        $payment->init($payMode['providerId'])->createTransaction($this->id, $this->total, $this->currency);
+                    } catch (PaymentException $e) {
+                        die($e->getMessage());
+                    }
                 }
             }
         }else{
@@ -452,6 +454,16 @@ class CartHandler extends ancestor {
         return $payment->getTransactionHistory($this->id);
     }
 
+    private function getDomain(){
+        $domain = $this->owner->domain;
+
+        if($this->owner->getHostConfig()['application'] == 'admin' && !Empty($this->owner->getHostConfig()['publicSite'])){
+            $domain = $this->owner->getHostConfig()['publicSite'];
+        }
+
+        return rtrim($domain, '/');
+    }
+
     public function getTemplateData(){
         $this->loadCart();
 
@@ -478,7 +490,7 @@ class CartHandler extends ancestor {
             'shippingAddress' => $this->userData['shippingAddress'],
             'invoiceAddress' => $this->userData['invoiceAddress'],
             'remarks' => $this->remarks,
-            'domain' => rtrim($this->owner->domain, '/'),
+            'domain' => $this->getDomain(),
         ];
     }
 
@@ -486,12 +498,13 @@ class CartHandler extends ancestor {
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
             $this->getTemplateData(),
+            false,
             false
         );
 
         $data = [
             'id' => $this->userId,
-            'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->key . '/',
+            'link' => $this->getDomain() . $this->owner->getPageName('finish') . $this->key . '/',
             'order' => $cartMailBody,
             'orderNumber' => $this->orderNumber,
             'status' => $this->status,
@@ -594,10 +607,6 @@ class CartHandler extends ancestor {
                 'cart_key' => $this->key,
                 'cart_shop_id' => $this->owner->shopId,
             ];
-
-            if($this->owner->hostConfig['isVirtual']){
-                $where['cart_store_id'] = $this->owner->storeId;
-            }
 
             $cart = $this->owner->db->getFirstRow(
                 $this->owner->db->genSQLSelect(
@@ -1014,7 +1023,7 @@ class CartHandler extends ancestor {
         ];
 
         if(is_numeric($key) && $key && $this->isAdmin){
-                $where['cart_id'] = (int) $key;
+            $where['cart_id'] = (int) $key;
         }else{
             $where['cart_key'] = $key;
         }

@@ -8,7 +8,7 @@ if(!Empty($this->params[0])){
     $key = $this->params[0];
 }
 
-if(!$key){
+if(!$key || is_numeric($key)){
     $this->pageRedirect('/');
 }else {
     $this->cartHandler->init($key, false);

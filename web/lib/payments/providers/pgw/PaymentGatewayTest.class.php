@@ -10,6 +10,16 @@ class PaymentGatewayTest extends PaymentProvider {
         return 'Payment Gateway Test';
     }
 
+    protected function init(): void
+    {
+
+    }
+
+    protected function hasRefund(): bool
+    {
+        return true;
+    }
+
     protected function pay():void
     {
         $data = [
@@ -93,5 +103,4 @@ class PaymentGatewayTest extends PaymentProvider {
     {
         return enumPaymentStatus::Failed();
     }
-
 }

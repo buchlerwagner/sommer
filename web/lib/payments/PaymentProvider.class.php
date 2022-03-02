@@ -23,6 +23,10 @@ abstract class PaymentProvider extends ancestor {
     protected $authCode;
     protected $message;
 
+    protected abstract function init():void;
+
+    protected abstract function hasRefund():bool;
+
     protected abstract function pay():void;
 
     protected abstract function check():enumPaymentStatus;
@@ -62,6 +66,8 @@ abstract class PaymentProvider extends ancestor {
 
     final public function initPayment(int $id, float $amount, string $currency):void
     {
+        $this->init();
+
         $this->id = $id;
         $this->amount = $amount;
         $this->currency = $currency;
@@ -113,6 +119,17 @@ abstract class PaymentProvider extends ancestor {
 
     final public function initRefund(Transaction $transaction, float $refundAmount = 0):Transaction
     {
+        $this->init();
+
+        if($transaction->getStatus() != enumPaymentStatus::OK()->getValue()){
+            throw new PaymentException(PaymentException::INVALID_TRANSACTION_STATUS);
+        }
+
+        $checkDate = dateAddDays($transaction->created, 1);
+        if($checkDate > date('Y-m-d H:i:s')){
+            throw new PaymentException(PaymentException::REFUND_NOT_ALLOWED_YET);
+        }
+
         $this->transactionId = $transaction->transactionId;
         if(!$refundAmount){
             $refundAmount = $transaction->amount;
@@ -126,11 +143,8 @@ abstract class PaymentProvider extends ancestor {
                     'payment_transactions',
                     [
                         'pt_status' => $status->getValue(),
-                        'pt_auth_code' => $this->authCode,
-                        'pt_status_code' => $this->statusCode,
-                        'pt_message' => $this->message,
                         'pt_response' => $this->response,
-                        'pt_refunded' => $this->refunded,
+                        'pt_refunded' => $refundAmount,
                     ],
                     [
                         'pt_transactionid' => $this->transactionId
@@ -139,10 +153,9 @@ abstract class PaymentProvider extends ancestor {
             );
 
             $transaction->setStatus($status);
-            $transaction->authCode = $this->authCode;
             $transaction->message = $this->message;
         }else{
-            throw new Exception('Invalid refund amount!');
+            throw new PaymentException(PaymentException::INVALID_REFUND_AMOUNT);
         }
 
         return $transaction;

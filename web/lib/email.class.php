@@ -9,6 +9,7 @@ class email extends ancestor {
 	public $language;
 	public $tag;
 	public $host;
+	public $publicHost;
 
 	/*
 	 * Email containing parameters:
@@ -39,6 +40,7 @@ class email extends ancestor {
 		$this->userId = $this->owner->user->id;
 		$this->language = $this->owner->language;
 		$this->host = $this->owner->domain;
+		$this->publicHost = $this->owner->domain;
 		$this->from = '';
 		$this->replyto = '';
 		$this->to = '';
@@ -48,6 +50,10 @@ class email extends ancestor {
 		$this->body = '';
 		$this->mailId = uuid::v4();
 		$this->attachments = [];
+
+        if(!Empty($this->owner->getHostConfig()['publicSite'])){
+            $this->publicHost = rtrim($this->owner->getHostConfig()['publicSite'], '/') . '/';
+        }
 	}
 
 	public function addAttachment($file, $fileName = false) {
@@ -333,7 +339,7 @@ class email extends ancestor {
         $this->subject = $this->owner->lib->replaceValues($this->subject, $data);
         $this->body = $this->owner->lib->replaceValues($this->body, $data);
 
-		$this->body = $this->owner->view->renderContent('mail', ['contentstring' => $this->body, 'domain' => $this->host, 'heroImg' => $data['heroImg']], false);
+		$this->body = $this->owner->view->renderContent('mail', ['contentstring' => $this->body, 'domain' => $this->host, 'publicDomain' => $this->publicHost, 'heroImg' => $data['heroImg']], false);
 	}
 
 	private function getEmailSender(){

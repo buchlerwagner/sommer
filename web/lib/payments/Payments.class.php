@@ -44,7 +44,7 @@ class Payments extends ancestor {
                 $this->language
             ]);
         }else{
-            throw new Exception('Invalid payment provider ID');
+            throw new PaymentException(PaymentException::INVALID_PAYMENT_PROVIDER_ID);
         }
 
         return $this;
@@ -53,7 +53,7 @@ class Payments extends ancestor {
     public function createTransaction(int $cartId, float $amount, string $currency):void
     {
         if(!$this->provider){
-            throw new Exception('Payment provider is not initialised!');
+            throw new PaymentException(PaymentException::PAYMENT_PROVIDER_NOT_INITED);
         }
         if(!$this->hasPendingTransaction($cartId)){
             $this->owner->db->sqlQuery(
@@ -90,7 +90,7 @@ class Payments extends ancestor {
                     $transaction = $this->provider->checkTransaction($transaction);
                 }
 
-                catch(Exception $e){
+                catch(PaymentException $e){
 
                 }
             }
@@ -101,27 +101,23 @@ class Payments extends ancestor {
         return $transaction;
     }
 
-    public function refund(string $transactionId, float $refundAmount = 0):Transaction
+    public function refund(string $transactionId, float $refundAmount = 0):bool
     {
+        $success = false;
+
         if(!Empty($transactionId)){
             if($transaction = $this->getTransaction($transactionId)) {
-                try {
-                    $this->init($transaction->providerId);
-                    $transaction = $this->provider->initRefund($transaction, $refundAmount);
-                }
+                $this->init($transaction->providerId);
+                $transaction = $this->provider->initRefund($transaction, $refundAmount);
 
-                catch(Exception $e){
-
-                }
+                $success = ($transaction->getStatus() == enumPaymentStatus::Voided());
             }
-        }else{
-            $transaction = new Transaction();
         }
 
-        return $transaction;
+        return $success;
     }
 
-    private function loadSettings():PaymentProviderSettings
+    private function loadSettings():?PaymentProviderSettings
     {
         $settings = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
@@ -147,7 +143,7 @@ class Payments extends ancestor {
             )
         );
 
-        return new PaymentProviderSettings(($settings ?: []));
+        return ($settings ? new PaymentProviderSettings($settings) : null);
     }
 
     public function hasPendingTransaction(int $cartId):bool
@@ -197,7 +193,7 @@ class Payments extends ancestor {
         return ($out ?: []);
     }
 
-    public function getTransaction(string $transactionId):Transaction
+    public function getTransaction(string $transactionId):?Transaction
     {
         $out = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
@@ -230,6 +226,33 @@ class Payments extends ancestor {
             )
         );
 
-        return new Transaction(($out ?: []));
+        return ($out ? new Transaction($out) : null);
+    }
+
+    public function getRefundableTransaction(int $cartId):?Transaction
+    {
+        $out = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'payment_transactions',
+                [
+                    'pt_pp_id AS providerId',
+                    'pt_id AS id',
+                    'pt_created AS created',
+                    'pt_status AS status',
+                    'pt_transactionid AS transactionId',
+                    'pt_auth_code AS authCode',
+                    'pt_amount AS amount',
+                    'pt_currency AS currency',
+                    'pt_message AS message'
+                ],
+                [
+                    'pt_cart_id' => $cartId,
+                    'pt_shop_id' => $this->owner->shopId,
+                    'pt_status'  => enumPaymentStatus::OK()->getValue(),
+                ]
+            )
+        );
+
+        return ($out ? new Transaction($out) : null);
     }
 }
