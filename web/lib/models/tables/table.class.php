@@ -556,7 +556,7 @@ class table extends model {
 							if (!empty($sum['unitfield'])) {
 								$sql .= ", " . $sum['unitfield'] . " as unitfield";
 							}
-							$sql .= " FROM " . $this->dbTable . $where;
+							$sql .= " FROM " . $this->dbTable . $this->join . $where;
 							if (!empty($sum['where'])) {
 								$sql .= (!empty($where)) ? ' AND ' : ' WHERE ';
 								$sql .= $sum['where'];

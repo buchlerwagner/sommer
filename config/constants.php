@@ -13,16 +13,16 @@ const HOST_SETTINGS         = APPLICATION_NAME . '-hosts-';
 const LABELS_KEY            = APPLICATION_NAME . '-labels-';
 
 // content cache keys
-const CACHE_PAGES           = APPLICATION_NAME . '-pages-';
-const CACHE_CATEGORIES      = APPLICATION_NAME . '-categories-';
-const CACHE_SLIDERS         = APPLICATION_NAME . '-sliders-';
-const CACHE_GALLERY         = APPLICATION_NAME . '-gallery-';
-const CACHE_HIGHLIGHTS      = APPLICATION_NAME . '-highlights-';
-const CACHE_POPULARS        = APPLICATION_NAME . '-popular-';
-const CACHE_TAGGED          = APPLICATION_NAME . '-tagged-';
-const CACHE_SETTINGS        = APPLICATION_NAME . '-settings-';
+const CACHE_PAGES           = APPLICATION_NAME . INSTANCE_ID . '-pages-';
+const CACHE_CATEGORIES      = APPLICATION_NAME . INSTANCE_ID . '-categories-';
+const CACHE_SLIDERS         = APPLICATION_NAME . INSTANCE_ID . '-sliders-';
+const CACHE_GALLERY         = APPLICATION_NAME . INSTANCE_ID . '-gallery-';
+const CACHE_HIGHLIGHTS      = APPLICATION_NAME . INSTANCE_ID . '-highlights-';
+const CACHE_POPULARS        = APPLICATION_NAME . INSTANCE_ID . '-popular-';
+const CACHE_TAGGED          = APPLICATION_NAME . INSTANCE_ID . '-tagged-';
+const CACHE_SETTINGS        = APPLICATION_NAME . INSTANCE_ID . '-settings-';
 
-const CACHE_USER_PROFILE    = APPLICATION_NAME . '-userprofile-';
+const CACHE_USER_PROFILE    = APPLICATION_NAME . INSTANCE_ID . '-userprofile-';
 
 // cookie keys
 const COOKIE_MACHINEID      = 'sc-mid';

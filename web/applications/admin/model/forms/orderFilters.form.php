@@ -68,5 +68,13 @@ class orderFiltersForm extends filterForm {
                 )
             );
         }
+
+        $this->addControls(
+            (new groupRow('row4'))->addElements(
+                (new inputCheckbox('showDeletedRecords', 'LBL_SHOW_ARCHIVED_RECORDS'))
+                    ->setColSize('col-12 col-lg-6')
+                    ->setColor(enumColors::Danger())
+            )
+        );
     }
 }

@@ -83,7 +83,8 @@ class lists extends ancestor {
         $this->setList([
             0  => 'LBL_ANY',
             1  => 'LBL_PAID',
-            -1 => 'LBL_NOT_PAID',
+            2  => 'LBL_NOT_PAID',
+            -1 => 'LBL_REFUNDED',
         ]);
 
         return $this->getList();
