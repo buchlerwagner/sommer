@@ -31,6 +31,7 @@ class CartHandler extends ancestor {
     private $intervalId = false;
 	public $paymentFee = 0;
     private $paymentId = false;
+    private $paymentNoCash = false;
     private $isPaid = false;
     private $isRefunded = false;
     public $packagingFee = 0;
@@ -722,6 +723,10 @@ class CartHandler extends ancestor {
                         $variant = $this->product->getVariant($row['citem_pv_id']);
                         $itemLocalConsumption = (bool) $row['citem_local_consumption'];
 
+                        if($variant['price']['noCash'] && $this->orderType == ORDER_TYPE_ORDER){
+                            $this->paymentNoCash = true;
+                        }
+
                         $this->items[$row['citem_id']] = [
                             'id' => $row['citem_id'],
                             'cartId' => $row['citem_cart_id'],
@@ -1151,7 +1156,11 @@ class CartHandler extends ancestor {
         if(!Empty($types)){
             $pmTypes = $types;
         }else{
-            $pmTypes = [PAYMENT_TYPE_CASH, PAYMENT_TYPE_MONEY_TRANSFER, PAYMENT_TYPE_CARD];
+            if($this->paymentNoCash){
+                $pmTypes = [PAYMENT_TYPE_MONEY_TRANSFER, PAYMENT_TYPE_CARD];
+            }else {
+                $pmTypes = [PAYMENT_TYPE_CASH, PAYMENT_TYPE_MONEY_TRANSFER, PAYMENT_TYPE_CARD];
+            }
         }
 
         $result = $this->owner->db->getRows(

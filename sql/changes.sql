@@ -1,12 +1,14 @@
 # noinspection SqlNoDataSourceInspectionForFile
+-- 2022-03-04
+ALTER TABLE `product_variants` ADD COLUMN `pv_no_cash` TINYINT(1) NULL DEFAULT 0 AFTER `pv_max_sale`;
+ALTER TABLE `products` ADD COLUMN `prod_no_cash` TINYINT(1) NULL DEFAULT 0 AFTER `prod_archived`;
+
+
+
+
+
 ALTER TABLE `cart` ADD COLUMN `cart_refunded` FLOAT NULL DEFAULT NULL AFTER `cart_invoice_filename`;
-
-
-
-
 ALTER TABLE `payment_providers` CHANGE COLUMN `pp_shopid` `pp_merchant_id` VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL  COMMENT '' AFTER `pp_provider`;
-
-
 
 -- 2022-02-21
 CREATE TABLE `invoice_providers` (

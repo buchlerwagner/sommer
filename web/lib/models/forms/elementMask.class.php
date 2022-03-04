@@ -44,6 +44,12 @@ trait elementMask {
         return $this;
     }
 
+    public function setMaskCurrency(){
+        $this->setMaskAlias('currency');
+
+        return $this;
+    }
+
     public function setMaskDateTime($format, $showPlaceholder = true){
         $this->setMaskAlias('datetime');
         $this->addData('inputmask-inputformat', $format);
