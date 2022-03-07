@@ -20,7 +20,7 @@ class orderFiltersForm extends filterForm {
                     ->setColSize('col-12 col-lg-3'),
                 (new inputText('userName', 'LBL_CUSTOMER_NAME'))
                     ->setColSize('col-12 col-lg-3'),
-                (new inputText('us_email', 'LBL_CUSTOMER_EMAIL'))
+                (new inputText('email', 'LBL_CUSTOMER_EMAIL'))
                     ->setColSize('col-12 col-lg-3')
             ),
             (new groupRow('row2'))->addElements(

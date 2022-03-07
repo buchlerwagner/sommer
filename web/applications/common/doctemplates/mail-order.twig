@@ -167,12 +167,17 @@
     <br>
     <table border="0" cellpadding="10" cellspacing="0" width="50%">
         <tr>
-            <td>{{ _('LBL_TOTAL') }}:</td>
+            <td>{{ _('LBL_SUB_TOTAL') }}:</td>
             <td align="right" style="white-space: nowrap;">{{ _price(subtotal, currency) }}</td>
         </tr>
         {% if discount %}
         <tr>
-            <td>{{ _('LBL_DISCOUNT') }}:</td>
+            <td>
+                {{ _('LBL_DISCOUNT') }}:
+                {% if coupon %}
+                    <div style="color:#7E422D; font-size: 12px;">({{ _('LBL_COUPON') }}: {{ coupon.getCode }})</div>
+                {% endif %}
+            </td>
             <td align="right" style="white-space: nowrap;">{{ _price(discount, currency) }}</td>
         </tr>
         {% endif %}

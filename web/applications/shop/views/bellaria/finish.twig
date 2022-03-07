@@ -206,6 +206,26 @@
             <div class="column col-lg-4 offset-lg-8 col-md-6 col-sm-12">
                 <ul class="totals-table">
                     <li><h3>{{ _('LBL_CART_TOTAL') }}</h3></li>
+                    <li class="clearfix">
+                        <span class="col">
+                            {{ _('LBL_SUB_TOTAL') }}
+                        </span>
+                        <span class="col total-price cart-subtotal">{{ _price(cart.subtotal, cart.currency) }}</span>
+                    </li>
+
+                    {% if cart.getDiscount %}
+                        <li class="clearfix">
+                            <span class="col">
+                                {{ _('LBL_DISCOUNT') }}
+                                {% if cart.getAppliedCoupon %}
+                                    <div class="small text-muted">({{ _('LBL_COUPON') }}: {{ cart.getAppliedCoupon.getCode }})</div>
+                                {% endif %}
+                            </span>
+                            <span class="col total-price cart-total">
+                                {{ _price(cart.getDiscount, cart.currency) }}
+                            </span>
+                        </li>
+                    {% endif %}
 
                     {% if cart.packagingFee %}
                         <li class="clearfix">
@@ -215,15 +235,6 @@
                             </span>
                         </li>
                     {% endif %}
-
-                    {#
-                    <li class="clearfix">
-                        <span class="col">
-                            {{ _('LBL_SUB_TOTAL') }}
-                        </span>
-                        <span class="col total-price cart-total">{{ _price(cart.subtotal, cart.currency) }}</span>
-                    </li>
-                    #}
 
                     <li class="clearfix">
                         <span class="col">{{ _('LBL_SHIPPING_FEE') }}</span>

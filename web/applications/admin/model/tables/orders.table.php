@@ -215,6 +215,10 @@ class ordersTable extends table {
                         }
                         break;
 
+                    case 'email':
+                        $where[$field] = "us1.us_email = '$values'";
+                        break;
+
                     default:
                         $where[$field] = $field . " = '$values'";
                         break;

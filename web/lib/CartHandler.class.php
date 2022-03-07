@@ -25,7 +25,7 @@ class CartHandler extends ancestor {
 	public $orderNumber;
 	public $total = 0;
 	public $subtotal = 0;
-	public $discount = 0;
+	private $discount = 0;
 	public $shippingFee = 0;
     private $shippingId = false;
     private $intervalId = false;
@@ -60,6 +60,11 @@ class CartHandler extends ancestor {
 	public $storeName;
 
 	private $options = [];
+
+    /**
+     * @var $coupon Coupon
+     */
+	public $coupon = null;
 
     public function init($key = false, $create = true) {
         if($this->owner->user->getGroup() == USER_GROUP_ADMINISTRATORS){
@@ -240,6 +245,7 @@ class CartHandler extends ancestor {
                 $cartItem->setVat($item['price']['vatKey'], $item['price']['vat']);
                 $cartItem->setQuantity($item['quantity']['amount'], $item['quantity']['unit']);
                 $cartItem->setUnitPrice($item['price']['unitPrice']);
+                $cartItem->setDiscounted(($item['price']['discount'] > 0));
 
                 $cart->addItem($cartItem);
             }
@@ -254,6 +260,22 @@ class CartHandler extends ancestor {
         $cart->setPayment($this->getSelectedPaymentMode(), $this->paymentFee);
 
         return $cart;
+    }
+
+    public function getAppliedCoupon():?Coupon
+    {
+        static $coupon;
+
+        if(!$coupon) {
+            /**
+             * @var $discountHandler DiscountHandler
+             */
+            $discountHandler = $this->owner->addByClassName('DiscountHandler');
+
+            $coupon = $discountHandler->getAppliedCoupon($this->id);
+        }
+
+        return $coupon;
     }
 
 	public function getCartItems(){
@@ -318,7 +340,7 @@ class CartHandler extends ancestor {
     }
 
     public function getDiscount(){
-        return $this->discount;
+        return abs($this->discount) * -1;
     }
 
 	public function getNumberOfCartItems(){
@@ -497,7 +519,8 @@ class CartHandler extends ancestor {
             'items' => $this->items,
             'currency' => $this->currency,
             'subtotal' => $this->subtotal,
-            'discount' => $this->discount,
+            'discount' => $this->getDiscount(),
+            'coupon' => $this->getAppliedCoupon(),
             'packagingFee' => $this->packagingFee,
             'shippingFee' => $this->shippingFee,
             'paymentFee' => $this->paymentFee,
@@ -649,6 +672,7 @@ class CartHandler extends ancestor {
                 $this->orderNumber = $cart['cart_order_number'];
                 $this->orderDate = $cart['cart_ordered'];
                 $this->total = $cart['cart_total'];
+                $this->discount = $cart['cart_discount'];
                 $this->packagingFee = $cart['cart_packaging_fee'];
                 $this->subtotal = $cart['cart_subtotal'];
                 $this->currency = $cart['cart_currency'];
@@ -788,6 +812,11 @@ class CartHandler extends ancestor {
                 'phone' => $user['phone'],
             ];
 
+            $this->userData['type'] = [
+                'group' => $user['group'],
+                'role' => $user['role'],
+            ];
+
             $this->userData['shippingAddress'] = [
                 'name' => $user['name'],
                 'country' => $user['country'],
@@ -904,7 +933,32 @@ class CartHandler extends ancestor {
 		return $key;
 	}
 
-	private function summarize(){
+    private function applyDiscounts(){
+        $this->discount = 0;
+
+        /**
+         * @var $discountHandler DiscountHandler
+         */
+        $discountHandler = $this->owner->addByClassName('DiscountHandler');
+
+        if($this->userId && $this->userData['type']['group'] == USER_GROUP_CUSTOMERS && $this->userData['type']['role'] == USER_ROLE_USER && $this->owner->user->isLoggedIn()){
+            $this->discount = $discountHandler->getLoyaltyDiscount($this->userId, $this->subtotal);
+        }else{
+            $this->discount = 0;
+        }
+
+        if($this->coupon = $discountHandler->getAppliedCoupon($this->id)){
+            $discount = $this->coupon->getDiscount();
+            if($discount > $this->discount){
+                $this->discount = $discount;
+            }else{
+                $discountHandler->clearCoupon($this->id);
+                $this->coupon = null;
+            }
+        }
+    }
+
+	public function summarize(){
 		$this->total = 0;
 		$this->subtotal = 0;
 		$this->packagingFee = 0;
@@ -916,16 +970,19 @@ class CartHandler extends ancestor {
 
                 if($item['packaging']['fee']){
                     $fee = ($item['packaging']['fee'] * $item['quantity']['amount']);
+                    $this->packagingFeeVat = $item['packaging']['vat'];
                 }
 
 				$this->subtotal += $item['price']['total'];
                 $this->packagingFee += $fee;
-
-                $this->packagingFeeVat = $item['packaging']['vat'];
 			}
 		}
 
         $this->checkShippingFee();
+
+        if($this->status == ORDER_STATUS_NEW) {
+            $this->applyDiscounts();
+        }
 
         $this->total = $this->subtotal + $this->packagingFee + $this->shippingFee + $this->paymentFee - $this->discount;
 
@@ -947,8 +1004,6 @@ class CartHandler extends ancestor {
 				]
 			)
 		);
-
-        //$this->subtotal += $this->packagingFee;
 
         return $this;
 	}

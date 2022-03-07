@@ -124,6 +124,84 @@ switch($action) {
         }
         break;
 
+    case 'set-coupon':
+        if($params['coupon']) {
+            $this->data['#coupon-error']['show'] = false;
+            $this->data['#coupon-error']['html'] = '';
+
+            /**
+             * @var $discountHandler DiscountHandler
+             */
+            $discountHandler = $this->addByClassName('DiscountHandler');
+            $discountHandler->applyCoupon($params['coupon'], $this->cartHandler->getCart());
+
+            $this->cartHandler->summarize();
+
+            $discount = $this->cartHandler->getDiscount();
+            if ($discount) {
+                $this->data['.discount-amount']['html'] = $this->lib->formatPrice($discount, $this->cartHandler->currency);
+                $this->data['.discount-item']['show'] = true;
+            } else {
+                $this->data['.discount-amount']['html'] = 0;
+                $this->data['.discount-item']['show'] = false;
+            }
+
+            $this->data['.cart-total']['html'] = $this->lib->formatPrice($this->cartHandler->total, $this->cartHandler->currency);
+
+            if($discountHandler->hasError()){
+                $this->data['#coupon-code']['value'] = '';
+                $this->data['#coupon-error']['show'] = true;
+                switch($discountHandler->getError()){
+                    case DiscountHandler::COUPON_ERR_INVALID;
+                        $this->data['#coupon-error']['html'] = $this->translate->getTranslation('ERR_COUPON_INVALID');
+                        break;
+                    case DiscountHandler::COUPON_ERR_EXPIRED;
+                        $this->data['#coupon-error']['html'] = $this->translate->getTranslation('ERR_COUPON_EXPIRED');
+                        break;
+                    case DiscountHandler::COUPON_ERR_USED;
+                        $this->data['#coupon-error']['html'] = $this->translate->getTranslation('ERR_COUPON_USED');
+                        break;
+                    case DiscountHandler::COUPON_ERR_ORDER_LIMIT;
+                        $this->data['#coupon-error']['html'] = $this->translate->getTranslation('ERR_COUPON_ORDER_LIMIT');
+                        break;
+                    case DiscountHandler::COUPON_ERR_NO_DISCOUNT;
+                        $this->data['#coupon-error']['html'] = $this->translate->getTranslation('ERR_COUPON_NO_DISCOUNT');
+                        break;
+                }
+            }else{
+                $this->data['#coupon-success']['show'] = true;
+            }
+        }
+        break;
+
+    case 'clear-coupon':
+        if($this->cartHandler->id) {
+            /**
+             * @var $coupon DiscountHandler
+             */
+            $discountHandler = $this->addByClassName('DiscountHandler');
+            $discountHandler->clearCoupon($this->cartHandler->id);
+
+            $this->cartHandler->summarize();
+
+            $discount = $this->cartHandler->getDiscount();
+            if($discount){
+                $this->data['.discount-amount']['html'] = $this->lib->formatPrice($discount, $this->cartHandler->currency);
+                $this->data['.discount-item']['show'] = true;
+            }else{
+                $this->data['.discount-amount']['html'] = 0;
+                $this->data['.discount-item']['show'] = false;
+            }
+
+            $this->data['.cart-total']['html'] = $this->lib->formatPrice($this->cartHandler->total, $this->cartHandler->currency);
+
+            $this->data['#coupon-success']['show'] = false;
+            $this->data['#coupon-error']['show'] = false;
+            $this->data['#coupon-error']['html'] = '';
+        }
+
+        break;
+
 	case 'popup':
 		$this->output = OUTPUT_RAW;
 

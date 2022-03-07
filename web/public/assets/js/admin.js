@@ -3422,8 +3422,6 @@ function removeInterval(id, smid) {
 $(function() {
     $.fn.modal.Constructor.prototype._enforceFocus = function () { };
     orders.init();
-
-
 });
 
 function loadUserData(params){

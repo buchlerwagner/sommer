@@ -9,10 +9,14 @@ class editCouponForm extends formBuilder {
         $this->title = 'LBL_EDIT_COUPON';
 		$this->dbTable = 'coupons';
 
+        if($_REQUEST['readonly']){
+            $this->readonly = true;
+        }
+
         /**
-         * @var $coupon Coupon
+         * @var $coupon DiscountHandler
          */
-        $coupon = $this->owner->addByClassName('Coupon');
+        $coupon = $this->owner->addByClassName('DiscountHandler');
         $code = $coupon->generateUniqueCode(6);
 
         $group = (new groupFieldset('general'))->addElements(
@@ -20,6 +24,7 @@ class editCouponForm extends formBuilder {
                 (new inputText('c_code', 'LBL_COUPON_CODE', $code))
                     ->setColSize('col-12 col-lg-8')
                     ->addClass('text-center font-weight-bolder text-primary')
+                    ->setReadonly(($this->keyFields['c_id']))
                     ->setRequired(),
 
                 (new inputDate('c_expiry', 'LBL_EXPIRY'))
@@ -80,11 +85,11 @@ class editCouponForm extends formBuilder {
 	}
 
     public function onValidate() {
-        if(!Empty($this->values['c_code'])){
+        if(!Empty($this->values['c_code']) && !$this->keyFields['c_id']){
             /**
-             * @var $coupon Coupon
+             * @var $coupon DiscountHandler
              */
-            $coupon = $this->owner->addByClassName('Coupon');
+            $coupon = $this->owner->addByClassName('DiscountHandler');
             if($coupon->isCouponExists($this->values['c_code'])){
                 $this->addError('ERR_COUPON_EXISTS', self::FORM_ERROR, ['c_code']);
             }
@@ -93,6 +98,7 @@ class editCouponForm extends formBuilder {
 
     public function onBeforeSave() {
         $this->values['c_shop_id'] = $this->owner->shopId;
+        $this->values['c_code'] = strtoupper($this->values['c_code']);
 
         if(Empty($this->values['c_include_discounted_products'])) $this->values['c_include_discounted_products'] = 0;
         if(Empty($this->values['c_multiple_usage'])) $this->values['c_multiple_usage'] = 0;

@@ -278,16 +278,27 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {#
                         <tr class="bg-gray-100">
                             <td colspan="4">
-                                {{ _('LBL_TOTAL') }}
+                                {{ _('LBL_SUB_TOTAL') }}
                             </td>
                             <td class="text-right">
                                 {{ _price(form.cart.subtotal, form.cart.currency) }}
                             </td>
                         </tr>
-                        #}
+                        {% if form.cart.getDiscount %}
+                            <tr class="bg-gray-100">
+                                <td colspan="4">
+                                    {{ _('LBL_DISCOUNT') }}
+                                    {% if form.cart.getAppliedCoupon %}
+                                        <span class="small">({{ _('LBL_COUPON') }}: <a href="/ajax/forms/editCoupon/{{ form.cart.getAppliedCoupon.getId }}/?readonly=1" data-toggle="modal" data-size="lg" data-target="#ajax-modal">{{ form.cart.getAppliedCoupon.getCode }})</a></span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right">
+                                    {{ _price(form.cart.getDiscount, form.cart.currency) }}
+                                </td>
+                            </tr>
+                        {% endif %}
                         {% if form.cart.packagingFee %}
                             <tr class="bg-gray-100">
                                 <td colspan="4">

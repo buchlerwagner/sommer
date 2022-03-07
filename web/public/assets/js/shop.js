@@ -162,6 +162,26 @@ var shoppingCart = {
             }
         });
 
+        document.addEventListener('click', e => {
+            if (e.target.closest('[data-toggle="clear"]')) {
+                e.target.closest('[data-toggle="clear"]').previousElementSibling.value = ''
+            }
+        })
+
+        $(document).on('change', '.set-coupon', function (){
+            if($('#coupon-code').val() != '') {
+                shoppingCart.sendData('set-coupon', {
+                    coupon: $('#coupon-code').val()
+                });
+            }else{
+                shoppingCart.sendData('clear-coupon');
+            }
+        });
+
+        $(document).on('click', '.clear-coupon', function (){
+            shoppingCart.sendData('clear-coupon');
+        });
+
         $(document).on('click', '.pager', function () {
             var page = parseInt($(this).data('page'));
             var currentPage = parseInt($('#page').val());

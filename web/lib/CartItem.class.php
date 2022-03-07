@@ -27,6 +27,8 @@ class CartItem {
 
     private $quantityUnit;
 
+    private $isDiscounted = false;
+
     public function __construct(int $id = 0, int $productId = 0, int $variantId = 0)
     {
         $this->id = $id;
@@ -118,6 +120,17 @@ class CartItem {
     public function getQuantityUnit():string
     {
         return $this->quantityUnit;
+    }
+
+    public function setDiscounted(bool $isDiscounted):self
+    {
+        $this->isDiscounted = $isDiscounted;
+        return $this;
+    }
+
+    public function isDiscounted():bool
+    {
+        return $this->isDiscounted;
     }
 
     final public function summarize(int $priceBase):self

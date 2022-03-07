@@ -6,6 +6,8 @@ class couponUsageTable extends table {
         $this->join  = 'LEFT JOIN users ON (us_id = cu_us_id)';
         $this->join .= ' LEFT JOIN cart ON (cart_id = cu_cart_id)';
 
+        $this->where = 'cart_status = "' . CartHandler::CART_STATUS_ORDERED . '"';
+
         $this->keyFields = ['cu_id', 'cu_c_id'];
         $this->foreignKeyFields = ['cu_c_id'];
 
@@ -26,8 +28,8 @@ class couponUsageTable extends table {
                 ->addClass('text-center')
                 ->setTemplate('{{ _date(val, 5) }}'),
 
-            (new column('us_firstname', 'LBL_NAME', 5))
-                ->setTemplate('{{ formatName(val, row.us_lastname) }}<div><a href="/orders/view|orders/{{ row.cart_id }}/" target="_blank">{{ row.cart_order_number }}</a></div>'),
+            (new column('cart_order_number', 'LBL_NAME', 5))
+                ->setTemplate('<a href="/orders/view|orders/{{ row.cart_id }}/" target="_blank">{{ row.cart_order_number }}</a><div class="small text-muted">{{ formatName(row.us_firstname, row.us_lastname) }}</div>'),
 
             (new column('cart_subtotal', 'LBL_ORDER_VALUE', 2))
                 ->addClass('text-right')
@@ -38,7 +40,7 @@ class couponUsageTable extends table {
                 ->setTemplate('{{ _price(val, row.cu_currency) }}'),
 
             new columnHidden('cart_id'),
-            new columnHidden('cart_order_number'),
+            new columnHidden('us_firstname'),
             new columnHidden('us_lastname'),
             new columnHidden('cu_currency'),
             new columnHidden('cart_currency')

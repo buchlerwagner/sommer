@@ -2,7 +2,13 @@
 -- 2022-03-04
 ALTER TABLE `product_variants` ADD COLUMN `pv_no_cash` TINYINT(1) NULL DEFAULT 0 AFTER `pv_max_sale`;
 ALTER TABLE `products` ADD COLUMN `prod_no_cash` TINYINT(1) NULL DEFAULT 0 AFTER `prod_archived`;
+ALTER TABLE `cart` ADD COLUMN `cart_coupon_id` INT(11) NULL DEFAULT 0 AFTER `cart_refunded`;
 
+ALTER TABLE `cart` CHANGE COLUMN `cart_subtotal` `cart_subtotal` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_order_status`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_shipping_fee` `cart_shipping_fee` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_packaging_fee`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_payment_fee` `cart_payment_fee` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_shipping_fee`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_discount` `cart_discount` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_payment_fee`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_total` `cart_total` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_discount`;
 
 
 

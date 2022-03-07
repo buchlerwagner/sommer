@@ -56,6 +56,9 @@ class couponsTable extends table {
                 if($row['c_expiry'] < date('Y-m-d') && Empty($row['cu_id'])){
                     $this->rows[$id]['options']['isDeleted'] = true;
                 }
+                if($row['cu_id']){
+                    $this->rows[$id]['options']['delete'] = false;
+                }
             }
         }
     }

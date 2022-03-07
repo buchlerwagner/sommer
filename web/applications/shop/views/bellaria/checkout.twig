@@ -396,6 +396,14 @@
                                         </li>
                                         {% endfor %}
 
+
+                                        <li class="checkout-item discount-item{% if not cart.getDiscount %} d-none{% endif %}">
+                                            <span class="item-sum">
+                                                <span>{{ _('LBL_DISCOUNT') }}</span>
+                                                <span class="text-right float-right discount-amount">{{ _price(cart.getDiscount, cart.currency) }}</span>
+                                            </span>
+                                        </li>
+
                                         {% if cart.packagingFee %}
                                         <li class="checkout-item">
                                             <span class="item-sum">
@@ -406,6 +414,7 @@
                                             </span>
                                         </li>
                                         {% endif %}
+
                                         <li class="checkout-item item-shipping-fee{% if not cart.getShippingId %} d-none{% endif %}">
                                             <span class="item-sum">
                                                 <span>{{ _('LBL_SHIPPING_FEE') }}</span>
@@ -436,6 +445,19 @@
                                             <div class="text-muted small">({{ _('LBL_VAT_INCLUDED') }})</div>
                                         </li>
                                     </ul>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="sidebar-widget cart-widget pt-4">
+                            <div id="coupon-error" class="alert alert-danger d-none"></div>
+                            <div id="coupon-success" class="alert alert-success{% if not cart.coupon %} d-none{% endif %}">{{ _('LBL_VALID_COUPON_CODE_APPLIED') }}</div>
+                            <div class="form-row">
+                                <div class="col form-group col-md-12 floating-label input-clearable mb-0">
+                                    <input type="text" id="coupon-code" name="coupon_code" class="form-control set-coupon" value="{% if cart.coupon %}{{ cart.coupon.getCode }}{% endif %}" placeholder="">
+                                    <i class="fa fa-times clear-coupon" data-toggle="clear" title="{{ _('LBL_CLEAR_COUPON') }}"></i>
+                                    <label class="control-label" for="coupon-code">{{ _('LBL_COUPON_CODE') }}</label>
                                 </div>
                             </div>
                         </div>
