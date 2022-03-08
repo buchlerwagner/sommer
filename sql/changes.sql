@@ -10,6 +10,64 @@ ALTER TABLE `cart` CHANGE COLUMN `cart_payment_fee` `cart_payment_fee` DOUBLE NU
 ALTER TABLE `cart` CHANGE COLUMN `cart_discount` `cart_discount` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_payment_fee`;
 ALTER TABLE `cart` CHANGE COLUMN `cart_total` `cart_total` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_discount`;
 
+CREATE TABLE `loyalty_rules` (
+     `lr_id` int(11) NOT NULL AUTO_INCREMENT,
+     `lr_shop_id` int(11) DEFAULT NULL,
+     `lr_valid_from` date DEFAULT NULL,
+     `lr_min_order_limit` float DEFAULT 0,
+     `lr_discount` float DEFAULT 0,
+     `lr_only_paid` tinyint(1) DEFAULT 0,
+     `lr_only_finished` tinyint(1) DEFAULT 0,
+     PRIMARY KEY (`lr_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `automatic_coupons` (
+     `ac_id` int(11) NOT NULL AUTO_INCREMENT,
+     `ac_shop_id` int(11) DEFAULT NULL,
+     `ac_code_length` tinyint(1) DEFAULT 6,
+     `ac_expiry_days` int(11) DEFAULT 7,
+     `ac_min_sale_limit` float DEFAULT 0,
+     `ac_min_order_limit` float DEFAULT 0,
+     `ac_discount_value` float DEFAULT 0,
+     `ac_discount_percent` float DEFAULT 0,
+     `ac_include_discounted_products` tinyint(1) DEFAULT 0,
+     `ac_multiple_usage` tinyint(1) DEFAULT 0,
+     `ac_enabled` tinyint(1) DEFAULT 0,
+     PRIMARY KEY (`ac_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `coupons` (
+   `c_id` int(11) NOT NULL AUTO_INCREMENT,
+   `c_shop_id` int(11) DEFAULT NULL,
+   `c_code` varchar(10) DEFAULT NULL,
+   `c_created` datetime DEFAULT NULL,
+   `c_expiry` date DEFAULT NULL,
+   `c_min_order_limit` float DEFAULT 0,
+   `c_discount_value` float DEFAULT 0,
+   `c_discount_percent` float DEFAULT 0,
+   `c_include_discounted_products` tinyint(1) DEFAULT 0,
+   `c_multiple_usage` tinyint(1) DEFAULT 0,
+   `c_enabled` tinyint(1) DEFAULT 1,
+   PRIMARY KEY (`c_id`),
+   UNIQUE KEY `code` (`c_code`,`c_shop_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `coupon_usage` (
+    `cu_id` int(11) NOT NULL AUTO_INCREMENT,
+    `cu_c_id` int(11) DEFAULT NULL,
+    `cu_us_id` int(11) DEFAULT 0,
+    `cu_cart_id` int(11) DEFAULT 0,
+    `cu_timestamp` timestamp NULL DEFAULT NULL,
+    `cu_value` float DEFAULT 0,
+    `cu_currency` char(3) DEFAULT 'HUF',
+    PRIMARY KEY (`cu_id`),
+    UNIQUE KEY `uq` (`cu_cart_id`,`cu_c_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
+
+
+
+
 
 
 

@@ -7,6 +7,7 @@ class couponsTable extends table {
 
 		$this->keyFields = ['c_id'];
         $this->where = 'c_shop_id = ' . $this->owner->shopId;
+        $this->groupBy = 'c_id';
 
         $this->formName = 'editCoupon';
 		$this->subTable = true;
@@ -26,7 +27,7 @@ class couponsTable extends table {
                 ->setTemplate('<b class="text-primary">{{ val }}</b>'),
             (new column('c_expiry', 'LBL_EXPIRY', 2))
                 ->addClass('text-center')
-                ->setTemplate('{{ _date(val) }}'),
+                ->setTemplate('{% if val %}{{ _date(val) }}{% else %}{{ _("LBL_NO_EXPIRY") }}{% endif %}'),
             (new column('c_min_order_limit', 'LBL_MIN_ORDER_LIMIT', 2))
                 ->addClass('text-right')
                 ->setTemplate('{{ _price(val, "' . $this->owner->currencySign . '") }}'),
@@ -53,7 +54,7 @@ class couponsTable extends table {
     public function onAfterLoad() {
         if($this->rows){
             foreach($this->rows AS $id => $row){
-                if($row['c_expiry'] < date('Y-m-d') && Empty($row['cu_id'])){
+                if($row['c_expiry'] && $row['c_expiry'] < date('Y-m-d') && Empty($row['cu_id'])){
                     $this->rows[$id]['options']['isDeleted'] = true;
                 }
                 if($row['cu_id']){

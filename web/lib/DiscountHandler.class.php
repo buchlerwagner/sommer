@@ -1,6 +1,8 @@
 <?php
 
 class DiscountHandler extends ancestor {
+    const DEFAULT_CODE_LENGTH    = 6;
+
     const COUPON_ERR_INVALID     = 1;
     const COUPON_ERR_EXPIRED     = 2;
     const COUPON_ERR_USED        = 3;
@@ -9,11 +11,13 @@ class DiscountHandler extends ancestor {
 
     private $error = false;
 
-    public static function generateCode(int $length = 6):string
+    public static function generateCode(int $length = self::DEFAULT_CODE_LENGTH):string
     {
+        $randomString = '';
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        $randomString = '';
+        if(!$length) $length = self::DEFAULT_CODE_LENGTH;
+
         for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[mt_rand(0, strlen($characters) - 1)];
         }
@@ -169,7 +173,7 @@ class DiscountHandler extends ancestor {
             )
         );
         if($coupon) {
-            if (($coupon['expiry'] < date('Y-m-d')) && $coupon['cartStatus'] == CartHandler::CART_STATUS_NEW) {
+            if (($coupon['expiry'] && $coupon['expiry'] < date('Y-m-d')) && $coupon['cartStatus'] == CartHandler::CART_STATUS_NEW) {
                 $this->clearCoupon($cartId);
                 return null;
             }
@@ -180,9 +184,22 @@ class DiscountHandler extends ancestor {
         return null;
     }
 
-    public function getGeneratedCoupon(int $cartId)
+    public function getPromoCoupon(int $couponId, float $orderAmount = 0):?Coupon
     {
-        // check is coupon used or not
+        if($couponId){
+            $coupon = $this->getCouponById($couponId);
+            if($coupon instanceof Coupon){
+                if($coupon->isExpired()){
+                    $coupon = null;
+                }elseif($this->isCouponUsed($coupon)){
+                    $coupon = null;
+                }
+            }
+        }else{
+            $coupon = $this->generateCoupon($orderAmount);
+        }
+
+        return $coupon;
     }
 
     public function clearCoupon(int $cartId):void
@@ -252,7 +269,7 @@ class DiscountHandler extends ancestor {
             )
         );
         if($coupon) {
-            if ($coupon['expiry'] < date('Y-m-d')) {
+            if ($coupon['expiry'] && $coupon['expiry'] < date('Y-m-d')) {
                 $this->setError(self::COUPON_ERR_EXPIRED);
 
                 return null;
@@ -262,10 +279,11 @@ class DiscountHandler extends ancestor {
         }
 
         $this->setError(self::COUPON_ERR_INVALID);
+
         return null;
     }
 
-    private function isCouponUsed(Coupon $coupon, int $cartId):bool
+    private function isCouponUsed(Coupon $coupon, int $cartId = 0):bool
     {
         if(!$coupon->isMultipleUsage()) {
             $couponUsage = $this->owner->db->getFirstRow(
@@ -313,5 +331,96 @@ class DiscountHandler extends ancestor {
                 ]
             )
         );
+    }
+
+    private function getCouponById(int $id):?Coupon
+    {
+        $coupon = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'coupons',
+                [
+                    'c_id AS id',
+                    'c_code AS code',
+                    'c_min_order_limit AS minOrderLimit',
+                    'c_discount_value AS discountValue',
+                    'c_discount_percent AS discountPercent',
+                    'c_include_discounted_products AS includeDiscountedItems',
+                    'c_multiple_usage AS isMultipleUsage',
+                    'c_expiry AS expiry',
+                ],
+                [
+                    'c_shop_id' => $this->owner->shopId,
+                    'c_id' => $id,
+                    'c_enabled' => 1
+                ]
+            )
+        );
+
+        return ($coupon ? new Coupon($coupon) : null);
+    }
+
+    private function generateCoupon(float $orderAmount):?Coupon
+    {
+        $coupon = null;
+
+        if($rule = $this->getApplicableCouponRule($orderAmount)){
+            $coupon = new Coupon($rule);
+
+            $coupon->setCode( $this->generateUniqueCode($rule['codeLength']) );
+
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLInsert(
+                    'coupons',
+                    [
+                        'c_shop_id' => $this->owner->shopId,
+                        'c_code' => $coupon->getCode(),
+                        'c_created' => 'NOW()',
+                        'c_expiry' => ($coupon->getExpiry() ?: null),
+                        'c_min_order_limit' => $coupon->getMinOrderLimit(),
+                        'c_discount_value' => $coupon->getDiscountValue(),
+                        'c_discount_percent' => $coupon->getDiscountPercent(),
+                        'c_include_discounted_products' => ($coupon->isIncludeDiscountedItems() ? 1 : 0),
+                        'c_multiple_usage' => ($coupon->isMultipleUsage() ? 1 : 0),
+                        'c_enabled' => 1,
+                    ],
+                    [
+                        'c_shop_id' => $this->owner->shopId,
+                        'c_code' => $coupon->getCode(),
+                    ]
+                )
+            );
+
+            $coupon->setId( $this->owner->db->getInsertRecordId() );
+        }
+
+        return ($coupon ?: null);
+    }
+
+    private function getApplicableCouponRule(float $orderAmount = 0):array
+    {
+        $rule = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'automatic_coupons',
+                [
+                    'ac_id AS id',
+                    'ac_code_length AS codeLength',
+                    'ac_min_order_limit AS minOrderLimit',
+                    'ac_discount_value AS discountValue',
+                    'ac_discount_percent AS discountPercent',
+                    'ac_include_discounted_products AS includeDiscountedItems',
+                    'ac_multiple_usage AS isMultipleUsage',
+                    'ac_expiry_days AS expiryDays',
+                ],
+                [
+                    'ac_shop_id' => $this->owner->shopId,
+                    'ac_min_sale_limit' => [
+                        'less' => $orderAmount
+                    ],
+                    'ac_enabled' => 1
+                ]
+            )
+        );
+
+        return ($rule ?: []);
     }
 }

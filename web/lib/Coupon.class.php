@@ -11,6 +11,8 @@ class Coupon {
     private $discount = 0;
     private $expiry;
 
+    private $expiryDays = 0;
+
     public function __construct(array $settings)
     {
         $this->id = null;
@@ -38,7 +40,7 @@ class Coupon {
         $this->discount = 0;
 
         if($cartAmount > $this->minOrderLimit || $this->minOrderLimit == 0 ){
-            $this->setDiscount( $this->discountValue + round($cartAmount * $this->discountPercent) );
+            $this->setDiscount( $this->discountValue + round($cartAmount * ($this->discountPercent / 100)) );
         }
 
         return $this->getDiscount();
@@ -144,7 +146,7 @@ class Coupon {
      */
     public function setDiscountPercent(float $discountPercent): self
     {
-        $this->discountPercent = ($discountPercent ? $discountPercent / 100 : 0);
+        $this->discountPercent = $discountPercent;
         return $this;
     }
 
@@ -194,20 +196,55 @@ class Coupon {
 
 
     /**
-     * @param string $expiry
+     * @param mixed $expiry
      * @return Coupon
      */
-    public function setExpiry(string $expiry):self
+    public function setExpiry($expiry):self
     {
-        $this->expiry = $expiry;
+        $this->expiry = ($expiry ? standardDate($expiry) : false);
         return $this;
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getExpiry():string
+    public function getExpiry()
     {
         return $this->expiry;
     }
+
+    public function isExpired(string $checkDate = ''):bool
+    {
+        if($this->expiry === false){
+            return false;
+        }
+
+        if(!Empty($checkDate)){
+            $date = standardDate($checkDate);
+        }else {
+            $date = date('Y-m-d');
+        }
+
+        return ($this->expiry < $date);
+    }
+
+    /**
+     * @param int $expiryDays
+     * @return Coupon
+     */
+    public function setExpiryDays(int $expiryDays): self
+    {
+        $this->expiryDays = $expiryDays;
+
+        if($this->expiryDays > 0){
+            $expiryDate = dateAddDays('now', $this->expiryDays);
+        }else{
+            $expiryDate = false;
+        }
+
+        $this->setExpiry($expiryDate);
+
+        return $this;
+    }
+
 }

@@ -66,6 +66,8 @@ class CartHandler extends ancestor {
      */
 	public $coupon = null;
 
+	public $promoCouponId = false;
+
     public function init($key = false, $create = true) {
         if($this->owner->user->getGroup() == USER_GROUP_ADMINISTRATORS){
             $this->isAdmin = true;
@@ -230,13 +232,14 @@ class CartHandler extends ancestor {
              ->setInvoiceNumber($this->invoiceNumber)
              ->setInvoiceFileName($this->invoiceFileName)
              ->setOrderNumber($this->orderNumber)
-             ->setDiscount($this->discount)
              ->setTotal($this->total)
              ->setCurrency($this->currency)
              ->setInvoiceProvider($this->invoiceProviderId)
              ->setPaid($this->isPaid());
 
         $cart->setCustomer( $this->userData );
+
+        $defaultVat = 18;
 
         if($this->items){
             foreach($this->items AS $item){
@@ -248,7 +251,15 @@ class CartHandler extends ancestor {
                 $cartItem->setDiscounted(($item['price']['discount'] > 0));
 
                 $cart->addItem($cartItem);
+
+                if($item['price']['vatKey']) {
+                    $defaultVat = $item['price']['vatKey'];
+                }
             }
+        }
+
+        if($this->discount){
+            $cart->setDiscount($this->getDiscount(), $defaultVat);
         }
 
         if($this->packagingFee) {
@@ -273,6 +284,39 @@ class CartHandler extends ancestor {
             $discountHandler = $this->owner->addByClassName('DiscountHandler');
 
             $coupon = $discountHandler->getAppliedCoupon($this->id);
+        }
+
+        return $coupon;
+    }
+
+    public function getPromoCoupon():?Coupon
+    {
+        static $coupon = null;
+
+        if(!$coupon) {
+
+            /**
+             * @var $discountHandler DiscountHandler
+             */
+            $discountHandler = $this->owner->addByClassName('DiscountHandler');
+
+            $coupon = $discountHandler->getPromoCoupon($this->promoCouponId, $this->subtotal);
+            if(!$this->promoCouponId && $coupon instanceof Coupon){
+                $this->promoCouponId = $coupon->getId();
+
+                $this->owner->db->sqlQuery(
+                    $this->owner->db->genSQLUpdate(
+                        'cart',
+                        [
+                            'cart_coupon_id' => $this->promoCouponId,
+                        ],
+                        [
+                            'cart_id' => $this->id,
+                            'cart_shop_id' => $this->owner->shopId,
+                        ]
+                    )
+                );
+            }
         }
 
         return $coupon;
@@ -510,7 +554,7 @@ class CartHandler extends ancestor {
         return rtrim($domain, '/');
     }
 
-    public function getTemplateData(){
+    public function getTemplateData($addPromoCode = false){
         $this->loadCart();
 
         return [
@@ -521,6 +565,7 @@ class CartHandler extends ancestor {
             'subtotal' => $this->subtotal,
             'discount' => $this->getDiscount(),
             'coupon' => $this->getAppliedCoupon(),
+            'promoCoupon' => ($addPromoCode ? $this->getPromoCoupon() : false),
             'packagingFee' => $this->packagingFee,
             'shippingFee' => $this->shippingFee,
             'paymentFee' => $this->paymentFee,
@@ -545,7 +590,7 @@ class CartHandler extends ancestor {
     public function sendConfirmationEmail($resend = false){
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
-            $this->getTemplateData(),
+            $this->getTemplateData(true),
             false
         );
 
@@ -692,6 +737,7 @@ class CartHandler extends ancestor {
                 $this->invoiceFileName = $cart['cart_invoice_filename'];
                 $this->storeId = $cart['st_code'];
                 $this->storeName = $cart['st_name'];
+                $this->promoCouponId = (int) $cart['cart_coupon_id'];
 
                 if($this->userId){
                     $this->loadCustomerData($this->userId, $this->invoiceType);

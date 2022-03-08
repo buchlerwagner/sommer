@@ -133,9 +133,20 @@ class Cart {
         return $this->total;
     }
 
-    public function setDiscount(float $discount):self
+    public function setDiscount(float $discount, string $vat = ''):self
     {
         $this->discount = $discount;
+
+        if($this->discount){
+            $item = new CartItem();
+            $item->setName('Kedvezmény'); // @todo: localize
+            $item->setUnitPrice($this->discount);
+            $item->setVat($vat, (float)$vat / 100);
+            $item->setQuantity(1);
+
+            $this->addItem($item);
+        }
+
         return $this;
     }
 

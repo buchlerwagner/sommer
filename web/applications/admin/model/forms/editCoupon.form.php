@@ -30,7 +30,7 @@ class editCouponForm extends formBuilder {
                 (new inputDate('c_expiry', 'LBL_EXPIRY'))
                     ->setColSize('col-12 col-lg-4')
                     ->setIcon('fas fa-calendar')
-                    ->setRequired()
+                    ->setHelpText('LBL_EXPIRY_DATE_HELP_TEXT')
             ),
 
             (new groupRow('row2'))->addElements(
@@ -99,6 +99,8 @@ class editCouponForm extends formBuilder {
     public function onBeforeSave() {
         $this->values['c_shop_id'] = $this->owner->shopId;
         $this->values['c_code'] = strtoupper($this->values['c_code']);
+        $this->values['c_discount_value'] = abs($this->values['c_discount_value']);
+        $this->values['c_discount_percent'] = abs($this->values['c_discount_percent']);
 
         if(Empty($this->values['c_include_discounted_products'])) $this->values['c_include_discounted_products'] = 0;
         if(Empty($this->values['c_multiple_usage'])) $this->values['c_multiple_usage'] = 0;

@@ -163,7 +163,6 @@
         {% endif %}
     </table>
 
-
     <br>
     <table border="0" cellpadding="10" cellspacing="0" width="50%">
         <tr>
@@ -208,4 +207,17 @@
             <td align="right" style="border-top:1px solid #EDECEC;white-space: nowrap;"><b>{{ _price(total, currency) }}</b></td>
         </tr>
     </table>
+{% endif %}
+
+{% if promoCoupon %}
+    <div style="margin:20px 0;background-color: #d1ecf1;border: 1px solid #bee5eb;border-radius: 4px;color: #0c5460; padding: 10px;text-align: center;">
+        {{ _('LBL_PROMO_COUPON_INFO_TEXT', promoCoupon.getDiscountPercent, promoCoupon.getDiscountValue)|raw }}
+        <div style="margin:10px 0;">
+            <b style="font-size: 20px;">{{ promoCoupon.getCode }}</b>
+        </div>
+        <span style="font-size: 10px;">
+            {% if promoCoupon.getExpiry %}{{ _('LBL_COUPON_EXPIRY') }}: <b>{{ _date(promoCoupon.getExpiry) }}</b>{% else %}{{ _('LBL_COUPON_USAGE_UNLIMITED') }}{% endif %},
+            {{ _('LBL_COUPON_MIN_ORDER_LIMIT') }}: <b>{{ _price(promoCoupon.getMinOrderLimit, currency) }}</b>
+        </span>
+    </div>
 {% endif %}
