@@ -216,3 +216,17 @@
   font-size: 20px;
   z-index: 10;
 }
+
+.text-content p {
+  margin: 1em 0;
+}
+
+.text-content li {
+  list-style: inherit !important;
+  font-size: 17px;
+  line-height: 29px;
+}
+
+.text-content ul {
+  list-style: inherit !important;
+}
