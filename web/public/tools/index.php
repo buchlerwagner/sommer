@@ -14,7 +14,7 @@ if(!Empty($fw->getHostConfig()['publicSite'])){
 }
 
 
-d($publicDomain);
+d(($publicDomain ?: $fw->domain));
 dd($config);
 
 include_once('header.php');
