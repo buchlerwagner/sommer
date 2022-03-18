@@ -73,14 +73,14 @@ class router extends model {
 	public $user;
 
 	/**
-	 * @var cart
+	 * @var CartHandler
 	 */
-	public $cart = null;
+	public $cartHandler = null;
 
 	public $output = OUTPUT_HTML;
 	protected $messages = [];
 
-	public function __construct(){
+	public function __construct($host = false){
 		parent::__construct();
 
 		try {
@@ -101,7 +101,7 @@ class router extends model {
 		$this->user = $this->addByClassName('user');
 		$this->email = $this->addByClassName('email');
 
-        $this->setHost($_SERVER['HTTP_HOST']);
+        $this->setHost(($host ?: $_SERVER['HTTP_HOST']));
 
         if($this->hostConfig['shareSession']) {
             if(substr_count($this->host, '.') > 1) {
@@ -114,7 +114,7 @@ class router extends model {
             ini_set('session.cookie_domain', $mainDomain);
         }
 
-        if($this->hostConfig['auth']) {
+        if($this->hostConfig['auth'] && !$host) {
             $this->setBasicAuth();
         }
 
@@ -122,7 +122,7 @@ class router extends model {
 	}
 
     private function setHost($host){
-        if($this->hostConfig = $this->getHostConfig($host)){
+        if($this->hostConfig = $this->loadHostConfig($host)){
             $this->host = $this->hostConfig['host'];
 
             $this->shopId = $this->hostConfig['shopId'];
@@ -153,8 +153,9 @@ class router extends model {
         $this->domain = $protocol . $this->host . '/';
     }
 
-    private function getHostConfig($host){
+    private function loadHostConfig($host){
         $host = strtolower(trim($host));
+        if(Empty($host)) $host = 'default';
 
         $config = $this->mem->get(HOST_SETTINGS . $host);
         if(!$config){
@@ -193,7 +194,7 @@ class router extends model {
                     'timeZoneID' => $h['host_timezone'],
                     'timeZone' => $this->user->getTimezone($h['host_timezone']),
                     'country' => $h['host_country'],
-                    'publicSite' => rtrim($h['host_public_site'], '/') . '/',
+                    'publicSite' => ($h['host_public_site'] ? rtrim($h['host_public_site'], '/') . '/' : ''),
                     'defaultEmail' => $h['host_default_email'],
                     'production' => ($h['host_production']),
                     'shareSession' => ($h['host_share_session']),
@@ -227,6 +228,10 @@ class router extends model {
         }
 
         return $config;
+    }
+
+    public function getHostConfig(){
+        return $this->hostConfig;
     }
 
 	public function init(){
@@ -265,33 +270,29 @@ class router extends model {
             $this->page = 'maintenance';
         }else {
             /**
-             * @var $cart cart
+             * @var $cart CartHandler
              */
-            $this->cart = $this->addByClassName('cart');
-            $this->cart->init(false, false);
+            $this->cartHandler = $this->addByClassName('CartHandler');
+            $this->cartHandler->init(false, false);
 
             $this->parseUrl();
 
             if ($this->application == 'admin') {
-
-
+                /*
+                if($this->user->getUser() && $this->user->getUser()['force_pwchange'] && $this->page != 'logout'){
+                    if (!empty($this->user->getUser()['force_pwchange'])) {
+                        $this->addMessage('warning', 'LBL_PASSWORD_CHANGE_NEEDED', 'LBL_PASSWORD_CHANGE_NEEDED');
+                    }
+                    $this->page = 'change-pwd';
+                }
+                */
 
                 $this->menu['orders']['badge']['color'] = 'danger text-white';
-                $this->menu['orders']['badge']['value'] = $this->cart->getNumberOfNewOrders();
-            }elseif($this->application == 'shop'){
+                $this->menu['orders']['badge']['value'] = $this->cartHandler->getNumberOfNewOrders();
+            //}elseif($this->application == 'shop'){
                 //$fbLogin = $this->user->getFBLoginUrl();
             }
-
-            /*
-            if($this->user->getUser() && $this->user->getUser()['force_pwchange'] && $this->page != 'logout'){
-                if (!empty($this->user->getUser()['force_pwchange'])) {
-                    $this->addMessage('warning', 'LBL_PASSWORD_CHANGE_NEEDED', 'LBL_PASSWORD_CHANGE_NEEDED');
-                }
-                $this->page = 'change-pwd';
-            }
-            */
         }
-
 
 		$this->view->init();
 		if ($this->page == 'ajax') {

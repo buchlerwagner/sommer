@@ -93,6 +93,11 @@ class editVariantForm extends formBuilder {
                 (new inputSelect('pv_pkg_id', 'LBL_PACKAGE_FEE', 0))
                     ->setColSize('col-12 col-lg-6')
                     ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_NONE')->getPackagingOptions())
+            ),
+            (new groupRow('row6'))->addElements(
+                (new inputSwitch('pv_no_cash', 'LBL_NO_CASH', 0))
+                    ->setColor(enumColors::Danger())
+                    ->setColSize('col-12')
             )
         );
 
@@ -121,6 +126,7 @@ class editVariantForm extends formBuilder {
         if(Empty($this->values['pv_stock'])) $this->values['pv_stock'] = 0;
         if(Empty($this->values['pv_weight'])) $this->values['pv_weight'] = 0;
         if(Empty($this->values['pv_weight_unit'])) $this->values['pv_weight_unit'] = 0;
+        if(Empty($this->values['pv_no_cash'])) $this->values['pv_no_cash'] = 0;
 
         if(Empty($this->values['pv_allow_oversell'])) $this->values['pv_allow_oversell'] = 0;
         if(Empty($this->values['pv_physical'])) $this->values['pv_physical'] = 0;

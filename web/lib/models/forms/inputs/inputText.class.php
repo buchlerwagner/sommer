@@ -1,6 +1,6 @@
 <?php
 class inputText extends formElement {
-    use elementPlaceholder;
+    use elementPlaceholder, elementMask;
 
     const Type = 'text';
     private $maxLength = false;

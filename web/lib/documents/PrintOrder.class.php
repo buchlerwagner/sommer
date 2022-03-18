@@ -1,11 +1,11 @@
 <?php
 class PrintOrder extends docs {
     /**
-     * @var $cart cart
+     * @var $cart CartHandler
      */
     private $cart;
 
-    public function setCart(cart $cart){
+    public function setCart(CartHandler $cart){
         $this->cart = $cart;
         return $this;
     }

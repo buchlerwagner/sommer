@@ -134,6 +134,11 @@ class editProductForm extends formBuilder {
                 (new inputSelect('prod_pkg_id', 'LBL_PACKAGE_FEE', 0))
                     ->setColSize('col-12 col-lg-6')
                     ->setOptions($this->owner->lists->reset()->setEmptyItem('LBL_NONE')->getPackagingOptions())
+            ),
+            (new groupRow('row10'))->addElements(
+                (new inputSwitch('prod_no_cash', 'LBL_NO_CASH', 0))
+                    ->setColor(enumColors::Danger())
+                    ->setColSize('col-12')
             )
         );
 
@@ -313,6 +318,7 @@ class editProductForm extends formBuilder {
         if(Empty($this->values['prod_visible'])) $this->values['prod_visible'] = 0;
         if(Empty($this->values['prod_available'])) $this->values['prod_available'] = 0;
         if(Empty($this->values['prod_in_store_only'])) $this->values['prod_in_store_only'] = 0;
+        if(Empty($this->values['prod_no_cash'])) $this->values['prod_no_cash'] = 0;
 
         if(Empty($this->values['prod_page_title'])){
             $this->values['prod_page_title'] = $this->values['prod_name'];

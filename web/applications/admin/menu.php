@@ -125,6 +125,29 @@ $GLOBALS['MENU'] = [
         'userGroups' => [USER_GROUP_ADMINISTRATORS],
     ],
 
+    'loyalty-program' => [
+        'display' => 2,
+        'icon'  => 'fa-hands-heart',
+        'userGroups' => [USER_GROUP_ADMINISTRATORS],
+        'items' => [
+            'loyalty-rules' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
+            'automatic-coupons' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
+            'coupons' => [
+                'display' => 1,
+                'access'  => true,
+                'userGroups' => [USER_GROUP_ADMINISTRATORS]
+            ],
+        ]
+    ],
+
     'reports' => [
         'display' => 2,
         'icon'  => 'fa-list-alt',
@@ -167,6 +190,11 @@ $GLOBALS['MENU'] = [
                         'userGroups' => [USER_GROUP_ADMINISTRATORS]
                     ],
                     'payment-providers' => [
+                        'display' => 1,
+                        'access'  => true,
+                        'userGroups' => [USER_GROUP_ADMINISTRATORS]
+                    ],
+                    'invoice-providers' => [
                         'display' => 1,
                         'access'  => true,
                         'userGroups' => [USER_GROUP_ADMINISTRATORS]

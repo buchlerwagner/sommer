@@ -95,6 +95,17 @@
                             <b>{{ _date(form.cart.orderDate, 5) }}</b>
                         </div>
                         <div>
+                            <span class="text-secondary">{{ _('LBL_INVOICE_NUMBER') }}:</span>
+                            {% if form.cart.invoiceNumber %}
+                                <a href="/ajax/preview/?src={{ form.invoiceDir }}{{ form.cart.invoiceFileName }}" data-target="#ajax-modal" data-toggle="modal" data-size="xl">
+                                    <i class="fas fa-file-download"></i>
+                                    <b>{{ form.cart.invoiceNumber }}</b>
+                                </a>
+                            {% else %}
+                                <span class="text-danger">{{ _('LBL_NO_INVOICE') }}</span>
+                            {% endif %}
+                        </div>
+                        <div>
                             <span class="text-secondary">{{ _('LBL_ORDER_STATUS') }}:</span>
                             <b>{{ orderState(form.cart.orderStatus)|raw }}</b>
                         </div>
@@ -102,6 +113,8 @@
                             <span class="text-secondary">{{ _('LBL_PAYMENT_STATUS') }}:</span>
                             {% if form.cart.isPaid %}
                                 <span class="badge badge-success badge-sm text-white">{{ _('LBL_PAID') }}</span>
+                            {% elseif form.cart.isRefunded %}
+                                <span class="badge badge-info badge-sm text-white">{{ _('LBL_REFUNDED') }}</span>
                             {% else %}
                                 <span class="badge badge-danger badge-sm text-white">{{ _('LBL_NOT_PAID') }}</span>
                             {% endif %}
@@ -117,7 +130,7 @@
                                 <b>{{ form.cart.storeName }}</b>
 
                                 <span class="text-primary">
-                                {% if form.cart.localConsumption %}
+                                {% if form.cart.orderType == 1 %}
                                     (<i class="fas fa-utensils-alt"></i>
                                     {{ _('LBL_LOCAL_CONSUMPTION') }})
                                 {% else %}
@@ -189,7 +202,19 @@
         </a>
     {% endif %}
 
-    <a href="./?paid" class="btn btn-light btn-app {% if form.cart.isPaid %} disabled{% endif %}">
+    {% if form.hasInvoiceProvider %}
+        <a{% if not form.cart.invoiceNumber and form.cart.userData %} href="/ajax/forms/issueInvoice/{{ form.cart.id }}/" data-target="#ajax-modal" data-toggle="modal" {% endif %} class="btn btn-light btn-app{% if form.cart.invoiceNumber or not form.cart.userData%} disabled{% endif %}">
+            <i class="far fa-file-invoice text-primary"></i>
+            {{ _('BTN_CREATE_INVOICE') }}
+        </a>
+    {% else %}
+        <a href="#" class="btn btn-light btn-app disabled">
+            <i class="far fa-file-invoice text-primary"></i>
+            {{ _('BTN_CREATE_INVOICE') }}
+        </a>
+    {% endif %}
+
+    <a href="#" data-target="#confirm-delete" data-confirm-action="pageRedirect('./?paid');" data-confirm-question="{{ _('LBL_CONFIRM_PAID_STATUS') }}" data-confirm-button="{{ _('BTN_ORDER_PAID') }}" data-color="warning" data-toggle="modal" class="btn btn-light btn-app {% if form.cart.isPaid or form.cart.isRefunded %} disabled{% endif %}">
         <i class="far fa-check text-primary"></i>
         {{ _('BTN_ORDER_PAID') }}
     </a>
@@ -203,6 +228,13 @@
         <i class="far fa-envelope text-primary"></i>
         {{ _('BTN_MAIL_ORDER') }}
     </a>
+
+    {% if form.isRefundable %}
+    <a href="/ajax/forms/refundTransaction/{{ form.cart.id }}/" class="btn btn-light btn-app ml-4" data-target="#ajax-modal" data-toggle="modal">
+        <i class="far fa-undo text-warning"></i>
+        {{ _('BTN_REFUND') }}
+    </a>
+    {% endif %}
 </div>
 
 {% if form.cart.items %}
@@ -246,16 +278,27 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {#
                         <tr class="bg-gray-100">
                             <td colspan="4">
-                                {{ _('LBL_TOTAL') }}
+                                {{ _('LBL_SUB_TOTAL') }}
                             </td>
                             <td class="text-right">
                                 {{ _price(form.cart.subtotal, form.cart.currency) }}
                             </td>
                         </tr>
-                        #}
+                        {% if form.cart.getDiscount %}
+                            <tr class="bg-gray-100">
+                                <td colspan="4">
+                                    {{ _('LBL_DISCOUNT') }}
+                                    {% if form.cart.getAppliedCoupon %}
+                                        <span class="small">({{ _('LBL_COUPON') }}: <a href="/ajax/forms/editCoupon/{{ form.cart.getAppliedCoupon.getId }}/?readonly=1" data-toggle="modal" data-size="lg" data-target="#ajax-modal">{{ form.cart.getAppliedCoupon.getCode }})</a></span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right">
+                                    {{ _price(form.cart.getDiscount, form.cart.currency) }}
+                                </td>
+                            </tr>
+                        {% endif %}
                         {% if form.cart.packagingFee %}
                             <tr class="bg-gray-100">
                                 <td colspan="4">

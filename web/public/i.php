@@ -5,6 +5,7 @@ $fileName = '';
 if($_GET['src']){
     $src = urldecode($_GET['src']);
     $cropMode = (int) $_GET["m"];
+    $ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 
     if(Empty($_GET['w'])) $_GET['w'] = 'max';
     if(Empty($_GET['h'])) $_GET['h'] = 'max';
@@ -14,9 +15,8 @@ if($_GET['src']){
     if(IMG_CACHE_ENABLED){
         if (is_numeric($src)) {
             $ext = 'jpg';
-        } else {
-            $ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
         }
+
         $dir_level = 4;
         if(!$cropMode) $cropMode = 0;
         $file_hash = md5($src) . '.' . $ext;
@@ -28,6 +28,9 @@ if($_GET['src']){
 
         if (file_exists($file_path . $file_hash)) {
             switch ($ext) {
+                case 'svg':
+                    header('Content-type: image/svg+xml');
+                    break;
                 case 'gif':
                     header('Content-type: image/gif');
                     break;
@@ -47,6 +50,12 @@ if($_GET['src']){
 
     if(file_exists(DIR_UPLOAD . $src)){
         $fileName = DIR_UPLOAD . $src;
+
+        if($ext == 'svg'){
+            header("Content-type: image/svg+xml");
+            print @file_get_contents($fileName);
+            exit();
+        }
 
         if($_GET['w']=='max' OR $_GET['h'] == 'max') {
 

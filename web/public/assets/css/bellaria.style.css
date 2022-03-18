@@ -28412,4 +28412,41 @@ iframe#gmap_canvas {
   text-shadow: none !important;
 }
 
+.input-clearable {
+  position: relative;
+}
+.input-clearable [data-toggle=clear] {
+  display: none;
+}
+.input-clearable .form-control:not(:placeholder-shown):focus + [data-toggle=clear] {
+  display: block;
+}
+.input-clearable:hover .form-control:not(:placeholder-shown) + [data-toggle=clear] {
+  display: block;
+}
+
+.input-clearable [data-toggle=clear] {
+  cursor: pointer;
+  color: #ff5555;
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 20px;
+  z-index: 10;
+}
+
+.text-content p {
+  margin: 1em 0;
+}
+
+.text-content li {
+  list-style: inherit !important;
+  font-size: 17px;
+  line-height: 29px;
+}
+
+.text-content ul {
+  list-style: inherit !important;
+}
+
 /*# sourceMappingURL=bellaria.style.css.map */

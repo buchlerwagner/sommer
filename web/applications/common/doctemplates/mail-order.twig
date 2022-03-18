@@ -15,6 +15,14 @@
                     <br>
                     {{ _('LBL_AUTH_CODE') }}: <b>{{ transaction.authCode }}</b>
                 </div>
+            {% elseif transaction.getStatus == 'VOIDED' %}
+                <div style="border: 1px solid #bee5eb; color: #0c5460; background-color: #d1ecf1; border-radius: 5px; margin:10px 0;padding:10px 15px;">
+                    <b style="font-size: 18px;margin-bottom: 10px;">{{ _('LBL_PAYMENT_REFUNDED') }}</b>
+                    <br>
+                    {{ _('LBL_TRANSACTION_ID') }}: <b>{{ transaction.transactionId }}</b>
+                    <br>
+                    {{ _('LBL_AUTH_CODE') }}: <b>{{ transaction.authCode }}</b>
+                </div>
             {% else %}
                 <div style="border: 1px solid #f5c6cb; color: #721c24; background-color: #f8d7da; border-radius: 5px; margin:10px 0;padding:10px 15px;">
                     <b style="font-size: 18px;margin-bottom: 10px;">{{ _('LBL_PAYMENT_FAILED') }}</b>
@@ -155,16 +163,20 @@
         {% endif %}
     </table>
 
-
     <br>
     <table border="0" cellpadding="10" cellspacing="0" width="50%">
         <tr>
-            <td>{{ _('LBL_TOTAL') }}:</td>
+            <td>{{ _('LBL_SUB_TOTAL') }}:</td>
             <td align="right" style="white-space: nowrap;">{{ _price(subtotal, currency) }}</td>
         </tr>
         {% if discount %}
         <tr>
-            <td>{{ _('LBL_DISCOUNT') }}:</td>
+            <td>
+                {{ _('LBL_DISCOUNT') }}:
+                {% if coupon %}
+                    <div style="color:#7E422D; font-size: 12px;">({{ _('LBL_COUPON') }}: {{ coupon.getCode }})</div>
+                {% endif %}
+            </td>
             <td align="right" style="white-space: nowrap;">{{ _price(discount, currency) }}</td>
         </tr>
         {% endif %}
@@ -195,4 +207,17 @@
             <td align="right" style="border-top:1px solid #EDECEC;white-space: nowrap;"><b>{{ _price(total, currency) }}</b></td>
         </tr>
     </table>
+{% endif %}
+
+{% if promoCoupon %}
+    <div style="margin:20px 0;background-color: #d1ecf1;border: 1px solid #bee5eb;border-radius: 4px;color: #0c5460; padding: 10px;text-align: center;">
+        {{ _('LBL_PROMO_COUPON_INFO_TEXT', promoCoupon.getDiscountPercent, promoCoupon.getDiscountValue)|raw }}
+        <div style="margin:10px 0;">
+            <b style="font-size: 20px;">{{ promoCoupon.getCode }}</b>
+        </div>
+        <span style="font-size: 10px;">
+            {% if promoCoupon.getExpiry %}{{ _('LBL_COUPON_EXPIRY') }}: <b>{{ _date(promoCoupon.getExpiry) }}</b>{% else %}{{ _('LBL_COUPON_USAGE_UNLIMITED') }}{% endif %},
+            {{ _('LBL_COUPON_MIN_ORDER_LIMIT') }}: <b>{{ _price(promoCoupon.getMinOrderLimit, currency) }}</b>
+        </span>
+    </div>
 {% endif %}

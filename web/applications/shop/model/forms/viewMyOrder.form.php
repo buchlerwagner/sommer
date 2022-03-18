@@ -23,8 +23,8 @@ class viewMyOrderForm extends formBuilder {
 
     public function onAfterInit() {
         if($this->values['cart_key']) {
-            $this->owner->cart->init($this->values['cart_key'], false);
-            $this->cart = $this->owner->cart;
+            $this->owner->cartHandler->init($this->values['cart_key'], false);
+            $this->cart = $this->owner->cartHandler;
         }else{
             $this->owner->pageRedirect($this->owner->getPageName('orders'));
         }

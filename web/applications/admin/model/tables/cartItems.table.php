@@ -2,6 +2,7 @@
 class cartItemsTable extends table {
     private $cartId;
     public $isEmployee = true;
+    public $orderType = 0;
 
 	public function setup() {
         $this->cartId = (int) $this->parameters['foreignkeys'][0];
@@ -13,8 +14,11 @@ class cartItemsTable extends table {
         $this->tableType = 'inline';
         $this->bodyTemplate = 'table-body-cart-items';
         $this->hideCounter = true;
+        $this->optionsWidth = 1;
 
         $this->addColumns(
+            (new column('local', 'LBL_LOCAL_CONSUMPTION'))
+                ->addClass('text-center'),
             (new column('name', 'LBL_PRODUCT_TITLE', 3))
                 ->setColspan(2),
             (new column('unitprice', 'LBL_UNIT_PRICE', 2))
@@ -27,30 +31,31 @@ class cartItemsTable extends table {
 	}
 
     public function loadRows() {
-        $this->owner->cart->init($this->cartId, false);
-        $this->rows = $this->owner->cart->items;
+        $this->owner->cartHandler->init($this->cartId, false);
+        $this->orderType = $this->owner->cartHandler->getOrderType();
+        $this->rows = $this->owner->cartHandler->getCartItems();
 
-        if($this->owner->cart->packagingFee) {
+        if($this->owner->cartHandler->packagingFee) {
             $this->setUpdateField('.cart-item-packaging', enumJSActions::ShowHideElement(), true);
-            $this->setUpdateField('.cart-packaging-fee', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cart->packagingFee, $this->owner->cart->currency));
+            $this->setUpdateField('.cart-packaging-fee', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cartHandler->packagingFee, $this->owner->cartHandler->currency));
         }else{
             $this->setUpdateField('.cart-item-packaging', enumJSActions::ShowHideElement(), false);
         }
 
-        if($this->owner->cart->shippingFee) {
+        if($this->owner->cartHandler->shippingFee) {
             $this->setUpdateField('.cart-item-shipping', enumJSActions::ShowHideElement(), true);
-            $this->setUpdateField('.cart-shipping-fee', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cart->shippingFee, $this->owner->cart->currency));
+            $this->setUpdateField('.cart-shipping-fee', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cartHandler->shippingFee, $this->owner->cartHandler->currency));
         }else{
             $this->setUpdateField('.cart-item-shipping', enumJSActions::ShowHideElement(), false);
         }
 
-        if($this->owner->cart->shippingFee || $this->owner->cart->packagingFee) {
+        if($this->owner->cartHandler->shippingFee || $this->owner->cartHandler->packagingFee) {
             $this->setUpdateField('.cart-item-subtotal', enumJSActions::ShowHideElement(), true);
         }else{
             $this->setUpdateField('.cart-item-subtotal', enumJSActions::ShowHideElement(), false);
         }
 
-        $this->setUpdateField('.cart-subtotal', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cart->subtotal, $this->owner->cart->currency));
-        $this->setUpdateField('.cart-total', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cart->total, $this->owner->cart->currency));
+        $this->setUpdateField('.cart-subtotal', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cartHandler->subtotal, $this->owner->cartHandler->currency));
+        $this->setUpdateField('.cart-total', enumJSActions::SetHtml(), $this->owner->lib->formatPrice($this->owner->cartHandler->total, $this->owner->cartHandler->currency));
     }
 }

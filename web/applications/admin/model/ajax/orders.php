@@ -72,8 +72,8 @@ switch ($action) {
                     break;
                 }
 
-                $this->cart->init($_REQUEST['cartKey'], false);
-                $item = $this->cart->addProduct($productId, $variantId, 1);
+                $this->cartHandler->init($_REQUEST['cartKey'], false);
+                $item = $this->cartHandler->addProduct($productId, $variantId, 1);
 
                 $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
                 $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
@@ -85,8 +85,8 @@ switch ($action) {
         if($_REQUEST['id'] && $_REQUEST['cartKey']){
             $id = (int) $_REQUEST['id'];
 
-            $this->cart->init($_REQUEST['cartKey'], false);
-            $this->cart->removeProduct($id);
+            $this->cartHandler->init($_REQUEST['cartKey'], false);
+            $this->cartHandler->removeProduct($id);
 
             $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
             $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
@@ -98,8 +98,19 @@ switch ($action) {
             $id = (int) $_REQUEST['id'];
             $quantity = (int) $_REQUEST['quantity'];
 
-            $this->cart->init($_REQUEST['cartKey'], false);
-            $this->cart->changeProductQuantity($id, $quantity);
+            $this->cartHandler->init($_REQUEST['cartKey'], false);
+            $this->cartHandler->changeProductQuantity($id, $quantity);
+
+            $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
+            $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
+        }
+        break;
+
+    case 'setOrderType':
+        if($_REQUEST['cartKey']){
+            $id = (int) $_REQUEST['type'];
+            $this->cartHandler->init($_REQUEST['cartKey'], false);
+            $this->cartHandler->setOrderType($id);
 
             $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
             $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
@@ -109,8 +120,8 @@ switch ($action) {
     case 'setPaymentMode':
         if($_REQUEST['id'] && $_REQUEST['cartKey']){
             $id = (int) $_REQUEST['id'];
-            $this->cart->init($_REQUEST['cartKey'], false);
-            $this->cart->setPaymentMode($id);
+            $this->cartHandler->init($_REQUEST['cartKey'], false);
+            $this->cartHandler->setPaymentMode($id);
 
             $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
             $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
@@ -121,8 +132,8 @@ switch ($action) {
         if($_REQUEST['id'] && $_REQUEST['cartKey']){
             $id = (int) $_REQUEST['id'];
             $intervalId = (int) $_REQUEST['intervalId'];
-            $this->cart->init($_REQUEST['cartKey'], false);
-            $this->cart->setShippingMode($id, $intervalId, ($intervalId == -1 ? $_REQUEST['customInterval'] : false), $_REQUEST['date']);
+            $this->cartHandler->init($_REQUEST['cartKey'], false);
+            $this->cartHandler->setShippingMode($id, $intervalId, ($intervalId == -1 ? $_REQUEST['customInterval'] : false), $_REQUEST['date']);
 
             $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
             $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
@@ -130,27 +141,24 @@ switch ($action) {
         break;
 
     case 'setLocalConsumption':
-        if($_REQUEST['cartKey']){
-            $this->cart->init($_REQUEST['cartKey'], false);
-            $this->cart->setLocalConsumption((int) $_REQUEST['localConsumption']);
-
-            $this->data['orders']['refreshTable']['tableName'] = 'cartItems';
-            $this->data['orders']['refreshTable']['cartId'] = (int) $_REQUEST['cartId'];
+        if($_REQUEST['cartKey'] && $_REQUEST['itemId']){
+            $this->cartHandler->init($_REQUEST['cartKey'], false);
+            $this->cartHandler->setItemLocalConsumption($_REQUEST['itemId'], (int) $_REQUEST['localConsumption']);
         }
         break;
 
     case 'getShippingDetails':
         if($_REQUEST['id'] && $_REQUEST['cartKey']){
             $id = (int) $_REQUEST['id'];
-            $this->cart->init($_REQUEST['cartKey'], false);
-            $shippingModes = $this->cart->getShippingModes();
+            $this->cartHandler->init($_REQUEST['cartKey'], false);
+            $shippingModes = $this->cartHandler->getShippingModes();
             if($shippingModes){
                 foreach($shippingModes AS $shippingMode){
                     if($shippingMode['id'] == $id){
-                        $shippingMode['customIntervalText'] = $this->cart->customInterval;
-                        $shippingMode['intervalId'] = $this->cart->getIntervalId();
-                        if($this->cart->shippingDate){
-                            $shippingMode['selectedShippingDate'] = $this->cart->shippingDate;
+                        $shippingMode['customIntervalText'] = $this->cartHandler->customInterval;
+                        $shippingMode['intervalId'] = $this->cartHandler->getIntervalId();
+                        if($this->cartHandler->shippingDate){
+                            $shippingMode['selectedShippingDate'] = $this->cartHandler->shippingDate;
                         }else{
                             $shippingMode['selectedShippingDate'] = $shippingMode['shippingDate'];
                         }
@@ -165,5 +173,31 @@ switch ($action) {
             }
         }
 
+        break;
+
+    case 'checkTaxNumber':
+        if($_REQUEST['taxNumber']){
+            /**
+             * @var $invoice Invoices
+             */
+            $invoice = $this->addByClassName('Invoices');
+            try {
+                $buyer = $invoice->init()->getTaxPayer($_REQUEST['taxNumber']);
+                if($buyer->isValid()) {
+                    $this->data['#us_invoice_name']['value'] = $buyer->getName();
+                    $this->data['#us_invoice_country']['value'] = $buyer->getCountry();
+                    $this->data['#us_invoice_zip']['value'] = $buyer->getZipCode();
+                    $this->data['#us_invoice_city']['value'] = $buyer->getCity();
+                    $this->data['#us_invoice_address']['value'] = $buyer->getAddress();
+
+                    $this->data['#us_vat-formgroup']['removeclass'] = 'has-error';
+                    $this->data['#us_vat-formgroup']['addclass'] = 'has-success';
+                }else{
+                    $this->data['#us_vat-formgroup']['addclass'] = 'has-error';
+                }
+            } catch (Exception $e) {
+                $this->data['#us_vat-formgroup']['addclass'] = 'has-error';
+            }
+        }
         break;
 }

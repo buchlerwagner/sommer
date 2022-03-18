@@ -20,8 +20,8 @@
                             <tbody>
                             <tr>
                                 <td style="padding-top: 20px; padding-bottom: 20px;" class="emailLogo" valign="middle" align="center">
-                                    <a href="{{ domain }}" target="_blank" style="text-decoration:none;" class="">
-                                        <img src="{{ domain }}uploads/{{ shopId }}/logo-mail.png" title="{{ settings.shopName }}" alt="{{ settings.shopName }}">
+                                    <a href="{{ publicDomain }}" target="_blank" style="text-decoration:none;" class="">
+                                        <img src="{{ publicDomain }}uploads/{{ shopId }}/logo-mail.png" title="{{ settings.shopName }}" alt="{{ settings.shopName }}">
                                     </a>
                                 </td>
                             </tr>
@@ -90,27 +90,27 @@
                                 <td style="padding-top:10px;padding-bottom:10px;padding-left:10px;padding-right:10px;" class="socialLinks" valign="top" align="center">
                                     {% if settings.facebook %}
                                     <a href="{{ settings.facebook }}" target="_blank" style="display: inline-block;" class="facebook">
-                                        <img src="{{ domain }}{{ images }}facebook.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                        <img src="{{ publicDomain }}{{ images }}facebook.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
                                     </a>
                                     {% endif %}
                                     {% if settings.twitter %}
                                     <a href="{{ settings.twitter }}" target="_blank" style="display: inline-block;" class="twitter">
-                                        <img src="{{ domain }}{{ images }}twitter.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                        <img src="{{ publicDomain }}{{ images }}twitter.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
                                     </a>
                                     {% endif %}
                                     {% if settings.instagram %}
                                     <a href="{{ settings.instagram }}" target="_blank" style="display: inline-block;" class="instagram">
-                                        <img src="{{ domain }}{{ images }}instagram.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                        <img src="{{ publicDomain }}{{ images }}instagram.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
                                     </a>
                                     {% endif %}
                                     {% if settings.pinterest %}
                                     <a href="{{ settings.pinterest }}" target="_blank" style="display: inline-block;" class="pinterest">
-                                        <img src="{{ domain }}{{ images }}pinterest.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                        <img src="{{ publicDomain }}{{ images }}pinterest.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
                                     </a>
                                     {% endif %}
                                     {% if settings.youtube %}
                                         <a href="{{ settings.youtube }}" target="_blank" style="display: inline-block;" class="youtube">
-                                            <img src="{{ domain }}{{ images }}youtube.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
+                                            <img src="{{ publicDomain }}{{ images }}youtube.png" alt="" style="height:auto; width:100%; max-width:40px; margin-left:2px; margin-right:2px" width="40" border="0">
                                         </a>
                                     {% endif %}
                                 </td>
@@ -127,9 +127,9 @@
                             <tr>
                                 <td style="padding: 0px 10px 20px;" class="footerLinks" valign="top" align="center">
                                     <p class="text" style="color:#777777; font-family:'Open Sans', Helvetica, Arial, sans-serif; font-size:12px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:20px; text-transform:none; text-align:center; padding:0; margin:0;">
-                                        <a href="{{ domain }}aszf/" style="color:#777777;text-decoration:underline;" target="_blank">ÁSZF</a>
+                                        <a href="{{ publicDomain }}aszf/" style="color:#777777;text-decoration:underline;" target="_blank">ÁSZF</a>
                                         |
-                                        <a href="{{ domain }}adatkezelesi-tajekoztato/" style="color:#777777;text-decoration:underline;" target="_blank">Adatkezelési tájékoztató</a>
+                                        <a href="{{ publicDomain }}adatkezelesi-tajekoztato/" style="color:#777777;text-decoration:underline;" target="_blank">Adatkezelési tájékoztató</a>
                                     </p>
                                 </td>
                             </tr>

@@ -32,7 +32,13 @@ class editPayModeForm extends formBuilder {
                     ->setAppend($this->owner->currencySign),
                 (new inputSelect('pm_vat', 'LBL_VAT_KEY', 27))
                     ->setColSize('col-6 col-lg-3')
-                    ->setOptions($this->owner->lists->reset()->getVat())
+                    ->setOptions($this->owner->lists->reset()->getVat()),
+                (new inputText('pm_limit_max', 'LBL_LIMIT_MAX', 0))
+                    ->setColSize('col-6 col-lg-3')
+                    ->addClass('text-right')
+                    ->onlyNumbers()
+                    ->setHelpText('LBL_PAYMODE_LIMIT_INFO')
+                    ->setAppend($this->owner->currencySign . '-ig')
             ),
             (new groupRow('row3'))->addElements(
                 (new inputText('pm_order', 'LBL_POSITION', $this->getMaxOrder()))
@@ -59,7 +65,7 @@ class editPayModeForm extends formBuilder {
                     ->addData('show-remove', 'false')
                     ->addData('show-cancel', 'false')
                     ->addData('show-close', 'false')
-                    ->addData('allowed-file-extensions', '["jpg", "png", "jpeg", "gif"]')
+                    ->addData('allowed-file-extensions', '["jpg", "png", "jpeg", "gif", "svg"]')
                     ->addData('show-preview', 'false')
                     ->notDBField(),
 

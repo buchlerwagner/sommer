@@ -30,12 +30,12 @@
             {% for opt_key, opt_val in element.getOptions %}
                 {% if opt_val is iterable %}
                     {% if opt_val.name is not empty %}
-                        <option value="{{ opt_key }}" {% if (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) or (opt_key2 in value) %} selected="selected" {% endif %}{{ self.attributes(opt_val.data) }}{% if opt_val.class is not empty %} class="{{ opt_val.class }}"{% endif %}>{{ _(opt_val.name) }}</option>
+                        <option value="{{ opt_key }}" {% if (value == 0 and opt_key is same as(value)) or (value != 0 and opt_key == value) or (value is iterable and opt_key2 in value) %} selected="selected" {% endif %}{{ self.attributes(opt_val.data) }}{% if opt_val.class is not empty %} class="{{ opt_val.class }}"{% endif %}>{{ _(opt_val.name) }}</option>
                     {% else %}
                         <optgroup label="{{ _(opt_key) }}">
                             {% for opt_key2, opt_val2 in opt_val %}
                                 {% if opt_val2.name is not empty %}
-                                    <option value="{{ opt_key2 }}" {% if (value == 0 and opt_key2 is same as(value)) or (value != 0 and opt_key2 == value) or (opt_key2 in value) %} selected="selected"{% endif %}{{ self.attributes(opt_val2.data) }}>{{ _(opt_val2.name)|raw }}</option>
+                                    <option value="{{ opt_key2 }}" {% if (value == 0 and opt_key2 is same as(value)) or (value != 0 and opt_key2 == value) or (value is iterable and opt_key2 in value) %} selected="selected"{% endif %}{{ self.attributes(opt_val2.data) }}>{{ _(opt_val2.name)|raw }}</option>
                                 {% else %}
                                 <option value="{{ opt_key2 }}" {% if (value == 0 and opt_key2 is same as(value)) or (value != 0 and opt_key2 == value) %} selected="selected" {% endif %}>{{ _(opt_val2)|raw }}</option>
                                 {% endif %}

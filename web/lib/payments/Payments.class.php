@@ -8,7 +8,7 @@ class Payments extends ancestor {
      */
     private $provider = null;
 
-    public static function getPaymentProviders():array
+    public static function getProviders():array
     {
         $result = [];
 
@@ -22,7 +22,7 @@ class Payments extends ancestor {
              */
             $classname = substr(basename($file), 0, -10);
             if($classname::isAvailable()) {
-                $result[$classname] = $classname;
+                $result[$classname] = $classname::getName();
             }
         }
 
@@ -44,7 +44,7 @@ class Payments extends ancestor {
                 $this->language
             ]);
         }else{
-            throw new Exception('Invalid payment provider ID');
+            throw new PaymentException(PaymentException::INVALID_PAYMENT_PROVIDER_ID);
         }
 
         return $this;
@@ -53,8 +53,9 @@ class Payments extends ancestor {
     public function createTransaction(int $cartId, float $amount, string $currency):void
     {
         if(!$this->provider){
-            throw new Exception('Payment provider is not initialised!');
+            throw new PaymentException(PaymentException::PAYMENT_PROVIDER_NOT_INITED);
         }
+
         if(!$this->hasPendingTransaction($cartId)){
             $this->owner->db->sqlQuery(
                 $this->owner->db->genSQLInsert(
@@ -81,47 +82,66 @@ class Payments extends ancestor {
         }
     }
 
-    public function checkTransaction(string $transactionId):Transaction
+    public function checkTransaction(string $transactionId):?Transaction
     {
         if(!Empty($transactionId)){
             if($transaction = $this->getTransaction($transactionId)) {
                 try {
                     $this->init($transaction->providerId);
-                    $transaction = $this->provider->checkTransaction($transaction);
+                    return $this->provider->checkTransaction($transaction);
                 }
-
-                catch(Exception $e){
-
+                catch(PaymentException $e){
                 }
             }
-        }else{
-            $transaction = new Transaction();
         }
 
-        return $transaction;
+        return null;
     }
 
-    public function refund(string $transactionId, float $refundAmount = 0):Transaction
+    public function hasRefund():bool
+    {
+        if($this->provider){
+            return $this->provider->hasRefund();
+        }
+
+        return false;
+    }
+
+    public function isValidRefundRequest(Transaction $transaction, float $refundAmount ):bool
+    {
+        $isValid = false;
+
+        if($this->provider){
+            $error = $this->provider->hasRefundError($transaction, $refundAmount);
+
+            if(!$error) {
+                $isValid = true;
+            }else{
+                throw new PaymentException($error);
+            }
+        }
+
+        return $isValid;
+    }
+
+    public function refund(string $transactionId, float $refundAmount = 0):?Transaction
     {
         if(!Empty($transactionId)){
             if($transaction = $this->getTransaction($transactionId)) {
                 try {
                     $this->init($transaction->providerId);
-                    $transaction = $this->provider->initRefund($transaction, $refundAmount);
+
+                    return $this->provider->initRefund($transaction, $refundAmount);
                 }
-
-                catch(Exception $e){
-
+                catch (PaymentException $e){
                 }
             }
-        }else{
-            $transaction = new Transaction();
         }
 
-        return $transaction;
+        return null;
     }
 
-    private function loadSettings():PaymentProviderSettings
+    private function loadSettings():?PaymentProviderSettings
     {
         $settings = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
@@ -130,7 +150,8 @@ class Payments extends ancestor {
                     'pp_id AS id',
                     'pp_name AS name',
                     'pp_provider AS className',
-                    'pp_shopid AS shopId',
+                    'pp_shop_id AS shopId',
+                    'pp_merchant_id AS merchantId',
                     'pp_password AS password',
                     'pp_currency AS currency',
                     'pp_test_mode AS isTest',
@@ -146,10 +167,10 @@ class Payments extends ancestor {
             )
         );
 
-        return new PaymentProviderSettings(($settings ?: []));
+        return ($settings ? new PaymentProviderSettings($settings) : null);
     }
 
-    public function hasPendingTransaction(int $cartId)
+    public function hasPendingTransaction(int $cartId):bool
     {
         $transaction = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
@@ -165,7 +186,7 @@ class Payments extends ancestor {
             )
         );
 
-        return ($transaction ? $transaction['transactionId'] : false);
+        return (bool) $transaction;
     }
 
     public function getTransactionHistory(int $cartId):array
@@ -196,7 +217,7 @@ class Payments extends ancestor {
         return ($out ?: []);
     }
 
-    public function getTransaction(string $transactionId):Transaction
+    public function getTransaction(string $transactionId):?Transaction
     {
         $out = $this->owner->db->getFirstRow(
             $this->owner->db->genSQLSelect(
@@ -229,6 +250,37 @@ class Payments extends ancestor {
             )
         );
 
-        return new Transaction(($out ?: []));
+        return ($out ? new Transaction($out) : null);
+    }
+
+    public function getRefundableTransaction(int $cartId):?Transaction
+    {
+        $out = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'payment_transactions',
+                [
+                    'pt_pp_id AS providerId',
+                    'pt_id AS id',
+                    'pt_created AS created',
+                    'pt_status AS status',
+                    'pt_transactionid AS transactionId',
+                    'pt_auth_code AS authCode',
+                    'pt_amount AS amount',
+                    'pt_currency AS currency',
+                    'pt_message AS message'
+                ],
+                [
+                    'pt_cart_id' => $cartId,
+                    'pt_shop_id' => $this->owner->shopId,
+                    'pt_status'  => enumPaymentStatus::OK()->getValue(),
+                ],
+                [],
+                false,
+                'pt_created DESC',
+                1
+            )
+        );
+
+        return ($out ? new Transaction($out) : null);
     }
 }

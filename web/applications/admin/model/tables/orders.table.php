@@ -58,9 +58,10 @@ class ordersTable extends table {
             (new column('cart_order_status', 'LBL_STATUS', 1))
                 ->setTemplate('{{ orderState(val)|raw }}')
                 ->addClass('text-center'),
-            (new column('cart_order_number', 'LBL_ORDER_NUMBER', 2)),
+            (new column('cart_order_number', 'LBL_ORDER_NUMBER', 2))
+                ->setTemplate('{{ val }}{% if row.cart_invoice_number %}<div class="small text-muted">{{ row.cart_invoice_number }}</div>{% endif %}'),
             (new column('cart_ordered', 'LBL_ORDER_TIME', 2))
-                ->setTemplate('{{ _date(val, 5) }}' . ($isEmployee ? '' : '<div class="text-muted"><small>{{ row.seller_name }}</small></div>'))
+                ->setTemplate('{{ _date(val, 5) }}' . ($isEmployee ? '' : '<div class="small text-muted">{{ row.seller_name }}</div>'))
                 ->addClass('text-center'),
 
             (new column('cart_shipping_date', 'LBL_SHIPPING_DATE', 1))
@@ -73,9 +74,24 @@ class ordersTable extends table {
                 ->addClass('text-right')
                 ->setTemplate('{{ _price(val, row.cart_currency) }}'),
 
-            (new column('cart_paid', 'LBL_PAID', 1, enumTableColTypes::YesNo()))
+            (new columnIcons('cart_paid', 'LBL_PAID', 1))
+                ->setIcons([
+                    0 => [
+                        'icon' => 'fas fa-times',
+                        'color' => 'danger'
+                    ],
+                    1 => [
+                        'icon' => 'fas fa-check',
+                        'color' => 'success'
+                    ],
+                    -1 => [
+                        'icon' => 'fas fa-undo',
+                        'color' => 'info'
+                    ],
+                ])
                 ->addClass('text-center'),
 
+            new columnHidden('cart_invoice_number'),
             new columnHidden('cart_currency'),
             (new columnHidden('customer_last_name'))
                 ->setSelect('us1.us_lastname AS customer_last_name')
@@ -106,8 +122,7 @@ class ordersTable extends table {
         $filterValues = $this->getSession('orderFilters');
 
         if (!empty($filterValues)) {
-            $this->showDeletedRecords = true;
-            //$this->where = 'cart_status = "ORDERED" AND cart_shop_id = ' . $this->owner->shopId;
+            $this->where = 'cart_shop_id = ' . $this->owner->shopId;
 
             foreach ($filterValues as $field => $values) {
                 if (empty($values)) {
@@ -121,6 +136,9 @@ class ordersTable extends table {
                     $values = $this->owner->db->escapestring($values);
                 }
                 switch ($field) {
+                    case 'showDeletedRecords':
+                        $this->showDeletedRecords = true;
+                        break;
                     case 'freeText':
                         $query = [];
                         $searchFields = [
@@ -128,6 +146,7 @@ class ordersTable extends table {
                             "cart_key",
                             "cart_order_number",
                             "cart_remarks",
+                            "cart_invoice_number",
                         ];
 
                         foreach($searchFields AS $field){
@@ -139,14 +158,14 @@ class ordersTable extends table {
                     case 'userName':
                         $query = [];
                         $searchFields = [
-                            "us_firstname",
-                            "us_lastname",
-                            "CONCAT(us_lastname, ' ', us_firstname)",
-                            "us_invoice_name",
-                            "us_city",
-                            "us_address",
-                            "us_invoice_city",
-                            "us_invoice_address",
+                            "us1.us_firstname",
+                            "us1.us_lastname",
+                            "CONCAT(us1.us_lastname, ' ', us1.us_firstname)",
+                            "us1.us_invoice_name",
+                            "us1.us_city",
+                            "us1.us_address",
+                            "us1.us_invoice_city",
+                            "us1.us_invoice_address",
                         ];
 
                         foreach($searchFields AS $field){
@@ -189,9 +208,15 @@ class ordersTable extends table {
                     case 'isPaid':
                         if($values == 1){
                             $where[$field] = "cart_paid = 1";
-                        }elseif($values == -1){
+                        }elseif($values == 2){
                             $where[$field] = "cart_paid = 0";
+                        }elseif($values == -1){
+                            $where[$field] = "cart_paid = -1";
                         }
+                        break;
+
+                    case 'email':
+                        $where[$field] = "us1.us_email = '$values'";
                         break;
 
                     default:

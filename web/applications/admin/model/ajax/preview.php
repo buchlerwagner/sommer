@@ -8,8 +8,8 @@ $this->output = OUTPUT_RAW;
 $this->data = [];
 if($_REQUEST['src']){
     $src = $_REQUEST['src'];
-    $fileName = $src;
-    $fileDownload = $src;
+    $fileName = FOLDER_UPLOAD . str_replace(FOLDER_UPLOAD, '', $src);
+    $fileDownload = $fileName;
     $fileType = strtolower(pathinfo($src, PATHINFO_EXTENSION));
 }else {
     $hash = $_REQUEST['hash'];

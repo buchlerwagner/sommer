@@ -26,8 +26,8 @@ class showVariantsForm extends formBuilder {
             $this->state = FORM_STATE_INVALID;
             $this->addError('ERR_SELECT_PRODUCT', self::FORM_ERROR, []);
         }else{
-            $this->owner->cart->init($this->keyFields['cartId'], false);
-            $this->owner->cart->addProduct($this->keyFields['productId'], $this->values['variantId'], 1);
+            $this->owner->cartHandler->init($this->keyFields['cartId'], false);
+            $this->owner->cartHandler->addProduct($this->keyFields['productId'], $this->values['variantId'], 1);
         }
     }
 

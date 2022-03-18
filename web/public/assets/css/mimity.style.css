@@ -16787,6 +16787,10 @@ Sizes
   transform: translate(-50%, -50%);
 }
 
+.nav-tabs .nav-link.active {
+  color: #467bcb;
+}
+
 /*
       www.OnlineWebFonts.Com 
       You must credit the author Copy this link on your web 

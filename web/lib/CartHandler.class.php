@@ -1,5 +1,5 @@
 <?php
-class cart extends ancestor {
+class CartHandler extends ancestor {
 	const CART_SESSION_KEY = 'cart';
 
 	const CART_STATUS_NEW = 'NEW';
@@ -25,14 +25,17 @@ class cart extends ancestor {
 	public $orderNumber;
 	public $total = 0;
 	public $subtotal = 0;
-	public $discount = 0;
+	private $discount = 0;
 	public $shippingFee = 0;
     private $shippingId = false;
     private $intervalId = false;
 	public $paymentFee = 0;
     private $paymentId = false;
+    private $paymentNoCash = false;
     private $isPaid = false;
+    private $isRefunded = false;
     public $packagingFee = 0;
+    private $packagingFeeVat = 0;
 
     private $earliestTakeover = false;
     private $orderDateStart = false;
@@ -47,14 +50,23 @@ class cart extends ancestor {
 	public $items = [];
 	public $remarks;
 	public $orderType = 0;
-	public $invoiceType = 0;
-	public $localConsumption = false;
+	public $invoiceType = -1;
+	public $invoiceProviderId = 0;
+	public $invoiceNumber = false;
+	public $invoiceFileName = false;
 	public $shippingDate;
 	public $customInterval;
 	public $storeId;
 	public $storeName;
 
 	private $options = [];
+
+    /**
+     * @var $coupon Coupon
+     */
+	public $coupon = null;
+
+	public $promoCouponId = false;
 
     public function init($key = false, $create = true) {
         if($this->owner->user->getGroup() == USER_GROUP_ADMINISTRATORS){
@@ -69,7 +81,7 @@ class cart extends ancestor {
 		return $this;
 	}
 
-    public function createNewOrder(int $type = ORDER_TYPE_STORE){
+    public function createNewOrder(int $orderType = ORDER_TYPE_LOCAL){
         $pmId = 0;
         $paymentModes = $this->getPaymentModes([PAYMENT_TYPE_CASH]);
         if($paymentModes){
@@ -88,8 +100,7 @@ class cart extends ancestor {
                     'cart_store_id' => $this->owner->storeId,
                     'cart_us_id' => 0,
                     'cart_pm_id' => $pmId,
-                    'cart_order_type' => $type,
-                    'cart_local_consumption' => ($type == ORDER_TYPE_STORE ? 1 : 0),
+                    'cart_order_type' => $orderType,
                     'cart_created_by' => $this->owner->user->getUser()['id'],
                     'cart_created' => 'NOW()',
                     'cart_ordered' => 'NOW()',
@@ -156,7 +167,7 @@ class cart extends ancestor {
                 );
 			}
 
-			$this->loadCart()->summarize();
+			$this->loadCart();
 		}
 
 		return $this;
@@ -200,12 +211,116 @@ class cart extends ancestor {
 					)
 				);
 
-				$this->loadCart()->summarize();
+				$this->loadCart();
 			}
 		}
 
 		return $this;
 	}
+
+    public function getCart():Cart{
+        if(!$this->id){
+            throw new Exception('Cart is not loaded!');
+        }
+
+        $cart = new Cart($this->id, Cart::PRICE_BASE_GROSS);
+
+        $cart->setOrderStatus($this->orderStatus)
+             ->setOrderDate($this->orderDate)
+             ->setOrderType($this->orderType)
+             ->setShippingDate($this->shippingDate)
+             ->setInvoiceNumber($this->invoiceNumber)
+             ->setInvoiceFileName($this->invoiceFileName)
+             ->setOrderNumber($this->orderNumber)
+             ->setTotal($this->total)
+             ->setCurrency($this->currency)
+             ->setInvoiceProvider($this->invoiceProviderId)
+             ->setPaid($this->isPaid());
+
+        $cart->setCustomer( $this->userData );
+
+        $defaultVat = 18;
+
+        if($this->items){
+            foreach($this->items AS $item){
+                $cartItem = new CartItem($item['id'], $item['productId'], $item['variantId']);
+                $cartItem->setName($item['name'], $item['variant']);
+                $cartItem->setVat($item['price']['vatKey'], $item['price']['vat']);
+                $cartItem->setQuantity($item['quantity']['amount'], $item['quantity']['unit']);
+                $cartItem->setUnitPrice($item['price']['unitPrice']);
+                $cartItem->setDiscounted(($item['price']['discount'] > 0));
+
+                $cart->addItem($cartItem);
+
+                if($item['price']['vatKey']) {
+                    $defaultVat = $item['price']['vatKey'];
+                }
+            }
+        }
+
+        if($this->discount){
+            $cart->setDiscount($this->getDiscount(), $defaultVat);
+        }
+
+        if($this->packagingFee) {
+            $cart->setPackagingFee($this->packagingFee, $this->packagingFeeVat);
+        }
+
+        $cart->setShipping($this->getSelectedShippingMode(), $this->shippingFee);
+
+        $cart->setPayment($this->getSelectedPaymentMode(), $this->paymentFee);
+
+        return $cart;
+    }
+
+    public function getAppliedCoupon():?Coupon
+    {
+        static $coupon;
+
+        if(!$coupon) {
+            /**
+             * @var $discountHandler DiscountHandler
+             */
+            $discountHandler = $this->owner->addByClassName('DiscountHandler');
+
+            $coupon = $discountHandler->getAppliedCoupon($this->id);
+        }
+
+        return $coupon;
+    }
+
+    public function getPromoCoupon():?Coupon
+    {
+        static $coupon = null;
+
+        if(!$coupon) {
+
+            /**
+             * @var $discountHandler DiscountHandler
+             */
+            $discountHandler = $this->owner->addByClassName('DiscountHandler');
+
+            $coupon = $discountHandler->getPromoCoupon($this->promoCouponId, $this->subtotal);
+            if(!$this->promoCouponId && $coupon instanceof Coupon){
+                $this->promoCouponId = $coupon->getId();
+
+                $this->owner->db->sqlQuery(
+                    $this->owner->db->genSQLUpdate(
+                        'cart',
+                        [
+                            'cart_coupon_id' => $this->promoCouponId,
+                        ],
+                        [
+                            'cart_id' => $this->id,
+                            'cart_shop_id' => $this->owner->shopId,
+                        ]
+                    )
+                );
+            }
+        }
+
+        return $coupon;
+    }
 
 	public function getCartItems(){
 		return $this->items;
@@ -214,6 +329,23 @@ class cart extends ancestor {
 	public function getStatus(){
 		return $this->status;
 	}
+
+    public function setOrderType(int $type){
+        $this->orderType = $type;
+
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLUpdate(
+                'cart',
+                [
+                    'cart_order_type' => $this->orderType,
+                ],
+                [
+                    'cart_id' => $this->id,
+                    'cart_shop_id' => $this->owner->shopId,
+                ]
+            )
+        );
+    }
 
 	public function getOrderType(){
 		return $this->orderType;
@@ -227,16 +359,16 @@ class cart extends ancestor {
         return $this->isPaid;
     }
 
+    public function isRefunded(){
+        return $this->isRefunded;
+    }
+
     public function isBankCardPayment(){
         if($payMode = $this->getSelectedPaymentMode()){
             return ($payMode['type'] == PAYMENT_TYPE_CARD && $payMode['providerId']);
         }else{
             return false;
         }
-    }
-
-    public function isLocalConsumption(){
-        return $this->localConsumption;
     }
 
     public function getShippingId(){
@@ -252,7 +384,7 @@ class cart extends ancestor {
     }
 
     public function getDiscount(){
-        return $this->discount;
+        return abs($this->discount) * -1;
     }
 
 	public function getNumberOfCartItems(){
@@ -290,23 +422,45 @@ class cart extends ancestor {
         return $out;
     }
 
-	public function makeOrder($userId, $invoiceType = 0, $remarks = ''){
-        $orderStatus = ($this->orderType == ORDER_TYPE_STORE ? self::ORDER_STATUS_FINISHED : self::ORDER_STATUS_NEW);
-        $isPaid = ($this->orderType == ORDER_TYPE_STORE ? 1 : 0);
+	public function makeOrder($userId, $invoiceType = -1, $remarks = ''){
+        switch($this->orderType){
+            case ORDER_TYPE_LOCAL:
+            case ORDER_TYPE_TAKEAWAY:
+                $isPaid = 1;
+                $orderStatus = self::ORDER_STATUS_FINISHED;
+                break;
+
+            default:
+                $orderStatus = self::ORDER_STATUS_NEW;
+                $isPaid = 0;
+                break;
+        }
+
+        $this->invoiceType = (int) $invoiceType;
+        $this->orderNumber = $this->generateOrderNumber();
+
+        $this->loadCustomerData($userId, $this->invoiceType);
+
+        $data = [
+            'cart_us_id' => (int) $userId,
+            'cart_order_number' => $this->orderNumber,
+            'cart_status' => self::CART_STATUS_ORDERED,
+            'cart_order_status' => $orderStatus,
+            'cart_ordered' => 'NOW()',
+            'cart_invoice_type' => $this->invoiceType,
+            'cart_paid' => $isPaid,
+            'cart_remarks' => $remarks,
+        ];
+
+        if(in_array($this->orderType, [ORDER_TYPE_LOCAL, ORDER_TYPE_TAKEAWAY])){
+            $data['cart_sm_id'] = 0;
+            $data['cart_si_id'] = 0;
+        }
 
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLUpdate(
 				'cart',
-				[
-					'cart_us_id' => (int) $userId,
-					'cart_order_number' => $this->generateOrderNumber(),
-					'cart_status' => self::CART_STATUS_ORDERED,
-					'cart_order_status' => $orderStatus,
-					'cart_ordered' => 'NOW()',
-					'cart_invoice_type' => (int) $invoiceType,
-					'cart_paid' => $isPaid,
-					'cart_remarks' => $remarks,
-				],
+				$data,
 				[
 					'cart_id' => $this->id,
 					'cart_shop_id' => $this->owner->shopId,
@@ -321,7 +475,7 @@ class cart extends ancestor {
             }
         }
 
-        if($this->orderType != ORDER_TYPE_STORE) {
+        if($this->orderType == ORDER_TYPE_ORDER) {
             $this->sendConfirmationEmail();
         }
 
@@ -330,21 +484,43 @@ class cart extends ancestor {
 	}
 
     public function initPayment(){
-        if($this->isBankCardPayment()){
-            $payMode = $this->getSelectedPaymentMode();
-            if($payMode['providerId']) {
-                /**
-                 * @var $payment Payments
-                 */
-                $payment = $this->owner->addByClassName('Payments');
+        if($this->isBankCardPayment() && $this->orderType == ORDER_TYPE_ORDER){
+            if($this->owner->getHostConfig()['isVirtual']){
+                $payMode = $this->getSelectedPaymentMode();
+                if($payMode['providerId']) {
+                    /**
+                     * @var $payment Payments
+                     */
+                    $payment = $this->owner->addByClassName('Payments');
 
-                try {
-                    $payment->init($payMode['providerId'])->createTransaction($this->id, $this->total, $this->currency);
-                } catch (Exception $e) {
-                    die($e);
+                    try {
+                        $payment->init($payMode['providerId'])->createTransaction($this->id, $this->total, $this->currency);
+                    } catch (PaymentException $e) {
+                        die($e->getMessage());
+                    }
+                }
+            }
+        }else{
+            $this->issueInvoice();
+        }
+    }
+
+    public function isRefundable(){
+        $out = false;
+
+        if($this->isPaid() && $this->isBankCardPayment() && $this->orderType == ORDER_TYPE_ORDER){
+            /**
+             * @var $payment Payments
+             */
+            $payment = $this->owner->addByClassName('Payments');
+            if($transaction = $payment->getRefundableTransaction($this->id)){
+                if($payment->init($transaction->providerId)->hasRefund()){
+                    $out = true;
                 }
             }
         }
+
+        return $out;
     }
 
     public function getPaymentStatus(){
@@ -368,7 +544,17 @@ class cart extends ancestor {
         return $payment->getTransactionHistory($this->id);
     }
 
-    public function getTemplateData(){
+    private function getDomain(){
+        $domain = $this->owner->domain;
+
+        if($this->owner->getHostConfig()['application'] == 'admin' && !Empty($this->owner->getHostConfig()['publicSite'])){
+            $domain = $this->owner->getHostConfig()['publicSite'];
+        }
+
+        return rtrim($domain, '/');
+    }
+
+    public function getTemplateData($addPromoCode = false){
         $this->loadCart();
 
         return [
@@ -377,12 +563,15 @@ class cart extends ancestor {
             'items' => $this->items,
             'currency' => $this->currency,
             'subtotal' => $this->subtotal,
-            'discount' => $this->discount,
+            'discount' => $this->getDiscount(),
+            'coupon' => $this->getAppliedCoupon(),
+            'promoCoupon' => ($addPromoCode ? $this->getPromoCoupon() : false),
             'packagingFee' => $this->packagingFee,
             'shippingFee' => $this->shippingFee,
             'paymentFee' => $this->paymentFee,
             'total' => $this->total,
             'isPaid' => $this->isPaid(),
+            'isRefunded' => $this->isRefunded(),
             'shippingMode' => $this->getSelectedShippingMode(),
             'shippingInterval' => $this->getSelectedShippingInterval(),
             'shippingDate' => $this->shippingDate,
@@ -394,7 +583,7 @@ class cart extends ancestor {
             'shippingAddress' => $this->userData['shippingAddress'],
             'invoiceAddress' => $this->userData['invoiceAddress'],
             'remarks' => $this->remarks,
-            'domain' => rtrim($this->owner->domain, '/'),
+            'domain' => $this->getDomain(),
             'shopId' => $this->owner->shopId
         ];
     }
@@ -402,13 +591,13 @@ class cart extends ancestor {
     public function sendConfirmationEmail($resend = false){
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
-            $this->getTemplateData(),
+            $this->getTemplateData(true),
             false
         );
 
         $data = [
             'id' => $this->userId,
-            'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->key . '/',
+            'link' => $this->getDomain() . $this->owner->getPageName('finish') . $this->key . '/',
             'order' => $cartMailBody,
             'orderNumber' => $this->orderNumber,
             'status' => $this->status,
@@ -434,12 +623,6 @@ class cart extends ancestor {
         $mailData['showPaymentInfo'] = true;
         $mailData['transaction'] = $transaction;
 
-        /*
-        $mailData['paymentStatus'] = $transaction->getStatus();
-        $mailData['transactionId'] = $transaction->transactionId;
-        $mailData['authCode'] = $transaction->authCode;
-        $mailData['resultMessage'] = $transaction->message;
-        */
         $cartMailBody = $this->owner->view->renderContent(
             'mail-order',
             $mailData,
@@ -448,7 +631,7 @@ class cart extends ancestor {
 
         $data = [
             'id' => $this->userId,
-            'link' => rtrim($this->owner->domain, '/') .  $this->owner->getPageName('finish') . $this->key . '/',
+            'link' => $this->getDomain() . $this->owner->getPageName('finish') . $this->key . '/',
             'order' => $cartMailBody,
             'orderNumber' => $this->orderNumber,
             'status' => $this->status,
@@ -493,6 +676,12 @@ class cart extends ancestor {
             }
         }
 
+        $savePath = DIR_UPLOAD . $this->owner->shopId . '/invoices/';
+
+        if($this->invoiceFileName && file_exists($savePath . $this->invoiceFileName)){
+            $files[$this->invoiceNumber . '.pdf'] = $savePath . $this->invoiceFileName;
+        }
+
         return $files;
     }
 
@@ -505,10 +694,6 @@ class cart extends ancestor {
                 'cart_key' => $this->key,
                 'cart_shop_id' => $this->owner->shopId,
             ];
-
-            if($this->owner->hostConfig['isVirtual']){
-                $where['cart_store_id'] = $this->owner->storeId;
-            }
 
             $cart = $this->owner->db->getFirstRow(
                 $this->owner->db->genSQLSelect(
@@ -528,10 +713,12 @@ class cart extends ancestor {
                 $this->id = $cart['cart_id'];
                 $this->userId = $cart['cart_us_id'];
                 $this->status = $cart['cart_status'];
+                $this->orderType = (int) $cart['cart_order_type'];
                 $this->orderStatus = $cart['cart_order_status'];
                 $this->orderNumber = $cart['cart_order_number'];
                 $this->orderDate = $cart['cart_ordered'];
                 $this->total = $cart['cart_total'];
+                $this->discount = $cart['cart_discount'];
                 $this->packagingFee = $cart['cart_packaging_fee'];
                 $this->subtotal = $cart['cart_subtotal'];
                 $this->currency = $cart['cart_currency'];
@@ -539,48 +726,22 @@ class cart extends ancestor {
                 $this->shippingFee = $cart['cart_shipping_fee'];
                 $this->shippingId = $cart['cart_sm_id'];
                 $this->intervalId = $cart['cart_si_id'];
+                $this->customInterval = $cart['cart_custom_interval'];
                 $this->paymentFee = $cart['cart_payment_fee'];
                 $this->paymentId = $cart['cart_pm_id'];
-                $this->isPaid = $cart['cart_paid'];
+                $this->isPaid = ($cart['cart_paid'] == 1);
+                $this->isRefunded = ($cart['cart_paid'] == -1);
                 $this->remarks = $cart['cart_remarks'];
-                $this->customInterval = $cart['cart_custom_interval'];
-                $this->orderType = $cart['cart_order_type'];
-                $this->invoiceType = $cart['cart_invoice_type'];
-                $this->localConsumption = (bool) $cart['cart_local_consumption'];
+                $this->invoiceType = (int) $cart['cart_invoice_type'];
+                $this->invoiceProviderId = $cart['cart_invoice_provider'];
+                $this->invoiceNumber = $cart['cart_invoice_number'];
+                $this->invoiceFileName = $cart['cart_invoice_filename'];
                 $this->storeId = $cart['st_code'];
                 $this->storeName = $cart['st_name'];
+                $this->promoCouponId = (int) $cart['cart_coupon_id'];
 
                 if($this->userId){
-                    $user = $this->owner->user->getUserProfile($this->userId);
-                    $this->userData['contactData'] = [
-                        'id' => $user['id'],
-                        'firstName' => $user['firstname'],
-                        'lastName' => $user['lastname'],
-                        'name' => $user['name'],
-                        'email' => $user['email'],
-                        'phone' => $user['phone'],
-                    ];
-
-                    $this->userData['shippingAddress'] = [
-                        'name' => $user['name'],
-                        'country' => $user['country'],
-                        'zip' => $user['zip'],
-                        'city' => $user['city'],
-                        'address' => $user['address'],
-                    ];
-
-                    if($cart['cart_invoice_type']){
-                        $this->userData['invoiceAddress'] = [
-                            'name' => $user['invoice_name'],
-                            'country' => $user['invoice_country'],
-                            'zip' => $user['invoice_zip'],
-                            'city' => $user['invoice_city'],
-                            'address' => $user['invoice_address'],
-                            'vatNumber' => ($cart['cart_invoice_type'] == 2 ? $user['vat'] : false),
-                        ];
-                    }else {
-                        $this->userData['invoiceAddress'] = $this->userData['shippingAddress'];
-                    }
+                    $this->loadCustomerData($this->userId, $this->invoiceType);
                 }
 
                 $result = $this->owner->db->getRows(
@@ -631,6 +792,11 @@ class cart extends ancestor {
                         }
 
                         $variant = $this->product->getVariant($row['citem_pv_id']);
+                        $itemLocalConsumption = (bool) $row['citem_local_consumption'];
+
+                        if($variant['price']['noCash'] && $this->orderType == ORDER_TYPE_ORDER){
+                            $this->paymentNoCash = true;
+                        }
 
                         $this->items[$row['citem_id']] = [
                             'id' => $row['citem_id'],
@@ -644,16 +810,20 @@ class cart extends ancestor {
                             'url' => $row['citem_url'],
                             'minSale' => $this->product->getMinSale($row['citem_pv_id']),
                             'maxSale' => $this->product->getMaxSale($row['citem_pv_id']),
+                            'localConsumption' => $itemLocalConsumption,
                             'price' => [
                                 'value' => $row['citem_price'],
                                 'currency' => $row['citem_currency'],
                                 'discount' => $row['citem_discount'],
                                 'displayPrice' => $variant['price']['displayPrice'],
+                                'unitPrice' => $variant['price']['unitPrice'],
                                 'unit' => $variant['price']['unit'],
                                 'isWeightUnit' => $variant['price']['isWeightUnit'],
                                 'total' => ($price * $row['citem_quantity']),
+                                'vatKey' => ($itemLocalConsumption ? $variant['price']['vatLocal'] : $variant['price']['vatDeliver']),
+                                'vat' => ($itemLocalConsumption ? $variant['price']['vatLocal'] : $variant['price']['vatDeliver']) / 100,
                             ],
-                            'packaging' => $packaging,
+                            'packaging' => ($itemLocalConsumption ? [] : $packaging),
                             'quantity' => [
                                 'baseAmount' => $variant['packaging']['quantity'],
                                 'amount' => $row['citem_quantity'],
@@ -668,10 +838,54 @@ class cart extends ancestor {
                     }
                 }
             }
+
+            $this->summarize();
         }
 
 		return $this;
 	}
+
+    private function loadCustomerData($userId, $invoiceType){
+        if($userId){
+            $this->userId = $userId;
+
+            $user = $this->owner->user->getUserProfile($userId);
+            $this->userData['contactData'] = [
+                'id' => $user['id'],
+                'firstName' => $user['firstname'],
+                'lastName' => $user['lastname'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'phone' => $user['phone'],
+            ];
+
+            $this->userData['type'] = [
+                'group' => $user['group'],
+                'role' => $user['role'],
+            ];
+
+            $this->userData['shippingAddress'] = [
+                'name' => $user['name'],
+                'country' => $user['country'],
+                'zip' => $user['zip'],
+                'city' => $user['city'],
+                'address' => $user['address'],
+            ];
+
+            if($invoiceType){
+                $this->userData['invoiceAddress'] = [
+                    'name' => $user['invoice_name'],
+                    'country' => $user['invoice_country'],
+                    'zip' => $user['invoice_zip'],
+                    'city' => $user['invoice_city'],
+                    'address' => $user['invoice_address'],
+                    'vatNumber' => ($invoiceType == 2 ? $user['vat'] : false),
+                ];
+            }else {
+                $this->userData['invoiceAddress'] = $this->userData['shippingAddress'];
+            }
+        }
+    }
 
 	private function isProductInCart($productId, $variantId = 0){
 		$out = false;
@@ -735,7 +949,7 @@ class cart extends ancestor {
 
 		$key = $this->owner->db->getInsertRecordId();
 
-		$this->loadCart()->summarize();
+		$this->loadCart();
 
 		return $key;
 	}
@@ -760,23 +974,50 @@ class cart extends ancestor {
 				)
 			);
 
-			$this->loadCart()->summarize();
+			$this->loadCart();
 		}
 
 		return $key;
 	}
 
-	private function summarize(){
+    private function applyDiscounts(){
+        $this->discount = 0;
+
+        /**
+         * @var $discountHandler DiscountHandler
+         */
+        $discountHandler = $this->owner->addByClassName('DiscountHandler');
+
+        if($this->userId && $this->userData['type']['group'] == USER_GROUP_CUSTOMERS && $this->userData['type']['role'] == USER_ROLE_USER && $this->owner->user->isLoggedIn()){
+            $this->discount = $discountHandler->getLoyaltyDiscount($this->userId, $this->subtotal);
+        }else{
+            $this->discount = 0;
+        }
+
+        if($this->coupon = $discountHandler->getAppliedCoupon($this->id)){
+            $discount = $this->coupon->getDiscount();
+            if($discount > $this->discount){
+                $this->discount = $discount;
+            }else{
+                $discountHandler->clearCoupon($this->id);
+                $this->coupon = null;
+            }
+        }
+    }
+
+	public function summarize(){
 		$this->total = 0;
 		$this->subtotal = 0;
 		$this->packagingFee = 0;
+		$this->packagingFeeVat = 0;
 
 		if($this->items){
 			foreach($this->items AS $item){
                 $fee = 0;
 
-                if($item['packaging']['fee'] > 0 && !$this->localConsumption){
+                if($item['packaging']['fee']){
                     $fee = ($item['packaging']['fee'] * $item['quantity']['amount']);
+                    $this->packagingFeeVat = $item['packaging']['vat'];
                 }
 
 				$this->subtotal += $item['price']['total'];
@@ -785,6 +1026,10 @@ class cart extends ancestor {
 		}
 
         $this->checkShippingFee();
+
+        if($this->status == ORDER_STATUS_NEW) {
+            $this->applyDiscounts();
+        }
 
         $this->total = $this->subtotal + $this->packagingFee + $this->shippingFee + $this->paymentFee - $this->discount;
 
@@ -795,7 +1040,7 @@ class cart extends ancestor {
 					'cart_subtotal' => $this->subtotal,
                     'cart_packaging_fee' => $this->packagingFee,
 					'cart_shipping_fee' => $this->shippingFee,
-                    //'cart_payment_fee' => $this->paymentFee,
+                    'cart_payment_fee' => $this->paymentFee,
                     'cart_discount' => $this->discount,
                     'cart_total' => $this->total,
                 ],
@@ -806,8 +1051,6 @@ class cart extends ancestor {
 				]
 			)
 		);
-
-        //$this->subtotal += $this->packagingFee;
 
         return $this;
 	}
@@ -905,7 +1148,7 @@ class cart extends ancestor {
         ];
 
         if(is_numeric($key) && $key && $this->isAdmin){
-                $where['cart_id'] = (int) $key;
+            $where['cart_id'] = (int) $key;
         }else{
             $where['cart_key'] = $key;
         }
@@ -1015,7 +1258,11 @@ class cart extends ancestor {
         if(!Empty($types)){
             $pmTypes = $types;
         }else{
-            $pmTypes = [PAYMENT_TYPE_CASH, PAYMENT_TYPE_MONEY_TRANSFER, PAYMENT_TYPE_CARD];
+            if($this->paymentNoCash){
+                $pmTypes = [PAYMENT_TYPE_MONEY_TRANSFER, PAYMENT_TYPE_CARD];
+            }else {
+                $pmTypes = [PAYMENT_TYPE_CASH, PAYMENT_TYPE_MONEY_TRANSFER, PAYMENT_TYPE_CARD];
+            }
         }
 
         $result = $this->owner->db->getRows(
@@ -1026,8 +1273,10 @@ class cart extends ancestor {
                     'pm_name AS name',
                     'pm_type AS type',
                     'pm_price AS price',
+                    'pm_vat AS vat',
                     'pm_text AS text',
                     'pm_default AS def',
+                    'pm_limit_max AS limitMax',
                     'pm_logo AS logo',
                 ],
                 [
@@ -1044,10 +1293,12 @@ class cart extends ancestor {
         );
         if ($result) {
             foreach($result AS $row){
-                $out[$row['id']] = $row;
+                if($row['limitMax'] == 0 || $row['limitMax'] >= $this->subtotal || $this->storeId != 'W') {
+                    $out[$row['id']] = $row;
 
-                if($row['logo']){
-                    $out[$row['id']]['logo'] = FOLDER_UPLOAD . $this->owner->shopId . '/' . $row['logo'];
+                    if ($row['logo']) {
+                        $out[$row['id']]['logo'] = FOLDER_UPLOAD . $this->owner->shopId . '/' . $row['logo'];
+                    }
                 }
             }
         }
@@ -1070,6 +1321,7 @@ class cart extends ancestor {
                         'pm_text AS text',
                         'pm_email_text AS emailText',
                         'pm_logo AS logo',
+                        'pm_vat AS vat',
                     ],
                     [
                         'pm_shop_id' => $this->owner->shopId,
@@ -1081,7 +1333,6 @@ class cart extends ancestor {
             if($out['logo']){
                 $out['logo'] = FOLDER_UPLOAD . $this->owner->shopId . '/' . $out['logo'];
             }
-
         }
 
         return $out;
@@ -1099,6 +1350,7 @@ class cart extends ancestor {
                     'sm_name AS name',
                     'sm_free_limit AS freeLimit',
                     'sm_price AS price',
+                    'sm_vat AS vat',
                     'sm_default AS def',
                     'sm_text AS text',
                     'sm_type AS type',
@@ -1201,6 +1453,7 @@ class cart extends ancestor {
                         'sm_day_diff AS dayDiff',
                         'sm_select_date AS hasCustomDate',
                         'sm_custom_text AS customIntervalText',
+                        'sm_vat AS vat',
                     ],
                     [
                         'sm_shop_id' => $this->owner->shopId,
@@ -1254,25 +1507,32 @@ class cart extends ancestor {
         return $out;
     }
 
-    public function setLocalConsumption($isLocal){
-        $this->owner->db->sqlQuery(
-            $this->owner->db->genSQLUpdate(
-                'cart',
-                [
-                    'cart_local_consumption' => (int) $isLocal,
-                ],
-                [
-                    'cart_id' => $this->id,
-                    'cart_shop_id' => $this->owner->shopId,
-                    'cart_key' => $this->key
-                ]
-            )
-        );
+    public function setItemLocalConsumption($itemIds, int $isLocal){
+        if(!Empty($itemIds)) {
+            if(!is_array($itemIds)) $itemIds = [$itemIds];
 
-        $this->loadCart()->summarize();
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'cart_items',
+                    [
+                        'citem_local_consumption' => $isLocal,
+                    ],
+                    [
+                        'citem_id' => [
+                            'in' => $itemIds
+                        ],
+                        'citem_cart_id' => $this->id
+                    ]
+                )
+            );
+        }
+
+        $this->loadCart();
     }
 
     public function setCustomer($userId, $invoiceType = 0, $remarks = ''){
+        $this->loadCustomerData($userId, $invoiceType);
+
         $this->owner->db->sqlQuery(
             $this->owner->db->genSQLUpdate(
                 'cart',
@@ -1311,7 +1571,7 @@ class cart extends ancestor {
                 )
             );
 
-            $this->loadCart()->summarize();
+            $this->loadCart();
         }
     }
 
@@ -1348,7 +1608,7 @@ class cart extends ancestor {
                 )
             );
 
-            $this->loadCart()->summarize();
+            $this->loadCart();
         }
     }
 
@@ -1502,6 +1762,8 @@ class cart extends ancestor {
     }
 
     public function setPaid(){
+        $this->isPaid = true;
+
         $this->owner->db->sqlQuery(
             $this->owner->db->genSQLUpdate(
                 'cart',
@@ -1514,6 +1776,41 @@ class cart extends ancestor {
                 ]
             )
         );
+    }
+
+    public function setRefunded(float $amount = 0){
+        $this->isPaid = false;
+        $this->isRefunded = true;
+
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLUpdate(
+                'cart',
+                [
+                    'cart_paid' => -1,
+                    'cart_refunded' => $amount,
+                ],
+                [
+                    'cart_id' => $this->id,
+                    'cart_shop_id' => $this->owner->shopId,
+                ]
+            )
+        );
+    }
+
+    public function issueInvoice(){
+        if($this->invoiceType != -1){
+            /**
+             * @var $invoice Invoices
+             */
+            $invoice = $this->owner->addByClassName('Invoices');
+            if($invoice->hasInvoiceProvider()) {
+                try {
+                    $invoice->init($this->getCart())->createInvoice();
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+            }
+        }
     }
 
 }

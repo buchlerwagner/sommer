@@ -4,6 +4,20 @@ class viewOrderForm extends formBuilder {
     public $cartKey;
     public $isOpen = false;
     public $isEmployee = false;
+    public $hasInvoiceProvider = false;
+    public $isRefundable = false;
+    public $invoiceDir = '';
+
+    const PAYMENT_ICONS = [
+        1 => 'fa-money-bill',
+        2 => 'fa-laptop',
+        3 => 'fa-credit-card',
+    ];
+
+    const SHIPPING_ICONS = [
+        1 => 'fa-store',
+        2 => 'fa-truck',
+    ];
 
     public function setupKeyFields() {
         $this->setKeyFields(['cart_id']);
@@ -25,7 +39,7 @@ class viewOrderForm extends formBuilder {
 
         if($this->isOpen) {
             $this->title = 'LBL_CREATE_NEW_ORDER';
-            $this->owner->cart->init($this->cartKey, false);
+            $this->owner->cartHandler->init($this->cartKey, false);
 
             $search = (new groupFieldset('search-product'))->addElements(
                 (new inputAutocomplete('product'))
@@ -44,7 +58,9 @@ class viewOrderForm extends formBuilder {
                     ->add($this->loadSubTable('cartItems')),
 
                 (new groupInclude('order-totals', [
-                    'cart' => $this->owner->cart
+                    'cart' => $this->owner->cartHandler,
+                    'paymentIcons' => self::PAYMENT_ICONS,
+                    'shippingIcons' => self::SHIPPING_ICONS,
                 ]))
             );
 
@@ -74,6 +90,14 @@ class viewOrderForm extends formBuilder {
             $this->title = 'LBL_VIEW_ORDER';
             $this->includeBefore = 'view-order';
 
+            $this->invoiceDir = FOLDER_UPLOAD . $this->owner->shopId . '/invoices/';
+
+            /**
+             * @var $invoice Invoices
+             */
+            $invoice = $this->owner->addByClassName('Invoices');
+            $this->hasInvoiceProvider = $invoice->hasInvoiceProvider();
+
             $this->addButtons(
                 new buttonCancel('BTN_BACK')
             );
@@ -90,8 +114,12 @@ class viewOrderForm extends formBuilder {
         if(!$this->isOpen) {
             $this->setSubtitle($this->values['cart_order_number']);
 
-            $this->owner->cart->init($this->values['cart_key'], false);
-            $this->cart = $this->owner->cart;
+            $this->owner->cartHandler->init($this->values['cart_key'], false);
+            $this->cart = $this->owner->cartHandler;
+
+            if($this->owner->user->hasFunctionAccess('orders-refund')){
+                $this->isRefundable = $this->cart->isRefundable();
+            }
         }
     }
 
@@ -111,7 +139,7 @@ class viewOrderForm extends formBuilder {
         );
         if($cart){
             $this->cartKey = $cart['cartKey'];
-            if($cart['status'] == cart::CART_STATUS_NEW && $cart['storeId'] == $this->owner->storeId){
+            if($cart['status'] == CartHandler::CART_STATUS_NEW && $cart['storeId'] == $this->owner->storeId){
                 $this->isOpen = true;
             }
         }

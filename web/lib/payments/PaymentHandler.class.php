@@ -2,16 +2,16 @@
 
 class PaymentHandler extends ancestor {
 
-    public function handleTransaction(string $transactionId):Transaction
+    public function handleTransaction(string $transactionId):?Transaction
     {
         /**
          * @var $payment Payments
          */
         $payment = $this->owner->addByClassName('Payments', false, [], true);
 
-        $transaction = $payment->checkTransaction($transactionId);
-
-        $this->updateCart($transaction);
+        if($transaction = $payment->checkTransaction($transactionId)) {
+            $this->updateCart($transaction);
+        }
 
         return $transaction;
     }
@@ -20,14 +20,21 @@ class PaymentHandler extends ancestor {
     {
         if($transaction->cartKey){
             if($transaction->getStatus() !== enumPaymentStatus::Pending()->getValue()){
-                $this->owner->cart->init($transaction->cartKey, false);
+                $this->owner->cartHandler->init($transaction->cartKey, false);
 
                 if($transaction->getStatus() === enumPaymentStatus::OK()->getValue()) {
-                    $this->owner->cart->setPaid();
+                    $this->owner->cartHandler->setPaid();
+
+                    // Issue invoice after successful bank card payment
+                    $this->owner->cartHandler->issueInvoice();
+                }
+
+                if($transaction->getStatus() === enumPaymentStatus::Voided()->getValue()) {
+                    $this->owner->cartHandler->setRefunded($transaction->amount);
                 }
 
                 if($transaction->getStatus() !== enumPaymentStatus::Pending()->getValue()){
-                    $this->owner->cart->sendPaymentConfirmationEmail($transaction);
+                    $this->owner->cartHandler->sendPaymentConfirmationEmail($transaction);
                 }
             }
         }
@@ -43,6 +50,9 @@ class PaymentHandler extends ancestor {
                 ],
                 [
                     'pt_status'  => enumPaymentStatus::Pending()->getValue(),
+                    'pt_expiry' => [
+                        'less' => 'NOW()'
+                    ]
                 ]
             )
         );

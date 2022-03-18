@@ -13,15 +13,12 @@ class editPaymentProviderForm extends formBuilder {
         $this->addControls(
             (new inputText('pp_name', 'LBL_NAME'))
                 ->setRequired(),
-            (new inputSelect('pp_provider', 'LBL_PAYMENT_PROVIDER'))
-                ->setOptions(Payments::getPaymentProviders())
-                ->setRequired(),
-
-            (new inputText('pp_name', 'LBL_NAME'))
+            (new inputSelect('pp_provider', 'LBL_PROVIDER'))
+                ->setOptions(Payments::getProviders())
                 ->setRequired(),
 
             (new groupRow('row1'))->addElements(
-                (new inputText('pp_shopid', 'LBL_SHOP_ID'))
+                (new inputText('pp_merchant_id', 'LBL_MERCHANT_ID'))
                     ->setColSize('col-6')
                     ->setRequired(),
 
@@ -53,7 +50,7 @@ class editPaymentProviderForm extends formBuilder {
                     ->addData('show-remove', 'false')
                     ->addData('show-cancel', 'false')
                     ->addData('show-close', 'false')
-                    ->addData('allowed-file-extensions', '["pem"]')
+                    ->addData('allowed-file-extensions', '["pem", "key", "pub"]')
                     ->addData('show-preview', 'false')
                     ->notDBField(),
 

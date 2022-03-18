@@ -8,11 +8,11 @@ if(!Empty($this->params[0])){
     $key = $this->params[0];
 }
 
-$this->cart->init($key, false);
+$this->cartHandler->init($key, false);
 
-if($this->settings['stopSale'] || $this->cart->isEmpty()){
+if($this->settings['stopSale'] || $this->cartHandler->isEmpty()){
     $this->pageRedirect('/');
-}elseif($this->cart->getStatus() == cart::CART_STATUS_ORDERED){
+}elseif($this->cartHandler->getStatus() == CartHandler::CART_STATUS_ORDERED){
     $this->pageRedirect($this->getPageName('finish') . $key . '/');
 }
 

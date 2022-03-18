@@ -150,16 +150,16 @@ class orderForm extends formBuilder {
             $this->values['interval'] = -1;
         }
 
-        $this->owner->cart->init($key, false);
-        $this->owner->cart->setPaymentMode((int)$this->values['payment']);
-        $this->owner->cart->setShippingMode((int)$this->values['shipping'], (int)$this->values['interval'], $this->values['custom_interval'], $this->values['date']);
+        $this->owner->cartHandler->init($key, false);
+        $this->owner->cartHandler->setPaymentMode((int)$this->values['payment']);
+        $this->owner->cartHandler->setShippingMode((int)$this->values['shipping'], (int)$this->values['interval'], $this->values['custom_interval'], $this->values['date']);
 
         if(!Empty($this->values['options'])) {
-            $this->owner->cart->setOption('documents', $this->values['options']);
+            $this->owner->cartHandler->setOption('documents', $this->values['options']);
         }
 
         $userId = $this->registerUser();
-        $this->owner->cart->makeOrder($userId, $this->values['invoice_type'], $remarks);
+        $this->owner->cartHandler->makeOrder($userId, $this->values['invoice_type'], $remarks);
 
         $this->owner->pageRedirect($this->owner->getPageName('finish') . $key . '/');
     }

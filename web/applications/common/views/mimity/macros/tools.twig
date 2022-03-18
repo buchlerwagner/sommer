@@ -176,7 +176,7 @@
             <i class="fas fa-times text-danger"></i>
         {% endif %}
 	{% elseif column.type == 'icon' %}
-		<i class="{{ column.icons[ val ] }}{% if column.colors %} text-{{ column.colors[val] }}{% endif %}"></i>
+		<i class="{{ column.icons[ val ].icon }}{% if column.icons[ val ].color %} text-{{ column.icons[val].color }}{% endif %}"{% if column.icons[ val ].title %} title="{{ _(column.icons[ val ].title) }}" data-toggle="tooltip" {% endif %}></i>
     {% elseif column.type == 'styled' %}
         <div class="{{ column.cellclass }}">{{ val }}</div>
     {% elseif column.type == 'binoptions' %}

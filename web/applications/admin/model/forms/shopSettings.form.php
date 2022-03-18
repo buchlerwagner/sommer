@@ -37,13 +37,15 @@ class shopSettingsForm extends formBuilder {
 
         $menu = (new sectionBox('menu', 'LBL_MENU_SETTINGS', 'far fa-bars'))
             ->addElements(
-                (new inputText('menuBreakPoint', 'LBL_BREAK_POINT'))
-                    ->setColSize('col-4 col-lg-3')
-                    ->setIcon('far fa-page-break')
-                    ->onlyNumbers()
-                    ->setMaxLength(1)
-                    ->addClass('text-right')
-                    ->setName('settings/menuBreakPoint')
+                (new groupRow('row00'))->addElements(
+                    (new inputText('menuBreakPoint', 'LBL_BREAK_POINT'))
+                        ->setColSize('col-4 col-lg-3')
+                        ->setIcon('far fa-page-break')
+                        ->onlyNumbers()
+                        ->setMaxLength(1)
+                        ->addClass('text-right')
+                        ->setName('settings/menuBreakPoint')
+                )
             );
 
         $contact = (new sectionBox('contact', 'LBL_CONTACT_DATA', 'far fa-envelope'))

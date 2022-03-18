@@ -343,6 +343,8 @@ class mysql extends db {
                 $value = str_replace([' ', ','], ['', '.'], $value);
             } else if ($value === NULL || $value === 'NULL') {
                 $value = 'NULL';
+            } else if ($value == 'NOW()') {
+                $value = 'NOW()';
             } else {
                 $value = "'" . $this->escapeString($value) . "'";
             }

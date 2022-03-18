@@ -1,4 +1,108 @@
 # noinspection SqlNoDataSourceInspectionForFile
+-- 2022-03-04
+ALTER TABLE `product_variants` ADD COLUMN `pv_no_cash` TINYINT(1) NULL DEFAULT 0 AFTER `pv_max_sale`;
+ALTER TABLE `products` ADD COLUMN `prod_no_cash` TINYINT(1) NULL DEFAULT 0 AFTER `prod_archived`;
+ALTER TABLE `cart` ADD COLUMN `cart_coupon_id` INT(11) NULL DEFAULT 0 AFTER `cart_refunded`;
+
+ALTER TABLE `cart` CHANGE COLUMN `cart_subtotal` `cart_subtotal` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_order_status`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_shipping_fee` `cart_shipping_fee` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_packaging_fee`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_payment_fee` `cart_payment_fee` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_shipping_fee`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_discount` `cart_discount` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_payment_fee`;
+ALTER TABLE `cart` CHANGE COLUMN `cart_total` `cart_total` DOUBLE NULL DEFAULT 0  COMMENT '' AFTER `cart_discount`;
+
+CREATE TABLE `loyalty_rules` (
+     `lr_id` int(11) NOT NULL AUTO_INCREMENT,
+     `lr_shop_id` int(11) DEFAULT NULL,
+     `lr_valid_from` date DEFAULT NULL,
+     `lr_min_order_limit` float DEFAULT 0,
+     `lr_discount` float DEFAULT 0,
+     `lr_only_paid` tinyint(1) DEFAULT 0,
+     `lr_only_finished` tinyint(1) DEFAULT 0,
+     PRIMARY KEY (`lr_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `automatic_coupons` (
+     `ac_id` int(11) NOT NULL AUTO_INCREMENT,
+     `ac_shop_id` int(11) DEFAULT NULL,
+     `ac_code_length` tinyint(1) DEFAULT 6,
+     `ac_expiry_days` int(11) DEFAULT 7,
+     `ac_min_sale_limit` float DEFAULT 0,
+     `ac_min_order_limit` float DEFAULT 0,
+     `ac_discount_value` float DEFAULT 0,
+     `ac_discount_percent` float DEFAULT 0,
+     `ac_include_discounted_products` tinyint(1) DEFAULT 0,
+     `ac_multiple_usage` tinyint(1) DEFAULT 0,
+     `ac_enabled` tinyint(1) DEFAULT 0,
+     PRIMARY KEY (`ac_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `coupons` (
+   `c_id` int(11) NOT NULL AUTO_INCREMENT,
+   `c_shop_id` int(11) DEFAULT NULL,
+   `c_code` varchar(10) DEFAULT NULL,
+   `c_created` datetime DEFAULT NULL,
+   `c_expiry` date DEFAULT NULL,
+   `c_min_order_limit` float DEFAULT 0,
+   `c_discount_value` float DEFAULT 0,
+   `c_discount_percent` float DEFAULT 0,
+   `c_include_discounted_products` tinyint(1) DEFAULT 0,
+   `c_multiple_usage` tinyint(1) DEFAULT 0,
+   `c_enabled` tinyint(1) DEFAULT 1,
+   PRIMARY KEY (`c_id`),
+   UNIQUE KEY `code` (`c_code`,`c_shop_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `coupon_usage` (
+    `cu_id` int(11) NOT NULL AUTO_INCREMENT,
+    `cu_c_id` int(11) DEFAULT NULL,
+    `cu_us_id` int(11) DEFAULT 0,
+    `cu_cart_id` int(11) DEFAULT 0,
+    `cu_timestamp` timestamp NULL DEFAULT NULL,
+    `cu_value` float DEFAULT 0,
+    `cu_currency` char(3) DEFAULT 'HUF',
+    PRIMARY KEY (`cu_id`),
+    UNIQUE KEY `uq` (`cu_cart_id`,`cu_c_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
+
+
+
+
+
+
+
+ALTER TABLE `cart` ADD COLUMN `cart_refunded` FLOAT NULL DEFAULT NULL AFTER `cart_invoice_filename`;
+ALTER TABLE `payment_providers` CHANGE COLUMN `pp_shopid` `pp_merchant_id` VARCHAR(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL  COMMENT '' AFTER `pp_provider`;
+
+-- 2022-02-21
+CREATE TABLE `invoice_providers` (
+     `iv_id` int(11) NOT NULL AUTO_INCREMENT,
+     `iv_shop_id` int(11) DEFAULT 0,
+     `iv_name` varchar(255) DEFAULT NULL,
+     `iv_provider` varchar(100) DEFAULT NULL,
+     `iv_user_name` varchar(128) DEFAULT NULL,
+     `iv_password` varchar(128) DEFAULT NULL,
+     `iv_api_key` varchar(128) DEFAULT NULL,
+     `iv_test_mode` varchar(128) DEFAULT NULL,
+     `iv_enabled` tinyint(1) DEFAULT 0,
+     `iv_manual` tinyint(1) DEFAULT 0,
+     PRIMARY KEY (`iv_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `cart` ADD COLUMN `cart_invoice_number` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_custom_interval`;
+ALTER TABLE `cart` ADD COLUMN `cart_invoice_provider` INT(11) NULL DEFAULT 0 AFTER `cart_invoice_number`;
+ALTER TABLE `cart` ADD COLUMN `cart_invoice_filename` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `cart_invoice_provider`;
+
+ALTER TABLE `cart_items` ADD COLUMN `citem_local_consumption` TINYINT(1) NULL DEFAULT 0 AFTER `citem_url`;
+ALTER TABLE `payment_modes` ADD COLUMN `pm_limit_max` FLOAT NULL DEFAULT 0 AFTER `pm_order`;
+
+ALTER TABLE `cart` DROP COLUMN `cart_local_consumption` ;
+
+
+
+
+
+
 -- 2022-02-02
 
 ALTER TABLE `products` ADD COLUMN `prod_vat_local` DOUBLE NULL DEFAULT 5 AFTER `prod_price_discount`;
