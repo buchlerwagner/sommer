@@ -8,6 +8,12 @@ $config = $fw->getHostConfig();
 
 $publicDomain = rtrim($config['publicSite'], '/') . '/';
 
+$publicDomain = false;
+if(!Empty($fw->getHostConfig()['publicSite'])){
+    $publicDomain = rtrim($fw->getHostConfig()['publicSite'], '/') . '/';
+}
+
+
 d($publicDomain);
 dd($config);
 
