@@ -658,7 +658,7 @@ class CartHandler extends ancestor {
         $files = [];
         $savePath = DIR_UPLOAD . $this->owner->shopId . '/documents/';
 
-        $where = '(doc_optional = 0' . ($this->options['documents'] ? ' OR doc_id IN (' . implode(',', $this->options['documents']) . ')' : '') . ') AND doc_mail_types LIKE "%|new-order|%" AND doc_shop_id = ' . $this->owner->shopId;
+        $where = '(doc_optional = 0' . ($this->options['documents'] ? ' OR doc_id IN (' . implode(',', $this->options['documents']) . ')' : '') . ') AND doc_mail_types LIKE "%|order-new|%" AND doc_shop_id = ' . $this->owner->shopId;
 
         $result = $this->owner->db->getRows(
             $this->owner->db->genSQLSelect(

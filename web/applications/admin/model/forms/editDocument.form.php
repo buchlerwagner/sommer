@@ -20,7 +20,7 @@ class editDocumentForm extends formBuilder {
             (new inputCheckGroup('doc_mail_types', 'LBL_ATTACH_TO_MAILS'))
                 ->setOptions($this->owner->lists->reset()->getTemplateTypes()),
             (new groupRow('row2'))->addElements(
-                (new inputSwitch('doc_optional', 'LBL_OPTIONALLY_SELECTABLE', 0))
+                (new inputSwitch('doc_optional', 'LBL_OPTIONALLY_SELECTABLE'))
                     ->setGroupClass('mb-0 mt-2')
                     ->setColSize('col-12')
                     ->changeDefaultState(enumChangeAction::Readonly(), '#doc_select_text')

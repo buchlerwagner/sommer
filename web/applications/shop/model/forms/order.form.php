@@ -268,7 +268,7 @@ class orderForm extends formBuilder {
                 [
                     'doc_optional' => 1,
                     'doc_mail_types' => [
-                        'like' => '%|new-order|%'
+                        'like' => '%|order-new|%'
                     ],
                     'doc_shop_id' => $this->owner->shopId,
                 ]
