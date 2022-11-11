@@ -71,7 +71,7 @@ switch($action) {
 			$num = $this->cartHandler->getNumberOfCartItems();
             $this->data['.cart-counter']['html'] = $num;
             $this->data['.item-quantity-' . $id]['html'] = $this->cartHandler->getItem($id)['quantity']['amount'];
-            $this->data['.item-price-' . $id]['html'] = $this->lib->formatPrice($this->cartHandler->getItem($id)['price']['finalPrice'], $this->cartHandler->currency);
+            $this->data['.item-price-' . $id]['html'] = $this->lib->formatPrice($this->cartHandler->getItem($id)['price']['displayPrice'], $this->cartHandler->currency);
             $this->data['.item-total-' . $id]['html'] = $this->lib->formatPrice($this->cartHandler->getItem($id)['price']['total'], $this->cartHandler->currency);
             $this->data['.cart-total']['html'] = $this->lib->formatPrice($this->cartHandler->subtotal, $this->cartHandler->currency);
 
