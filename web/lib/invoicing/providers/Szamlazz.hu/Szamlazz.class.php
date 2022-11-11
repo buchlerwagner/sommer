@@ -78,6 +78,10 @@ class Szamlazz extends InvoiceProvider {
         // Számla kiállítás dátuma
         $header->setIssueDate($this->issueDate);
 
+        if($this->settings->prefix) {
+            $header->setPrefix($this->settings->prefix);
+        }
+
         // Vevő létrehozása (név, irányítószám, település, cím)
         $buyer = new Buyer($this->buyer->getName(), $this->buyer->getZipCode(), $this->buyer->getCity(), $this->buyer->getAddress());
         // Vevő telefonszáma

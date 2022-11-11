@@ -282,6 +282,7 @@ class Invoices extends ancestor {
                         'iv_api_key AS apiKey',
                         'iv_test_mode AS isTest',
                         'iv_manual AS isManual',
+                        'iv_prefix AS prefix',
                     ],
                     [
                         'iv_enabled' => 1,
@@ -313,6 +314,7 @@ class Invoices extends ancestor {
                         'iv_api_key AS apiKey',
                         'iv_test_mode AS isTest',
                         'iv_manual AS isManual',
+                        'iv_prefix AS prefix',
                     ],
                     [
                         'iv_id' => $providerId,

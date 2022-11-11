@@ -40,7 +40,7 @@ const FORM_STATE_SAVED      = 'saved';
 const FORM_STATE_BUTTONACTION = 'buttonaction';
 const FORM_STATE_RESETED    = 'reseted';
 
-const VERSION_JS            = '1.0.7';
+const VERSION_JS            = '1.0.8';
 const VERSION_CSS           = '1.0.7';
 
 //

@@ -128,7 +128,7 @@ abstract class docs extends ancestor {
         }
 
         $pdf = new \Mpdf\Mpdf($this->options);
-        $pdf->showImageErrors = true;
+        $pdf->showImageErrors = false;
         $pdf->SetDisplayMode('fullpage');
 
         if($this->pdfTemplate) {

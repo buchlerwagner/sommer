@@ -26,7 +26,7 @@ switch($action) {
                 if($item['new']){
                     $this->data['.shopping-cart-items']['append'] = $this->view->renderContent('cart-item', ['item' => $this->cartHandler->getItem($id)]);
                 }else {
-                    $this->data['.item-price-' . $id]['html'] = $this->lib->formatPrice($this->cartHandler->getItem($id)['price']['finalPrice'], $this->cartHandler->currency);
+                    $this->data['.item-price-' . $id]['html'] = $this->lib->formatPrice($this->cartHandler->getItem($id)['price']['displayPrice'], $this->cartHandler->currency);
                     $this->data['.item-total-' . $id]['html'] = $this->lib->formatPrice($this->cartHandler->getItem($id)['price']['total'], $this->cartHandler->currency);
                     $this->data['.item-quantity-' . $id]['html'] = $this->cartHandler->getItem($id)['quantity']['amount'];
                 }

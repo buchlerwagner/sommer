@@ -30,6 +30,9 @@ class editInvoiceProviderForm extends formBuilder {
 
             (new inputText('iv_api_key', 'LBL_API_KEY')),
 
+            (new inputText('iv_prefix', 'LBL_INVOICE_PREFIX'))
+                ->setMaxLength(5),
+
             (new inputSwitch('iv_enabled', 'LBL_ENABLED'))
                 ->setColor(enumColors::Success())
         );
@@ -45,9 +48,10 @@ class editInvoiceProviderForm extends formBuilder {
         if(Empty($this->values['iv_test_mode'])) $this->values['iv_test_mode'] = 0;
         if(Empty($this->values['iv_enabled'])) $this->values['iv_enabled'] = 0;
         if(Empty($this->values['iv_manual'])) $this->values['iv_manual'] = 0;
+        if(!Empty($this->values['iv_prefix'])) $this->values['iv_prefix'] = strtoupper($this->values['iv_prefix']);
 
         if($this->values['iv_password']){
-            $this->values['iv_password'] = serialize(cryptString(SMTP_HASH_KEY, $this->values['pp_password']));
+            $this->values['iv_password'] = serialize(cryptString(SMTP_HASH_KEY, $this->values['iv_password']));
         }else{
             $this->values['iv_password'] = '';
         }

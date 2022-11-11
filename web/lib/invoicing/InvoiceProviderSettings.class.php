@@ -5,6 +5,7 @@ class InvoiceProviderSettings {
     public $className;
     public $userName;
     public $apiKey;
+    public $prefix;
 
     private $isTest = 0;
     private $isManual = 1;

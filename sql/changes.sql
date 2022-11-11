@@ -1,4 +1,7 @@
 # noinspection SqlNoDataSourceInspectionForFile
+ALTER TABLE `invoice_providers` CHANGE COLUMN `iv_password` `iv_password` BLOB NULL  COMMENT '' AFTER `iv_user_name`;
+
+
 -- 2022-03-04
 ALTER TABLE `product_variants` ADD COLUMN `pv_no_cash` TINYINT(1) NULL DEFAULT 0 AFTER `pv_max_sale`;
 ALTER TABLE `products` ADD COLUMN `prod_no_cash` TINYINT(1) NULL DEFAULT 0 AFTER `prod_archived`;
