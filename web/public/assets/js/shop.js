@@ -542,23 +542,34 @@ var shoppingCart = {
                 offDates = [];
             }
 
+            console.log(offDates);
             $(this).flatpickr({
-                dateFormat: "Y-m-d",
                 minDate: minDate,
-                disable: offDates,
+                dateFormat: 'Y-m-d',
                 enable: [
                     function (date){
+                        var isEnabled = false;
+                        var dd = String(date.getDate()).padStart(2, '0');
+                        var mm = String(date.getMonth() + 1).padStart(2, '0');
+                        var yyyy = date.getFullYear();
+                        var dt = yyyy + '-' + mm + '-' + dd;
+
                         if(dayLimits.length > 0){
                             if(dayLimits.includes(date.getDay())){
-                                return true;
+                                isEnabled = true;
                             }
                         }else{
-                            return true;
+                            isEnabled = true;
                         }
 
-                        return false;
+                        if(offDates.includes(dt)){
+                            isEnabled = false;
+                        }
+
+                        return isEnabled;
                     }
                 ],
+                //disable: offDates,
                 locale: 'hu'
             });
         });

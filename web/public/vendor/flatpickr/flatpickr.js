@@ -1,8 +1,8 @@
-/* flatpickr v4.6.9, @license MIT */
+/* flatpickr v4.6.13, @license MIT */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.flatpickr = factory());
+        typeof define === 'function' && define.amd ? define(factory) :
+            (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.flatpickr = factory());
 }(this, (function () { 'use strict';
 
     /*! *****************************************************************************
@@ -88,8 +88,8 @@
             // Adjust to Thursday in week 1 and count number of weeks from date to week1.
             return (1 +
                 Math.round(((date.getTime() - week1.getTime()) / 86400000 -
-                    3 +
-                    ((week1.getDay() + 6) % 7)) /
+                        3 +
+                        ((week1.getDay() + 6) % 7)) /
                     7));
         },
         hourIncrement: 1,
@@ -208,8 +208,9 @@
         var t;
         return function () {
             var _this = this;
+            var args = arguments;
             clearTimeout(t);
-            t = setTimeout(function () { return fn.apply(_this, arguments); }, wait);
+            t = setTimeout(function () { return fn.apply(_this, args); }, wait);
         };
     }
     var arrayify = function (obj) {
@@ -279,7 +280,7 @@
             dateObj.setMonth(locale.months.longhand.indexOf(monthName));
         },
         G: function (dateObj, hour) {
-            dateObj.setHours(parseFloat(hour));
+            dateObj.setHours((dateObj.getHours() >= 12 ? 12 : 0) + parseFloat(hour));
         },
         H: function (dateObj, hour) {
             dateObj.setHours(parseFloat(hour));
@@ -312,7 +313,7 @@
             dateObj.setDate(parseFloat(day));
         },
         h: function (dateObj, hour) {
-            dateObj.setHours(parseFloat(hour));
+            dateObj.setHours((dateObj.getHours() >= 12 ? 12 : 0) + parseFloat(hour));
         },
         i: function (dateObj, minutes) {
             dateObj.setMinutes(parseFloat(minutes));
@@ -339,13 +340,13 @@
         },
     };
     var tokenRegex = {
-        D: "(\\w+)",
-        F: "(\\w+)",
+        D: "",
+        F: "",
         G: "(\\d\\d|\\d)",
         H: "(\\d\\d|\\d)",
         J: "(\\d\\d|\\d)\\w+",
         K: "",
-        M: "(\\w+)",
+        M: "",
         S: "(\\d\\d|\\d)",
         U: "(.+)",
         W: "(\\d\\d|\\d)",
@@ -355,7 +356,7 @@
         h: "(\\d\\d|\\d)",
         i: "(\\d\\d|\\d)",
         j: "(\\d\\d|\\d)",
-        l: "(\\w+)",
+        l: "",
         m: "(\\d\\d|\\d)",
         n: "(\\d\\d|\\d)",
         s: "(\\d\\d|\\d)",
@@ -437,12 +438,12 @@
             return frmt
                 .split("")
                 .map(function (c, i, arr) {
-                return formats[c] && arr[i - 1] !== "\\"
-                    ? formats[c](dateObj, locale, config)
-                    : c !== "\\"
-                        ? c
-                        : "";
-            })
+                    return formats[c] && arr[i - 1] !== "\\"
+                        ? formats[c](dateObj, locale, config)
+                        : c !== "\\"
+                            ? c
+                            : "";
+                })
                 .join("");
         };
     };
@@ -469,17 +470,15 @@
                     parsedDate = new Date();
                     timeless = true;
                 }
+                else if (config && config.parseDate) {
+                    parsedDate = config.parseDate(date, format);
+                }
                 else if (/Z$/.test(datestr) ||
                     /GMT$/.test(datestr) // datestrings w/ timezone
-                )
+                ) {
                     parsedDate = new Date(date);
-                else if (config && config.parseDate)
-                    parsedDate = config.parseDate(date, format);
+                }
                 else {
-                    parsedDate =
-                        !config || !config.noCalendar
-                            ? new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0)
-                            : new Date(new Date().setHours(0, 0, 0, 0));
                     var matched = void 0, ops = [];
                     for (var i = 0, matchIndex = 0, regexStr = ""; i < format.length; i++) {
                         var token_1 = format[i];
@@ -497,11 +496,15 @@
                         }
                         else if (!isBackSlash)
                             regexStr += "."; // don't really care
-                        ops.forEach(function (_a) {
-                            var fn = _a.fn, val = _a.val;
-                            return (parsedDate = fn(parsedDate, val, locale) || parsedDate);
-                        });
                     }
+                    parsedDate =
+                        !config || !config.noCalendar
+                            ? new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0)
+                            : new Date(new Date().setHours(0, 0, 0, 0));
+                    ops.forEach(function (_a) {
+                        var fn = _a.fn, val = _a.val;
+                        return (parsedDate = fn(parsedDate, val, locale) || parsedDate);
+                    });
                     parsedDate = matched ? parsedDate : undefined;
                 }
             }
@@ -528,6 +531,13 @@
     }
     var isBetween = function (ts, ts1, ts2) {
         return ts > Math.min(ts1, ts2) && ts < Math.max(ts1, ts2);
+    };
+    var calculateSecondsSinceMidnight = function (hours, minutes, seconds) {
+        return hours * 3600 + minutes * 60 + seconds;
+    };
+    var parseSeconds = function (secondsSinceMidnight) {
+        var hours = Math.floor(secondsSinceMidnight / 3600), minutes = (secondsSinceMidnight - hours * 3600) / 60;
+        return [hours, minutes, secondsSinceMidnight - hours * 3600 - minutes * 60];
     };
     var duration = {
         DAY: 86400000,
@@ -600,10 +610,13 @@
         self.changeYear = changeYear;
         self.clear = clear;
         self.close = close;
+        self.onMouseOver = onMouseOver;
         self._createElement = createElement;
+        self.createDay = createDay;
         self.destroy = destroy;
         self.isEnabled = isEnabled;
         self.jumpToDate = jumpToDate;
+        self.updateValue = updateValue;
         self.open = open;
         self.redraw = redraw;
         self.set = set;
@@ -640,10 +653,10 @@
             setCalendarWidth();
             var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             /* TODO: investigate this further
-        
+
               Currently, there is weird positioning behavior in safari causing pages
               to scroll up. https://github.com/chmln/flatpickr/issues/563
-        
+
               However, most browsers are not Safari and positioning is expensive when used
               in scale. https://github.com/chmln/flatpickr/issues/1096
             */
@@ -651,6 +664,11 @@
                 positionCalendar();
             }
             triggerEvent("onReady");
+        }
+        function getClosestActiveElement() {
+            var _a;
+            return (((_a = self.calendarContainer) === null || _a === void 0 ? void 0 : _a.getRootNode())
+                .activeElement || document.activeElement);
         }
         function bindToInstance(fn) {
             return fn.bind(self);
@@ -671,10 +689,10 @@
                         self.daysContainer.style.width = daysWidth + "px";
                         self.calendarContainer.style.width =
                             daysWidth +
-                                (self.weekWrapper !== undefined
-                                    ? self.weekWrapper.offsetWidth
-                                    : 0) +
-                                "px";
+                            (self.weekWrapper !== undefined
+                                ? self.weekWrapper.offsetWidth
+                                : 0) +
+                            "px";
                         self.calendarContainer.style.removeProperty("visibility");
                         self.calendarContainer.style.removeProperty("display");
                     }
@@ -687,7 +705,7 @@
         function updateTime(e) {
             if (self.selectedDates.length === 0) {
                 var defaultDate = self.config.minDate === undefined ||
-                    compareDates(new Date(), self.config.minDate) >= 0
+                compareDates(new Date(), self.config.minDate) >= 0
                     ? new Date()
                     : new Date(self.config.minDate.getTime());
                 var defaults = getDefaultHours(self.config);
@@ -734,32 +752,47 @@
                     self.minDateHasTime &&
                     self.latestSelectedDateObj &&
                     compareDates(self.latestSelectedDateObj, self.config.minDate, true) ===
-                        0);
+                    0);
             var limitMaxHours = self.config.maxTime !== undefined ||
                 (self.config.maxDate &&
                     self.maxDateHasTime &&
                     self.latestSelectedDateObj &&
                     compareDates(self.latestSelectedDateObj, self.config.maxDate, true) ===
-                        0);
-            if (limitMaxHours) {
-                var maxTime = self.config.maxTime !== undefined
-                    ? self.config.maxTime
-                    : self.config.maxDate;
-                hours = Math.min(hours, maxTime.getHours());
-                if (hours === maxTime.getHours())
-                    minutes = Math.min(minutes, maxTime.getMinutes());
-                if (minutes === maxTime.getMinutes())
-                    seconds = Math.min(seconds, maxTime.getSeconds());
+                    0);
+            if (self.config.maxTime !== undefined &&
+                self.config.minTime !== undefined &&
+                self.config.minTime > self.config.maxTime) {
+                var minBound = calculateSecondsSinceMidnight(self.config.minTime.getHours(), self.config.minTime.getMinutes(), self.config.minTime.getSeconds());
+                var maxBound = calculateSecondsSinceMidnight(self.config.maxTime.getHours(), self.config.maxTime.getMinutes(), self.config.maxTime.getSeconds());
+                var currentTime = calculateSecondsSinceMidnight(hours, minutes, seconds);
+                if (currentTime > maxBound && currentTime < minBound) {
+                    var result = parseSeconds(minBound);
+                    hours = result[0];
+                    minutes = result[1];
+                    seconds = result[2];
+                }
             }
-            if (limitMinHours) {
-                var minTime = self.config.minTime !== undefined
-                    ? self.config.minTime
-                    : self.config.minDate;
-                hours = Math.max(hours, minTime.getHours());
-                if (hours === minTime.getHours() && minutes < minTime.getMinutes())
-                    minutes = minTime.getMinutes();
-                if (minutes === minTime.getMinutes())
-                    seconds = Math.max(seconds, minTime.getSeconds());
+            else {
+                if (limitMaxHours) {
+                    var maxTime = self.config.maxTime !== undefined
+                        ? self.config.maxTime
+                        : self.config.maxDate;
+                    hours = Math.min(hours, maxTime.getHours());
+                    if (hours === maxTime.getHours())
+                        minutes = Math.min(minutes, maxTime.getMinutes());
+                    if (minutes === maxTime.getMinutes())
+                        seconds = Math.min(seconds, maxTime.getSeconds());
+                }
+                if (limitMinHours) {
+                    var minTime = self.config.minTime !== undefined
+                        ? self.config.minTime
+                        : self.config.minDate;
+                    hours = Math.max(hours, minTime.getHours());
+                    if (hours === minTime.getHours() && minutes < minTime.getMinutes())
+                        minutes = minTime.getMinutes();
+                    if (minutes === minTime.getMinutes())
+                        seconds = Math.max(seconds, minTime.getSeconds());
+                }
             }
             setHours(hours, minutes, seconds);
         }
@@ -768,7 +801,7 @@
          */
         function setHoursFromDate(dateObj) {
             var date = dateObj || self.latestSelectedDateObj;
-            if (date) {
+            if (date && date instanceof Date) {
                 setHours(date.getHours(), date.getMinutes(), date.getSeconds());
             }
         }
@@ -821,7 +854,7 @@
                 return element.forEach(function (el) { return bind(el, event, handler, options); });
             element.addEventListener(event, handler, options);
             self._handlers.push({
-                remove: function () { return element.removeEventListener(event, handler); },
+                remove: function () { return element.removeEventListener(event, handler, options); },
             });
         }
         function triggerChange() {
@@ -849,7 +882,10 @@
                     if (self.config.mode === "range")
                         onMouseOver(getEventTarget(e));
                 });
-            bind(window.document.body, "keydown", onKeyDown);
+            bind(self._input, "keydown", onKeyDown);
+            if (self.calendarContainer !== undefined) {
+                bind(self.calendarContainer, "keydown", onKeyDown);
+            }
             if (!self.config.inline && !self.config.static)
                 bind(window, "resize", debouncedResize);
             if (window.ontouchstart !== undefined)
@@ -881,7 +917,6 @@
                 if (self.amPM !== undefined) {
                     bind(self.amPM, "click", function (e) {
                         updateTime(e);
-                        triggerChange();
                     });
                 }
             }
@@ -898,11 +933,11 @@
             var jumpTo = jumpDate !== undefined
                 ? self.parseDate(jumpDate)
                 : self.latestSelectedDateObj ||
-                    (self.config.minDate && self.config.minDate > self.now
-                        ? self.config.minDate
-                        : self.config.maxDate && self.config.maxDate < self.now
-                            ? self.config.maxDate
-                            : self.now);
+                (self.config.minDate && self.config.minDate > self.now
+                    ? self.config.minDate
+                    : self.config.maxDate && self.config.maxDate < self.now
+                        ? self.config.maxDate
+                        : self.now);
             var oldYear = self.currentYear;
             var oldMonth = self.currentMonth;
             try {
@@ -1008,8 +1043,8 @@
                     ? self.config.appendTo
                     : window.document.body).appendChild(self.calendarContainer);
         }
-        function createDay(className, date, dayNumber, i) {
-            var dateIsEnabled = isEnabled(date, true), dayElement = createElement("span", "flatpickr-day " + className, date.getDate().toString());
+        function createDay(className, date, _dayNumber, i) {
+            var dateIsEnabled = isEnabled(date, true), dayElement = createElement("span", className, date.getDate().toString());
             dayElement.dateObj = date;
             dayElement.$i = i;
             dayElement.setAttribute("aria-label", self.formatDate(date, self.config.ariaDateFormat));
@@ -1044,7 +1079,7 @@
             if (self.weekNumbers &&
                 self.config.showMonths === 1 &&
                 className !== "prevMonthDay" &&
-                dayNumber % 7 === 1) {
+                i % 7 === 6) {
                 self.weekNumbers.insertAdjacentHTML("beforeend", "<span class='flatpickr-day'>" + self.config.getWeek(date) + "</span>");
             }
             triggerEvent("onDayCreate", dayElement);
@@ -1097,11 +1132,12 @@
             return undefined;
         }
         function focusOnDay(current, offset) {
-            var dayFocused = isInView(document.activeElement || document.body);
+            var activeElement = getClosestActiveElement();
+            var dayFocused = isInView(activeElement || document.body);
             var startElem = current !== undefined
                 ? current
                 : dayFocused
-                    ? document.activeElement
+                    ? activeElement
                     : self.selectedDateElem !== undefined && isInView(self.selectedDateElem)
                         ? self.selectedDateElem
                         : self.todayDateElem !== undefined && isInView(self.todayDateElem)
@@ -1124,16 +1160,16 @@
             var dayNumber = prevMonthDays + 1 - firstOfMonth, dayIndex = 0;
             // prepend days from the ending of previous month
             for (; dayNumber <= prevMonthDays; dayNumber++, dayIndex++) {
-                days.appendChild(createDay(prevMonthDayClass, new Date(year, month - 1, dayNumber), dayNumber, dayIndex));
+                days.appendChild(createDay("flatpickr-day " + prevMonthDayClass, new Date(year, month - 1, dayNumber), dayNumber, dayIndex));
             }
             // Start at 1 since there is no 0th day
             for (dayNumber = 1; dayNumber <= daysInMonth; dayNumber++, dayIndex++) {
-                days.appendChild(createDay("", new Date(year, month, dayNumber), dayNumber, dayIndex));
+                days.appendChild(createDay("flatpickr-day", new Date(year, month, dayNumber), dayNumber, dayIndex));
             }
             // append days from the next month
             for (var dayNum = daysInMonth + 1; dayNum <= 42 - firstOfMonth &&
-                (self.config.showMonths === 1 || dayIndex % 7 !== 0); dayNum++, dayIndex++) {
-                days.appendChild(createDay(nextMonthDayClass, new Date(year, month + 1, dayNum % daysInMonth), dayNum, dayIndex));
+            (self.config.showMonths === 1 || dayIndex % 7 !== 0); dayNum++, dayIndex++) {
+                days.appendChild(createDay("flatpickr-day " + nextMonthDayClass, new Date(year, month + 1, dayNum % daysInMonth), dayNum, dayIndex));
             }
             //updateNavigationCurrentMonth();
             var dayContainer = createElement("div", "dayContainer");
@@ -1219,7 +1255,7 @@
                 yearElement.setAttribute("max", self.config.maxDate.getFullYear().toString());
                 yearElement.disabled =
                     !!self.config.minDate &&
-                        self.config.minDate.getFullYear() === self.config.maxDate.getFullYear();
+                    self.config.minDate.getFullYear() === self.config.maxDate.getFullYear();
             }
             var currentMonth = createElement("div", "flatpickr-current-month");
             currentMonth.appendChild(monthElement);
@@ -1504,8 +1540,6 @@
             });
         }
         function isCalendarElem(elem) {
-            if (self.config.appendTo && self.config.appendTo.contains(elem))
-                return true;
             return self.calendarContainer.contains(elem);
         }
         function documentClick(e) {
@@ -1521,17 +1555,18 @@
                         e.path.indexOf &&
                         (~e.path.indexOf(self.input) ||
                             ~e.path.indexOf(self.altInput)));
-                var lostFocus = e.type === "blur"
-                    ? isInput &&
-                        e.relatedTarget &&
-                        !isCalendarElem(e.relatedTarget)
-                    : !isInput &&
-                        !isCalendarElement &&
-                        !isCalendarElem(e.relatedTarget);
+                var lostFocus = !isInput &&
+                    !isCalendarElement &&
+                    !isCalendarElem(e.relatedTarget);
                 var isIgnored = !self.config.ignoredFocusElements.some(function (elem) {
                     return elem.contains(eventTarget_1);
                 });
                 if (lostFocus && isIgnored) {
+                    if (self.config.allowInput) {
+                        self.setDate(self._input.value, false, self.config.altInput
+                            ? self.config.altFormat
+                            : self.config.dateFormat);
+                    }
                     if (self.timeContainer !== undefined &&
                         self.minuteElement !== undefined &&
                         self.hourElement !== undefined &&
@@ -1542,10 +1577,8 @@
                     self.close();
                     if (self.config &&
                         self.config.mode === "range" &&
-                        self.selectedDates.length === 1) {
+                        self.selectedDates.length === 1)
                         self.clear(false);
-                        self.redraw();
-                    }
                 }
             }
         }
@@ -1575,8 +1608,8 @@
             if (timeless === void 0) { timeless = true; }
             var dateToCheck = self.parseDate(date, undefined, timeless); // timeless
             if ((self.config.minDate &&
-                dateToCheck &&
-                compareDates(dateToCheck, self.config.minDate, timeless !== undefined ? timeless : !self.minDateHasTime) < 0) ||
+                    dateToCheck &&
+                    compareDates(dateToCheck, self.config.minDate, timeless !== undefined ? timeless : !self.minDateHasTime) < 0) ||
                 (self.config.maxDate &&
                     dateToCheck &&
                     compareDates(dateToCheck, self.config.maxDate, timeless !== undefined ? timeless : !self.maxDateHasTime) > 0))
@@ -1605,8 +1638,8 @@
                         : !bool;
                 }
                 else if (
-                // disabled by range
-                typeof d === "object" &&
+                    // disabled by range
+                    typeof d === "object" &&
                     dateToCheck !== undefined &&
                     d.from &&
                     d.to &&
@@ -1625,8 +1658,9 @@
         }
         function onBlur(e) {
             var isInput = e.target === self._input;
+            var valueChanged = self._input.value.trimEnd() !== getDateStr();
             if (isInput &&
-                (self.selectedDates.length > 0 || self._input.value.length > 0) &&
+                valueChanged &&
                 !(e.relatedTarget && isCalendarElem(e.relatedTarget))) {
                 self.setDate(self._input.value, true, e.target === self.altInput
                     ? self.config.altFormat
@@ -1656,6 +1690,7 @@
                     self.setDate(self._input.value, true, eventTarget === self.altInput
                         ? self.config.altFormat
                         : self.config.dateFormat);
+                    self.close();
                     return eventTarget.blur();
                 }
                 else {
@@ -1692,9 +1727,10 @@
                     case 39:
                         if (!isTimeObj && !isInput) {
                             e.preventDefault();
+                            var activeElement = getClosestActiveElement();
                             if (self.daysContainer !== undefined &&
                                 (allowInput === false ||
-                                    (document.activeElement && isInView(document.activeElement)))) {
+                                    (activeElement && isInView(activeElement)))) {
                                 var delta_1 = e.keyCode === 39 ? 1 : -1;
                                 if (!e.ctrlKey)
                                     focusOnDay(undefined, delta_1);
@@ -1713,7 +1749,7 @@
                         e.preventDefault();
                         var delta = e.keyCode === 40 ? 1 : -1;
                         if ((self.daysContainer &&
-                            eventTarget.$i !== undefined) ||
+                                eventTarget.$i !== undefined) ||
                             eventTarget === self.input ||
                             eventTarget === self.altInput) {
                             if (e.ctrlKey) {
@@ -1781,10 +1817,11 @@
                 triggerEvent("onKeyDown", e);
             }
         }
-        function onMouseOver(elem) {
+        function onMouseOver(elem, cellClass) {
+            if (cellClass === void 0) { cellClass = "flatpickr-day"; }
             if (self.selectedDates.length !== 1 ||
                 (elem &&
-                    (!elem.classList.contains("flatpickr-day") ||
+                    (!elem.classList.contains(cellClass) ||
                         elem.classList.contains("flatpickr-disabled"))))
                 return;
             var hoverDate = elem
@@ -1802,43 +1839,38 @@
                         maxRange = t;
                 }
             }
-            for (var m = 0; m < self.config.showMonths; m++) {
-                var month = self.daysContainer.children[m];
-                var _loop_1 = function (i, l) {
-                    var dayElem = month.children[i], date = dayElem.dateObj;
-                    var timestamp = date.getTime();
-                    var outOfRange = (minRange > 0 && timestamp < minRange) ||
-                        (maxRange > 0 && timestamp > maxRange);
-                    if (outOfRange) {
-                        dayElem.classList.add("notAllowed");
-                        ["inRange", "startRange", "endRange"].forEach(function (c) {
-                            dayElem.classList.remove(c);
-                        });
-                        return "continue";
-                    }
-                    else if (containsDisabled && !outOfRange)
-                        return "continue";
-                    ["startRange", "inRange", "endRange", "notAllowed"].forEach(function (c) {
+            var hoverableCells = Array.from(self.rContainer.querySelectorAll("*:nth-child(-n+" + self.config.showMonths + ") > ." + cellClass));
+            hoverableCells.forEach(function (dayElem) {
+                var date = dayElem.dateObj;
+                var timestamp = date.getTime();
+                var outOfRange = (minRange > 0 && timestamp < minRange) ||
+                    (maxRange > 0 && timestamp > maxRange);
+                if (outOfRange) {
+                    dayElem.classList.add("notAllowed");
+                    ["inRange", "startRange", "endRange"].forEach(function (c) {
                         dayElem.classList.remove(c);
                     });
-                    if (elem !== undefined) {
-                        elem.classList.add(hoverDate <= self.selectedDates[0].getTime()
-                            ? "startRange"
-                            : "endRange");
-                        if (initialDate < hoverDate && timestamp === initialDate)
-                            dayElem.classList.add("startRange");
-                        else if (initialDate > hoverDate && timestamp === initialDate)
-                            dayElem.classList.add("endRange");
-                        if (timestamp >= minRange &&
-                            (maxRange === 0 || timestamp <= maxRange) &&
-                            isBetween(timestamp, initialDate, hoverDate))
-                            dayElem.classList.add("inRange");
-                    }
-                };
-                for (var i = 0, l = month.children.length; i < l; i++) {
-                    _loop_1(i, l);
+                    return;
                 }
-            }
+                else if (containsDisabled && !outOfRange)
+                    return;
+                ["startRange", "inRange", "endRange", "notAllowed"].forEach(function (c) {
+                    dayElem.classList.remove(c);
+                });
+                if (elem !== undefined) {
+                    elem.classList.add(hoverDate <= self.selectedDates[0].getTime()
+                        ? "startRange"
+                        : "endRange");
+                    if (initialDate < hoverDate && timestamp === initialDate)
+                        dayElem.classList.add("startRange");
+                    else if (initialDate > hoverDate && timestamp === initialDate)
+                        dayElem.classList.add("endRange");
+                    if (timestamp >= minRange &&
+                        (maxRange === 0 || timestamp <= maxRange) &&
+                        isBetween(timestamp, initialDate, hoverDate))
+                        dayElem.classList.add("inRange");
+                }
+            });
         }
         function onResize() {
             if (self.isOpen && !self.config.static && !self.config.inline)
@@ -1887,8 +1919,8 @@
                 if (dateObj !== undefined) {
                     self[type === "min" ? "minDateHasTime" : "maxDateHasTime"] =
                         dateObj.getHours() > 0 ||
-                            dateObj.getMinutes() > 0 ||
-                            dateObj.getSeconds() > 0;
+                        dateObj.getMinutes() > 0 ||
+                        dateObj.getSeconds() > 0;
                 }
                 if (self.selectedDates) {
                     self.selectedDates = self.selectedDates.filter(function (d) { return isEnabled(d); });
@@ -1904,8 +1936,8 @@
                         self.currentYearElement.removeAttribute(type);
                     self.currentYearElement.disabled =
                         !!inverseDateObj &&
-                            dateObj !== undefined &&
-                            inverseDateObj.getFullYear() === dateObj.getFullYear();
+                        dateObj !== undefined &&
+                        inverseDateObj.getFullYear() === dateObj.getFullYear();
                 }
             };
         }
@@ -1987,18 +2019,18 @@
                 // https://github.com/microsoft/TypeScript/issues/31663
                 self.config[boolOpts[i]] =
                     self.config[boolOpts[i]] === true ||
-                        self.config[boolOpts[i]] === "true";
+                    self.config[boolOpts[i]] === "true";
             HOOKS.filter(function (hook) { return self.config[hook] !== undefined; }).forEach(function (hook) {
                 self.config[hook] = arrayify(self.config[hook] || []).map(bindToInstance);
             });
             self.isMobile =
                 !self.config.disableMobile &&
-                    !self.config.inline &&
-                    self.config.mode === "single" &&
-                    !self.config.disable.length &&
-                    !self.config.enable &&
-                    !self.config.weekNumbers &&
-                    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                !self.config.inline &&
+                self.config.mode === "single" &&
+                !self.config.disable.length &&
+                !self.config.enable &&
+                !self.config.weekNumbers &&
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             for (var i = 0; i < self.config.plugins.length; i++) {
                 var pluginConf = self.config.plugins[i](self) || {};
                 for (var key in pluginConf) {
@@ -2031,6 +2063,10 @@
                 : self.config.locale !== "default"
                     ? flatpickr.l10ns[self.config.locale]
                     : undefined));
+            tokenRegex.D = "(" + self.l10n.weekdays.shorthand.join("|") + ")";
+            tokenRegex.l = "(" + self.l10n.weekdays.longhand.join("|") + ")";
+            tokenRegex.M = "(" + self.l10n.months.shorthand.join("|") + ")";
+            tokenRegex.F = "(" + self.l10n.months.longhand.join("|") + ")";
             tokenRegex.K = "(" + self.l10n.amPM[0] + "|" + self.l10n.amPM[1] + "|" + self.l10n.amPM[0].toLowerCase() + "|" + self.l10n.amPM[1].toLowerCase() + ")";
             var userConfig = __assign(__assign({}, instanceConfig), JSON.parse(JSON.stringify(element.dataset || {})));
             if (userConfig.time_24hr === undefined &&
@@ -2111,6 +2147,8 @@
             var editableSheet = null;
             for (var i = 0; i < document.styleSheets.length; i++) {
                 var sheet = document.styleSheets[i];
+                if (!sheet.cssRules)
+                    continue;
                 try {
                     sheet.cssRules;
                 }
@@ -2160,7 +2198,7 @@
             var target = t;
             var selectedDate = (self.latestSelectedDateObj = new Date(target.dateObj.getTime()));
             var shouldChangeMonth = (selectedDate.getMonth() < self.currentMonth ||
-                selectedDate.getMonth() >
+                    selectedDate.getMonth() >
                     self.currentMonth + self.config.showMonths - 1) &&
                 self.config.mode !== "range";
             self.selectedDateElem = target;
@@ -2224,6 +2262,7 @@
             showMonths: [buildMonths, setCalendarWidth, buildWeekdays],
             minDate: [jumpToDate],
             maxDate: [jumpToDate],
+            positionElement: [updatePositionElement],
             clickOpens: [
                 function () {
                     if (self.config.clickOpens === true) {
@@ -2309,21 +2348,21 @@
             return arr
                 .slice()
                 .map(function (rule) {
-                if (typeof rule === "string" ||
-                    typeof rule === "number" ||
-                    rule instanceof Date) {
-                    return self.parseDate(rule, undefined, true);
-                }
-                else if (rule &&
-                    typeof rule === "object" &&
-                    rule.from &&
-                    rule.to)
-                    return {
-                        from: self.parseDate(rule.from, undefined),
-                        to: self.parseDate(rule.to, undefined),
-                    };
-                return rule;
-            })
+                    if (typeof rule === "string" ||
+                        typeof rule === "number" ||
+                        rule instanceof Date) {
+                        return self.parseDate(rule, undefined, true);
+                    }
+                    else if (rule &&
+                        typeof rule === "object" &&
+                        rule.from &&
+                        rule.to)
+                        return {
+                            from: self.parseDate(rule.from, undefined),
+                            to: self.parseDate(rule.to, undefined),
+                        };
+                    return rule;
+                })
                 .filter(function (x) { return x; }); // remove falsy values
         }
         function setupDates() {
@@ -2333,8 +2372,8 @@
             var preloadedDate = self.config.defaultDate ||
                 ((self.input.nodeName === "INPUT" ||
                     self.input.nodeName === "TEXTAREA") &&
-                    self.input.placeholder &&
-                    self.input.value === self.input.placeholder
+                self.input.placeholder &&
+                self.input.value === self.input.placeholder
                     ? null
                     : self.input.value);
             if (preloadedDate)
@@ -2343,10 +2382,10 @@
                 self.selectedDates.length > 0
                     ? self.selectedDates[0]
                     : self.config.minDate &&
-                        self.config.minDate.getTime() > self.now.getTime()
+                    self.config.minDate.getTime() > self.now.getTime()
                         ? self.config.minDate
                         : self.config.maxDate &&
-                            self.config.maxDate.getTime() < self.now.getTime()
+                        self.config.maxDate.getTime() < self.now.getTime()
                             ? self.config.maxDate
                             : self.now;
             self.currentYear = self._initialDate.getFullYear();
@@ -2359,14 +2398,14 @@
                 self.config.maxTime = self.parseDate(self.config.maxTime, "H:i");
             self.minDateHasTime =
                 !!self.config.minDate &&
-                    (self.config.minDate.getHours() > 0 ||
-                        self.config.minDate.getMinutes() > 0 ||
-                        self.config.minDate.getSeconds() > 0);
+                (self.config.minDate.getHours() > 0 ||
+                    self.config.minDate.getMinutes() > 0 ||
+                    self.config.minDate.getSeconds() > 0);
             self.maxDateHasTime =
                 !!self.config.maxDate &&
-                    (self.config.maxDate.getHours() > 0 ||
-                        self.config.maxDate.getMinutes() > 0 ||
-                        self.config.maxDate.getSeconds() > 0);
+                (self.config.maxDate.getHours() > 0 ||
+                    self.config.maxDate.getMinutes() > 0 ||
+                    self.config.maxDate.getSeconds() > 0);
         }
         function setupInputs() {
             self.input = getInputElem();
@@ -2395,6 +2434,9 @@
             }
             if (!self.config.allowInput)
                 self._input.setAttribute("readonly", "readonly");
+            updatePositionElement();
+        }
+        function updatePositionElement() {
             self._positionElement = self.config.positionElement || self._input;
         }
         function setupMobile() {
@@ -2465,7 +2507,9 @@
         }
         function isDateSelected(date) {
             for (var i = 0; i < self.selectedDates.length; i++) {
-                if (compareDates(self.selectedDates[i], date) === 0)
+                var selectedDate = self.selectedDates[i];
+                if (selectedDate instanceof Date &&
+                    compareDates(selectedDate, date) === 0)
                     return "" + i;
             }
             return false;
@@ -2494,26 +2538,28 @@
             });
             self._hidePrevMonthArrow =
                 self.config.minDate !== undefined &&
-                    (self.currentYear === self.config.minDate.getFullYear()
-                        ? self.currentMonth <= self.config.minDate.getMonth()
-                        : self.currentYear < self.config.minDate.getFullYear());
+                (self.currentYear === self.config.minDate.getFullYear()
+                    ? self.currentMonth <= self.config.minDate.getMonth()
+                    : self.currentYear < self.config.minDate.getFullYear());
             self._hideNextMonthArrow =
                 self.config.maxDate !== undefined &&
-                    (self.currentYear === self.config.maxDate.getFullYear()
-                        ? self.currentMonth + 1 > self.config.maxDate.getMonth()
-                        : self.currentYear > self.config.maxDate.getFullYear());
+                (self.currentYear === self.config.maxDate.getFullYear()
+                    ? self.currentMonth + 1 > self.config.maxDate.getMonth()
+                    : self.currentYear > self.config.maxDate.getFullYear());
         }
-        function getDateStr(format) {
+        function getDateStr(specificFormat) {
+            var format = specificFormat ||
+                (self.config.altInput ? self.config.altFormat : self.config.dateFormat);
             return self.selectedDates
                 .map(function (dObj) { return self.formatDate(dObj, format); })
                 .filter(function (d, i, arr) {
-                return self.config.mode !== "range" ||
-                    self.config.enableTime ||
-                    arr.indexOf(d) === i;
-            })
+                    return self.config.mode !== "range" ||
+                        self.config.enableTime ||
+                        arr.indexOf(d) === i;
+                })
                 .join(self.config.mode !== "range"
-                ? self.config.conjunction
-                : self.l10n.rangeSeparator);
+                    ? self.config.conjunction
+                    : self.l10n.rangeSeparator);
         }
         /**
          * Updates the values of inputs associated with the calendar
@@ -2565,9 +2611,9 @@
                 if (newValue < min) {
                     newValue =
                         max +
-                            newValue +
-                            int(!isHourElem) +
-                            (int(isHourElem) && int(!self.amPM));
+                        newValue +
+                        int(!isHourElem) +
+                        (int(isHourElem) && int(!self.amPM));
                     if (isMinuteElem)
                         incrementNumInput(undefined, -1, self.hourElement);
                 }
