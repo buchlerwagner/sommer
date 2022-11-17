@@ -182,13 +182,13 @@ class ordersTable extends table {
                         break;
 
                     case 'cart_ordered_min':
-                        $where[$field] = substr($field, 0, -4) . " >= '" . standardDate($values) . "'";
+                        $where[$field] = substr($field, 0, -4) . " >= '" . standardDate($values) . " 00:00:00'";
                         $this->settings['orderfield'] = 'cart_ordered';
                         $this->settings['orderdir']   = 'ASC';
                         break;
 
                     case 'cart_ordered_max':
-                        $where[$field] = substr($field, 0, -4) . " <= '" . standardDate($values) . "'";
+                        $where[$field] = substr($field, 0, -4) . " <= '" . standardDate($values) . " 23:59:59'";
                         $this->settings['orderfield'] = 'cart_ordered';
                         $this->settings['orderdir']   = 'ASC';
                         break;

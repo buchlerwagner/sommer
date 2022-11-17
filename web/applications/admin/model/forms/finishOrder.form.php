@@ -24,7 +24,6 @@ class finishOrderForm extends formBuilder {
         $this->title = 'LBL_CLOSE_ORDER';
         $this->reloadPage = true;
 
-        $this->addExtraField('us_email2', false);
         $this->addExtraField('us_role', false);
 
         $defaultInvoiceOption = 0;
@@ -74,7 +73,12 @@ class finishOrderForm extends formBuilder {
                 (new inputText('us_firstname', 'LBL_FIRSTNAME'))
                     ->setColSize('col-6')
             ),
-            (new inputText('us_email', 'LBL_EMAIL')),
+            (new inputText('us_email2', 'LBL_EMAIL')),
+
+            (new inputSwitch('sendEmail', 'LBL_SEND_ORDER_CONFIRMATION_EMAIL'))
+                ->notDBField()
+                ->setColor(enumColors::Primary()),
+
             (new inputText('us_phone', 'LBL_PHONE'))
         );
 
@@ -83,7 +87,9 @@ class finishOrderForm extends formBuilder {
             $general
         );
 
-        if($this->orderType === ORDER_TYPE_ORDER) {
+        $shippingMode = $this->order->getSelectedShippingMode();
+
+        if($this->orderType === ORDER_TYPE_ORDER && $shippingMode['type'] == 2) {
             $shippingAddress = (new groupFieldset('address-data', 'LBL_SHIPPING_ADDRESS', 'invoice-data'))
                 ->addTools('LBL_SAME_AS_INVOICE_ADDRESS', 'copy-invoice-address', 'fal fa-copy')
                 ->addElements(
@@ -128,7 +134,7 @@ class finishOrderForm extends formBuilder {
                         ->setColSize('col-12')
                 )
         );
-        if($this->orderType === ORDER_TYPE_ORDER) {
+        if($this->orderType === ORDER_TYPE_ORDER && $shippingMode['type'] == 2) {
             $invoiceAddress->addTools('LBL_SAME_AS_SHIPPING_ADDRESS', 'copy-shipping-address', 'fal fa-copy');
         }
 
@@ -148,10 +154,6 @@ class finishOrderForm extends formBuilder {
     }
 
     public function onAfterInit() {
-        if($this->values['us_role'] == USER_ROLE_NONE){
-            $this->values['us_email'] = $this->values['us_email2'];
-        }
-
         if(Empty($_POST)) {
             $this->values['invoiceType'] = $this->order->invoiceType;
             $this->values['remarks'] = $this->order->remarks;
@@ -167,14 +169,11 @@ class finishOrderForm extends formBuilder {
             $this->userRole = $this->getUserRole($this->keyFields['us_id']);
             if ($this->userRole === USER_ROLE_USER) {
                 $res = $this->owner->db->getFirstRow(
-                    "SELECT us_id FROM users WHERE us_shop_id = " . $this->owner->shopId . " AND us_id != " . $this->keyFields['us_id'] . " AND us_email LIKE \"" . $this->owner->db->escapeString($this->values['us_email']) . "\""
+                    "SELECT us_id FROM users WHERE us_shop_id = " . $this->owner->shopId . " AND us_id != " . $this->keyFields['us_id'] . " AND us_email LIKE \"" . $this->owner->db->escapeString($this->values['us_emails']) . "\""
                 );
                 if (!empty($res)) {
-                    $this->addError('ERR_10009', self::FORM_ERROR, ['us_email']);
+                    $this->addError('ERR_10009', self::FORM_ERROR, ['us_email2']);
                 }
-
-            } else {
-                $this->values['us_email2'] = $this->values['us_email'];
             }
         }
 
@@ -185,37 +184,51 @@ class finishOrderForm extends formBuilder {
             if (empty($this->values['us_firstname'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_firstname']);
             }
-            if (empty($this->values['us_email'])) {
-                $this->addError('ERR_1000', self::FORM_ERROR, ['us_email']);
-            } else {
-                if (!checkEmail($this->values['us_email'])) {
-                    $this->addError('ERR_1001', self::FORM_ERROR, ['us_email']);
+
+            if($this->values['sendEmail']) {
+                if (empty($this->values['us_email2'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['us_email2']);
+                } else {
+                    if (!checkEmail($this->values['us_email2'])) {
+                        $this->addError('ERR_1001', self::FORM_ERROR, ['us_email2']);
+                    }
                 }
             }
+
             if (empty($this->values['us_phone'])) {
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_phone']);
             }
-            if (empty($this->values['us_invoice_name'])) {
-                $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_name']);
-            }
-            if (empty($this->values['us_invoice_zip'])) {
-                $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_zip']);
-            }
-            if (empty($this->values['us_invoice_city'])) {
-                $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_city']);
-            }
-            if (empty($this->values['us_invoice_address'])) {
-                $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_address']);
-            }
-            if ($this->values['invoiceType'] == 2) {
-                if(Empty($this->values['us_vat'])) {
+
+            if($this->values['invoiceType'] == 2) {
+                if (empty($this->values['us_email2'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['us_email2']);
+                } else {
+                    if (!checkEmail($this->values['us_email2'])) {
+                        $this->addError('ERR_1001', self::FORM_ERROR, ['us_email2']);
+                    }
+                }
+
+                if (empty($this->values['us_invoice_name'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_name']);
+                }
+                if (empty($this->values['us_invoice_zip'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_zip']);
+                }
+                if (empty($this->values['us_invoice_city'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_city']);
+                }
+                if (empty($this->values['us_invoice_address'])) {
+                    $this->addError('ERR_1000', self::FORM_ERROR, ['us_invoice_address']);
+                }
+
+                if (empty($this->values['us_vat'])) {
                     $this->addError('ERR_1000', self::FORM_ERROR, ['us_vat']);
-                }else {
+                } else {
                     /**
                      * @var $invoice Invoices
                      */
                     $invoice = $this->owner->addByClassName('Invoices');
-                    if($invoice->hasInvoiceProvider()) {
+                    if ($invoice->hasInvoiceProvider()) {
                         try {
                             $buyer = $invoice->init()->getTaxPayer($this->values['us_vat']);
                             if (!$buyer->isValid()) {
@@ -229,7 +242,9 @@ class finishOrderForm extends formBuilder {
             }
         }
 
-        if($this->orderType === ORDER_TYPE_ORDER) {
+        $shippingMode = $this->order->getSelectedShippingMode();
+
+        if($this->orderType === ORDER_TYPE_ORDER && $shippingMode['type'] == 2) {
             if(Empty($this->values['us_zip'])){
                 $this->addError('ERR_1000', self::FORM_ERROR, ['us_zip']);
             }
@@ -243,6 +258,8 @@ class finishOrderForm extends formBuilder {
     }
 
     public function onBeforeSave() {
+        if(!$this->values['sendEmail']) $this->values['sendEmail'] = 0;
+
         $this->values['us_shop_id'] = $this->owner->shopId;
         if(!Empty($this->values['user']['id'])){
             $this->keyFields['us_id'] = (int) $this->values['user']['id'];
@@ -255,7 +272,6 @@ class finishOrderForm extends formBuilder {
         }elseif(!$this->keyFields['us_id']){
             $this->values['us_group'] = USER_GROUP_CUSTOMERS;
             $this->values['us_role'] = USER_ROLE_NONE;
-            $this->values['us_email2'] = $this->values['us_email'];
             $this->values['us_email'] = uuid::v4();
             $this->values['us_hash'] = uuid::v4();
             $this->values['us_registered'] = 'NOW()';
@@ -276,7 +292,7 @@ class finishOrderForm extends formBuilder {
         }
 
         if($this->close){
-            $this->order->makeOrder($userId, $this->values['invoiceType'], $this->values['remarks']);
+            $this->order->makeOrder($userId, $this->values['invoiceType'], $this->values['remarks'], $this->values['sendEmail']);
         }else {
             $this->order->setCustomer($userId, $this->values['invoiceType'], $this->values['remarks']);
         }

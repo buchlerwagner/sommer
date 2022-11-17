@@ -15,10 +15,12 @@ class issueInvoiceForm extends formBuilder {
         $this->reloadPage = true;
         $this->cart = $this->owner->cartHandler->init($this->keyFields['cart_id'], false)->getCart();
 
-        $today = $dueDate = date('Y-m-d');
+        $today = $dueDate = $fulfillmentDate = date('Y-m-d');
         $paymentMode = $this->cart->getPaymentMode();
         if($paymentMode['type'] == PAYMENT_TYPE_MONEY_TRANSFER){
             $dueDate = dateAddDays($today, 8);
+        }elseif($paymentMode['type'] == PAYMENT_TYPE_CARD){
+            $fulfillmentDate = $dueDate = $this->cart->getOrderDate();
         }
 
         $this->addControls(
@@ -29,7 +31,7 @@ class issueInvoiceForm extends formBuilder {
                     ->setColSize('col-12 col-lg-4')
                     ->setRequired(),
 
-                (new inputDate('invFulfillmentDate', 'LBL_FULFILLMENT_DATE', $today))
+                (new inputDate('invFulfillmentDate', 'LBL_FULFILLMENT_DATE', $fulfillmentDate))
                     ->setIcon('fas fa-calendar')
                     ->setColSize('col-12 col-lg-4')
                     ->setRequired(),
@@ -44,10 +46,10 @@ class issueInvoiceForm extends formBuilder {
                 ->setOptions($this->owner->lists->getPaymentModes())
                 ->setRequired(),
 
-            (new inputSwitch('setPaid', 'LBL_SET_PAID'))
+            (new inputSwitch('setPaid', 'LBL_SET_PAID', true))
                 ->setColor(enumColors::Primary()),
 
-            (new inputSwitch('sendEmail', 'LBL_SEND_EMAIL'))
+            (new inputSwitch('sendEmail', 'LBL_SEND_EMAIL', true))
                 ->setColor(enumColors::Primary())
         );
 

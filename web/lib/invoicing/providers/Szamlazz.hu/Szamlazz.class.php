@@ -214,41 +214,44 @@ class Szamlazz extends InvoiceProvider {
     {
         $buyer = new InvoiceBuyer();
 
-        preg_match('/<ns2:taxpayerValidity>(.*?)<\/ns2:taxpayerValidity>/is', $xml, $m);
+        $xml = str_replace('ns2:', '', $xml);
+        $xml = str_replace('ns3:', '', $xml);
+
+        preg_match('/<taxpayerValidity>(.*?)<\/taxpayerValidity>/is', $xml, $m);
         $buyer->setValid( (mb_convert_case($m[1], MB_CASE_LOWER) === 'true') );
 
-        //preg_match('/<ns2:incorporation>.*?<\/ns2:incorporation>/is', $xml, $m);
+        //preg_match('/<incorporation>.*?<incorporation>/is', $xml, $m);
 
-        //preg_match('/<ns2:taxpayerName>(.*?)<\/ns2:taxpayerName>/is', $xml, $m);
+        //preg_match('/<taxpayerName>(.*?)<taxpayerName>/is', $xml, $m);
         //$buyer->setName(htmlspecialchars_decode($m[1]));
 
-        preg_match('/<ns2:taxpayerShortName>(.*?)<\/ns2:taxpayerShortName>/is', $xml, $m);
+        preg_match('/<taxpayerShortName>(.*?)<\/taxpayerShortName>/is', $xml, $m);
         $buyer->setName(htmlspecialchars_decode($m[1]));
 
-        preg_match('/<ns3:countryCode>(.*?)<\/ns3:countryCode>/is', $xml, $m);
+        preg_match('/<countryCode>(.*?)<\/countryCode>/is', $xml, $m);
         $buyer->setCountry($m[1]);
 
-        preg_match('/<ns3:postalCode>(.*?)<\/ns3:postalCode>/is', $xml, $m);
+        preg_match('/<postalCode>(.*?)<\/postalCode>/is', $xml, $m);
         $buyer->setZipCode($m[1]);
 
-        preg_match('/<ns3:city>(.*?)<\/ns3:city>/is', $xml, $m);
+        preg_match('/<city>(.*?)<\/city>/is', $xml, $m);
         $buyer->setCity(mb_convert_case($m[1], MB_CASE_TITLE));
 
-        preg_match('/<ns3:streetName>(.*?)<\/ns3:streetName>/is', $xml, $m);
+        preg_match('/<streetName>(.*?)<\/streetName>/is', $xml, $m);
         $address = mb_convert_case($m[1], MB_CASE_TITLE);
 
-        preg_match('/<ns3:publicPlaceCategory>(.*?)<\/ns3:publicPlaceCategory>/is', $xml, $m);
+        preg_match('/<publicPlaceCategory>(.*?)<\/publicPlaceCategory>/is', $xml, $m);
         $address .= ' ' . mb_convert_case($m[1], MB_CASE_LOWER);
 
-        preg_match('/<ns3:number>(.*?)<\/ns3:number>/is', $xml, $m);
+        preg_match('/<number>(.*?)<\/number>/is', $xml, $m);
         $address .= ' ' . $m[1];
         $buyer->setAddress(trim($address));
 
-        preg_match('/<ns3:taxpayerId>(.*?)<\/ns3:taxpayerId>/is', $xml, $m);
+        preg_match('/<taxpayerId>(.*?)<\/taxpayerId>/is', $xml, $m);
         $vat = $m[1];
-        preg_match('/<ns3:vatCode>(.*?)<\/ns3:vatCode>/is', $xml, $m);
+        preg_match('/<vatCode>(.*?)<\/vatCode>/is', $xml, $m);
         $vat .= '-' . $m[1];
-        preg_match('/<ns3:countyCode>(.*?)<\/ns3:countyCode>/is', $xml, $m);
+        preg_match('/<countyCode>(.*?)<\/countyCode>/is', $xml, $m);
         $vat .= '-' . $m[1];
         $buyer->setVatNumber($vat);
 

@@ -137,14 +137,13 @@ class CartItem {
     {
         if($priceBase == Cart::PRICE_BASE_GROSS){
             $this->totalGrossPrice = $this->unitPrice * $this->quantity;
-            $this->totalNetPrice = round($this->totalGrossPrice / (1 + $this->vat));
-
+            $this->unitPrice = round($this->unitPrice / (1 + $this->vat), 1);
+            $this->totalNetPrice = $this->unitPrice * $this->quantity;
             $this->vatAmount = $this->totalGrossPrice - $this->totalNetPrice;
 
-            $this->unitPrice = round($this->unitPrice / (1 + $this->vat));
         }else{
             $this->totalNetPrice = $this->unitPrice * $this->quantity;
-            $this->vatAmount = round($this->totalNetPrice * $this->vat);
+            $this->vatAmount = round($this->vat * $this->quantity);
 
             $this->totalGrossPrice = $this->totalNetPrice + $this->vatAmount;
         }

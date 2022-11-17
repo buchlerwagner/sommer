@@ -422,7 +422,7 @@ class CartHandler extends ancestor {
         return $out;
     }
 
-	public function makeOrder($userId, $invoiceType = -1, $remarks = ''){
+	public function makeOrder($userId, $invoiceType = -1, $remarks = '', $sendConfirmationEmail = true){
         switch($this->orderType){
             case ORDER_TYPE_LOCAL:
             case ORDER_TYPE_TAKEAWAY:
@@ -475,7 +475,7 @@ class CartHandler extends ancestor {
             }
         }
 
-        if($this->orderType == ORDER_TYPE_ORDER) {
+        if($this->orderType == ORDER_TYPE_ORDER && $sendConfirmationEmail) {
             $this->sendConfirmationEmail();
         }
 
@@ -798,6 +798,10 @@ class CartHandler extends ancestor {
                             $this->paymentNoCash = true;
                         }
 
+                        preg_match_all('!\d+!', $variant['price']['unit'], $matches);
+                        $unit = ($matches[0][0] ?? 1);
+                        $displayPrice = $row['citem_price'] * $unit;
+
                         $this->items[$row['citem_id']] = [
                             'id' => $row['citem_id'],
                             'cartId' => $row['citem_cart_id'],
@@ -815,8 +819,10 @@ class CartHandler extends ancestor {
                                 'value' => $row['citem_price'],
                                 'currency' => $row['citem_currency'],
                                 'discount' => $row['citem_discount'],
-                                'displayPrice' => $variant['price']['displayPrice'],
-                                'unitPrice' => $variant['price']['unitPrice'],
+                                //'displayPrice' => $variant['price']['displayPrice'],
+                                //'unitPrice' => $variant['price']['unitPrice'],
+                                'displayPrice' => $displayPrice,
+                                'unitPrice' => $row['citem_price'],
                                 'unit' => $variant['price']['unit'],
                                 'isWeightUnit' => $variant['price']['isWeightUnit'],
                                 'total' => ($price * $row['citem_quantity']),
@@ -1107,8 +1113,10 @@ class CartHandler extends ancestor {
 	}
 
     private function generateOrderNumber(){
+        $date = strtotime($this->shippingDate ?? date('Y-m-d'));
+
         $out  = ($this->owner->storeId ?: 'X') . '-';
-        $out .= date('Ymd') . '-';
+        $out .= date('Ymd', $date) . '-';
         $out .= $this->getSelectedShippingMode()['code'] . '-';
         $out .= str_pad($this->getTodaySumOrders() + 1, 4, '0', STR_PAD_LEFT);
 

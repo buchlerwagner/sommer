@@ -47,6 +47,15 @@
 
                 {% if cartId != r.cartId %}
                     {% set cartId = r.cartId %}
+
+                    {% if not loop.first %}
+                    <tr>
+                        <td colspan="2">
+                            <hr>
+                        </td>
+                    </tr>
+                    {% endif %}
+
                     <tr style="background-color: #EDECEC;">
                         <td colspan="2" style="border-bottom:1px solid #EDECEC;">
                             <b>{{ r.orderNumber }}</b>
@@ -57,7 +66,9 @@
                             {% if r.shippingStoreName %}
                                 {{ r.shippingStoreName }}
                             {% else %}
-                                {{ _('LBL_SHIPPING_TYPE_DELIVERY') }}
+                                {{ _('LBL_SHIPPING_TYPE_DELIVERY') }}:
+                                {{ r.shippingZip }} {{ r.shippingCity }}, {{ r.shippingAddress }}
+
                             {% endif %}
                             {% if r.remarks %}
                                 <br>
@@ -69,11 +80,7 @@
 
                 <tr>
                     <td style="border-bottom:1px solid #EDECEC;padding-left: 15px;">
-                        {{ r.categoryName }} / {{ r.productName }}
-                        {% if r.variantName %}
-                        <br>
-                        {{ r.variantName }}
-                        {% endif %}
+                        {{ r.productName }}{% if r.variantName %} ({{ r.variantName }}){% endif %}
                     </td>
                     <td align="right" style="border-bottom:1px solid #EDECEC;">
                         {{ r.quantity }} {{ r.unit }}

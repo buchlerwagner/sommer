@@ -20,12 +20,14 @@ class todayOrdersTable extends table {
 
         $this->headerCaption = 'LBL_TODAY_ORDERS';
 		$this->subTable = false;
-		$this->delete = false;
+		$this->delete = true;
 		$this->header = true;
 		$this->edit = false;
 		$this->view = true;
-		$this->options = false;
+		$this->options = true;
 		$this->defaultAction = 'view';
+        $this->optionsWidth = 1;
+        $this->deleteField = 'cart_deleted';
 
 		$this->settings['display']    = 20;
 		$this->settings['orderfield'] = 'cart_created';
@@ -36,7 +38,7 @@ class todayOrdersTable extends table {
             0 => [
                 0 => [
                     'caption' => 'LBL_TOTAL',
-                    'class' => 'col-10',
+                    'class' => 'col-9',
                     'colspan' => 4
                 ],
                 1 => [
@@ -44,6 +46,9 @@ class todayOrdersTable extends table {
                     'class'     => 'col-2',
                     'unitfield' => 'cart_currency',
                     'where'     => $this->where
+                ],
+                2 => [
+                    'class'     => 'col-1',
                 ]
             ]
         ];
@@ -61,7 +66,7 @@ class todayOrdersTable extends table {
             (new column('customer_first_name', 'LBL_CUSTOMER', 4))
                 ->setSelect('us1.us_firstname AS customer_first_name')
                 ->setTemplate('{{ formatName(val, row.customer_last_name) }}'),
-            (new column('cart_total', 'LBL_TOTAL', 3))
+            (new column('cart_total', 'LBL_TOTAL', 2))
                 ->addClass('text-right')
                 ->setTemplate('{{ _price(val, row.cart_currency) }}'),
 

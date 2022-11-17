@@ -69,7 +69,8 @@ class Cart {
 
     public function setOrderDate(?string $date):self
     {
-        $this->orderDate = $date;
+        $dt = strtotime($date);
+        $this->orderDate = date('Y-m-d', $dt);
         return $this;
     }
 
