@@ -1,4 +1,8 @@
 # noinspection SqlNoDataSourceInspectionForFile
+ALTER TABLE `shipping_modes` ADD COLUMN `sm_excluded_dates` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `sm_custom_text`;
+
+
+
 ALTER TABLE `invoice_providers` CHANGE COLUMN `iv_password` `iv_password` BLOB NULL  COMMENT '' AFTER `iv_user_name`;
 
 
