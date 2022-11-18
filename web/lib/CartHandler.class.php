@@ -1118,7 +1118,8 @@ class CartHandler extends ancestor {
         $out  = ($this->owner->storeId ?: 'X') . '-';
         $out .= date('Ymd', $date) . '-';
         $out .= $this->getSelectedShippingMode()['code'] . '-';
-        $out .= str_pad($this->getTodaySumOrders() + 1, 4, '0', STR_PAD_LEFT);
+        //$out .= str_pad($this->getTodaySumOrders() + 1, 4, '0', STR_PAD_LEFT);
+        $out .= str_pad($this->getNextOrderNumber(), 4, '0', STR_PAD_LEFT);
 
         return $out;
     }
@@ -1138,6 +1139,18 @@ class CartHandler extends ancestor {
             )
         );
         return (int) $row['num'];
+    }
+
+    private function getNextOrderNumber(){
+        $num = (int) $this->owner->lib->getVar('order-number-' . date('Y'));
+        if(!$num){
+            $num = 0;
+        }
+        $num++;
+
+        $this->owner->lib->setVar('order-number-' . date('Y'), $num);
+
+        return $num;
     }
 
 	public function destroyKey(){

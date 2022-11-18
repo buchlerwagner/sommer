@@ -680,15 +680,15 @@ class functions extends ancestor {
 	public function setVar($key, $value){
 		$this->owner->db->sqlQuery(
 			$this->owner->db->genSQLInsert(
-				DB_NAME_WEB . ".variables",
+				'variables',
 				[
 					'var_key' => $key,
-					'var_ug_id' => $this->owner->user->group,
+					'var_shop_id' => $this->owner->shopId,
 					'var_value' => $value
 				],
 				[
 					'var_key',
-					'var_ug_id'
+					'var_shop_id'
 				]
 			)
 		);
@@ -701,14 +701,18 @@ class functions extends ancestor {
 	 * @return string
 	 */
 	public function getVar($key){
-		$key = $this->owner->db->escapeString($key);
-		$sql = "SELECT var_value FROM " . DB_NAME_WEB . ".variables WHERE var_key='" . $key . "' AND var_ug_id='" . $this->owner->user->group . "'";
-		$row = $this->owner->db->getFirstRow($sql);
-
-		if(!$row){
-			$sql = "SELECT var_value FROM " . DB_NAME_WEB . ".variables WHERE var_key='" . $key . "' AND var_ug_id='0'";
-			$row = $this->owner->db->getFirstRow($sql);
-		}
+        $row = $this->owner->db->getFirstRow(
+            $this->owner->db->genSQLSelect(
+                'variables',
+                [
+                    'var_value'
+                ],
+                [
+                    'var_key' => $key,
+                    'var_shop_id' => $this->owner->shopId
+                ]
+            )
+        );
 
 		if($row){
 			$result = $row['var_value'];
