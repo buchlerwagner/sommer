@@ -65,6 +65,8 @@ if($this->params[0]){
     }
     if(isset($_REQUEST['tags'])){
         $params['filters']['tags'] = $_REQUEST['tags'];
+    }else{
+        $params['filters']['tags'] = [];
     }
     if(isset($_REQUEST['sort'])){
         $params['sorter'] = $_REQUEST['sort'];
@@ -76,4 +78,3 @@ if($this->params[0]){
     $this->setPageMetaData($categoryData);
     $this->data['products'] = $shop->getProducts($params);
 }
-
