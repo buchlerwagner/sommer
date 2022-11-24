@@ -137,17 +137,6 @@ class table extends model {
 			'foreignkeys'   => [],
 		];
 
-        if ($this->owner->page != 'ajax') {
-            $this->settings['rights'] = ((!empty($this->owner->originalPage)) ? $this->owner->originalPage : $this->owner->page);
-        }
-
-        if (empty($this->settings['rights']) && $this->owner->user->isLoggedIn()) {
-            if ($this->owner->originalPage) $page = $this->owner->originalPage;
-            if ($page != 'ajax') {
-                $this->settings['rights'] = $page;
-            }
-        }
-
         $this->selection = $this->owner->getSession($this->name . '-selections');
         $this->setup();
 
@@ -155,6 +144,20 @@ class table extends model {
 		if (!empty($savedSettings)) {
 			$this->settings = $savedSettings;
 		}
+
+        if ($this->owner->page != 'ajax') {
+            $this->settings['rights'] = ((!empty($this->owner->originalPage)) ? $this->owner->originalPage : $this->owner->page);
+        }
+
+        /*
+        if (empty($this->settings['rights']) && $this->owner->user->isLoggedIn()) {
+            $page = $this->owner->page;
+            if ($this->owner->originalPage) $page = $this->owner->originalPage;
+            if ($page != 'ajax') {
+                $this->settings['rights'] = $page;
+            }
+        }
+        */
 
 		if ($this->owner->user->isLoggedIn() && $this->owner->user->getUser()['access_rights'][ $this->settings['rights'] ] < ACCESS_RIGHT_WRITE) {
 			if(isset($this->settings['custom-role'])) {
