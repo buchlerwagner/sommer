@@ -681,6 +681,11 @@ abstract class formBuilder extends model {
         return $this;
     }
 
+    protected function removeButton($id){
+        unset($this->buttons[$id]);
+        return $this;
+    }
+
     protected function insertElementToGroup($id, formControl ...$controls){
         if($element = $this->findElement($this->controls, $id)) {
             if($element instanceof formControl) {

@@ -422,7 +422,7 @@ class CartHandler extends ancestor {
         return $out;
     }
 
-	public function makeOrder($userId, $invoiceType = -1, $remarks = '', $sendConfirmationEmail = true){
+	public function makeOrder($userId, $invoiceType = -1, $remarks = '', $sendConfirmationEmail = true, $updateOnly = false){
         switch($this->orderType){
             case ORDER_TYPE_LOCAL:
             case ORDER_TYPE_TAKEAWAY:
@@ -437,20 +437,23 @@ class CartHandler extends ancestor {
         }
 
         $this->invoiceType = (int) $invoiceType;
-        $this->orderNumber = $this->generateOrderNumber();
 
         $this->loadCustomerData($userId, $this->invoiceType);
 
         $data = [
             'cart_us_id' => (int) $userId,
-            'cart_order_number' => $this->orderNumber,
             'cart_status' => self::CART_STATUS_ORDERED,
             'cart_order_status' => $orderStatus,
-            'cart_ordered' => 'NOW()',
             'cart_invoice_type' => $this->invoiceType,
-            'cart_paid' => $isPaid,
             'cart_remarks' => $remarks,
         ];
+
+        if(!$updateOnly) {
+            $this->orderNumber = $this->generateOrderNumber();
+            $data['cart_order_number'] = $this->orderNumber;
+            $data['cart_ordered'] = 'NOW()';
+            $data['cart_paid'] = $isPaid;
+        }
 
         if(in_array($this->orderType, [ORDER_TYPE_LOCAL, ORDER_TYPE_TAKEAWAY])){
             $data['cart_sm_id'] = 0;

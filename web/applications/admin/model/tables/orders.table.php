@@ -9,12 +9,12 @@ class ordersTable extends table {
 
         $this->where = 'cart_order_status != "CLOSED" AND cart_shop_id = ' . $this->owner->shopId;
         $isEmployee = ($this->owner->user->getRole() == USER_ROLE_EMPLOYEE);
+        $this->where .= ' AND (cart_status = "ORDERED" OR (cart_status = "NEW" AND cart_order_number IS NOT NULL))';
 
         if($isEmployee){
             $this->where .= ' AND cart_store_id = "' . $this->owner->storeId . '"';
             $this->where .= ' AND cart_created_by = ' . $this->owner->user->id;
         }else{
-            $this->where .= ' AND cart_status = "ORDERED"';
             $this->join  .= ' LEFT JOIN users AS us2 ON (us2.us_id = cart_created_by)';
         }
 
@@ -56,7 +56,7 @@ class ordersTable extends table {
 
         $this->addColumns(
             (new column('cart_order_status', 'LBL_STATUS', 1))
-                ->setTemplate('{{ orderState(val)|raw }}')
+                ->setTemplate('{{ orderState(val)|raw }}{% if row.cart_status == "NEW" %}<div class="small text-warning blink">{{ _("LBL_EDITING") }}</div>{% endif %}')
                 ->addClass('text-center'),
             (new column('cart_order_number', 'LBL_ORDER_NUMBER', 2))
                 ->setTemplate('{{ val }}{% if row.cart_invoice_number %}<div class="small text-muted">{{ row.cart_invoice_number }}</div>{% endif %}'),
@@ -93,6 +93,7 @@ class ordersTable extends table {
 
             new columnHidden('cart_invoice_number'),
             new columnHidden('cart_currency'),
+            new columnHidden('cart_status'),
             (new columnHidden('customer_last_name'))
                 ->setSelect('us1.us_lastname AS customer_last_name')
 

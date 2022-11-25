@@ -119,7 +119,7 @@ abstract class formButton {
 
     final public function setForm($formName) {
         $this->form = $formName;
-        $this->id .= '-' . $formName;
+        //$this->id .= '-' . $formName;
         return $this;
     }
 

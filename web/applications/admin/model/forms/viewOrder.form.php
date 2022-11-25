@@ -39,7 +39,7 @@ class viewOrderForm extends formBuilder {
 
         if($this->isOpen) {
             $this->title = 'LBL_CREATE_NEW_ORDER';
-            $this->owner->cartHandler->init($this->cartKey, false);
+            $cart = $this->owner->cartHandler->init($this->cartKey, false);
 
             $search = (new groupFieldset('search-product'))->addElements(
                 (new inputAutocomplete('product'))
@@ -81,11 +81,16 @@ class viewOrderForm extends formBuilder {
 
             $this->includeBefore = 'create-order';
 
-            $this->addButtons(
-                (new buttonCancel('BTN_BACK'))
-                    ->setUrl('/')
-            );
-
+            if($cart->orderNumber){
+                $this->addButtons(
+                    new buttonCancel('BTN_BACK')
+                );
+            }else {
+                $this->addButtons(
+                    (new buttonCancel('BTN_BACK'))
+                        ->setUrl('/')
+                );
+            }
         }else {
             $this->title = 'LBL_VIEW_ORDER';
             $this->includeBefore = 'view-order';
@@ -99,10 +104,16 @@ class viewOrderForm extends formBuilder {
             $this->hasInvoiceProvider = $invoice->hasInvoiceProvider();
 
             $this->addButtons(
+                (new buttonConfirm('openOrder', 'BTN_EDIT_ORDER', 'btn btn-primary mr-2 float-start'))
+                    ->setIcon('fas fa-cart-plus')
+                    ->setName('openOrder')
+                    ->setForm('viewOrderForm')
+                    ->setAction(enumModalActions::PostForm())
+                    ->setTexts('LBL_OPEN_ORDER_TO_EDIT', 'BTN_EDIT_ORDER'),
+
                 new buttonCancel('BTN_BACK')
             );
         }
-
 	}
 
     public function onAfterInit() {
@@ -119,6 +130,15 @@ class viewOrderForm extends formBuilder {
 
             if($this->owner->user->hasFunctionAccess('orders-refund')){
                 $this->isRefundable = $this->cart->isRefundable();
+            }
+
+            if($this->cart->isPaid() || !Empty($this->cart->invoiceNumber)) {
+                $this->removeButton('openOrder');
+            }
+        }else{
+            if($this->values['cart_order_number']) {
+                $this->title = 'LBL_EDIT_ORDER';
+                $this->setSubtitle($this->values['cart_order_number']);
             }
         }
     }
@@ -139,7 +159,7 @@ class viewOrderForm extends formBuilder {
         );
         if($cart){
             $this->cartKey = $cart['cartKey'];
-            if($cart['status'] == CartHandler::CART_STATUS_NEW && $cart['storeId'] == $this->owner->storeId){
+            if($cart['status'] == CartHandler::CART_STATUS_NEW && ($cart['storeId'] == $this->owner->storeId || $this->owner->user->hasRole([USER_ROLE_SUPERVISOR, USER_ROLE_ADMIN]))){
                 $this->isOpen = true;
             }
         }
@@ -167,6 +187,24 @@ class viewOrderForm extends formBuilder {
             );
 
             $this->owner->pageRedirect('/');
+        }
+    }
+
+    public function openOrder(){
+        if(!$this->isOpen){
+            $this->owner->db->sqlQuery(
+                $this->owner->db->genSQLUpdate(
+                    'cart',
+                    [
+                        'cart_status' => CartHandler::CART_STATUS_NEW
+                    ],
+                    [
+                        'cart_id' => $this->keyFields['cart_id'],
+                    ]
+                )
+            );
+
+            $this->owner->pageRedirect('/orders/view|orders/' . $this->keyFields['cart_id'] . '/');
         }
     }
 }

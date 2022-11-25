@@ -5,6 +5,7 @@ class finishOrderForm extends formBuilder {
     private $userRole;
     private $orderType = 1;
     private $close = false;
+    private $updateOnly = false;
 
     /**
      * @var CartHandler
@@ -291,8 +292,8 @@ class finishOrderForm extends formBuilder {
             $userId = 0;
         }
 
-        if($this->close){
-            $this->order->makeOrder($userId, $this->values['invoiceType'], $this->values['remarks'], $this->values['sendEmail']);
+        if($this->close) {
+            $this->order->makeOrder($userId, $this->values['invoiceType'], $this->values['remarks'], $this->values['sendEmail'], $this->updateOnly);
         }else {
             $this->order->setCustomer($userId, $this->values['invoiceType'], $this->values['remarks']);
         }
@@ -321,6 +322,10 @@ class finishOrderForm extends formBuilder {
                 $this->keyFields['us_id'] = (int) $row['userId'];
 
                 $this->order = $this->owner->cartHandler->init($this->cartKey, false);
+
+                if(!is_null($this->order->orderNumber) && $this->order->status == CartHandler::CART_STATUS_NEW){
+                    $this->updateOnly = true;
+                }
             }
         }
     }
