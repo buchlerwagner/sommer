@@ -28449,11 +28449,11 @@ iframe#gmap_canvas {
   list-style: inherit !important;
 }
 
-.content ul {
+.content-description ul {
   padding: 0 0 0 20px;
 }
 
-.content li {
+.content-description li {
   list-style: disc;
 }
 
