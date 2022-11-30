@@ -28449,4 +28449,12 @@ iframe#gmap_canvas {
   list-style: inherit !important;
 }
 
+.content ul {
+  padding: 0 0 0 20px;
+}
+
+.content li {
+  list-style: disc;
+}
+
 /*# sourceMappingURL=bellaria.style.css.map */
