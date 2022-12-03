@@ -22,7 +22,8 @@ class productsTable extends table {
                 'prod_img' => '',
                 'prod_page_title' => '',
                 'prod_url' => '',
-            ]
+            ],
+            'callback' => 'setNewProductKey'
         ];
 
         $this->delete = true;
@@ -166,6 +167,10 @@ class productsTable extends table {
                 );
             }
         }
+    }
 
+    protected function setNewProductKey($row){
+        $row['prod_key'] = uuid::v4();
+        return $row;
     }
 }
