@@ -258,7 +258,9 @@ class editProductForm extends formBuilder {
     }
 
     public function onAfterLoadValues() {
-        $this->values['prod_properties'] = array_keys($this->product->getProperties());
+        if(!$_POST) {
+            $this->values['prod_properties'] = array_keys($this->product->getProperties());
+        }
 
         $units = $this->owner->lists->getUnits();
         $this->getControl('prod_min_sale')->setAppend($units[$this->values['prod_pack_unit']]);

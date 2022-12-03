@@ -392,7 +392,7 @@ class product extends ancestor {
         return $properties;
     }
 
-    public function setProperties(array $properties){
+    public function setProperties(?array $properties){
         $this->owner->db->sqlQuery(
             $this->owner->db->genSQLDelete(
                 'product_properties',
