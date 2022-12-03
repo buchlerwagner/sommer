@@ -294,7 +294,6 @@ class editProductForm extends formBuilder {
             $this->values['prod_earliest_takeover'] = null;
         }
 
-
         if($this->values['prod_variants']) {
             $this->getLowestVariantPrice();
 
