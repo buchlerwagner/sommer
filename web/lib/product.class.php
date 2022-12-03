@@ -422,7 +422,7 @@ class product extends ancestor {
         static $weightUnits = [];
 
         $isWeightUnit = false;
-        $unit = $packageUnits[$row['pv_pack_pcs_unit']];
+        $unit = $packageUnits[$row['prod_pack_pcs_unit']];
 
         if(Empty($packageUnits)) {
             $packageUnits = $this->owner->lists->getUnits();
@@ -437,20 +437,20 @@ class product extends ancestor {
         $url = '/' . $GLOBALS['PAGE_NAMES'][$this->owner->language]['products']['name'] . '/' . $row['cat_url'] . '/' . $row['prod_id'] . '-' . $row['prod_url'] . '/';
         $path = $this->getImagePath(false, $row['prod_cat_id']);
 
-        if(!Empty($row['pv_price_discount']) && $row['pv_price_discount'] < $row['pv_price']){
-            $displayPrice = $row['pv_price_discount'];
+        if(!Empty($row['prod_price_discount']) && $row['prod_price_discount'] < $row['prod_price']){
+            $displayPrice = $row['prod_price_discount'];
         }else {
-            $displayPrice = $row['pv_price'];
+            $displayPrice = $row['prod_price'];
         }
         $unitPrice = $displayPrice;
 
-        if(in_array($packageUnits[$row['pv_pack_unit']], $weightUnits)){
+        if(in_array($packageUnits[$row['prod_pack_unit']], $weightUnits)){
             $isWeightUnit = true;
-            if(!$row['pv_pack_quantity']) $row['pv_pack_quantity'] = 1;
-            $unitPrice = $unitPrice / $row['pv_pack_quantity'];
+            if(!$row['prod_pack_quantity']) $row['prod_pack_quantity'] = 1;
+            $unitPrice = $unitPrice / $row['prod_pack_quantity'];
 
-            if($row['pv_pack_quantity'] > 1){
-                $unit = $row['pv_pack_quantity'] . ' ' . $packageUnits[$row['pv_pack_pcs_unit']];
+            if($row['prod_pack_quantity'] > 1){
+                $unit = $row['prod_pack_quantity'] . ' ' . $packageUnits[$row['prod_pack_pcs_unit']];
             }
         }
 
