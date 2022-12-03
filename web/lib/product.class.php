@@ -393,16 +393,16 @@ class product extends ancestor {
     }
 
     public function setProperties(array $properties){
-        if($properties){
-            $this->owner->db->sqlQuery(
-                $this->owner->db->genSQLDelete(
-                    'product_properties',
-                    [
-                        'pp_prod_id' => $this->productId
-                    ]
-                )
-            );
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLDelete(
+                'product_properties',
+                [
+                    'pp_prod_id' => $this->productId
+                ]
+            )
+        );
 
+        if(!Empty($properties)){
             foreach($properties AS $propId) {
                 $this->owner->db->sqlQuery(
                     $this->owner->db->genSQLInsert(

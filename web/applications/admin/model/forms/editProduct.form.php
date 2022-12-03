@@ -285,9 +285,8 @@ class editProductForm extends formBuilder {
             $this->values['prod_url'] = safeURL($this->values['prod_url']);
         }
 
-        if(!Empty($this->values['prod_properties'])){
-            $this->product->setProperties($this->values['prod_properties']);
-        }
+        $this->product->setProperties($this->values['prod_properties']);
+        unset($this->values['prod_properties']);
 
         if(!Empty($this->values['prod_earliest_takeover'])){
             $this->values['prod_earliest_takeover'] = standardTime($this->values['prod_earliest_takeover']);
@@ -295,7 +294,6 @@ class editProductForm extends formBuilder {
             $this->values['prod_earliest_takeover'] = null;
         }
 
-        unset($this->values['prod_properties']);
 
         if($this->values['prod_variants']) {
             $this->getLowestVariantPrice();
