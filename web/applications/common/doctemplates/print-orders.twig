@@ -4,12 +4,12 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;">
     <title></title>
+    {% include "doc-styles.twig" %}
     <style type="text/css" media="print">
         @page {
             margin: 20px 50px;
         }
     </style>
-    {% include "doc-styles.twig" %}
 </head>
 <body>
 <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 20px">
@@ -39,74 +39,73 @@
         </tr>
     </tbody>
 </table>
-<table width="100%" cellpadding="5" cellspacing="0">
-    <tbody>
-        {% if rows %}
-            {% set cartId = false %}
-            {% for r in rows %}
 
-                {% if cartId != r.cartId %}
-                    {% set cartId = r.cartId %}
+{% if rows %}
+    {% set cartId = false %}
+    {% set tableOpen = false %}
+    {% for r in rows %}
 
-                    {% if not loop.first %}
-                    <tr>
-                        <td colspan="2">
-                            <hr>
-                        </td>
-                    </tr>
-                    {% endif %}
+            {% if cartId != r.cartId %}
+                {% set cartId = r.cartId %}
 
-                    <tr style="background-color: #EDECEC;">
-                        <td colspan="2" style="border-bottom:1px solid #EDECEC;">
-                            <b>{{ r.orderNumber }}</b>
-                            <br>
-                            {{ r.customerName }} ({{ r.customerPhone }})
-                            <br>
-                            {{ _('LBL_PAYMENT_TYPE') }}:
-                            {% if r.paymentType == 1 %}
-                                {{ _('LBL_PAYMENT_TYPE_CASH') }}
-                            {% elseif r.paymentType == 2 %}
-                                {{ _('LBL_PAYMENT_TYPE_MONEY_TRANSFER') }}
-                            {% elseif r.paymentType == 3 %}
-                                {{ _('LBL_PAYMENT_TYPE_CARD') }}
-                            {% endif %}
-
-                            {% if r.isPaid %}
-                                ({{ _('LBL_PAID') }})
-                            {% endif %}
-                            <br>
-                            {{ _('LBL_DELIVERY_PLACE') }}: ({{ r.shippingCode }})
-                            {% if r.shippingStoreName %}
-                                {{ r.shippingStoreName }}
-                            {% else %}
-                                {{ _('LBL_SHIPPING_TYPE_DELIVERY') }}:
-                                {{ r.shippingZip }} {{ r.shippingCity }}, {{ r.shippingAddress }}
-
-                            {% endif %}
-                            {% if r.remarks %}
-                                <br>
-                                <span class="small">{{ _('LBL_REMARKS') }}: {{ r.remarks|nl2br }}</span>
-                            {% endif %}
-                        </td>
-                    </tr>
+                {% if tableOpen %}
+                    </tbody>
+                    </table>
+                    <br>
                 {% endif %}
 
-                <tr>
-                    <td style="border-bottom:1px solid #EDECEC;padding-left: 15px;">
-                        {{ r.productName }}{% if r.variantName %} ({{ r.variantName }}){% endif %}
-                    </td>
-                    <td align="right" style="border-bottom:1px solid #EDECEC;">
-                        {{ r.quantity }} {{ r.unit }}
+                {% set tableOpen = true %}
+
+                <table width="100%" cellpadding="5" cellspacing="0" border="0" class="border no-page-break-inside">
+                <tbody>
+
+                <tr style="background-color: #EDECEC;">
+                    <td colspan="2" style="border-bottom:1px solid #EDECEC;">
+                        <b>{{ r.orderNumber }}</b>
+                        <br>
+                        {{ r.customerName }} ({{ r.customerPhone }})
+                        <br>
+                        {{ _('LBL_PAYMENT_TYPE') }}:
+                        {% if r.paymentType == 1 %}
+                            {{ _('LBL_PAYMENT_TYPE_CASH') }}
+                        {% elseif r.paymentType == 2 %}
+                            {{ _('LBL_PAYMENT_TYPE_MONEY_TRANSFER') }}
+                        {% elseif r.paymentType == 3 %}
+                            {{ _('LBL_PAYMENT_TYPE_CARD') }}
+                        {% endif %}
+
+                        {% if r.isPaid %}
+                            ({{ _('LBL_PAID') }})
+                        {% endif %}
+                        <br>
+                        {{ _('LBL_DELIVERY_PLACE') }}: ({{ r.shippingCode }})
+                        {% if r.shippingStoreName %}
+                            {{ r.shippingStoreName }}
+                        {% else %}
+                            {{ _('LBL_SHIPPING_TYPE_DELIVERY') }}:
+                            {{ r.shippingZip }} {{ r.shippingCity }}, {{ r.shippingAddress }}
+
+                        {% endif %}
+                        {% if r.remarks %}
+                            <br>
+                            <span class="small">{{ _('LBL_REMARKS') }}: {{ r.remarks|nl2br }}</span>
+                        {% endif %}
                     </td>
                 </tr>
-            {% endfor %}
-        {% else %}
+            {% endif %}
+
             <tr>
-                <td colspan="2" align="center">{{ _('LBL_NO_ITEMS') }}</td>
+                <td style="border-bottom:1px solid #EDECEC;padding-left: 15px;">
+                    {{ r.productName }}{% if r.variantName %} ({{ r.variantName }}){% endif %}
+                </td>
+                <td align="right" style="border-bottom:1px solid #EDECEC;">
+                    {{ r.quantity }} {{ r.unit }}
+                </td>
             </tr>
-        {% endif %}
-    </tbody>
-</table>
+    {% endfor %}
+{% else %}
+    {{ _('LBL_NO_ITEMS') }}
+{% endif %}
 
 </body>
 </html>
