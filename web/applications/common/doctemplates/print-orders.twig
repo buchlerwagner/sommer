@@ -62,6 +62,19 @@
                             <br>
                             {{ r.customerName }} ({{ r.customerPhone }})
                             <br>
+                            {{ _('LBL_PAYMENT_TYPE') }}:
+                            {% if r.paymentType == 1 %}
+                                {{ _('LBL_PAYMENT_TYPE_CASH') }}
+                            {% elseif r.paymentType == 2 %}
+                                {{ _('LBL_PAYMENT_TYPE_MONEY_TRANSFER') }}
+                            {% elseif r.paymentType == 3 %}
+                                {{ _('LBL_PAYMENT_TYPE_CARD') }}
+                            {% endif %}
+
+                            {% if r.isPaid %}
+                                ({{ _('LBL_PAID') }})
+                            {% endif %}
+                            <br>
                             {{ _('LBL_DELIVERY_PLACE') }}: ({{ r.shippingCode }})
                             {% if r.shippingStoreName %}
                                 {{ r.shippingStoreName }}
