@@ -103,6 +103,12 @@
                 </td>
             </tr>
     {% endfor %}
+
+    {% if tableOpen %}
+        </tbody>
+        </table>
+        <br>
+    {% endif %}
 {% else %}
     {{ _('LBL_NO_ITEMS') }}
 {% endif %}
