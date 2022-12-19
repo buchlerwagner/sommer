@@ -60,11 +60,28 @@
                 <tbody>
 
                 <tr style="background-color: #EDECEC;">
-                    <td colspan="2" style="border-bottom:1px solid #EDECEC;">
+                    <td style="border-bottom:1px solid #EDECEC;">
                         <b>{{ r.orderNumber }}</b>
                         <br>
                         {{ r.customerName }} ({{ r.customerPhone }})
                         <br>
+                        {{ _('LBL_DELIVERY_PLACE') }}: ({{ r.shippingCode }})
+
+                        {% if r.shippingStoreName %}
+                            {{ r.shippingStoreName }}
+                        {% else %}
+                            {{ _('LBL_SHIPPING_TYPE_DELIVERY') }}:<br>
+                            {{ r.shippingZip }} {{ r.shippingCity }}, {{ r.shippingAddress }}
+                        {% endif %}
+                        {% if r.remarks %}
+                            <br>
+                            <span class="small">{{ _('LBL_REMARKS') }}: {{ r.remarks|nl2br }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="border-bottom:1px solid #EDECEC;" align="right" valign="top">
+                        {{ _('LBL_TOTAL') }}: <b>{{ _price(r.cartTotal, r.currency) }}</b>
+                        <br>
+
                         {{ _('LBL_PAYMENT_TYPE') }}:
                         {% if r.paymentType == 1 %}
                             {{ _('LBL_PAYMENT_TYPE_CASH') }}
@@ -76,19 +93,6 @@
 
                         {% if r.isPaid %}
                             ({{ _('LBL_PAID') }})
-                        {% endif %}
-                        <br>
-                        {{ _('LBL_DELIVERY_PLACE') }}: ({{ r.shippingCode }})
-                        {% if r.shippingStoreName %}
-                            {{ r.shippingStoreName }}
-                        {% else %}
-                            {{ _('LBL_SHIPPING_TYPE_DELIVERY') }}:
-                            {{ r.shippingZip }} {{ r.shippingCity }}, {{ r.shippingAddress }}
-
-                        {% endif %}
-                        {% if r.remarks %}
-                            <br>
-                            <span class="small">{{ _('LBL_REMARKS') }}: {{ r.remarks|nl2br }}</span>
                         {% endif %}
                     </td>
                 </tr>
