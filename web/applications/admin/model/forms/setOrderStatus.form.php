@@ -121,7 +121,7 @@ class setOrderStatusForm extends formBuilder {
                     'items' => $this->owner->cartHandler->items,
                     'currency' => $this->owner->cartHandler->currency,
                     'subtotal' => $this->owner->cartHandler->subtotal,
-                    'discount' => $this->owner->cartHandler->discount,
+                    'discount' => $this->owner->cartHandler->getDiscount(),
                     'packagingFee' => $this->owner->cartHandler->packagingFee,
                     'shippingFee' => $this->owner->cartHandler->shippingFee,
                     'paymentFee' => $this->owner->cartHandler->paymentFee,

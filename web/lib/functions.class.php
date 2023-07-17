@@ -588,13 +588,12 @@ class functions extends ancestor {
 		foreach($menu as $key => $val) {
 			switch ($val['display']) {
 				case 0: // invisible
-					continue;
 					break;
 				case 1: // visible
 				case 2: // menu group
 				case 3: // footer
-					if (empty($footer) && in_array($val['display'], [3, 4])) continue;
-					if (!empty($footer) && in_array($val['display'], [1, 2]) && empty($val['footer'])) continue;
+					if (empty($footer) && in_array($val['display'], [3, 4])) break;
+					if (!empty($footer) && in_array($val['display'], [1, 2]) && empty($val['footer'])) break;
 
 					if (!empty($val['items'])) {
 						$val['items'] = $this->getAccessibleMenu($val['items'], false, $key);
