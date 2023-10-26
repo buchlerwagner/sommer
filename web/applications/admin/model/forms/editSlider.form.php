@@ -33,7 +33,11 @@ class editSliderForm extends formBuilder {
 
                 (new inputSelect('s_text_size', 'LBL_TEXT_FONT_SIZE', 100))
                     ->setColSize('col-4 col-lg-2')
-                    ->setOptions($fontSizes)
+                    ->setOptions($fontSizes),
+
+                (new inputDate('s_expire', 'LBL_EXPIRY'))
+                    ->setColSize('col-12 col-lg-4')
+                    ->setIcon('fas fa-calendar')
             ),
 
             (new inputFile('upload_file', 'LBL_IMAGE'))
@@ -71,6 +75,12 @@ class editSliderForm extends formBuilder {
     public function onBeforeSave() {
         $this->values['s_shop_id'] = $this->owner->shopId;
         if(Empty($this->values['s_hide_title'])) $this->values['s_hide_title'] = 0;
+
+        if(!Empty($this->values['s_expire'])) {
+            $this->values['s_expire'] = standardDate($this->values['s_expire']);
+        }else{
+            $this->values['s_expire'] = null;
+        }
 
         if($this->values['removeImg']){
             $this->deleteImage();

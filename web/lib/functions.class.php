@@ -988,6 +988,7 @@ class functions extends ancestor {
                         's_title_size AS titleSize',
                         's_text_size AS textSize',
                         's_hide_title AS hideTitle',
+                        's_expire AS expire',
                     ],
                     [
                         's_shop_id' => $this->owner->shopId,
@@ -1006,6 +1007,34 @@ class functions extends ancestor {
                     $sliders[$row['id']]['image'] = FOLDER_UPLOAD . $this->owner->shopId . '/sliders/' . $row['image'];
                 }
 
+                $this->owner->mem->set(CACHE_SLIDERS . $this->owner->shopId, $sliders);
+            }
+        }
+
+        if(!Empty($sliders)){
+            $hasExpired = false;
+
+            foreach($sliders AS $key => $slide){
+                if(!Empty($slide['expire']) && $slide['expire'] <= date('Y-m-d')){
+                    $hasExpired = true;
+
+                    $this->owner->db->sqlQuery(
+                        $this->owner->db->genSqlUpdate(
+                            'sliders',
+                            [
+                                's_visible' => 0
+                            ],
+                            [
+                                's_id' => $slide['id']
+                            ]
+                        )
+                    );
+
+                    unset($sliders[$key]);
+                }
+            }
+
+            if($hasExpired){
                 $this->owner->mem->set(CACHE_SLIDERS . $this->owner->shopId, $sliders);
             }
         }

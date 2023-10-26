@@ -1,4 +1,9 @@
 # noinspection SqlNoDataSourceInspectionForFile
+ALTER TABLE `sliders` ADD COLUMN `s_expire` DATE NULL DEFAULT NULL AFTER `s_hide_title`;
+
+
+
+
 ALTER TABLE `shipping_modes` ADD COLUMN `sm_excluded_dates` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `sm_custom_text`;
 
 

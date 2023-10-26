@@ -592,6 +592,15 @@ var shoppingCart = {
                 });
             });
         }
+
+        $('#frmContact').one('submit', function (event) {
+            $('#btnSubmitContactForm').prepend('<i class="far fa-spin fa-spinner mr-1"></i>');
+            $('#btnSubmitContactForm').attr('disabled', 'disabled');
+
+            event.preventDefault();
+
+            $("#frmContact").attr('action', '.?contact[save]=1').submit()
+        });
     },
 
     reInit: function(){
