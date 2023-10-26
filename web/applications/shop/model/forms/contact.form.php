@@ -134,6 +134,7 @@ class contactForm extends formBuilder {
 
                 $data = [];
                 unset($this->values['agree_privacy']);
+                unset($this->values['submitToken']);
 
                 foreach ($this->values as $key => $value) {
                     $data['r_' . $key] = $value;
