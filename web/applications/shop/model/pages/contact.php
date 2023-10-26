@@ -6,7 +6,7 @@
 
 $this->loadForm('contact');
 $sections = $this->lib->getWidgetContents('contact');
-if($sections){
+if(!Empty($sections)){
     foreach($sections AS $content){
         $this->data['content'] = $content;
         break;
