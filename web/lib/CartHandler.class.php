@@ -41,6 +41,7 @@ class CartHandler extends ancestor {
     private $orderDateStart = false;
     private $orderDateEnd = false;
     private $orderDayLimits = [];
+    private $orderIncludedDates = [];
     private $saleLimitText = false;
 
     private $userId;
@@ -791,6 +792,14 @@ class CartHandler extends ancestor {
                                 }
                             }
 
+                            if(!Empty($dateLimits['includedDates'])){
+                                foreach($dateLimits['includedDates'] AS $date) {
+                                    if(!in_array($date, $this->orderIncludedDates)) {
+                                        $this->orderIncludedDates[] = $date;
+                                    }
+                                }
+                            }
+
                             $this->saleLimitText = $this->product->getSaleLimitText();
                         }
 
@@ -1384,6 +1393,7 @@ class CartHandler extends ancestor {
                     'sm_custom_interval AS hasCustomInterval',
                     'sm_custom_text AS customIntervalText',
                     'sm_excluded_dates AS excludedDates',
+                    'sm_included_dates AS includedDates',
                 ],
                 [
                     'sm_shop_id' => $this->owner->shopId,
@@ -1399,6 +1409,7 @@ class CartHandler extends ancestor {
                 $out[$row['id']] = $row;
                 $out[$row['id']]['shippingDate'] = $this->getNextShippingDate(($row['dayDiff'] ? dateAddDays('now', $row['dayDiff']) : date('Y-m-d')));
                 $out[$row['id']]['shippingLastDate'] = false;
+                $out[$row['id']]['onDates'] = [];
                 $out[$row['id']]['offDates'] = [];
 
                 if($out[$row['id']]['hasCustomDate']){
@@ -1430,12 +1441,32 @@ class CartHandler extends ancestor {
                     }
                 }
 
+                if($row['includedDates']){
+                    $includedDates = json_decode($row['includedDates'], true);
+                    if($includedDates){
+                        foreach($includedDates AS $date){
+                            if(!in_array($date, $out[$row['id']]['onDates'])){
+                                $out[$row['id']]['onDates'][] = $date;
+                            }
+                        }
+                    }
+                }
+
+                if(!Empty($this->orderIncludedDates)){
+                    foreach($this->orderIncludedDates AS $date){
+                        if(!in_array($date, $out[$row['id']]['onDates'])){
+                            $out[$row['id']]['onDates'][] = $date;
+                        }
+                    }
+                }
+
                 if($this->orderDayLimits){
                     $out[$row['id']]['dayLimits'] = $this->orderDayLimits;
                     $out[$row['id']]['saleLimitText'] = $this->saleLimitText;
                 }
 
                 $out[$row['id']]['offDates'] = (!Empty($out[$row['id']]['offDates']) ? json_encode($out[$row['id']]['offDates']) : false);
+                $out[$row['id']]['onDates'] = (!Empty($out[$row['id']]['onDates']) ? json_encode($out[$row['id']]['onDates']) : false);
 
                 if($row['hasIntervals']){
                     $where = [

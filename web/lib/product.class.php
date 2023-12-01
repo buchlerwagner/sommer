@@ -105,6 +105,7 @@ class product extends ancestor {
                 'start' => $this->data['category']['limitStart'],
                 'end' => $this->data['category']['limitEnd'],
                 'days' => $this->data['category']['dayLimits'],
+                'includedDates' => $this->data['category']['includedDates'],
             ];
         }
 
@@ -505,6 +506,7 @@ class product extends ancestor {
                 'stopSale' => ($row['cat_stop_sale']),
                 'limitSale' => ($row['cat_limit_sale']),
                 'limitSaleText' => $row['cat_limit_sale_text'],
+                'includedDates' => (!Empty($row['cat_included_dates']) ? json_decode($row['cat_included_dates'], true) : [] ),
                 'limitStart' => $row['cat_date_start'],
                 'limitEnd' => $row['cat_date_end'],
                 'dayLimits' => ( $row['cat_takeover_days'] ? explode('|', trim($row['cat_takeover_days'], '|')) : false),

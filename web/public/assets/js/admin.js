@@ -3383,6 +3383,7 @@ function removeInterval(id, smid) {
                 var $isIndividual = $(this).parents('.shipping-intervals').find('.set-shipping-interval');
                 var minDate = $(this).data('min-date');
                 var offDates = $(this).data('off-dates') || [];
+                var onDates = $(this).data('on-dates') || [];
                 var dayLimits = $(this).data('dow') || [];
 
                 if ($isIndividual.is(':checked')) {
@@ -3401,6 +3402,10 @@ function removeInterval(id, smid) {
                                     return true;
                                 }
                             } else {
+                                return true;
+                            }
+
+                            if (onDates.includes(date.getDay())) {
                                 return true;
                             }
 
