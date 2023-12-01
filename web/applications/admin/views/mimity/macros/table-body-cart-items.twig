@@ -28,7 +28,7 @@
                     <div class="input-group-prepend">
                         <button class="btn btn-light quantity-select btn-minus" data-value="-1" type="button" id="button-minus"><i class="fal fa-minus"></i></button>
                     </div>
-                    <input type="text" name="quantity" data-min="{{ item.minSale }}" data-max="{{ item.maxSale }}" class="form-control bg-white text-center numbersonly quantity-input border-right-0 item-quantity-{{ item.id }}" value="{{ item.quantity.amount }}">
+                    <input type="text" name="quantity" data-min="0" data-max="0" class="form-control bg-white text-center numbersonly quantity-input border-right-0 item-quantity-{{ item.id }}" value="{{ item.quantity.amount }}">
                     <div class="input-group-append">
                         <span class="input-group-text bg-white" id="quantity-unit">{{ item.quantity.unit }}</span>
                     </div>

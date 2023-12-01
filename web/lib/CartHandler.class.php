@@ -1232,7 +1232,7 @@ class CartHandler extends ancestor {
 	}
 
     private function checkQuantity($quantity, $variantId = 0){
-        if($this->product->isProductLoaded()) {
+        if($this->product->isProductLoaded() && !$this->isAdmin) {
             if ($quantity < $this->product->getMinSale($variantId)) {
                 $quantity = $this->product->getMinSale($variantId);
             }
