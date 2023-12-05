@@ -14,7 +14,7 @@
             <label for="shipping-date" class="mb-1">{{ _('LBL_SELECT_SHIPPING_DATE') }}</label>
             <div class="input-icon">
                 <i class="fa fa-calendar"></i>
-                <input id="shippingDate" type="text" name="shippingDate" value="{{ selectedShippingDate }}" class="date-picker save-shipping-mode form-control"{% if dayLimits %} data-dow="[{% for day in dayLimits %}{{ day }}{% if not loop.last %},{% endif %}{% endfor %}]"{% endif %} data-min-date="{{ shippingDate }}"{% if shippingLastDate %} data-max-date="{{ shippingLastDate }}"{% endif %} data-off-dates="{{ offDates }}">
+                <input id="shippingDate" type="text" name="shippingDate" value="{{ selectedShippingDate }}" class="date-picker save-shipping-mode form-control"{% if dayLimits %} data-dow="[{% for day in dayLimits %}{{ day }}{% if not loop.last %},{% endif %}{% endfor %}]"{% endif %} data-min-date="{{ shippingDate }}"{% if shippingLastDate %} data-max-date="{{ shippingLastDate }}"{% endif %} data-off-dates="{{ offDates }}" data-on-dates='{{ onDates }}'>
             </div>
         </div>
     {% endif %}

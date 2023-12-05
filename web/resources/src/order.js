@@ -317,19 +317,29 @@ var orders = {
                     disable: offDates,
                     enable: [
                         function (date) {
-                            if (dayLimits.length > 0) {
-                                if (dayLimits.includes(date.getDay())) {
-                                    return true;
+                            var isEnabled = false;
+                            var dd = String(date.getDate()).padStart(2, '0');
+                            var mm = String(date.getMonth() + 1).padStart(2, '0');
+                            var yyyy = date.getFullYear();
+                            var dt = yyyy + '-' + mm + '-' + dd;
+
+                            if(dayLimits.length > 0){
+                                if(dayLimits.includes(date.getDay())){
+                                    isEnabled = true;
                                 }
-                            } else {
-                                return true;
+                            }else{
+                                isEnabled = true;
                             }
 
-                            if (onDates.includes(date.getDay())) {
-                                return true;
+                            if(offDates.includes(dt)){
+                                isEnabled = false;
                             }
 
-                            return false;
+                            if (onDates.includes(dt)) {
+                                isEnabled = true;
+                            }
+
+                            return isEnabled;
                         }
                     ],
                     locale: 'hu'

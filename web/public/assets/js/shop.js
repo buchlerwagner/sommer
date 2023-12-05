@@ -543,8 +543,6 @@ var shoppingCart = {
                 offDates = [];
             }
 
-            console.log(onDates);
-
             $(this).flatpickr({
                 minDate: minDate,
                 dateFormat: 'Y-m-d',
