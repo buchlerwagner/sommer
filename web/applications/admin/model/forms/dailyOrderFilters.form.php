@@ -13,7 +13,7 @@ class dailyOrderFiltersForm extends filterForm {
 
         $this->addControls(
             (new groupRow('row1'))->addElements(
-                (new inputDate('orderData_min', 'LBL_ORDER_DATE', $defaultDate))
+                (new inputDate('orderDate_min', 'LBL_ORDER_DATE', $defaultDate))
                     ->setIcon('fa fa-calendar')
                     ->setAppend('tól')
                     ->setMaxDate(date('Y-m-d'))
