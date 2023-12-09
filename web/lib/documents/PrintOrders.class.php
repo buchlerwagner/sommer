@@ -29,6 +29,14 @@ class PrintOrders extends docs {
             $this->setVar('dateMax', $this->filters['shippingDate_max']);
         }
 
+        if ($this->filters['orderDate_min']) {
+            $this->setVar('orderDateMin', $this->filters['orderDate_min']);
+        }
+
+        if ($this->filters['orderDate_max']) {
+            $this->setVar('orderDateMax', $this->filters['orderDate_max']);
+        }
+
         $result = $this->owner->db->getRows(
             $this->owner->db->genSQLSelect(
                 'orders',
@@ -59,6 +67,14 @@ class PrintOrders extends docs {
                     $values = $this->owner->db->escapestring($values);
                 }
                 switch ($field) {
+                    case 'orderDate_min':
+                        $where[$field] = substr($field, 0, -4) . " >= '" . standardDate($values) . " 00:00:00'";
+                        break;
+
+                    case 'orderDate_max':
+                        $where[$field] = substr($field, 0, -4) . " <= '" . standardDate($values) . " 23:59:59'";
+                        break;
+
                     case 'shippingDate_min':
                         $field = substr($field, 0, -4);
                         $where[$field]['greater='] = standardDate($values);
@@ -68,6 +84,7 @@ class PrintOrders extends docs {
                         $field = substr($field, 0, -4);
                         $where[$field]['less='] = standardDate($values);
                         break;
+
                     default:
                         $where[$field] = $values;
                         break;
