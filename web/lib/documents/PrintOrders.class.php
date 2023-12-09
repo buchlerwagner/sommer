@@ -68,11 +68,13 @@ class PrintOrders extends docs {
                 }
                 switch ($field) {
                     case 'orderDate_min':
-                        $where[$field] = substr($field, 0, -4) . " >= '" . standardDate($values) . " 00:00:00'";
+                        $field = substr($field, 0, -4);
+                        $where[$field]['greater='] = standardDate($values) . " 00:00:00'";
                         break;
 
                     case 'orderDate_max':
-                        $where[$field] = substr($field, 0, -4) . " <= '" . standardDate($values) . " 23:59:59'";
+                        $field = substr($field, 0, -4);
+                        $where[$field]['less='] = standardDate($values) . " 23:59:59'";
                         break;
 
                     case 'shippingDate_min':
