@@ -65,7 +65,16 @@ class dailyOrdersTable extends table {
                 } else {
                     $values = $this->owner->db->escapestring($values);
                 }
+
                 switch ($field) {
+                    case 'orderDate_min':
+                        $where[$field] = substr($field, 0, -4) . " >= '" . standardDate($values) . " 00:00:00'";
+                        break;
+
+                    case 'orderDate_max':
+                        $where[$field] = substr($field, 0, -4) . " <= '" . standardDate($values) . " 23:59:59'";
+                        break;
+
                     case 'shippingDate_min':
                         $where[$field] = substr($field, 0, -4) . " >= '" . standardDate($values) . "'";
                         break;
@@ -73,6 +82,7 @@ class dailyOrdersTable extends table {
                     case 'shippingDate_max':
                         $where[$field] = substr($field, 0, -4) . " <= '" . standardDate($values) . "'";
                         break;
+
                     default:
                         $where[$field] = $field . " = '$values'";
                         break;
