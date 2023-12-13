@@ -32,16 +32,16 @@ class dailyOrderFiltersForm extends filterForm {
                     ->setIcon('fa fa-calendar')
                     ->setColSize('col-6 col-lg-2')
                     ->addEmptyLabel()
-                    ->setAppend('ig')
-            ),
-            (new groupRow('row2'))->addElements(
-                (new inputSelect('shippingCode', 'LBL_DELIVERY_PLACE'))
-                    ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getShippingModes(true))
-                    ->setColSize('col-12 col-lg-4'),
+                    ->setAppend('ig'),
                 (new inputSelect('categoryId', 'LBL_CATEGORY'))
                     ->makeSelectPicker()
                     ->setOptions($this->owner->lists->setEmptyItem('LBL_ANY')->getCategories(true))
-                    ->setColSize('col-12 col-sm-4')
+                    ->setColSize('col-6 col-lg-3')
+            ),
+            (new groupRow('row2'))->addElements(
+                (new inputCheckGroup('shippingCode', 'LBL_DELIVERY_PLACE'))
+                    ->setOptions($this->owner->lists->reset()->getShippingModes(true))
+                    ->setColSize('col-12 col-lg-6')
             )
         );
     }

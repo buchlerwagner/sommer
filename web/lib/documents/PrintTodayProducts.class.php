@@ -17,7 +17,12 @@ class PrintTodayProducts extends docs {
             $filters = $this->table->getFilters();
 
             if ($filters['shippingCode']) {
-                $this->setVar('delivery', $stores[$filters['shippingCode']]);
+                $places = [];
+                foreach($filters['shippingCode'] AS $code){
+                    $places[] = $stores[$code];
+                }
+
+                $this->setVar('delivery', implode(', ', $places));
             }
 
             if ($filters['categoryId']) {

@@ -83,6 +83,15 @@ class dailyOrdersTable extends table {
                         $where[$field] = substr($field, 0, -4) . " <= '" . standardDate($values) . "'";
                         break;
 
+                    case 'shippingCode':
+                        $codes = [];
+                        foreach($values AS $v){
+                            $codes[] = "'" . $v . "'";
+                        }
+
+                        $where[$field] = $field . " IN (" . implode(',', $codes) . ")";
+                        break;
+
                     default:
                         $where[$field] = $field . " = '$values'";
                         break;
