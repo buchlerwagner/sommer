@@ -79,6 +79,16 @@ class PrintLabels extends docs {
                     $values = $this->owner->db->escapestring($values);
                 }
                 switch ($field) {
+                    case 'orderDate_min':
+                        $field = substr($field, 0, -4);
+                        $where[$field]['greater='] = standardDate($values) . " 00:00:00'";
+                        break;
+
+                    case 'orderDate_max':
+                        $field = substr($field, 0, -4);
+                        $where[$field]['less='] = standardDate($values) . " 23:59:59'";
+                        break;
+
                     case 'shippingDate_min':
                         $field = substr($field, 0, -4);
                         $where[$field]['greater='] = standardDate($values);
@@ -88,6 +98,16 @@ class PrintLabels extends docs {
                         $field = substr($field, 0, -4);
                         $where[$field]['less='] = standardDate($values);
                         break;
+
+                    case 'shippingCode':
+                        $codes = [];
+                        foreach($values AS $v){
+                            $codes[] = "'" . $v . "'";
+                        }
+
+                        $where[$field]['in'] = $codes;
+                        break;
+
                     default:
                         $where[$field] = $values;
                         break;
