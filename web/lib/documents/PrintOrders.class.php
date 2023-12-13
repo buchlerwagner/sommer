@@ -14,7 +14,13 @@ class PrintOrders extends docs {
         $stores = $this->owner->lists->reset()->getShippingModes(true);
 
         if ($this->filters['shippingCode']) {
-            $this->setVar('delivery', $stores[$this->filters['shippingCode']]);
+
+            $places = [];
+            foreach($this->filters['shippingCode'] AS $code){
+                $places[] = $stores[$code];
+            }
+
+            $this->setVar('delivery', implode(', ', $places));
         }
 
         if ($this->filters['categoryId']) {
@@ -85,6 +91,15 @@ class PrintOrders extends docs {
                     case 'shippingDate_max':
                         $field = substr($field, 0, -4);
                         $where[$field]['less='] = standardDate($values);
+                        break;
+
+                    case 'shippingCode':
+                        $codes = [];
+                        foreach($values AS $v){
+                            $codes[] = "'" . $v . "'";
+                        }
+
+                        $where[$field]['in'] = $codes;
                         break;
 
                     default:
