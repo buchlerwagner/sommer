@@ -447,22 +447,22 @@ var shoppingCart = {
         $('.set-shipping-interval').on('change', function (){
             var $this = $(this);
             var $parent = $this.parents('.shipping-intervals');
-            var $dateControl = $this.parents('.shipping-intervals').find('.date-picker');
-
-            var minDate = false;
-            var offDates = false;
+            //var $dateControl = $this.parents('.shipping-intervals').find('.date-picker');
+            //var minDate = false;
+            //var offDates = false;
 
             if($this.is(':checked')){
                 $parent.find('.custom-interval').removeClass('d-none').show();
                 $parent.find('.interval-select').hide();
 
-                minDate = 'today';
-                offDates = [];
+                //minDate = 'today';
+                //offDates = [];
             }else{
                 $parent.find('.custom-interval').hide();
                 $parent.find('.interval-select').removeClass('d-none').show();
             }
 
+            /*
             if($dateControl.length > 0){
                 $dateControl.flatpickr({
                     dateFormat: "Y-m-d",
@@ -475,6 +475,7 @@ var shoppingCart = {
                     $dateControl.val($dateControl.data('min-date'));
                 }
             }
+            */
         });
 
         $(document).on('keyup', '.numbersonly', function(){
@@ -532,16 +533,18 @@ var shoppingCart = {
 
         $('.date-picker:not(.inited)').each (function () {
             $(this).addClass('inited');
-            var $isIndividual = $(this).parents('.shipping-intervals').find('.set-shipping-interval');
             var minDate = $(this).data('min-date');
             var offDates = $(this).data('off-dates') || [];
             var onDates = $(this).data('on-dates') || [];
             var dayLimits = $(this).data('dow') || [];
 
+            /*
+            var $isIndividual = $(this).parents('.shipping-intervals').find('.set-shipping-interval');
             if($isIndividual.is(':checked')){
                 minDate = 'today';
                 offDates = [];
             }
+            */
 
             $(this).flatpickr({
                 minDate: minDate,
