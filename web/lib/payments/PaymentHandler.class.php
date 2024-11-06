@@ -16,6 +16,15 @@ class PaymentHandler extends ancestor {
         return $transaction;
     }
 
+    public function handleCallback(string $transactionId, $data = []):void
+    {
+        /**
+         * @var $payment Payments
+         */
+        $payment = $this->owner->addByClassName('Payments', false, [], true);
+        $payment->processCallback($transactionId, $data);
+    }
+
     private function updateCart(Transaction $transaction):void
     {
         if($transaction->cartKey){

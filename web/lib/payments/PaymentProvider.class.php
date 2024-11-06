@@ -4,6 +4,7 @@ abstract class PaymentProvider extends ancestor {
 
     private $id;
     protected $transactionId;
+    protected $providerTransactionId;
 
     /**
      * @var PaymentProviderSettings|null
@@ -14,6 +15,7 @@ abstract class PaymentProvider extends ancestor {
     protected $timeout;
 
     protected $amount;
+    protected $refundAmount = 0;
     protected $refunded;
     protected $currency;
 
@@ -23,13 +25,23 @@ abstract class PaymentProvider extends ancestor {
     protected $authCode;
     protected $message;
 
+    protected $params = [];
+
     protected abstract function init():void;
+
+    protected abstract function onBeforePayment():void;
+
+    protected abstract function onAfterPayment():void;
 
     protected abstract function pay():void;
 
     protected abstract function check():enumPaymentStatus;
 
-    protected abstract function refund(float $amount):enumPaymentStatus;
+    protected abstract function refund(float $amount, Transaction $transaction):enumPaymentStatus;
+
+    public abstract function callback($data = []):enumPaymentStatus;
+
+    public abstract function sendCallbackResponse($data = []):void;
 
     public abstract function hasRefund():bool;
 
@@ -55,8 +67,9 @@ abstract class PaymentProvider extends ancestor {
         return $this;
     }
 
-    final protected function setResult(string $statusCode, string $authCode, string $message = ''):self
+    final protected function setResult(string $providerTransactionId, string $statusCode, string $authCode, string $message = ''):self
     {
+        $this->providerTransactionId = $providerTransactionId;
         $this->statusCode = $statusCode;
         $this->authCode = $authCode;
         $this->message = $message;
@@ -64,20 +77,24 @@ abstract class PaymentProvider extends ancestor {
         return $this;
     }
 
-    final public function initPayment(int $id, float $amount, string $currency):void
+    final public function initPayment(int $id, float $amount, string $currency, array $params = []):void
     {
         $this->init();
 
         $this->id = $id;
         $this->amount = $amount;
         $this->currency = $currency;
+        $this->params = $params;
         $this->transactionId = $this->generateTransactionId();
+
+        $this->onBeforePayment();
 
         $this->owner->db->sqlQuery(
             $this->owner->db->genSQLUpdate(
                 'payment_transactions',
                 [
                     'pt_transactionid' => $this->transactionId,
+                    'pt_provider_transactionid' => $this->providerTransactionId,
                     'pt_expiry'        => $this->getTimeout(),
                 ],
                 [
@@ -91,7 +108,11 @@ abstract class PaymentProvider extends ancestor {
 
     final public function checkTransaction(Transaction $transaction):Transaction
     {
+        $this->init();
+
         $this->transactionId = $transaction->transactionId;
+        $this->providerTransactionId = $transaction->providerTransactionId;
+
         $status = $this->check();
 
         $this->owner->db->sqlQuery(
@@ -117,6 +138,32 @@ abstract class PaymentProvider extends ancestor {
         return $transaction;
     }
 
+    final public function processCallback(Transaction $transaction, $data = []):void
+    {
+        $this->init();
+
+        $this->transactionId = $transaction->transactionId;
+        $this->providerTransactionId = $transaction->providerTransactionId;
+
+        $status = $this->callback($data);
+
+        $this->owner->db->sqlQuery(
+            $this->owner->db->genSQLUpdate(
+                'payment_transactions',
+                [
+                    'pt_status' => $status->getValue(),
+                    'pt_callback_response' => $data,
+                    'pt_callback_timestamp' => 'NOW()',
+                ],
+                [
+                    'pt_transactionid' => $this->transactionId
+                ]
+            )
+        );
+
+        $this->sendCallbackResponse($data);
+    }
+
     final public function hasRefundError(Transaction $transaction, float $refundAmount)
     {
         if($transaction->getStatus() != enumPaymentStatus::OK()->getValue()){
@@ -125,7 +172,7 @@ abstract class PaymentProvider extends ancestor {
 
         $checkDate = dateAddDays($transaction->created, 1);
         if($checkDate > date('Y-m-d H:i:s')){
-            return PaymentException::REFUND_NOT_ALLOWED_YET;
+            //return PaymentException::REFUND_NOT_ALLOWED_YET;
         }
 
         if($refundAmount > $transaction->amount || $refundAmount == 0) {
@@ -145,7 +192,7 @@ abstract class PaymentProvider extends ancestor {
 
         if(!$this->hasRefundError($transaction, $refundAmount)) {
             $this->transactionId = $transaction->transactionId;
-            $status = $this->refund($refundAmount);
+            $status = $this->refund($refundAmount, $transaction);
 
             if($status->getValue() == enumPaymentStatus::Voided()->getValue() || $status->getValue() == enumPaymentStatus::Pending()->getValue()){
                 $this->owner->db->sqlQuery(
@@ -186,7 +233,7 @@ abstract class PaymentProvider extends ancestor {
 
     protected function generateTransactionId():string
     {
-        return uniqid();
+        return uuid::v4();
     }
 
     protected function saveLog($data, $action, $method = 'rq'):void
@@ -208,6 +255,11 @@ abstract class PaymentProvider extends ancestor {
 
             @file_put_contents( $folderName . '/' . $fileName, $data, FILE_APPEND );
         }
+    }
+
+    protected function getParam(string $key)
+    {
+        return ($this->params[$key] ?: false);
     }
 
 }

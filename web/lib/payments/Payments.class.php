@@ -2,6 +2,7 @@
 class Payments extends ancestor {
     private $providerId;
     private $language;
+    private $params = [];
 
     /**
      * @var PaymentProvider
@@ -50,6 +51,18 @@ class Payments extends ancestor {
         return $this;
     }
 
+    public function addParam(string $key, $value):self
+    {
+        $this->params[$key] = $value;
+
+        return $this;
+    }
+
+    private function getParams():array
+    {
+        return $this->params;
+    }
+
     public function createTransaction(int $cartId, float $amount, string $currency):void
     {
         if(!$this->provider){
@@ -77,7 +90,8 @@ class Payments extends ancestor {
             $this->provider->initPayment(
                 $this->owner->db->getInsertRecordId(),
                 $amount,
-                $currency
+                $currency,
+                $this->getParams()
             );
         }
     }
@@ -88,6 +102,7 @@ class Payments extends ancestor {
             if($transaction = $this->getTransaction($transactionId)) {
                 try {
                     $this->init($transaction->providerId);
+
                     return $this->provider->checkTransaction($transaction);
                 }
                 catch(PaymentException $e){
@@ -96,6 +111,21 @@ class Payments extends ancestor {
         }
 
         return null;
+    }
+
+    public function processCallback(string $transactionId, $data = []):void
+    {
+        if(!Empty($transactionId)){
+            if($transaction = $this->getTransaction($transactionId)) {
+                try {
+                    $this->init($transaction->providerId);
+
+                    $this->provider->processCallback($transaction, $data);
+                }
+                catch(PaymentException $e){
+                }
+            }
+        }
     }
 
     public function hasRefund():bool
@@ -199,6 +229,7 @@ class Payments extends ancestor {
                     'pt_created AS created',
                     'pt_status AS status',
                     'pt_transactionid AS transactionId',
+                    'pt_provider_transactionid AS providerTransactionId',
                     'pt_auth_code AS authCode',
                     'pt_amount AS amount',
                     'pt_currency AS currency',
@@ -228,6 +259,7 @@ class Payments extends ancestor {
                     'pt_created AS created',
                     'pt_status AS status',
                     'pt_transactionid AS transactionId',
+                    'pt_provider_transactionid AS providerTransactionId',
                     'pt_auth_code AS authCode',
                     'pt_amount AS amount',
                     'pt_currency AS currency',
@@ -235,6 +267,7 @@ class Payments extends ancestor {
 
                     'pt_cart_id AS cartId',
                     'cart_key AS cartKey',
+                    'pt_response AS response',
                 ],
                 [
                     'pt_transactionid' => $transactionId,
@@ -264,6 +297,7 @@ class Payments extends ancestor {
                     'pt_created AS created',
                     'pt_status AS status',
                     'pt_transactionid AS transactionId',
+                    'pt_provider_transactionid AS providerTransactionId',
                     'pt_auth_code AS authCode',
                     'pt_amount AS amount',
                     'pt_currency AS currency',

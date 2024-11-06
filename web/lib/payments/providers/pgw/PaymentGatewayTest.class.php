@@ -60,7 +60,7 @@ class PaymentGatewayTest extends PaymentProvider {
         return $status;
     }
 
-    protected function refund(float $amount):enumPaymentStatus
+    protected function refund(float $amount, Transaction $transaction):enumPaymentStatus
     {
         $status = enumPaymentStatus::Pending();
 
@@ -139,5 +139,25 @@ class PaymentGatewayTest extends PaymentProvider {
         }
 
         return $status;
+    }
+
+    protected function onBeforePayment(): void
+    {
+        // TODO: Implement onBeforePayment() method.
+    }
+
+    protected function onAfterPayment(): void
+    {
+        // TODO: Implement onAfterPayment() method.
+    }
+
+    public function callback($data = []): enumPaymentStatus
+    {
+        return enumPaymentStatus::OK();
+    }
+
+    public function sendCallbackResponse($data = []): void
+    {
+        // TODO: Implement sendCallbackResponse() method.
     }
 }

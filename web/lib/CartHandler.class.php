@@ -498,7 +498,11 @@ class CartHandler extends ancestor {
                     $payment = $this->owner->addByClassName('Payments');
 
                     try {
-                        $payment->init($payMode['providerId'])->createTransaction($this->id, $this->total, $this->currency);
+                        $payment->init($payMode['providerId']);
+                        $payment->addParam('customerEmail', $this->userData['contactData']['email']);
+                        $payment->addParam('orderNumber', $this->orderNumber);
+                        $payment->addParam('items', $this->items);
+                        $payment->createTransaction($this->id, $this->total, $this->currency);
                     } catch (PaymentException $e) {
                         die($e->getMessage());
                     }

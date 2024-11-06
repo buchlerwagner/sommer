@@ -3,6 +3,7 @@
 class Transaction {
     public $id;
     public $transactionId;
+    public $providerTransactionId;
     public $providerId;
     public $created;
     public $authCode;
@@ -11,6 +12,7 @@ class Transaction {
     public $message;
     public $cartId;
     public $cartKey;
+    public $response;
 
     private $status;
 
