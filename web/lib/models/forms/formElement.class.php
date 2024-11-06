@@ -118,7 +118,7 @@ abstract class formElement extends formControl {
     }
 
     final public function getPrepend():string{
-        return $this->prepend;
+        return ($this->prepend ?? '');
     }
 
     final public function setAppend($tag){
