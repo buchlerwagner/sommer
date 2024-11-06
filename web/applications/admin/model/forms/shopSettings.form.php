@@ -129,10 +129,12 @@ class shopSettingsForm extends formBuilder {
                 (new inputText('googleSecret', 'LBL_GOOGLE_SECRET'))
                     ->setIcon('far fa-key')
                     ->setName('settings/googleSecret'),
-
                 (new inputText('facebookAppId', 'LBL_FACEBOOK_APP_ID'))
                     ->setIcon('fab fa-facebook')
-                    ->setName('settings/facebookAppId')
+                    ->setName('settings/facebookAppId'),
+                (new inputText('barionPixel', 'LBL_BARION_PIXEL'))
+                    ->setIcon('fas fa-credit-card')
+                    ->setName('settings/barionPixel')
             );
 
         $social = (new sectionBox('social', 'LBL_SOCIAL_MEDIA', 'far fa-share-alt'))
