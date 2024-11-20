@@ -107,7 +107,7 @@ class Barion extends PaymentProvider
         $this->saveResponse(json_encode((array)$paymentDetails));
 
         if (!empty($paymentDetails)) {
-            $this->setResult($paymentDetails->PaymentId, $paymentDetails->Status, $paymentDetails->FundingInformation->AuthorizationCode);
+            $this->setResult($paymentDetails->PaymentId, $paymentDetails->Status, ($paymentDetails->FundingInformation->AuthorizationCode ?? ''));
 
             $status = $this->getStatus($paymentDetails->Status);
         }
