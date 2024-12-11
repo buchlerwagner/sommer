@@ -65,6 +65,8 @@
                         <br>
                         {{ r.customerName }} ({{ r.customerPhone }})
                         <br>
+                        {{ _('LBL_SHIPPING_DATE') }}: {{ r.shippingDate }}
+                        <br>
                         {{ _('LBL_DELIVERY_PLACE') }}: ({{ r.shippingCode }})
 
                         {% if r.shippingStoreName %}
