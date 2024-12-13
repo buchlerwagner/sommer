@@ -119,6 +119,10 @@ class orderForm extends formBuilder {
         }
         if (empty($this->values['shipping'])) {
             $this->addError('ERR_2002', self::FORM_ERROR, ['shipping']);
+        }else{
+            if($this->values['shipping'] == 2 && $this->values['zip'] >= 2000 && strtolower(trim($this->values['city'])) != 'budapest'){
+                $this->addError('ERR_20022', self::FORM_ERROR, ['shipping', 'zip', 'city']);
+            }
         }
         if (empty($this->values['payment'])) {
             $this->addError('ERR_2003', self::FORM_ERROR, ['payment']);
