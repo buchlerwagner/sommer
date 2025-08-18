@@ -10,6 +10,7 @@
     {% endfor %}
 {% endif %}
 
+
 {% if highlightedItems %}
 <section class="services-section highlighted-items"{# style="background-image: url({{ theme }}images/backgrounds/1.jpg);"#}>
     <div class="auto-container">
@@ -17,12 +18,20 @@
             <div class="divider"><img src="{{ theme }}images/icons/divider_1.png" alt=""></div>
             <h2>{{ _('LBL_OUR_HIGHLIGHTED_PRODUCTS') }}</h2>
         </div>
+
+        <div class="mb-5 text-center">
+            <img src="/images/Almodozo.jpg" width="300" alt="" class="mr-4">
+            <img src="/images/Stilusgyakorlat.jpg" width="300" alt="">
+        </div>
+
+
         <div class="services-carousel owl-carousel owl-theme">
             {% for item in highlightedItems %}
                 {{ tools.highlightItem(item) }}
             {% endfor %}
         </div>
     </div>
+
 </section>
 {% endif %}
 
