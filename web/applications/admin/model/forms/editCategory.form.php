@@ -63,6 +63,10 @@ class editCategoryForm extends formBuilder {
                         ->setOptions($this->owner->lists->getDaysOfWeek())
                         ->setColSize('col-6 col-lg-4')
                 ),
+                (new groupRow('row4'))->addElements(
+                    (new inputText('cat_included_dates', 'LBL_ADDITIONAL_DATES'))
+                        ->setColSize('col-12')
+                ),
                 (new inputSwitch('cat_stop_sale', 'LBL_CATEGORY_STOP_SALE', 0))
                     ->setColor(enumColors::Danger())
                     ->changeState(1, enumChangeAction::Disable(), '#cat_limit_sale')
@@ -192,6 +196,20 @@ class editCategoryForm extends formBuilder {
         if(Empty($this->values['cat_date_start'])) $this->values['cat_date_start'] = null;
         if(Empty($this->values['cat_date_end'])) $this->values['cat_date_end'] = null;
 
+        if(!Empty($this->values['cat_included_dates'])){
+            $dates = str_replace([';', '|', ' '], ',', $this->values['cat_included_dates']);
+            $dates = explode(',', $dates);
+            $this->values['cat_included_dates'] = [];
+            foreach ($dates as $date) {
+                $date = standardDate(trim($date));
+                if(!Empty($date) && !in_array($date, $this->values['cat_included_dates']) && $date >= date('Y-m-d')) {
+                    $this->values['cat_included_dates'][] = $date;
+                }
+            }
+
+            $this->values['cat_included_dates'] = json_encode($this->values['cat_included_dates']);
+        }
+
         if($this->values['removeImg']){
             $this->deleteImage();
         }else {
@@ -210,6 +228,11 @@ class editCategoryForm extends formBuilder {
 
         if(Empty($this->values['cat_page_img'])){
             $this->removeControl('removeImg');
+        }
+
+        if(!Empty($this->values['cat_included_dates'])) {
+            $this->values['cat_included_dates'] = json_decode($this->values['cat_included_dates'], true);
+            $this->values['cat_included_dates'] = implode(', ', $this->values['cat_included_dates']);
         }
     }
 
