@@ -1429,7 +1429,11 @@ class CartHandler extends ancestor {
                 if($this->orderDateStart && $this->orderDateEnd){
                     $out[$row['id']]['hasCustomInterval'] = false;
                     $out[$row['id']]['offDates'] = [];
-                    $out[$row['id']]['shippingDate'] = $this->orderDateStart;
+                    if($this->orderDateStart < date('Y-m-d')) {
+                        $out[$row['id']]['shippingDate'] = date('Y-m-d');
+                    }else {
+                        $out[$row['id']]['shippingDate'] = $this->orderDateStart;
+                    }
                     $out[$row['id']]['shippingLastDate'] = $this->orderDateEnd;
                     $out[$row['id']]['saleLimitText'] = $this->saleLimitText;
                 }
@@ -1468,6 +1472,15 @@ class CartHandler extends ancestor {
                     $out[$row['id']]['dayLimits'] = $this->orderDayLimits;
                     $out[$row['id']]['saleLimitText'] = $this->saleLimitText;
                 }
+
+                $out[$row['id']]['firstAvailableDate'] = 'xxx';
+
+                $out[$row['id']]['firstAvailableDate'] = $this->firstAvailableShippingDate(
+                    dateAddDays('now', $row['dayDiff']),
+                    $out[$row['id']]['shippingLastDate'],
+                    $out[$row['id']]['onDates'],
+                    $out[$row['id']]['offDates']
+                );
 
                 $out[$row['id']]['offDates'] = (!Empty($out[$row['id']]['offDates']) ? json_encode($out[$row['id']]['offDates']) : false);
                 $out[$row['id']]['onDates'] = (!Empty($out[$row['id']]['onDates']) ? json_encode($out[$row['id']]['onDates']) : false);
@@ -1886,5 +1899,88 @@ class CartHandler extends ancestor {
             }
         }
     }
+
+    /**
+     * Returns the first available shipping date within [$fromDate, $endDate] (inclusive).
+     *
+     * Rules:
+     * - A day cannot be in $offDates.
+     * - If $this->orderDayLimits is not empty, only those weekdays are allowed (1..7, Mon..Sun),
+     *   UNLESS the date is explicitly in $onDates.
+     * - If a day is in $onDates, it is allowed regardless of $this->orderDayLimits (but still blocked by $offDates).
+     *
+     * @param string|\DateTimeInterface $fromDate
+     * @param string|\DateTimeInterface|null $endDate
+     * @param array $onDates  Array of dates ('Y-m-d') that are explicitly allowed
+     * @param array $offDates Array of dates ('Y-m-d') that are explicitly blocked
+     *
+     * @return string|null Returns date in 'Y-m-d' format, or null if none found.
+     */
+    private function firstAvailableShippingDate($fromDate, $endDate, $onDates = [], $offDates = [])
+    {
+        if (!$endDate) {
+            $endDate = date('Y-m-d', strtotime('+1 year'));
+        }
+
+        $onDates = array_fill_keys(array_map('strval', $onDates), true);
+        $offDates = array_fill_keys(array_map('strval', $offDates), true);
+
+        $orderDayLimits = is_array($this->orderDayLimits ?? null) ? $this->orderDayLimits : [];
+        $orderDayLimits = array_values(array_unique(array_map('intval', $orderDayLimits)));
+        $orderDayLimitsMap = array_fill_keys($orderDayLimits, true);
+        $hasLimits = !empty($orderDayLimitsMap);
+
+        $start = $this->toDateTimeImmutable($fromDate)->setTime(0, 0, 0);
+        $end = $this->toDateTimeImmutable($endDate)->setTime(0, 0, 0);
+
+        if ($start > $end) {
+            return null;
+        }
+
+        for ($cursor = $start; $cursor <= $end; $cursor = $cursor->modify('+1 day')) {
+            $dateString = $cursor->format('Y-m-d');
+
+            // Always blocked if in offDates
+            if (isset($offDates[$dateString])) {
+                continue;
+            }
+
+            // Explicit allow (ignores weekday limits)
+            if (isset($onDates[$dateString])) {
+                return $dateString;
+            }
+
+            // If limits exist, enforce weekday check
+            if ($hasLimits) {
+                $weekday = (int) $cursor->format('N'); // 1..7 (Mon..Sun)
+                if (!isset($orderDayLimitsMap[$weekday])) {
+                    continue;
+                }
+            }
+
+            return $dateString;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string|\DateTimeInterface $value
+     * @return \DateTimeImmutable
+     */
+    private function toDateTimeImmutable($value)
+    {
+        if ($value instanceof \DateTimeImmutable) {
+            return $value;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return (new \DateTimeImmutable($value->format('Y-m-d H:i:s')))->setTimezone($value->getTimezone());
+        }
+
+        // Expecting string: 'Y-m-d' (or any strtotime-compatible format)
+        return new \DateTimeImmutable((string) $value);
+    }
+
 
 }

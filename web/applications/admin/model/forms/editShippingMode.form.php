@@ -76,6 +76,16 @@ class editShippingModeForm extends formBuilder {
                                 ->setAppend('LBL_DAYS')
                         ),
 
+                        (new groupRow('row6'))->addElements(
+                            (new inputText('sm_excluded_dates', 'LBL_EXCLUDED_DATES'))
+                                ->setColSize('col-12')
+                        ),
+
+                        (new groupRow('row7'))->addElements(
+                            (new inputText('sm_included_dates', 'LBL_INCLUDED_DATES'))
+                                ->setColSize('col-12')
+                        ),
+
                         (new inputSwitch('sm_select_date', 'LBL_SHIPPING_CUSTOM_DATE', 0)),
 
                         (new inputSwitch('sm_intervals', 'LBL_SHIPPING_INTERVALS', 0))
@@ -106,6 +116,19 @@ class editShippingModeForm extends formBuilder {
         );
 	}
 
+    public function onAfterInit()
+    {
+        if(!Empty($this->values['sm_excluded_dates'])) {
+            $this->values['sm_excluded_dates'] = json_decode($this->values['sm_excluded_dates'], true);
+            $this->values['sm_excluded_dates'] = implode(', ', $this->values['sm_excluded_dates']);
+        }
+
+        if(!Empty($this->values['sm_included_dates'])) {
+            $this->values['sm_included_dates'] = json_decode($this->values['sm_included_dates'], true);
+            $this->values['sm_included_dates'] = implode(', ', $this->values['sm_included_dates']);
+        }
+    }
+
     public function onBeforeSave() {
         $this->values['sm_shop_id'] = $this->owner->shopId;
         if(Empty($this->values['sm_select_date'])) $this->values['sm_select_date'] = 0;
@@ -115,6 +138,34 @@ class editShippingModeForm extends formBuilder {
         if(Empty($this->values['sm_price'])) $this->values['sm_price'] = 0;
         if(Empty($this->values['sm_free_limit'])) $this->values['sm_free_limit'] = 0;
         if(Empty($this->values['sm_order'])) $this->values['sm_order'] = $this->getMaxOrder();
+
+        if(!Empty($this->values['sm_excluded_dates'])){
+            $dates = str_replace([';', '|', ' '], ',', $this->values['sm_excluded_dates']);
+            $dates = explode(',', $dates);
+            $this->values['sm_excluded_dates'] = [];
+            foreach ($dates as $date) {
+                $date = standardDate(trim($date));
+                if(!Empty($date) && !in_array($date, $this->values['sm_excluded_dates']) && $date >= date('Y-m-d')) {
+                    $this->values['sm_excluded_dates'][] = $date;
+                }
+            }
+
+            $this->values['sm_excluded_dates'] = json_encode($this->values['sm_excluded_dates']);
+        }
+
+        if(!Empty($this->values['sm_included_dates'])){
+            $dates = str_replace([';', '|', ' '], ',', $this->values['sm_included_dates']);
+            $dates = explode(',', $dates);
+            $this->values['sm_included_dates'] = [];
+            foreach ($dates as $date) {
+                $date = standardDate(trim($date));
+                if(!Empty($date) && !in_array($date, $this->values['sm_included_dates']) && $date >= date('Y-m-d')) {
+                    $this->values['sm_included_dates'][] = $date;
+                }
+            }
+
+            $this->values['sm_included_dates'] = json_encode($this->values['sm_included_dates']);
+        }
 
         /*
         if(Empty($this->values['sm_default'])) {
